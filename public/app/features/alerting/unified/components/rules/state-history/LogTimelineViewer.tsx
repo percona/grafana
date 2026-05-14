@@ -1,7 +1,8 @@
-import React from 'react';
+import { memo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { DataFrame, InterpolateFunction, TimeRange } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { VisibilityMode } from '@grafana/schema';
 import { LegendDisplayMode, useTheme2 } from '@grafana/ui';
 import { TimelineChart } from 'app/core/components/TimelineChart/TimelineChart';
@@ -15,7 +16,7 @@ interface LogTimelineViewerProps {
 // noop
 const replaceVariables: InterpolateFunction = (v) => v;
 
-export const LogTimelineViewer = React.memo(({ frames, timeRange }: LogTimelineViewerProps) => {
+export const LogTimelineViewer = memo(({ frames, timeRange }: LogTimelineViewerProps) => {
   const theme = useTheme2();
 
   return (
@@ -38,11 +39,36 @@ export const LogTimelineViewer = React.memo(({ frames, timeRange }: LogTimelineV
             showLegend: true,
           }}
           legendItems={[
-            { label: 'Normal', color: theme.colors.success.main, yAxis: 1 },
-            { label: 'Pending', color: theme.colors.warning.main, yAxis: 1 },
-            { label: 'Alerting', color: theme.colors.error.main, yAxis: 1 },
-            { label: 'NoData', color: theme.colors.info.main, yAxis: 1 },
-            { label: 'Mixed', color: theme.colors.text.secondary, yAxis: 1 },
+            {
+              label: t('alerting.log-timeline-viewer.label.normal', 'Normal'),
+              color: theme.colors.success.main,
+              yAxis: 1,
+            },
+            {
+              label: t('alerting.log-timeline-viewer.label.pending', 'Pending'),
+              color: theme.colors.warning.main,
+              yAxis: 1,
+            },
+            {
+              label: t('alerting.log-timeline-viewer.label.recovering', 'Recovering'),
+              color: theme.colors.warning.main,
+              yAxis: 1,
+            },
+            {
+              label: t('alerting.log-timeline-viewer.label.firing', 'Firing'),
+              color: theme.colors.error.main,
+              yAxis: 1,
+            },
+            {
+              label: t('alerting.log-timeline-viewer.label.no-data', 'No Data'),
+              color: theme.colors.info.main,
+              yAxis: 1,
+            },
+            {
+              label: t('alerting.log-timeline-viewer.label.mixed', 'Mixed'),
+              color: theme.colors.text.secondary,
+              yAxis: 1,
+            },
           ]}
           replaceVariables={replaceVariables}
         />

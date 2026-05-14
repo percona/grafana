@@ -3,94 +3,22 @@ import { Moment } from 'moment';
 
 import { AbstractLabelOperator, AbstractQuery, DateTime, dateTime, TimeRange } from '@grafana/data';
 
+import { escapeLabelValueInExactSelector, escapeLabelValueInRegexSelector } from './escaping';
 import {
-  escapeLabelValueInExactSelector,
-  escapeLabelValueInRegexSelector,
   expandRecordingRules,
   fixSummariesMetadata,
   getPrometheusTime,
   getRangeSnapInterval,
-  parseSelector,
+  removeQuotesIfExist,
   toPromLikeQuery,
   truncateResult,
 } from './language_utils';
 import { PrometheusCacheLevel } from './types';
 
-describe('parseSelector()', () => {
-  let parsed;
-
-  it('returns a clean selector from an empty selector', () => {
-    parsed = parseSelector('{}', 1);
-    expect(parsed.selector).toBe('{}');
-    expect(parsed.labelKeys).toEqual([]);
-  });
-
-  it('returns a clean selector from an unclosed selector', () => {
-    const parsed = parseSelector('{foo');
-    expect(parsed.selector).toBe('{}');
-  });
-
-  it('returns the selector sorted by label key', () => {
-    parsed = parseSelector('{foo="bar"}');
-    expect(parsed.selector).toBe('{foo="bar"}');
-    expect(parsed.labelKeys).toEqual(['foo']);
-
-    parsed = parseSelector('{foo="bar",baz="xx"}');
-    expect(parsed.selector).toBe('{baz="xx",foo="bar"}');
-  });
-
-  it('returns a clean selector from an incomplete one', () => {
-    parsed = parseSelector('{foo}');
-    expect(parsed.selector).toBe('{}');
-
-    parsed = parseSelector('{foo="bar",baz}');
-    expect(parsed.selector).toBe('{foo="bar"}');
-
-    parsed = parseSelector('{foo="bar",baz="}');
-    expect(parsed.selector).toBe('{foo="bar"}');
-
-    // Cursor in value area counts as incomplete
-    parsed = parseSelector('{foo="bar",baz=""}', 16);
-    expect(parsed.selector).toBe('{foo="bar"}');
-
-    parsed = parseSelector('{foo="bar",baz="4"}', 17);
-    expect(parsed.selector).toBe('{foo="bar"}');
-  });
-
-  it('throws if not inside a selector', () => {
-    expect(() => parseSelector('foo{}', 0)).toThrow();
-    expect(() => parseSelector('foo{} + bar{}', 5)).toThrow();
-  });
-
-  it('returns the selector nearest to the cursor offset', () => {
-    expect(() => parseSelector('{foo="bar"} + {foo="bar"}', 0)).toThrow();
-
-    parsed = parseSelector('{foo="bar"} + {foo="bar"}', 1);
-    expect(parsed.selector).toBe('{foo="bar"}');
-
-    parsed = parseSelector('{foo="bar"} + {baz="xx"}', 1);
-    expect(parsed.selector).toBe('{foo="bar"}');
-
-    parsed = parseSelector('{baz="xx"} + {foo="bar"}', 16);
-    expect(parsed.selector).toBe('{foo="bar"}');
-  });
-
-  it('returns a selector with metric if metric is given', () => {
-    parsed = parseSelector('bar{foo}', 4);
-    expect(parsed.selector).toBe('{__name__="bar"}');
-
-    parsed = parseSelector('baz{foo="bar"}', 13);
-    expect(parsed.selector).toBe('{__name__="baz",foo="bar"}');
-
-    parsed = parseSelector('bar:metric:1m{}', 14);
-    expect(parsed.selector).toBe('{__name__="bar:metric:1m"}');
-  });
-});
-
 describe('fixSummariesMetadata', () => {
   const synthetics = {
     ALERTS: {
-      type: 'counter',
+      type: 'gauge',
       help: 'Time series showing pending and firing alerts. The sample value is set to 1 as long as the alert is in the indicated active (pending or firing) state.',
     },
   };
@@ -153,52 +81,65 @@ describe('expandRecordingRules()', () => {
   });
 
   it('does not modify recording rules name in label values', () => {
-    expect(expandRecordingRules('{__name__="metric"} + bar', { metric: 'foo', bar: 'super' })).toBe(
-      '{__name__="metric"} + super'
-    );
+    expect(
+      expandRecordingRules('{__name__="metric"} + bar', {
+        metric: { expandedQuery: 'foo' },
+        bar: { expandedQuery: 'super' },
+      })
+    ).toBe('{__name__="metric"} + super');
   });
 
   it('returns query with expanded recording rules', () => {
-    expect(expandRecordingRules('metric', { metric: 'foo' })).toBe('foo');
-    expect(expandRecordingRules('metric + metric', { metric: 'foo' })).toBe('foo + foo');
-    expect(expandRecordingRules('metric{}', { metric: 'foo' })).toBe('foo{}');
-    expect(expandRecordingRules('metric[]', { metric: 'foo' })).toBe('foo[]');
-    expect(expandRecordingRules('metric + foo', { metric: 'foo', foo: 'bar' })).toBe('foo + bar');
+    expect(expandRecordingRules('metric', { metric: { expandedQuery: 'foo' } })).toBe('foo');
+    expect(expandRecordingRules('metric + metric', { metric: { expandedQuery: 'foo' } })).toBe('foo + foo');
+    expect(expandRecordingRules('metric{}', { metric: { expandedQuery: 'foo' } })).toBe('foo{}');
+    expect(expandRecordingRules('metric[]', { metric: { expandedQuery: 'foo' } })).toBe('foo[]');
+    expect(
+      expandRecordingRules('metric + foo', {
+        metric: { expandedQuery: 'foo' },
+        foo: { expandedQuery: 'bar' },
+      })
+    ).toBe('foo + bar');
   });
 
   it('returns query with labels with expanded recording rules', () => {
     expect(
-      expandRecordingRules('metricA{label1="value1"} / metricB{label2="value2"}', { metricA: 'fooA', metricB: 'fooB' })
+      expandRecordingRules('metricA{label1="value1"} / metricB{label2="value2"}', {
+        metricA: { expandedQuery: 'fooA' },
+        metricB: { expandedQuery: 'fooB' },
+      })
     ).toBe('fooA{label1="value1"} / fooB{label2="value2"}');
     expect(
       expandRecordingRules('metricA{label1="value1",label2="value,2"}', {
-        metricA: 'rate(fooA[])',
+        metricA: { expandedQuery: 'rate(fooA[])' },
       })
     ).toBe('rate(fooA{label1="value1", label2="value,2"}[])');
     expect(
       expandRecordingRules('metricA{label1="value1"} / metricB{label2="value2"}', {
-        metricA: 'rate(fooA[])',
-        metricB: 'rate(fooB[])',
+        metricA: { expandedQuery: 'rate(fooA[])' },
+        metricB: { expandedQuery: 'rate(fooB[])' },
       })
     ).toBe('rate(fooA{label1="value1"}[]) / rate(fooB{label2="value2"}[])');
     expect(
       expandRecordingRules('metricA{label1="value1",label2="value2"} / metricB{label3="value3"}', {
-        metricA: 'rate(fooA[])',
-        metricB: 'rate(fooB[])',
+        metricA: { expandedQuery: 'rate(fooA[])' },
+        metricB: { expandedQuery: 'rate(fooB[])' },
       })
     ).toBe('rate(fooA{label1="value1", label2="value2"}[]) / rate(fooB{label3="value3"}[])');
   });
 
   it('expands the query even it is wrapped with parentheses', () => {
     expect(
-      expandRecordingRules('sum (metric{label1="value1"}) by (env)', { metric: 'foo{labelInside="valueInside"}' })
+      expandRecordingRules('sum (metric{label1="value1"}) by (env)', {
+        metric: { expandedQuery: 'foo{labelInside="valueInside"}' },
+      })
     ).toBe('sum (foo{labelInside="valueInside", label1="value1"}) by (env)');
   });
 
   it('expands the query with regex match', () => {
     expect(
       expandRecordingRules('sum (metric{label1=~"/value1/(sa|sb)"}) by (env)', {
-        metric: 'foo{labelInside="valueInside"}',
+        metric: { expandedQuery: 'foo{labelInside="valueInside"}' },
       })
     ).toBe('sum (foo{labelInside="valueInside", label1=~"/value1/(sa|sb)"}) by (env)');
   });
@@ -206,11 +147,58 @@ describe('expandRecordingRules()', () => {
   it('ins:metric:per{pid="val-42", comp="api"}', () => {
     const query = `aaa:111{pid="val-42", comp="api"} + bbb:222{pid="val-42"}`;
     const mapping = {
-      'aaa:111':
-        '(max without (mp) (targetMetric{device=~"/dev/(sda1|sdb)"}) / max without (mp) (targetMetric2{device=~"/dev/(sda1|sdb)"}))',
-      'bbb:222': '(targetMetric2{device=~"/dev/(sda1|sdb)"})',
+      'aaa:111': {
+        expandedQuery:
+          '(max without (mp) (targetMetric{device=~"/dev/(sda1|sdb)"}) / max without (mp) (targetMetric2{device=~"/dev/(sda1|sdb)"}))',
+      },
+      'bbb:222': { expandedQuery: '(targetMetric2{device=~"/dev/(sda1|sdb)"})' },
     };
     const expected = `(max without (mp) (targetMetric{device=~"/dev/(sda1|sdb)", pid="val-42", comp="api"}) / max without (mp) (targetMetric2{device=~"/dev/(sda1|sdb)", pid="val-42", comp="api"})) + (targetMetric2{device=~"/dev/(sda1|sdb)", pid="val-42"})`;
+    const result = expandRecordingRules(query, mapping);
+    expect(result).toBe(expected);
+  });
+
+  it('when there is an identifier, identifier must be removed from expanded query', () => {
+    const query = `ins:metric:per{uuid="111", comp="api"}`;
+    const mapping = {
+      'ins:metric:per': {
+        expandedQuery: 'targetMetric{device="some_device"}',
+        identifier: 'uuid',
+        identifierValue: '111',
+      },
+    };
+    const expected = `targetMetric{device="some_device", comp="api"}`;
+    const result = expandRecordingRules(query, mapping);
+    expect(result).toBe(expected);
+  });
+
+  it('when there is an identifier, identifier must be removed from complex expanded query', () => {
+    const query = `instance_path:requests:rate5m{uuid="111", four="tops"} + instance_path:requests:rate15m{second="album", uuid="222"}`;
+    const mapping = {
+      'instance_path:requests:rate5m': {
+        expandedQuery: `rate(prometheus_http_requests_total{job="prometheus"}`,
+        identifier: 'uuid',
+        identifierValue: '111',
+      },
+      'instance_path:requests:rate15m': {
+        expandedQuery: `prom_http_requests_sum{job="prometheus"}`,
+        identifier: 'uuid',
+        identifierValue: '222',
+      },
+    };
+    const expected = `rate(prometheus_http_requests_total{job="prometheus", four="tops"} + prom_http_requests_sum{job="prometheus", second="album"}`;
+    const result = expandRecordingRules(query, mapping);
+    expect(result).toBe(expected);
+  });
+
+  it('when there is an empty label value it should still be able to expand the rule', () => {
+    const query = `sum(max by (cluster, container) (pod_cpu:active:kube_limits{container!="", cluster=~"pink"}))`;
+    const mapping = {
+      'pod_cpu:active:kube_limits': {
+        expandedQuery: `kube_limits{job!="", resource="cpu"} * on (namespace, pod, cluster) group_left () max by (namespace, pod, cluster) ((kube_pod_status_phase{phase=~"Pending|Running"} == 1))`,
+      },
+    };
+    const expected = `sum(max by (cluster, container) (kube_limits{job!="", resource="cpu", container!="", cluster=~"pink"} * on (namespace, pod, cluster) group_left () max by (namespace, pod, cluster) ((kube_pod_status_phase{phase=~"Pending|Running", container!="", cluster=~"pink"} == 1))))`;
     const result = expandRecordingRules(query, mapping);
     expect(result).toBe(expected);
   });
@@ -515,5 +503,61 @@ describe('truncateResult', () => {
     expect(array.length).toBe(1000);
     expect(array[0]).toBe(0);
     expect(array[999]).toBe(999);
+  });
+});
+
+describe('removeQuotesIfExist', () => {
+  it('removes quotes from a string with double quotes', () => {
+    const input = '"hello"';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('hello');
+  });
+
+  it('returns the original string if it does not start and end with quotes', () => {
+    const input = 'hello';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('hello');
+  });
+
+  it('returns the original string if it has mismatched quotes', () => {
+    const input = '"hello';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('"hello');
+  });
+
+  it('removes quotes for strings with special characters inside quotes', () => {
+    const input = '"hello, world!"';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('hello, world!');
+  });
+
+  it('removes quotes for strings with spaces inside quotes', () => {
+    const input = '"   "';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('   ');
+  });
+
+  it('returns the original string for an empty string', () => {
+    const input = '';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('');
+  });
+
+  it('returns the original string if the string only has a single quote character', () => {
+    const input = '"';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('"');
+  });
+
+  it('handles strings with nested quotes correctly', () => {
+    const input = '"nested \"quotes\""';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('nested \"quotes\"');
+  });
+
+  it('removes quotes from a numeric string wrapped in quotes', () => {
+    const input = '"12345"';
+    const result = removeQuotesIfExist(input);
+    expect(result).toBe('12345');
   });
 });

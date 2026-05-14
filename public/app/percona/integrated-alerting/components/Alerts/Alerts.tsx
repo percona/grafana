@@ -4,7 +4,9 @@ import { format } from 'date-fns';
 import React, { FC, useCallback } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
-import { Icon, LinkButton, useStyles2 } from '@grafana/ui';
+import { OrgRole } from '@grafana/data';
+import { config } from '@grafana/runtime';
+import { LinkButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { alertmanagerApi } from 'app/features/alerting/unified/api/alertmanagerApi';
@@ -13,6 +15,7 @@ import { makeLabelBasedSilenceLink } from 'app/features/alerting/unified/utils/m
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { isViewer } from 'app/percona/shared/helpers/permissions';
 import { AlertmanagerAlert, AlertState } from 'app/plugins/datasource/alertmanager/types';
 
 import { Table } from '../../../shared/components/Elements/Table/Table';
@@ -23,6 +26,7 @@ import { AlertDetails } from './AlertDetails/AlertDetails';
 import { ACTIONS_COLUMN, DATA_INTERVAL, SILENCES_URL } from './Alerts.constants';
 import { Messages as AlertMessages } from './Alerts.messages';
 import { getStyles } from './Alerts.styles';
+import { AlertsEmptyState } from './AlertsEmptyState';
 
 const {
   table: { columns },
@@ -107,6 +111,8 @@ export const Alerts: FC = () => {
             row={row}
             value={
               <LinkButton
+                data-testid={`silence-alert-row-${row.index}`}
+                disabled={isViewer(config.bootData.user)}
                 href={
                   row.original.status.state === AlertState.Suppressed
                     ? SILENCES_URL
@@ -154,18 +160,18 @@ export const Alerts: FC = () => {
   return (
     <Page navModel={navModel}>
       <Page.Contents>
-        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
+        <FeatureLoader
+          featureName={Messages.alerting}
+          featureSelector={featureSelector}
+          allowedRoles={[OrgRole.Admin, OrgRole.Editor, OrgRole.Viewer]}
+        >
           <Table
             totalItems={alertManagerAlerts.length}
             data={alertManagerAlerts || []}
             columns={columns}
             pendingRequest={amAlertsIsLoading}
             autoResetExpanded={false}
-            emptyMessage={
-              <h1>
-                <Icon name="check-circle" size="xxl" /> No alerts detected
-              </h1>
-            }
+            emptyMessage={<AlertsEmptyState />}
             getCellProps={getCellProps}
             renderExpandedRow={renderSelectedSubRow}
           />

@@ -8,6 +8,7 @@ export interface NodePayload {
   region?: string;
   az?: string;
   custom_labels?: Record<string, string>;
+  is_pmm_server_node: boolean;
   agents?: DbAgent[];
 }
 export interface GenericNodePayload extends NodePayload {

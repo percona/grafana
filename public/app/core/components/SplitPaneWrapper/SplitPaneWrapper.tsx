@@ -1,10 +1,11 @@
 import { css, cx } from '@emotion/css';
-import React, { createRef, MutableRefObject, PureComponent } from 'react';
+import { createRef, MutableRefObject, PureComponent } from 'react';
+import * as React from 'react';
 import SplitPane, { Split } from 'react-split-pane';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { getDragStyles } from '@grafana/ui';
-import { config } from 'app/core/config';
 
 interface Props {
   splitOrientation?: Split;

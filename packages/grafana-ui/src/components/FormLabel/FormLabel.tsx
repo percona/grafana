@@ -1,8 +1,9 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import { Icon } from '../Icon/Icon';
-import { Tooltip, PopoverContent } from '../Tooltip';
+import { Tooltip } from '../Tooltip/Tooltip';
+import { PopoverContent } from '../Tooltip/types';
 
 interface Props {
   children: ReactNode;

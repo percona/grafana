@@ -1,11 +1,10 @@
 import { render } from '@testing-library/react';
-import React from 'react';
 
 const mockPushMeasurement = jest.fn();
 
 import { PanelLoadTimeMonitor } from './PanelLoadTimeMonitor';
 
-jest.mock('app/core/config', () => ({
+jest.mock('@grafana/runtime', () => ({
   config: {
     grafanaJavascriptAgent: {
       enabled: true,

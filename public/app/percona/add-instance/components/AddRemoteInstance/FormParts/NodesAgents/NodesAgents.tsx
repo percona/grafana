@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo } from 'react';
 import { useField } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
@@ -20,7 +20,7 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const styles = useStyles2(getStyles);
@@ -77,7 +77,10 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
       loadData();
     } else if (!selectedNode) {
       // preselect pmm-server node
-      const pmmServerNode = nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID);
+      const pmmServerNode =
+        nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID) ||
+        nodesOptions.find((node) => node.isPMMServerNode);
+
       if (pmmServerNode) {
         setNodeAndAgent(pmmServerNode);
       }

@@ -3,17 +3,15 @@ package database
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/dashboards"
-	"github.com/grafana/grafana/pkg/services/dashboards/dashboardaccess"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
-	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/publicdashboards"
 	. "github.com/grafana/grafana/pkg/services/publicdashboards/models"
-	"github.com/grafana/grafana/pkg/services/sqlstore"
-	"github.com/grafana/grafana/pkg/services/sqlstore/searchstore"
 	"github.com/grafana/grafana/pkg/setting"
 )
 
@@ -43,7 +41,7 @@ func ProvideStore(sqlStore db.DB, cfg *setting.Cfg, features featuremgmt.Feature
 }
 
 // FindAllWithPagination Returns a list of public dashboards by orgId, based on permissions and with pagination
-func (d *PublicDashboardStoreImpl) FindAllWithPagination(ctx context.Context, query *PublicDashboardListQuery) (*PublicDashboardListResponseWithPagination, error) {
+func (d *PublicDashboardStoreImpl) FindAll(ctx context.Context, query *PublicDashboardListQuery) (*PublicDashboardListResponseWithPagination, error) {
 	resp := &PublicDashboardListResponseWithPagination{
 		PublicDashboards: make([]*PublicDashboardListResponse, 0),
 		TotalCount:       0,
@@ -55,24 +53,14 @@ func (d *PublicDashboardStoreImpl) FindAllWithPagination(ctx context.Context, qu
 	}
 
 	pubdashBuilder := db.NewSqlBuilder(d.cfg, d.features, d.sqlStore.GetDialect(), recursiveQueriesAreSupported)
-	pubdashBuilder.Write("SELECT dashboard_public.uid, dashboard_public.access_token, dashboard.uid as dashboard_uid, dashboard_public.is_enabled, dashboard.title, dashboard.slug")
+	pubdashBuilder.Write("SELECT uid, access_token, dashboard_uid, is_enabled")
 	pubdashBuilder.Write(" FROM dashboard_public")
-	pubdashBuilder.Write(" JOIN dashboard ON dashboard.uid = dashboard_public.dashboard_uid AND dashboard.org_id = dashboard_public.org_id")
-	pubdashBuilder.Write(` WHERE dashboard_public.org_id = ?`, query.OrgID)
-	if query.User.OrgRole != org.RoleAdmin {
-		pubdashBuilder.WriteDashboardPermissionFilter(query.User, dashboardaccess.PERMISSION_VIEW, searchstore.TypeDashboard)
-	}
-	pubdashBuilder.Write(" ORDER BY dashboard.title")
-	pubdashBuilder.Write(d.sqlStore.GetDialect().LimitOffset(int64(query.Limit), int64(query.Offset)))
+	pubdashBuilder.Write(` WHERE org_id = ?`, query.OrgID)
 
 	counterBuilder := db.NewSqlBuilder(d.cfg, d.features, d.sqlStore.GetDialect(), recursiveQueriesAreSupported)
 	counterBuilder.Write("SELECT COUNT(*)")
 	counterBuilder.Write(" FROM dashboard_public")
-	counterBuilder.Write(" JOIN dashboard ON dashboard.uid = dashboard_public.dashboard_uid AND dashboard.org_id = dashboard_public.org_id")
-	counterBuilder.Write(` WHERE dashboard_public.org_id = ?`, query.OrgID)
-	if query.User.OrgRole != org.RoleAdmin {
-		counterBuilder.WriteDashboardPermissionFilter(query.User, dashboardaccess.PERMISSION_VIEW, searchstore.TypeDashboard)
-	}
+	counterBuilder.Write(` WHERE org_id = ?`, query.OrgID)
 
 	err = d.sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		err := sess.SQL(pubdashBuilder.GetSQLString(), pubdashBuilder.GetParams()...).Find(&resp.PublicDashboards)
@@ -102,6 +90,31 @@ func (d *PublicDashboardStoreImpl) Find(ctx context.Context, uid string) (*Publi
 	err := d.sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		var err error
 		found, err = sess.Get(publicDashboard)
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !found {
+		return nil, nil
+	}
+
+	return publicDashboard, nil
+}
+
+// FindByOrgAndUid Returns public dashboard by org and uid or nil if not found
+func (d *PublicDashboardStoreImpl) FindByOrgAndUid(ctx context.Context, orgId int64, uid string) (*PublicDashboard, error) {
+	if uid == "" {
+		return nil, nil
+	}
+
+	var found bool
+	publicDashboard := &PublicDashboard{}
+	err := d.sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
+		var err error
+		found, err = sess.Where("uid = ? AND org_id = ?", uid, orgId).Get(publicDashboard)
 		return err
 	})
 
@@ -170,12 +183,12 @@ func (d *PublicDashboardStoreImpl) FindByDashboardUid(ctx context.Context, orgId
 }
 
 // ExistsEnabledByDashboardUid Responds true if there is an enabled public dashboard for a dashboard uid
-func (d *PublicDashboardStoreImpl) ExistsEnabledByDashboardUid(ctx context.Context, dashboardUid string) (bool, error) {
+func (d *PublicDashboardStoreImpl) ExistsEnabledByDashboardUid(ctx context.Context, orgId int64, dashboardUid string) (bool, error) {
 	hasPublicDashboard := false
 	err := d.sqlStore.WithDbSession(ctx, func(dbSession *db.Session) error {
-		sql := "SELECT COUNT(*) FROM dashboard_public WHERE dashboard_uid=? AND is_enabled=true"
+		sql := "SELECT COUNT(*) FROM dashboard_public WHERE org_id=? AND dashboard_uid=? AND is_enabled=true"
 
-		result, err := dbSession.SQL(sql, dashboardUid).Count()
+		result, err := dbSession.SQL(sql, orgId, dashboardUid).Count()
 		if err != nil {
 			return err
 		}
@@ -247,15 +260,16 @@ func (d *PublicDashboardStoreImpl) Update(ctx context.Context, cmd SavePublicDas
 			return err
 		}
 
-		sqlResult, err := sess.Exec("UPDATE dashboard_public SET is_enabled = ?, annotations_enabled = ?, time_selection_enabled = ?, share = ?, time_settings = ?, updated_by = ?, updated_at = ? WHERE uid = ?",
+		sqlResult, err := sess.Exec("UPDATE dashboard_public SET is_enabled = ?, annotations_enabled = ?, time_selection_enabled = ?, share = ?, time_settings = ?, updated_by = ?, updated_at = ? WHERE uid = ? AND org_id = ?",
 			cmd.PublicDashboard.IsEnabled,
 			cmd.PublicDashboard.AnnotationsEnabled,
 			cmd.PublicDashboard.TimeSelectionEnabled,
 			cmd.PublicDashboard.Share,
 			string(timeSettingsJSON),
 			cmd.PublicDashboard.UpdatedBy,
-			cmd.PublicDashboard.UpdatedAt.UTC().Format("2006-01-02 15:04:05"),
-			cmd.PublicDashboard.Uid)
+			cmd.PublicDashboard.UpdatedAt.UTC(),
+			cmd.PublicDashboard.Uid,
+			cmd.PublicDashboard.OrgId)
 
 		if err != nil {
 			return err
@@ -269,13 +283,16 @@ func (d *PublicDashboardStoreImpl) Update(ctx context.Context, cmd SavePublicDas
 	return affectedRows, err
 }
 
-// Deletes a public dashboard
-func (d *PublicDashboardStoreImpl) Delete(ctx context.Context, uid string) (int64, error) {
-	dashboard := &PublicDashboard{Uid: uid}
+// Delete deletes a public dashboard
+func (d *PublicDashboardStoreImpl) Delete(ctx context.Context, orgId int64, uid string) (int64, error) {
 	var affectedRows int64
 	err := d.sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
-		var err error
-		affectedRows, err = sess.Delete(dashboard)
+		sqlResult, err := sess.Exec("DELETE FROM dashboard_public WHERE uid = ? AND org_id = ?", uid, orgId)
+		if err != nil {
+			return err
+		}
+
+		affectedRows, err = sqlResult.RowsAffected()
 
 		return err
 	})
@@ -283,17 +300,28 @@ func (d *PublicDashboardStoreImpl) Delete(ctx context.Context, uid string) (int6
 	return affectedRows, err
 }
 
-func (d *PublicDashboardStoreImpl) FindByFolder(ctx context.Context, orgId int64, folderUid string) ([]*PublicDashboard, error) {
-	var pubdashes []*PublicDashboard
-
-	err := d.sqlStore.WithDbSession(ctx, func(sess *sqlstore.DBSession) error {
-		return sess.SQL("SELECT * from dashboard_public WHERE (dashboard_uid, org_id) IN (SELECT uid, org_id FROM dashboard WHERE org_id = ? AND folder_uid = ?)", orgId, folderUid).Find(&pubdashes)
-	})
-	if err != nil {
-		return nil, err
+// DeleteByDashboardUIDs deletes public dashboards by dashboard uids
+func (d *PublicDashboardStoreImpl) DeleteByDashboardUIDs(ctx context.Context, orgId int64, dashboardUIDs []string) error {
+	if len(dashboardUIDs) == 0 {
+		return nil
 	}
 
-	return pubdashes, nil
+	return d.sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
+		s := strings.Builder{}
+		s.WriteString("DELETE FROM dashboard_public WHERE org_id = ? AND ")
+		s.WriteString(fmt.Sprintf("dashboard_uid IN (%s)", strings.Repeat("?,", len(dashboardUIDs)-1)+"?"))
+		sql := s.String()
+		args := make([]any, 0, len(dashboardUIDs)+2)
+		args = append(args, sql)
+		args = append(args, orgId)
+		for _, dashboardUID := range dashboardUIDs {
+			args = append(args, dashboardUID)
+		}
+
+		_, err := sess.Exec(args...)
+
+		return err
+	})
 }
 
 func (d *PublicDashboardStoreImpl) GetMetrics(ctx context.Context) (*Metrics, error) {

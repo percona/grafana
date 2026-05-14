@@ -19,15 +19,18 @@ import {
   DataLinkPostProcessor,
   ExploreUrlState,
   urlUtil,
+  DataFrameType,
 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { getTemplateSrv, reportInteraction, VariableInterpolation } from '@grafana/runtime';
 import { DataQuery } from '@grafana/schema';
 import { contextSrv } from 'app/core/services/context_srv';
 import { getTransformationVars } from 'app/features/correlations/transformations';
+import { parseDataplaneLogsFrame } from 'app/features/logs/logsFrame';
 import { ExploreItemState } from 'app/types/explore';
 
 import { getLinkSrv } from '../../panel/panellinks/link_srv';
-import { getUrlStateFromPaneState } from '../hooks/useStateSync';
+import { getUrlStateFromPaneState } from '../hooks/useStateSync/external.utils';
 
 type DataLinkFilter = (link: DataLink, scopedVars: ScopedVars) => boolean;
 
@@ -49,7 +52,7 @@ const DATA_LINK_FILTERS: DataLinkFilter[] = [dataLinkHasRequiredPermissionsFilte
  * for internal links and undefined for non-internal links
  */
 export interface ExploreFieldLinkModel extends LinkModel<Field> {
-  variables?: VariableInterpolation[];
+  variables: VariableInterpolation[];
 }
 
 const DATA_LINK_USAGE_KEY = 'grafana_data_link_clicked';
@@ -65,7 +68,7 @@ export const exploreDataLinkPostProcessorFactory = (
     const { field, dataLinkScopedVars: vars, frame: dataFrame, link, linkModel } = options;
     const { valueRowIndex: rowIndex } = options.config;
 
-    if (!link.internal || rowIndex === undefined) {
+    if (rowIndex === undefined) {
       return linkModel;
     }
 
@@ -116,7 +119,7 @@ export const getFieldLinksForExplore = (options: {
     value: {
       raw: field.values[rowIndex],
     },
-    text: 'Raw value',
+    text: t('explore.get-field-links-for-explore.text.raw-value', 'Raw value'),
   };
 
   let fieldDisplayValuesProxy: Record<string, DisplayValue> | undefined = undefined;
@@ -134,8 +137,20 @@ export const getFieldLinksForExplore = (options: {
         refId: dataFrame.refId,
         fields: fieldDisplayValuesProxy,
       },
-      text: 'Data',
+      text: t('explore.get-field-links-for-explore.text.data', 'Data'),
     };
+
+    if (dataFrame.meta?.type === DataFrameType.LogLines) {
+      const dataPlane = parseDataplaneLogsFrame(dataFrame);
+      const labels = dataPlane?.getLogFrameLabels();
+      if (labels != null) {
+        Object.entries(labels[rowIndex]).forEach((value) => {
+          scopedVars[value[0]] = {
+            value: value[1],
+          };
+        });
+      }
+    }
 
     dataFrame.fields.forEach((f) => {
       if (fieldDisplayValuesProxy && fieldDisplayValuesProxy[f.name]) {
@@ -159,57 +174,57 @@ export const getFieldLinksForExplore = (options: {
     });
 
     const fieldLinks = links.map((link) => {
-      if (!link.internal) {
-        const replace: InterpolateFunction = (value, vars) =>
-          getTemplateSrv().replace(value, { ...vars, ...scopedVars });
+      let internalLinkSpecificVars: ScopedVars = {};
+      if (link.meta?.transformations) {
+        link.meta?.transformations.forEach((transformation) => {
+          let fieldValue;
+          if (transformation.field) {
+            const transformField = dataFrame?.fields.find((field) => field.name === transformation.field);
+            fieldValue = transformField?.values[rowIndex];
+          } else {
+            fieldValue = field.values[rowIndex];
+          }
 
-        const linkModel = getLinkSrv().getDataLinkUIModel(link, replace, field);
-        if (!linkModel.title) {
-          linkModel.title = getTitleFromHref(linkModel.href);
-        }
-        return linkModel;
+          internalLinkSpecificVars = {
+            ...internalLinkSpecificVars,
+            ...getTransformationVars(transformation, fieldValue, field.name),
+          };
+        });
+      }
+
+      const allVars = { ...scopedVars, ...internalLinkSpecificVars };
+      const variableData = getVariableUsageInfo(link, allVars);
+      let variables: VariableInterpolation[] = [];
+
+      // if the link has no variables (static link), add it with the right key but an empty value so we know what field the static link is associated with
+      if (variableData.variables.length === 0) {
+        const fieldName = field.name.toString();
+        variables.push({ variableName: fieldName, value: '', match: '' });
       } else {
-        let internalLinkSpecificVars: ScopedVars = {};
-        if (link.internal?.transformations) {
-          link.internal?.transformations.forEach((transformation) => {
-            let fieldValue;
-            if (transformation.field) {
-              const transformField = dataFrame?.fields.find((field) => field.name === transformation.field);
-              fieldValue = transformField?.values[rowIndex];
-            } else {
-              fieldValue = field.values[rowIndex];
-            }
+        variables = variableData.variables;
+      }
+      if (variableData.allVariablesDefined) {
+        if (!link.internal) {
+          const replace: InterpolateFunction = (value, vars) =>
+            getTemplateSrv().replace(value, { ...vars, ...allVars, ...scopedVars });
 
-            internalLinkSpecificVars = {
-              ...internalLinkSpecificVars,
-              ...getTransformationVars(transformation, fieldValue, field.name),
-            };
-          });
-        }
-
-        const allVars = { ...scopedVars, ...internalLinkSpecificVars };
-        const variableData = getVariableUsageInfo(link, allVars);
-        let variables: VariableInterpolation[] = [];
-
-        // if the link has no variables (static link), add it with the right key but an empty value so we know what field the static link is associated with
-        if (variableData.variables.length === 0) {
-          const fieldName = field.name.toString();
-          variables.push({ variableName: fieldName, value: '', match: '' });
+          const linkModel = getLinkSrv().getDataLinkUIModel(link, replace, field);
+          if (!linkModel.title) {
+            linkModel.title = getTitleFromHref(linkModel.href);
+          }
+          linkModel.target = linkModel.target ?? '_blank';
+          return { ...linkModel, variables: variables };
         } else {
-          variables = variableData.variables;
-        }
+          const splitFnWithTracking = (options?: SplitOpenOptions<DataQuery>) => {
+            reportInteraction(DATA_LINK_USAGE_KEY, {
+              origin: link.origin || DataLinkConfigOrigin.Datasource,
+              app: CoreApp.Explore,
+              internal: true,
+            });
 
-        const splitFnWithTracking = (options?: SplitOpenOptions<DataQuery>) => {
-          reportInteraction(DATA_LINK_USAGE_KEY, {
-            origin: link.origin || DataLinkConfigOrigin.Datasource,
-            app: CoreApp.Explore,
-            internal: true,
-          });
+            splitOpenFn?.(options);
+          };
 
-          splitOpenFn?.(options);
-        };
-
-        if (variableData.allVariablesDefined) {
           const internalLink = mapInternalLinkToExplore({
             link,
             internalLink: link.internal,
@@ -221,9 +236,9 @@ export const getFieldLinksForExplore = (options: {
             replaceVariables: getTemplateSrv().replace.bind(getTemplateSrv()),
           });
           return { ...internalLink, variables: variables };
-        } else {
-          return undefined;
         }
+      } else {
+        return undefined;
       }
     });
     return fieldLinks.filter((link): link is ExploreFieldLinkModel => !!link);

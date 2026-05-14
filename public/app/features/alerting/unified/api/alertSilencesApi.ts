@@ -1,5 +1,5 @@
 import { AppEvents } from '@grafana/data';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Silence, SilenceCreatePayload } from 'app/plugins/datasource/alertmanager/types';
 
 import { alertingApi } from './alertingApi';
@@ -26,8 +26,14 @@ export const alertSilencesApi = alertingApi.injectEndpoints({
           accesscontrol: accessControl,
         },
       }),
-      providesTags: (result) =>
-        result ? result.map(({ id }) => ({ type: 'AlertmanagerSilences', id })) : ['AlertmanagerSilences'],
+      providesTags: (result) => {
+        return result
+          ? [
+              ...result.map(({ id }) => ({ type: 'AlertmanagerSilences' as const, id })),
+              { type: 'AlertmanagerSilences' },
+            ]
+          : [{ type: 'AlertmanagerSilences' }];
+      },
     }),
 
     getSilence: build.query<

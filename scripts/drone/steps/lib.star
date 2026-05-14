@@ -3,6 +3,11 @@ This module is a library of Drone steps and other pipeline components.
 """
 
 load(
+    "scripts/drone/steps/github.star",
+    "github_app_generate_token_step",
+    "github_app_step_volumes",
+)
+load(
     "scripts/drone/steps/rgm.star",
     "rgm_build_backend_step",
 )
@@ -99,23 +104,25 @@ def clone_enterprise_step_pr(source = "${DRONE_COMMIT}", target = "main", canFai
         check = []
     else:
         check = [
-            'is_fork=$(curl "https://$GITHUB_TOKEN@api.github.com/repos/grafana/grafana/pulls/$DRONE_PULL_REQUEST" | jq .head.repo.fork)',
+            'is_fork=$(curl --retry 5 "https://$${GITHUB_TOKEN}@api.github.com/repos/grafana/grafana/pulls/$DRONE_PULL_REQUEST" | jq .head.repo.fork)',
             'if [ "$is_fork" != false ]; then return 1; fi',  # Only clone if we're confident that 'fork' is 'false'. Fail if it's also empty.
         ]
 
     step = {
         "name": "clone-enterprise",
         "image": images["git"],
-        "environment": {
-            "GITHUB_TOKEN": from_secret("github_token"),
-        },
         "commands": [
             "apk add --update curl jq bash",
+            "GITHUB_TOKEN=$(cat /github-app/token)",
         ] + check + [
-            'git clone "https://$${GITHUB_TOKEN}@github.com/grafana/grafana-enterprise.git" ' + location,
+            'git clone "https://x-access-token:$${GITHUB_TOKEN}@github.com/grafana/grafana-enterprise.git" ' + location,
             "cd {}".format(location),
             'if git checkout {0}; then echo "checked out {0}"; elif git checkout {1}; then echo "git checkout {1}"; else git checkout main; fi'.format(source, target),
         ],
+        "depends_on": [
+            github_app_generate_token_step()["name"],
+        ],
+        "volumes": github_app_step_volumes(),
     }
 
     if canFail:
@@ -170,7 +177,7 @@ def enterprise_downstream_step(ver_mode):
       Drone step.
     """
     repo = "grafana/grafana-enterprise@"
-    if ver_mode == "pr":
+    if ver_mode == "pr" or ver_mode == "rrc":
         repo += "${DRONE_SOURCE_BRANCH}"
     else:
         repo += "main"
@@ -195,6 +202,9 @@ def enterprise_downstream_step(ver_mode):
         step.update({"failure": "ignore"})
         step["settings"]["params"].append("OSS_PULL_REQUEST=${DRONE_PULL_REQUEST}")
 
+    if ver_mode == "rrc":
+        step["settings"]["params"].append("SOURCE_TAG=${DRONE_TAG}")
+
     return step
 
 def validate_modfile_step():
@@ -216,14 +226,19 @@ def validate_openapi_spec_step():
         ],
     }
 
-def dockerize_step(name, hostname, port):
-    return {
+def dockerize_step(name, hostname, port, canFail = False):
+    step = {
         "name": name,
         "image": images["dockerize"],
         "commands": [
             "dockerize -wait tcp://{}:{} -timeout 120s".format(hostname, port),
         ],
     }
+
+    if canFail:
+        step["failure"] = "ignore"
+
+    return step
 
 def build_storybook_step(ver_mode):
     return {
@@ -300,14 +315,17 @@ def store_storybook_step(ver_mode, trigger = None):
     return step
 
 def e2e_tests_artifacts():
+    # Note: This function is kept for backward compatibility but now only handles
+    # artifacts from the remaining E2E tests that haven't been migrated to GitHub Actions
     return {
         "name": "e2e-tests-artifacts-upload",
         "image": images["cloudsdk"],
         "depends_on": [
-            "end-to-end-tests-dashboards-suite",
-            "end-to-end-tests-panels-suite",
-            "end-to-end-tests-smoke-tests-suite",
-            "end-to-end-tests-various-suite",
+            # Note: Main E2E tests have been migrated to GitHub Actions
+            # Only depend on remaining Drone E2E tests
+            "end-to-end-tests-cloud-plugins-suite-azure",
+            "playwright-plugin-e2e",
+            github_app_generate_token_step()["name"],
         ],
         "failure": "ignore",
         "when": {
@@ -319,11 +337,11 @@ def e2e_tests_artifacts():
         "environment": {
             "GCP_GRAFANA_UPLOAD_ARTIFACTS_KEY": from_secret(gcp_upload_artifacts_key),
             "E2E_TEST_ARTIFACTS_BUCKET": "releng-pipeline-artifacts-dev",
-            "GITHUB_TOKEN": from_secret("github_token"),
         },
         "commands": [
-            # if no videos found do nothing
-            "if [ -z `find ./e2e -type f -name *spec.ts.mp4` ]; then echo 'missing videos'; false; fi",
+            "export GITHUB_TOKEN=$(cat /github-app/token)",
+            # if no videos found do nothing (may be fewer videos now that main tests are in GitHub Actions)
+            "if [ -z `find ./e2e -type f -name *spec.ts.mp4` ]; then echo 'no e2e videos found from remaining tests'; exit 0; fi",
             "apt-get update",
             "apt-get install -yq zip",
             "printenv GCP_GRAFANA_UPLOAD_ARTIFACTS_KEY > /tmp/gcpkey_upload_artifacts.json",
@@ -336,6 +354,7 @@ def e2e_tests_artifacts():
             'curl -X POST https://api.github.com/repos/${DRONE_REPO}/statuses/${DRONE_COMMIT_SHA} -H "Authorization: token $${GITHUB_TOKEN}" -d ' +
             '"{\\"state\\":\\"success\\",\\"target_url\\":\\"$${E2E_ARTIFACTS_VIDEO_ZIP}\\", \\"description\\": \\"Click on the details to download e2e recording videos\\", \\"context\\": \\"e2e_artifacts\\"}"',
         ],
+        "volumes": github_app_step_volumes(),
     }
 
 def playwright_e2e_report_upload():
@@ -372,6 +391,7 @@ def playwright_e2e_report_post_link():
         "image": images["curl"],
         "depends_on": [
             "playwright-e2e-report-upload",
+            github_app_generate_token_step()["name"],
         ],
         "failure": "ignore",
         "when": {
@@ -380,10 +400,8 @@ def playwright_e2e_report_post_link():
                 "failure",
             ],
         },
-        "environment": {
-            "GITHUB_TOKEN": from_secret("github_token"),
-        },
         "commands": [
+            "GITHUB_TOKEN=$(cat /github-app/token)",
             # if the trace doesn't folder exists, it means that there are no failed tests.
             "if [ ! -d ./playwright-report/trace ]; then echo 'all tests passed'; exit 0; fi",
             # if it exists, we will post a comment on the PR with the link to the report
@@ -395,15 +413,17 @@ def playwright_e2e_report_post_link():
             '-H "X-GitHub-Api-Version: 2022-11-28" -d ' +
             '"{\\"body\\":\\"❌ Failed to run Playwright plugin e2e tests. <br /> <br /> Click [here]($${E2E_PLAYWRIGHT_REPORT_URL}) to browse the Playwright report and trace viewer. <br /> For information on how to run Playwright tests locally, refer to the [Developer guide](https://github.com/grafana/grafana/blob/main/contribute/developer-guide.md#to-run-the-playwright-tests). \\"}"',
         ],
+        "volumes": github_app_step_volumes(),
     }
 
-def upload_cdn_step(ver_mode, trigger = None):
+def upload_cdn_step(ver_mode, trigger = None, depends_on = ["grafana-server"]):
     """Uploads CDN assets using the Grafana build tool.
 
     Args:
       ver_mode: only uses the step trigger when ver_mode == 'release-branch' or 'main'
       trigger: a Drone trigger for the step.
         Defaults to None.
+      depends_on: drone steps that this step depends on
 
     Returns:
       Drone step.
@@ -412,9 +432,7 @@ def upload_cdn_step(ver_mode, trigger = None):
     step = {
         "name": "upload-cdn-assets",
         "image": images["publish"],
-        "depends_on": [
-            "grafana-server",
-        ],
+        "depends_on": depends_on,
         "environment": {
             "GCP_KEY": from_secret(gcp_grafanauploads),
             "PRERELEASE_BUCKET": from_secret(prerelease_bucket),
@@ -457,6 +475,26 @@ def build_frontend_step():
         ],
         "commands": [
             "yarn build",
+        ],
+    }
+
+def build_test_plugins_step():
+    """Build the test plugins used in e2e tests
+
+    Returns:
+      Drone step.
+    """
+    return {
+        "name": "build-test-plugins",
+        "image": images["node"],
+        "environment": {
+            "NODE_OPTIONS": "--max_old_space_size=8192",
+        },
+        "depends_on": [
+            "yarn-install",
+        ],
+        "commands": [
+            "yarn e2e:plugin:build",
         ],
     }
 
@@ -532,34 +570,6 @@ def build_plugins_step(ver_mode):
         ],
     }
 
-def test_backend_step():
-    return {
-        "name": "test-backend",
-        "image": images["go"],
-        "depends_on": [
-            "wire-install",
-        ],
-        "commands": [
-            # shared-mime-info and shared-mime-info-lang is used for exactly 1 test for the
-            # mime.TypeByExtension function.
-            "apk add --update build-base shared-mime-info shared-mime-info-lang",
-            "go list -f '{{.Dir}}/...' -m | xargs go test -tags requires_buildifer -short -covermode=atomic -timeout=5m",
-        ],
-    }
-
-def test_backend_integration_step():
-    return {
-        "name": "test-backend-integration",
-        "image": images["go"],
-        "depends_on": [
-            "wire-install",
-        ],
-        "commands": [
-            "apk add --update build-base",
-            "go test -count=1 -covermode=atomic -timeout=5m -run '^TestIntegration' $(find ./pkg -type f -name '*_test.go' -exec grep -l '^func TestIntegration' '{}' '+' | grep -o '\\(.*\\)/' | sort -u)",
-        ],
-    }
-
 def betterer_frontend_step():
     """Run betterer on frontend code.
 
@@ -575,45 +585,7 @@ def betterer_frontend_step():
         ],
         "commands": [
             "apk add --update git bash",
-            "yarn betterer ci",
-        ],
-    }
-
-def test_frontend_step():
-    """Runs tests on frontend code.
-
-    Returns:
-      Drone step.
-    """
-
-    return {
-        "name": "test-frontend",
-        "image": images["node"],
-        "environment": {
-            "TEST_MAX_WORKERS": "50%",
-        },
-        "depends_on": [
-            "yarn-install",
-        ],
-        "commands": [
-            "yarn run ci:test-frontend",
-        ],
-    }
-
-def lint_frontend_step():
-    return {
-        "name": "lint-frontend",
-        "image": images["node"],
-        "environment": {
-            "TEST_MAX_WORKERS": "50%",
-        },
-        "depends_on": [
-            "yarn-install",
-        ],
-        "commands": [
-            "yarn run prettier:check",
-            "yarn run lint",
-            "yarn run typecheck",
+            "yarn betterer:ci",
         ],
     }
 
@@ -640,6 +612,28 @@ def verify_i18n_step():
         ],
     }
 
+def verify_api_clients_step():
+    uncommited_error_message = "\nAPI client generation has not been committed. Please run 'yarn generate-apis', commit the changes and push again."
+    return {
+        "name": "verify-api-clients",
+        "image": images["node_deb"],
+        "depends_on": [
+            "yarn-install",
+        ],
+        "commands": [
+            "yarn generate-apis",
+            # Verify that client generation has been run and committed
+            '''
+            file_diff=$(git diff ':!conf')
+            if [ -n "$file_diff" ]; then
+                echo $file_diff
+                echo "{}"
+                exit 1
+            fi
+            '''.format(uncommited_error_message),
+        ],
+    }
+
 def test_a11y_frontend_step(ver_mode, port = 3001):
     """Runs automated accessiblity tests against the frontend.
 
@@ -655,21 +649,13 @@ def test_a11y_frontend_step(ver_mode, port = 3001):
     commands = [
         # Note - this runs in a container running node 14, which does not support the -y option to npx
         "npx wait-on@7.0.1 http://$HOST:$PORT",
+        "pa11y-ci --config e2e/pa11yci.conf.js",
     ]
     failure = "ignore"
+    no_thresholds = "true"
     if ver_mode == "pr":
-        commands.extend(
-            [
-                "pa11y-ci --config .pa11yci-pr.conf.js",
-            ],
-        )
         failure = "always"
-    else:
-        commands.extend(
-            [
-                "pa11y-ci --config .pa11yci.conf.js --json > pa11y-ci-results.json",
-            ],
-        )
+        no_thresholds = "false"
 
     return {
         "name": "test-a11y-frontend",
@@ -682,6 +668,7 @@ def test_a11y_frontend_step(ver_mode, port = 3001):
             "GRAFANA_MISC_STATS_API_KEY": from_secret("grafana_misc_stats_api_key"),
             "HOST": "grafana-server",
             "PORT": port,
+            "NO_THRESHOLDS": no_thresholds,
         },
         "failure": failure,
         "commands": commands,
@@ -697,6 +684,7 @@ def frontend_metrics_step(trigger = None):
     Returns:
       Drone step.
     """
+
     step = {
         "name": "publish-frontend-metrics",
         "image": images["node"],
@@ -715,16 +703,6 @@ def frontend_metrics_step(trigger = None):
     if trigger:
         step = dict(step, when = trigger)
     return step
-
-def codespell_step():
-    return {
-        "name": "codespell",
-        "image": images["python"],
-        "commands": [
-            "pip3 install codespell",
-            "codespell -I docs/.codespellignore docs/",
-        ],
-    }
 
 def grafana_server_step():
     """Runs the grafana-server binary as a service.
@@ -763,6 +741,7 @@ def e2e_tests_step(suite, port = 3001, tries = None):
         "image": images["cypress"],
         "depends_on": [
             "grafana-server",
+            "build-test-plugins",
         ],
         "environment": {
             "HOST": "grafana-server",
@@ -770,6 +749,19 @@ def e2e_tests_step(suite, port = 3001, tries = None):
         "commands": [
             cmd,
         ],
+    }
+
+def start_storybook_step():
+    return {
+        "name": "start-storybook",
+        "image": images["node"],
+        "depends_on": [
+            "yarn-install",
+        ],
+        "commands": [
+            "yarn storybook --quiet",
+        ],
+        "detach": True,
     }
 
 def cloud_plugins_e2e_tests_step(suite, cloud, trigger = None):
@@ -793,7 +785,6 @@ def cloud_plugins_e2e_tests_step(suite, cloud, trigger = None):
         environment = {
             "CYPRESS_CI": "true",
             "HOST": "grafana-server",
-            "GITHUB_TOKEN": from_secret("github_token"),
             "AZURE_SP_APP_ID": from_secret("azure_sp_app_id"),
             "AZURE_SP_PASSWORD": from_secret("azure_sp_app_pw"),
             "AZURE_TENANT": from_secret("azure_tenant"),
@@ -811,12 +802,18 @@ def cloud_plugins_e2e_tests_step(suite, cloud, trigger = None):
     branch = "${DRONE_SOURCE_BRANCH}".replace("/", "-")
     step = {
         "name": "end-to-end-tests-{}-{}".format(suite, cloud),
-        "image": "us-docker.pkg.dev/grafanalabs-dev/cloud-data-sources/e2e-13.10.0:1.0.0",
+        "image": "us-docker.pkg.dev/grafanalabs-dev/docker-oss-plugin-partnerships-dev/e2e-14.3.2:1.0.0",
         "depends_on": [
             "grafana-server",
+            github_app_generate_token_step()["name"],
         ],
         "environment": environment,
-        "commands": ["cd /", "./cpp-e2e/scripts/ci-run.sh {} {}".format(cloud, branch)],
+        "commands": [
+            "GITHUB_TOKEN=$(cat /github-app/token)",
+            "cd /",
+            "./cpp-e2e/scripts/ci-run.sh {} {}".format(cloud, branch),
+        ],
+        "volumes": github_app_step_volumes(),
     }
     step = dict(step, when = when)
     return step
@@ -832,6 +829,7 @@ def playwright_e2e_tests_step():
         "image": images["node_deb"],
         "depends_on": [
             "grafana-server",
+            "build-test-plugins",
         ],
         "commands": [
             "npx wait-on@7.0.1 http://$HOST:$PORT",
@@ -868,7 +866,7 @@ def fetch_images_step():
         "volumes": [{"name": "docker", "path": "/var/run/docker.sock"}],
     }
 
-def publish_images_step(ver_mode, docker_repo, trigger = None):
+def publish_images_step(ver_mode, docker_repo, trigger = None, depends_on = ["rgm-build-docker"]):
     """Generates a step for publishing public Docker images with grabpl.
 
     Args:
@@ -878,6 +876,7 @@ def publish_images_step(ver_mode, docker_repo, trigger = None):
         It is combined with the 'grafana/' library prefix.
       trigger: a Drone trigger for the pipeline.
         Defaults to None.
+      depends_on: drone steps that this step depends on
 
     Returns:
       Drone step.
@@ -889,8 +888,8 @@ def publish_images_step(ver_mode, docker_repo, trigger = None):
         "GCP_KEY": from_secret(gcp_grafanauploads),
         "DOCKER_USER": from_secret("docker_username"),
         "DOCKER_PASSWORD": from_secret("docker_password"),
-        "GITHUB_APP_ID": from_secret("delivery-bot-app-id"),
-        "GITHUB_APP_INSTALLATION_ID": from_secret("delivery-bot-app-installation-id"),
+        "GITHUB_APP_ID": "329617",
+        "GITHUB_APP_INSTALLATION_ID": "37346161",
         "GITHUB_APP_PRIVATE_KEY": from_secret("delivery-bot-app-private-key"),
     }
 
@@ -898,7 +897,7 @@ def publish_images_step(ver_mode, docker_repo, trigger = None):
         docker_repo,
     )
 
-    deps = ["rgm-build-docker"]
+    deps = depends_on
     if ver_mode == "release":
         deps = ["fetch-images"]
         cmd += " --version-tag ${DRONE_TAG}"
@@ -907,8 +906,8 @@ def publish_images_step(ver_mode, docker_repo, trigger = None):
         environment = {
             "DOCKER_USER": from_secret("docker_username"),
             "DOCKER_PASSWORD": from_secret("docker_password"),
-            "GITHUB_APP_ID": from_secret("delivery-bot-app-id"),
-            "GITHUB_APP_INSTALLATION_ID": from_secret("delivery-bot-app-installation-id"),
+            "GITHUB_APP_ID": "329617",
+            "GITHUB_APP_INSTALLATION_ID": "37346161",
             "GITHUB_APP_PRIVATE_KEY": from_secret("delivery-bot-app-private-key"),
         }
 
@@ -926,125 +925,6 @@ def publish_images_step(ver_mode, docker_repo, trigger = None):
         step = dict(step, failure = "ignore")
 
     return step
-
-def integration_tests_steps(name, cmds, hostname = None, port = None, environment = None):
-    """Integration test steps
-
-    Args:
-      name: the name of the step.
-      cmds: the commands to run to perform the integration tests.
-      hostname: the hostname where the remote server is available.
-      port: the port where the remote server is available.
-      environment: Any extra environment variables needed to run the integration tests.
-
-    Returns:
-      A list of drone steps. If a hostname / port were provided, then a step to wait for the remove server to be
-      available is also returned.
-    """
-    dockerize_name = "wait-for-{}".format(name)
-
-    depends = [
-        "wire-install",
-    ]
-
-    step = {
-        "name": "{}-integration-tests".format(name),
-        "image": images["go"],
-        "depends_on": depends,
-        "commands": [
-            "apk add --update build-base",
-        ] + cmds,
-    }
-
-    if environment:
-        step["environment"] = environment
-
-    if hostname == None:
-        return [step]
-
-    depends = depends.append(dockerize_name)
-
-    return [
-        dockerize_step(dockerize_name, hostname, port),
-        step,
-    ]
-
-def integration_benchmarks_step(name, environment = None):
-    cmds = [
-        "if [ -z ${GO_PACKAGES} ]; then echo 'missing GO_PACKAGES'; false; fi",
-        "go test -v -run=^$ -benchmem -timeout=1h -count=8 -bench=. ${GO_PACKAGES}",
-    ]
-
-    return integration_tests_steps("{}-benchmark".format(name), cmds, environment = environment)
-
-def postgres_integration_tests_steps():
-    cmds = [
-        "apk add --update postgresql-client",
-        "psql -p 5432 -h postgres -U grafanatest -d grafanatest -f " +
-        "devenv/docker/blocks/postgres_tests/setup.sql",
-        "go clean -testcache",
-        "go test -p=1 -count=1 -covermode=atomic -timeout=5m -run '^TestIntegration' $(find ./pkg -type f -name '*_test.go' -exec grep -l '^func TestIntegration' '{}' '+' | grep -o '\\(.*\\)/' | sort -u)",
-    ]
-
-    environment = {
-        "PGPASSWORD": "grafanatest",
-        "GRAFANA_TEST_DB": "postgres",
-        "POSTGRES_HOST": "postgres",
-    }
-
-    return integration_tests_steps("postgres", cmds, "postgres", "5432", environment)
-
-def mysql_integration_tests_steps(hostname, version):
-    cmds = [
-        "apk add --update mysql-client",
-        "cat devenv/docker/blocks/mysql_tests/setup.sql | mysql -h {} -P 3306 -u root -prootpass".format(hostname),
-        "go clean -testcache",
-        "go test -p=1 -count=1 -covermode=atomic -timeout=5m -run '^TestIntegration' $(find ./pkg -type f -name '*_test.go' -exec grep -l '^func TestIntegration' '{}' '+' | grep -o '\\(.*\\)/' | sort -u)",
-    ]
-
-    environment = {
-        "GRAFANA_TEST_DB": "mysql",
-        "MYSQL_HOST": hostname,
-    }
-
-    return integration_tests_steps("mysql-{}".format(version), cmds, hostname, "3306", environment)
-
-def redis_integration_tests_steps():
-    cmds = [
-        "go clean -testcache",
-        "go list -f '{{.Dir}}/...' -m | xargs go test -run IntegrationRedis -covermode=atomic -timeout=2m",
-    ]
-
-    environment = {
-        "REDIS_URL": "redis://redis:6379/0",
-    }
-
-    return integration_tests_steps("redis", cmds, "redis", "6379", environment = environment)
-
-def remote_alertmanager_integration_tests_steps():
-    cmds = [
-        "go clean -testcache",
-        "go test -run TestIntegrationRemoteAlertmanager -covermode=atomic -timeout=2m ./pkg/services/ngalert/...",
-    ]
-
-    environment = {
-        "AM_TENANT_ID": "test",
-        "AM_URL": "http://mimir_backend:8080",
-    }
-
-    return integration_tests_steps("remote-alertmanager", cmds, "mimir_backend", "8080", environment = environment)
-
-def memcached_integration_tests_steps():
-    cmds = [
-        "go clean -testcache",
-        "go list -f '{{.Dir}}/...' -m | xargs go test -run IntegrationMemcached -covermode=atomic -timeout=2m",
-    ]
-
-    environment = {
-        "MEMCACHED_HOSTS": "memcached:11211",
-    }
-
-    return integration_tests_steps("memcached", cmds, "memcached", "11211", environment)
 
 def release_canary_npm_packages_step(trigger = None):
     """Releases canary NPM packages.
@@ -1064,7 +944,7 @@ def release_canary_npm_packages_step(trigger = None):
             "NPM_TOKEN": from_secret(npm_token),
         },
         "commands": [
-            "apk add --update bash",
+            "apk add --update bash git",
             "./scripts/publish-npm-packages.sh --dist-tag 'canary' --registry 'https://registry.npmjs.org'",
         ],
     }
@@ -1084,7 +964,15 @@ def release_canary_npm_packages_step(trigger = None):
 
     return step
 
-def upload_packages_step(ver_mode, trigger = None):
+def upload_packages_step(
+        ver_mode,
+        trigger = None,
+        depends_on = [
+            # Note: Main E2E tests have been migrated to GitHub Actions
+            # Updated dependencies to only include remaining Drone E2E tests
+            "end-to-end-tests-cloud-plugins-suite-azure",
+            "playwright-plugin-e2e",
+        ]):
     """Upload packages to object storage.
 
     Args:
@@ -1092,6 +980,7 @@ def upload_packages_step(ver_mode, trigger = None):
         edition packages when executed.
       trigger: a Drone trigger for the step.
         Defaults to None.
+      depends_on: drone steps that this step depends on
 
     Returns:
       Drone step.
@@ -1099,7 +988,7 @@ def upload_packages_step(ver_mode, trigger = None):
     step = {
         "name": "upload-packages",
         "image": images["publish"],
-        "depends_on": end_to_end_tests_deps(),
+        "depends_on": depends_on,
         "environment": {
             "GCP_KEY": from_secret(gcp_grafanauploads_base64),
             "PRERELEASE_BUCKET": from_secret("prerelease_bucket"),
@@ -1112,7 +1001,7 @@ def upload_packages_step(ver_mode, trigger = None):
         step = dict(step, when = trigger)
     return step
 
-def publish_grafanacom_step(ver_mode):
+def publish_grafanacom_step(ver_mode, depends_on = ["publish-linux-packages-deb", "publish-linux-packages-rpm"]):
     """Publishes Grafana packages to grafana.com.
 
     Args:
@@ -1120,6 +1009,7 @@ def publish_grafanacom_step(ver_mode):
         variable as the value for the --build-id option.
         TODO: is this actually used by the grafanacom subcommand? I think it might
         just use the environment variable directly.
+      depends_on: what other steps this one depends on (strings)
 
     Returns:
       Drone step.
@@ -1137,10 +1027,7 @@ def publish_grafanacom_step(ver_mode):
     return {
         "name": "publish-grafanacom",
         "image": images["publish"],
-        "depends_on": [
-            "publish-linux-packages-deb",
-            "publish-linux-packages-rpm",
-        ],
+        "depends_on": depends_on,
         "environment": {
             "GRAFANA_COM_API_KEY": from_secret("grafana_api_key"),
             "GCP_KEY": from_secret(gcp_grafanauploads_base64),
@@ -1219,94 +1106,6 @@ def retry_command(command, attempts = 60, delay = 30):
         "done",
     ]
 
-def verify_linux_DEB_packages_step(depends_on = []):
-    install_command = "apt-get update >/dev/null 2>&1 && DEBIAN_FRONTEND=noninteractive apt-get install -yq grafana=$version >/dev/null 2>&1"
-
-    return {
-        "name": "verify-linux-DEB-packages",
-        "image": images["ubuntu"],
-        "environment": {},
-        "commands": [
-            'export version=$(echo ${TAG} | sed -e "s/+security-/-/g")',
-            'echo "Step 1: Updating package lists..."',
-            "apt-get update >/dev/null 2>&1",
-            'echo "Step 2: Installing prerequisites..."',
-            "DEBIAN_FRONTEND=noninteractive apt-get install -yq apt-transport-https software-properties-common wget >/dev/null 2>&1",
-            'echo "Step 3: Adding Grafana GPG key..."',
-            "mkdir -p /etc/apt/keyrings/",
-            "wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null",
-            'echo "Step 4: Adding Grafana repository..."',
-            'echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list',
-            'echo "Step 5: Installing Grafana..."',
-            # The packages take a bit of time to propogate within the repo. This retry will check their availability within 10 minutes.
-        ] + retry_command(install_command) + [
-            'echo "Step 6: Verifying Grafana installation..."',
-            'if dpkg -s grafana | grep -q "Version: $version"; then',
-            '    echo "Successfully verified Grafana version $version"',
-            "else",
-            '    echo "Failed to verify Grafana version $version"',
-            "    exit 1",
-            "fi",
-            'echo "Verification complete."',
-        ],
-        "depends_on": depends_on,
-    }
-
-def verify_linux_RPM_packages_step(depends_on = []):
-    repo_config = (
-        "[grafana]\n" +
-        "name=grafana\n" +
-        "baseurl=https://rpm.grafana.com\n" +
-        "repo_gpgcheck=0\n" +  # Change this to 0
-        "enabled=1\n" +
-        "gpgcheck=0\n" +  # Change this to 0
-        "gpgkey=https://rpm.grafana.com/gpg.key\n" +
-        "sslverify=1\n" +
-        "sslcacert=/etc/pki/tls/certs/ca-bundle.crt\n"
-    )
-
-    install_command = "dnf install -y --nogpgcheck grafana-$version >/dev/null 2>&1"
-
-    return {
-        "name": "verify-linux-RPM-packages",
-        "image": images["rocky"],
-        "environment": {},
-        "commands": [
-            'echo "Step 1: Updating package lists..."',
-            "dnf check-update -y >/dev/null 2>&1 || true",
-            'echo "Step 2: Installing prerequisites..."',
-            "dnf install -y dnf-utils >/dev/null 2>&1",
-            'echo "Step 3: Adding Grafana GPG key..."',
-            "rpm --import https://rpm.grafana.com/gpg.key",
-            'echo "Step 4: Configuring Grafana repository..."',
-            "echo -e '" + repo_config + "' > /etc/yum.repos.d/grafana.repo",
-            'echo "Step 5: Checking RPM repository..."',
-            'export version=$(echo "${TAG}" | sed -e "s/+security-/^security_/g")',
-            "dnf list available grafana-$version",
-            "if [ $? -eq 0 ]; then",
-            '    echo "Grafana package found in repository. Installing from repo..."',
-        ] + retry_command(install_command) + [
-            '    echo "Verifying GPG key..."',
-            "    rpm --import https://rpm.grafana.com/gpg.key",
-            "    rpm -qa gpg-pubkey* | xargs rpm -qi | grep -i grafana",
-            "else",
-            '    echo "Grafana package version $version not found in repository."',
-            "    dnf repolist",
-            "    dnf list available grafana*",
-            "    exit 1",
-            "fi",
-            'echo "Step 6: Verifying Grafana installation..."',
-            'if rpm -q grafana | grep -q "$verison"; then',
-            '    echo "Successfully verified Grafana version $version"',
-            "else",
-            '    echo "Failed to verify Grafana version $version"',
-            "    exit 1",
-            "fi",
-            'echo "Verification complete."',
-        ],
-        "depends_on": depends_on,
-    }
-
 def verify_gen_cue_step():
     return {
         "name": "verify-gen-cue",
@@ -1334,11 +1133,11 @@ def verify_gen_jsonnet_step():
     }
 
 def end_to_end_tests_deps():
+    # Note: Main E2E tests have been migrated to GitHub Actions
+    # Only return dependencies for E2E tests that still run in Drone
     return [
-        "end-to-end-tests-dashboards-suite",
-        "end-to-end-tests-panels-suite",
-        "end-to-end-tests-smoke-tests-suite",
-        "end-to-end-tests-various-suite",
+        "end-to-end-tests-cloud-plugins-suite-azure",
+        "playwright-plugin-e2e",
     ]
 
 def compile_build_cmd():

@@ -1,11 +1,11 @@
 import { cx, css } from '@emotion/css';
-import React from 'react';
+import { cloneElement, ReactNode } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useTheme2 } from '../../themes';
+import { useTheme2 } from '../../themes/ThemeContext';
 import { getChildId } from '../../utils/reactUtils';
-import { PopoverContent } from '../Tooltip';
+import { PopoverContent } from '../Tooltip/types';
 
 import { FieldProps } from './Field';
 import { FieldValidationMessage } from './FieldValidationMessage';
@@ -23,12 +23,17 @@ export interface Props extends Omit<FieldProps, 'css' | 'horizontal' | 'descript
   /** Make field's background transparent */
   transparent?: boolean;
   /** Error message to display */
-  error?: string | null;
+  error?: ReactNode;
   htmlFor?: string;
   /** Make tooltip interactive */
   interactive?: boolean;
 }
 
+/**
+ * A basic component for rendering form elements, like `Input`, `Checkbox`, `Combobox`, etc, inline together with `InlineLabel`. If the child element has `id` specified, the label's `htmlFor` attribute, pointing to the id, will be added.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/forms-inlinefield--docs
+ */
 export const InlineField = ({
   children,
   label,
@@ -45,6 +50,7 @@ export const InlineField = ({
   error,
   transparent,
   interactive,
+  validationMessageHorizontalOverflow,
   ...htmlProps
 }: Props) => {
   const theme = useTheme2();
@@ -70,9 +76,13 @@ export const InlineField = ({
     <div className={cx(styles.container, className)} {...htmlProps}>
       {labelElement}
       <div className={styles.childContainer}>
-        {React.cloneElement(children, { invalid, disabled, loading })}
+        {cloneElement(children, { invalid, disabled, loading })}
         {invalid && error && (
-          <div className={cx(styles.fieldValidationWrapper)}>
+          <div
+            className={cx(styles.fieldValidationWrapper, {
+              [styles.validationMessageHorizontalOverflow]: !!validationMessageHorizontalOverflow,
+            })}
+          >
             <FieldValidationMessage>{error}</FieldValidationMessage>
           </div>
         )}
@@ -99,6 +109,14 @@ const getStyles = (theme: GrafanaTheme2, grow?: boolean, shrink?: boolean) => {
     }),
     fieldValidationWrapper: css({
       marginTop: theme.spacing(0.5),
+    }),
+    validationMessageHorizontalOverflow: css({
+      width: 0,
+      overflowX: 'visible',
+
+      '& > *': {
+        whiteSpace: 'nowrap',
+      },
     }),
   };
 };

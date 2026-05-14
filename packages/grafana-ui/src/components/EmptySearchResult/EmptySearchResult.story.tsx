@@ -1,11 +1,10 @@
 import { Meta } from '@storybook/react';
-import React from 'react';
 
 import { EmptySearchResult } from './EmptySearchResult';
 import mdx from './EmptySearchResult.mdx';
 
 const meta: Meta<typeof EmptySearchResult> = {
-  title: 'Visualizations/EmptySearchResult',
+  title: 'Information/Deprecated/EmptySearchResult',
   component: EmptySearchResult,
   parameters: {
     docs: {

@@ -4,6 +4,7 @@ const path = require('path');
 
 const benchmarkPlugin = require('./e2e/cypress/plugins/benchmark/index');
 const readProvisions = require('./e2e/cypress/plugins/readProvisions');
+const smtpTester = require('./e2e/cypress/plugins/smtpTester');
 const typescriptPreprocessor = require('./e2e/cypress/plugins/typescriptPreprocessor');
 
 module.exports = defineConfig({
@@ -12,6 +13,9 @@ module.exports = defineConfig({
   viewportWidth: 1920,
   viewportHeight: 1080,
 
+  env: {
+    LOG_SELECTORS_INFO: false,
+  },
   e2e: {
     supportFile: './e2e/cypress/support/e2e.js',
     setupNodeEvents(on, config) {
@@ -25,6 +29,10 @@ module.exports = defineConfig({
 
       if (config.env['BENCHMARK_PLUGIN_ENABLED'] === true) {
         benchmarkPlugin.initialize(on, config);
+      }
+
+      if (config.env['SMTP_PLUGIN_ENABLED'] === true) {
+        smtpTester.initialize(on, config);
       }
 
       on('task', {
@@ -76,6 +84,21 @@ module.exports = defineConfig({
 
         // IMPORTANT: return the updated browser launch options
         return launchOptions;
+      });
+
+      on('after:spec', (_, results) => {
+        if (!results || !results.video || !results.tests) {
+          return;
+        }
+
+        // Do we have failures for any retry attempts?
+        const failures = results.tests.some((test) => test.attempts.some((attempt) => attempt.state === 'failed'));
+        if (failures) {
+          return;
+        }
+
+        // delete the video if the spec passed and no tests retried
+        fs.unlinkSync(results.video);
       });
     },
   },

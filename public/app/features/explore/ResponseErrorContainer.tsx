@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { LoadingState } from '@grafana/data';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { ErrorContainer } from './ErrorContainer';
 

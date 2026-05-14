@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import React, { FC, useState, useMemo } from 'react';
+import { FC, useState, useMemo } from 'react';
 
 import { IconButton, LinkButton, Tooltip, useStyles2 } from '@grafana/ui';
 
@@ -10,7 +10,7 @@ import { EditAlertRuleTemplateModal } from '../EditAlertRuleTemplateModal/EditAl
 import { getStyles } from './AlertRuleTemplateActions.styles';
 import { AlertRuleTemplateActionsProps } from './AlertRuleTemplateActions.types';
 
-const nonActionableSources = [SourceDescription.BUILT_IN, SourceDescription.USER_FILE, SourceDescription.SAAS];
+const nonActionableSources = [SourceDescription.BUILT_IN, SourceDescription.USER_FILE];
 
 export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ template, getAlertRuleTemplates }) => {
   const styles = useStyles2(getStyles);

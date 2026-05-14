@@ -359,7 +359,7 @@ describe('field convert types transformer', () => {
     ]);
   });
 
-  it('will support custom join separators', () => {
+  it('will support custom join separators for field type other', () => {
     const options = {
       conversions: [{ targetField: 'vals', destinationType: FieldType.string, joinWith: '|' }],
     };
@@ -387,6 +387,67 @@ describe('field convert types transformer', () => {
       {
         type: FieldType.string,
         values: ['a|b|2', '3|x|y'],
+      },
+    ]);
+  });
+
+  it('will support custom join separators for field type string', () => {
+    const options = {
+      conversions: [{ targetField: 'string_arrays', destinationType: FieldType.string, joinWith: '&' }],
+    };
+
+    const stringArrayValues = toDataFrame({
+      fields: [
+        {
+          name: 'string_arrays',
+          type: FieldType.string,
+          values: [
+            ['a', 'b', 'c'],
+            ['d', 'e', 'f'],
+          ],
+        },
+      ],
+    });
+
+    const stringified = convertFieldTypes(options, [stringArrayValues]);
+    expect(
+      stringified[0].fields.map(({ type, values }) => ({
+        type,
+        values,
+      }))
+    ).toEqual([
+      {
+        type: FieldType.string,
+        values: ['a&b&c', 'd&e&f'],
+      },
+    ]);
+  });
+
+  it('will support custom join separators for field type string, correctly handling undefined and null', () => {
+    const options = {
+      conversions: [{ targetField: 'mixed_values', destinationType: FieldType.string, joinWith: '&' }],
+    };
+
+    const mixedValues = toDataFrame({
+      fields: [
+        {
+          name: 'mixed_values',
+          type: FieldType.string,
+          values: [['a', 'b', 'c'], ['d', undefined, 'f'], undefined, 'regular string', null],
+        },
+      ],
+    });
+
+    const stringified = convertFieldTypes(options, [mixedValues]);
+    expect(
+      stringified[0].fields.map(({ type, values }) => ({
+        type,
+        values,
+      }))
+    ).toEqual([
+      {
+        type: FieldType.string,
+        values: ['a&b&c', 'd&&f', undefined, '"regular string"', 'null'],
       },
     ]);
   });
@@ -484,6 +545,54 @@ describe('fieldToTimeField', () => {
         1636640100000, 1636679700000, 1636640100000, 1636679700000, 1636640100000, 1636679700000, 1636659900000,
         1636659900000,
       ],
+    });
+  });
+
+  it('should properly parse Unix timestamps - in seconds', () => {
+    const numberTimeField: Field = {
+      config: {},
+      name: 'Unix second timestamps',
+      type: FieldType.number,
+      values: [1728397800, 1728397815, 1728397830],
+    };
+
+    expect(fieldToTimeField(numberTimeField, 'X')).toEqual({
+      config: {},
+      name: 'Unix second timestamps',
+      type: FieldType.time,
+      values: [1728397800000, 1728397815000, 1728397830000],
+    });
+  });
+
+  it('should properly parse Unix timestamps - in millseconds (with format)', () => {
+    const numberTimeField: Field = {
+      config: {},
+      name: 'Unix MS timestamps',
+      type: FieldType.number,
+      values: [1728397800000, 1728397815000, 1728397830000],
+    };
+
+    expect(fieldToTimeField(numberTimeField, 'x')).toEqual({
+      config: {},
+      name: 'Unix MS timestamps',
+      type: FieldType.time,
+      values: [1728397800000, 1728397815000, 1728397830000],
+    });
+  });
+
+  it('should properly parse Unix timestamps - in millseconds (without format)', () => {
+    const numberTimeField: Field = {
+      config: {},
+      name: 'Unix MS timestamps',
+      type: FieldType.number,
+      values: [1728397800000, 1728397815000, 1728397830000],
+    };
+
+    expect(fieldToTimeField(numberTimeField)).toEqual({
+      config: {},
+      name: 'Unix MS timestamps',
+      type: FieldType.time,
+      values: [1728397800000, 1728397815000, 1728397830000],
     });
   });
 });

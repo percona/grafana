@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import { PureComponent } from 'react';
 
-import { TNil } from '../../../types';
-import DraggableManager, { DraggableBounds, DraggingUpdate } from '../index';
+import TNil from '../../../types/TNil';
+import DraggableManager from '../DraggableManager';
+import { DraggableBounds, DraggingUpdate } from '../types';
 
 import './RegionDemo.css';
 
@@ -30,7 +31,7 @@ type RegionDemoProps = {
   updateState: (update: TUpdate) => void;
 };
 
-export default class RegionDemo extends React.PureComponent<RegionDemoProps> {
+export default class RegionDemo extends PureComponent<RegionDemoProps> {
   _dragManager: DraggableManager;
 
   _realmElm: HTMLElement | TNil;

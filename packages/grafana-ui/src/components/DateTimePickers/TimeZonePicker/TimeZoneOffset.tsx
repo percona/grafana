@@ -1,10 +1,9 @@
 import { css, cx } from '@emotion/css';
 import { isString } from 'lodash';
-import React from 'react';
 
 import { GrafanaTheme2, TimeZone, dateTimeFormat } from '@grafana/data';
 
-import { useStyles2 } from '../../../themes';
+import { useStyles2 } from '../../../themes/ThemeContext';
 
 interface Props {
   timestamp: number;

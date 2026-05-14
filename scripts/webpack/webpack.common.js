@@ -1,3 +1,4 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -7,6 +8,11 @@ module.exports = {
   target: 'web',
   entry: {
     app: './public/app/index.ts',
+    swagger: './public/swagger/index.tsx',
+  },
+  experiments: {
+    // Required to load WASM modules.
+    asyncWebAssembly: true,
   },
   output: {
     clean: true,
@@ -16,14 +22,12 @@ module.exports = {
     publicPath: 'public/build/',
   },
   resolve: {
+    conditionNames: ['@grafana-app/source', '...'],
     extensions: ['.ts', '.tsx', '.es6', '.js', '.json', '.svg'],
     alias: {
       // some of data source plugins use global Prism object to add the language definition
       // we want to have same Prism object in core and in grafana/ui
       prismjs: require.resolve('prismjs'),
-      // some sub-dependencies use a different version of @emotion/react and generate warnings
-      // in the browser about @emotion/react loaded twice. We want to only load it once
-      '@emotion/react': require.resolve('@emotion/react'),
       // due to our webpack configuration not understanding package.json `exports`
       // correctly we must alias this package to the correct file
       // the alternative to this alias is to copy-paste the file into our
@@ -59,12 +63,25 @@ module.exports = {
     },
   ],
   plugins: [
-    new webpack.NormalModuleReplacementPlugin(/^@grafana\/schema\/dist\/esm\/(.*)$/, (resource) => {
-      resource.request = resource.request.replace('@grafana/schema/dist/esm', '@grafana/schema/src');
-    }),
     new CorsWorkerPlugin(),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'public/img',
+          to: 'img',
+        },
+        {
+          from: 'public/maps',
+          to: 'maps',
+        },
+        {
+          from: 'public/gazetteer',
+          to: 'gazetteer',
+        },
+      ],
     }),
   ],
   module: {
@@ -77,37 +94,9 @@ module.exports = {
         },
       },
       {
-        test: /\.html$/,
-        exclude: /(index|error)\-template\.html/,
-        use: [
-          {
-            loader: 'ngtemplate-loader?relativeTo=' + path.resolve(__dirname, '../../public') + '&prefix=public',
-          },
-          {
-            loader: 'html-loader',
-            options: {
-              sources: false,
-              minimize: {
-                removeComments: false,
-                collapseWhitespace: false,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
         test: /\.(svg|ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/,
         type: 'asset/resource',
         generator: { filename: 'static/img/[name].[hash:8][ext]' },
-      },
-      // for pre-caching SVGs as part of the JS bundles
-      {
-        test: /(unicons|mono|custom)[\\/].*\.svg$/,
-        type: 'asset/source',
       },
       {
         // Required for msagl library (used in Nodegraph panel) to work
@@ -125,12 +114,6 @@ module.exports = {
       chunks: 'all',
       minChunks: 1,
       cacheGroups: {
-        unicons: {
-          test: /[\\/]node_modules[\\/]@iconscout[\\/]react-unicons[\\/].*[jt]sx?$/,
-          chunks: 'initial',
-          priority: 20,
-          enforce: true,
-        },
         moment: {
           test: /[\\/]node_modules[\\/]moment[\\/].*[jt]sx?$/,
           chunks: 'initial',

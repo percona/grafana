@@ -1,11 +1,9 @@
 package user
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
-	"github.com/grafana/grafana/pkg/services/auth/identity"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/services/search/model"
 )
 
@@ -17,6 +15,9 @@ func (f *HelpFlags1) AddFlag(flag HelpFlags1)     { *f |= flag }
 const (
 	HelpFlagGettingStartedPanelDismissed HelpFlags1 = 1 << iota
 	HelpFlagDashboardHelp1
+	HelpFlagEnterpriseAuth1
+	HelpFlagSyntheticMonitoring1
+	HelpFlagIRM1
 )
 
 type UpdateEmailActionType string
@@ -49,6 +50,8 @@ type User struct {
 	Created    time.Time
 	Updated    time.Time
 	LastSeenAt time.Time
+
+	IsProvisioned bool `xorm:"is_provisioned"`
 }
 
 type CreateUserCommand struct {
@@ -66,6 +69,7 @@ type CreateUserCommand struct {
 	SkipOrgSetup     bool
 	DefaultOrgRole   string
 	IsServiceAccount bool
+	IsProvisioned    bool
 }
 
 type GetUserByLoginQuery struct {
@@ -91,13 +95,20 @@ type UpdateUserCommand struct {
 	// If old password is included it will be validated against users current password.
 	OldPassword *Password `json:"-"`
 	// If OrgID is included update current org for user
-	OrgID      *int64      `json:"-"`
-	HelpFlags1 *HelpFlags1 `json:"-"`
+	OrgID         *int64      `json:"-"`
+	HelpFlags1    *HelpFlags1 `json:"-"`
+	IsProvisioned *bool       `json:"-"`
 }
 
 type UpdateUserLastSeenAtCommand struct {
 	UserID int64
 	OrgID  int64
+}
+
+type ListUserResult struct {
+	Users      []*User
+	ContinueID int64
+	RV         int64
 }
 
 type SearchUsersQuery struct {
@@ -110,7 +121,8 @@ type SearchUsersQuery struct {
 	SortOpts     []model.SortOption
 	Filters      []Filter
 
-	IsDisabled *bool
+	IsDisabled    *bool
+	IsProvisioned *bool
 }
 
 type SearchUserQueryResult struct {
@@ -122,17 +134,19 @@ type SearchUserQueryResult struct {
 
 type UserSearchHitDTO struct {
 	ID            int64                `json:"id" xorm:"id"`
-	UID           string               `json:"uid" xorm:"id"`
+	UID           string               `json:"uid" xorm:"uid"`
 	Name          string               `json:"name"`
 	Login         string               `json:"login"`
 	Email         string               `json:"email"`
 	AvatarURL     string               `json:"avatarUrl" xorm:"avatar_url"`
 	IsAdmin       bool                 `json:"isAdmin"`
 	IsDisabled    bool                 `json:"isDisabled"`
+	IsProvisioned bool                 `json:"isProvisioned"`
 	LastSeenAt    time.Time            `json:"lastSeenAt"`
 	LastSeenAtAge string               `json:"lastSeenAtAge"`
 	AuthLabels    []string             `json:"authLabels"`
 	AuthModule    AuthModuleConversion `json:"-"`
+	Created       time.Time            `json:"created" xorm:"created"`
 }
 
 type GetUserProfileQuery struct {
@@ -157,6 +171,7 @@ type UserProfileDTO struct {
 	CreatedAt                      time.Time       `json:"createdAt"`
 	AvatarURL                      string          `json:"avatarUrl"`
 	AccessControl                  map[string]bool `json:"accessControl,omitempty"`
+	IsProvisioned                  bool            `json:"isProvisioned"`
 }
 
 // implement Conversion interface to define custom field mapping (xorm feature)
@@ -208,6 +223,10 @@ type GetUserByIDQuery struct {
 	ID int64
 }
 
+type GetUserByUIDQuery struct {
+	UID string
+}
+
 type StartVerifyEmailCommand struct {
 	User   User
 	Email  string
@@ -217,27 +236,6 @@ type StartVerifyEmailCommand struct {
 type CompleteEmailVerifyCommand struct {
 	User identity.Requester
 	Code string
-}
-
-type ErrCaseInsensitiveLoginConflict struct {
-	Users []User
-}
-
-func (e *ErrCaseInsensitiveLoginConflict) Unwrap() error {
-	return ErrCaseInsensitive
-}
-
-func (e *ErrCaseInsensitiveLoginConflict) Error() string {
-	n := len(e.Users)
-
-	userStrings := make([]string, 0, n)
-	for _, v := range e.Users {
-		userStrings = append(userStrings, fmt.Sprintf("%s (email:%s, id:%d)", v.Login, v.Email, v.ID))
-	}
-
-	return fmt.Sprintf(
-		"Found a conflict in user login information. %d users already exist with either the same login or email: [%s].",
-		n, strings.Join(userStrings, ", "))
 }
 
 type Filter interface {
@@ -276,6 +274,7 @@ const (
 
 type AdminCreateUserResponse struct {
 	ID      int64  `json:"id"`
+	UID     string `json:"uid"`
 	Message string `json:"message"`
 }
 

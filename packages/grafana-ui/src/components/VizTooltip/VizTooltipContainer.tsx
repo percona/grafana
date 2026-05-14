@@ -1,10 +1,11 @@
 import { css, cx } from '@emotion/css';
-import React, { useState, HTMLAttributes, useMemo, useRef, useLayoutEffect } from 'react';
+import { useState, HTMLAttributes, useMemo, useRef, useLayoutEffect } from 'react';
+import * as React from 'react';
 import { useWindowSize } from 'react-use';
 
 import { Dimensions2D, GrafanaTheme2 } from '@grafana/data';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 import { getTooltipContainerStyles } from '../../themes/mixins';
 
 import { calculateTooltipPosition } from './utils';

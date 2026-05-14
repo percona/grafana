@@ -1,8 +1,8 @@
 package resourcepermissions
 
 import (
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 )
 
 type SetResourcePermissionCommand struct {
@@ -27,6 +27,7 @@ type GetResourcePermissionsQuery struct {
 	ResourceID           string
 	ResourceAttribute    string
 	OnlyManaged          bool
+	ExcludeManaged       bool //Exclude managed roles from SQL query (for provisioned-only fetches)
 	InheritedScopes      []string
 	EnforceAccessControl bool
 	User                 identity.Requester

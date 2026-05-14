@@ -1,10 +1,9 @@
 // Core Grafana history https://github.com/grafana/grafana/blob/v11.0.0-preview/public/app/plugins/datasource/prometheus/querybuilder/QueryPatternsModal.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
-import { promQueryModeller } from './PromQueryModeller';
 import { QueryPatternsModal } from './QueryPatternsModal';
+import { promQueryModeller } from './shared/modeller_instance';
 import { PromQueryPatternType } from './types';
 
 // don't care about interaction tracking in our unit tests

@@ -2,15 +2,20 @@ package notifier
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
 	"time"
 
+	alertingModels "github.com/grafana/alerting/models"
+	"github.com/grafana/alerting/notify/nfstatus"
 	"github.com/prometheus/client_golang/prometheus"
 
 	alertingCluster "github.com/grafana/alerting/cluster"
-	"github.com/grafana/grafana/pkg/util/errutil"
+
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
+	ac "github.com/grafana/grafana/pkg/services/accesscontrol"
 
 	alertingNotify "github.com/grafana/alerting/notify"
 
@@ -67,12 +72,25 @@ type Alertmanager interface {
 
 	// Receivers
 	GetReceivers(ctx context.Context) ([]apimodels.Receiver, error)
-	TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*TestReceiversResult, error)
+	TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*alertingNotify.TestReceiversResult, int, error)
+	TestIntegration(ctx context.Context, receiverName string, integrationConfig models.Integration, alert alertingModels.TestReceiversConfigAlertParams) (alertingModels.IntegrationStatus, error)
 	TestTemplate(ctx context.Context, c apimodels.TestTemplatesConfigBodyParams) (*TestTemplatesResults, error)
 
 	// Lifecycle
 	StopAndWait()
 	Ready() bool
+}
+
+// ExternalState holds nflog entries and silences from an external Alertmanager.
+type ExternalState struct {
+	Silences []byte
+	Nflog    []byte
+	FlushLog []byte
+}
+
+// StateMerger describes a type that is able to merge external state (nflog, silences) with its own.
+type StateMerger interface {
+	MergeState(ExternalState) error
 }
 
 type MultiOrgAlertmanager struct {
@@ -87,8 +105,9 @@ type MultiOrgAlertmanager struct {
 	logger         log.Logger
 
 	// clusterPeer represents the clustering peers of Alertmanagers between Grafana instances.
-	peer         alertingNotify.ClusterPeer
-	settleCancel context.CancelFunc
+	peer                   alertingNotify.ClusterPeer
+	alertsBroadcastChannel alertingCluster.ClusterChannel
+	settleCancel           context.CancelFunc
 
 	configStore AlertingStore
 	orgStore    store.OrgStore
@@ -99,6 +118,8 @@ type MultiOrgAlertmanager struct {
 
 	metrics *metrics.MultiOrgAlertmanager
 	ns      notifications.Service
+
+	receiverResourcePermissions ac.ReceiverPermissionsService
 }
 
 type OrgAlertmanagerFactory func(ctx context.Context, orgID int64) (Alertmanager, error)
@@ -120,37 +141,42 @@ func NewMultiOrgAlertmanager(
 	decryptFn alertingNotify.GetDecryptedValueFn,
 	m *metrics.MultiOrgAlertmanager,
 	ns notifications.Service,
+	receiverResourcePermissions ac.ReceiverPermissionsService,
 	l log.Logger,
 	s secrets.Service,
 	featureManager featuremgmt.FeatureToggles,
+	notificationHistorian nfstatus.NotificationHistorian,
 	opts ...Option,
 ) (*MultiOrgAlertmanager, error) {
 	moa := &MultiOrgAlertmanager{
 		Crypto:    NewCrypto(s, configStore, l),
 		ProvStore: provStore,
 
-		logger:         l,
-		settings:       cfg,
-		featureManager: featureManager,
-		alertmanagers:  map[int64]Alertmanager{},
-		configStore:    configStore,
-		orgStore:       orgStore,
-		kvStore:        kvStore,
-		decryptFn:      decryptFn,
-		metrics:        m,
-		ns:             ns,
-		peer:           &NilPeer{},
+		logger:                      l,
+		settings:                    cfg,
+		featureManager:              featureManager,
+		alertmanagers:               map[int64]Alertmanager{},
+		configStore:                 configStore,
+		orgStore:                    orgStore,
+		kvStore:                     kvStore,
+		decryptFn:                   decryptFn,
+		receiverResourcePermissions: receiverResourcePermissions,
+		metrics:                     m,
+		ns:                          ns,
+		peer:                        &NilPeer{},
 	}
 
 	if err := moa.setupClustering(cfg); err != nil {
 		return nil, err
 	}
 
+	moa.initAlertBroadcast()
+
 	// Set up the default per tenant Alertmanager factory.
 	moa.factory = func(ctx context.Context, orgID int64) (Alertmanager, error) {
-		m := metrics.NewAlertmanagerMetrics(moa.metrics.GetOrCreateOrgRegistry(orgID))
+		m := metrics.NewAlertmanagerMetrics(moa.metrics.GetOrCreateOrgRegistry(orgID), l)
 		stateStore := NewFileStore(orgID, kvStore)
-		return NewAlertmanager(ctx, orgID, moa.settings, moa.configStore, stateStore, moa.peer, moa.decryptFn, moa.ns, m, featureManager.IsEnabled(ctx, featuremgmt.FlagAlertingSimplifiedRouting))
+		return NewAlertmanager(ctx, orgID, moa.settings, moa.configStore, stateStore, moa.peer, moa.decryptFn, moa.ns, m, featureManager, moa.Crypto, notificationHistorian)
 	}
 
 	for _, opt := range opts {
@@ -169,15 +195,20 @@ func (moa *MultiOrgAlertmanager) setupClustering(cfg *setting.Cfg) error {
 	// Redis setup.
 	if cfg.UnifiedAlerting.HARedisAddr != "" {
 		redisPeer, err := newRedisPeer(redisConfig{
-			addr:       cfg.UnifiedAlerting.HARedisAddr,
-			name:       cfg.UnifiedAlerting.HARedisPeerName,
-			prefix:     cfg.UnifiedAlerting.HARedisPrefix,
-			password:   cfg.UnifiedAlerting.HARedisPassword,
-			username:   cfg.UnifiedAlerting.HARedisUsername,
-			db:         cfg.UnifiedAlerting.HARedisDB,
-			maxConns:   cfg.UnifiedAlerting.HARedisMaxConns,
-			tlsEnabled: cfg.UnifiedAlerting.HARedisTLSEnabled,
-			tls:        cfg.UnifiedAlerting.HARedisTLSConfig,
+			addr:             cfg.UnifiedAlerting.HARedisAddr,
+			name:             cfg.UnifiedAlerting.HARedisPeerName,
+			prefix:           cfg.UnifiedAlerting.HARedisPrefix,
+			password:         cfg.UnifiedAlerting.HARedisPassword,
+			username:         cfg.UnifiedAlerting.HARedisUsername,
+			db:               cfg.UnifiedAlerting.HARedisDB,
+			maxConns:         cfg.UnifiedAlerting.HARedisMaxConns,
+			tlsEnabled:       cfg.UnifiedAlerting.HARedisTLSEnabled,
+			tls:              cfg.UnifiedAlerting.HARedisTLSConfig,
+			clusterMode:      cfg.UnifiedAlerting.HARedisClusterModeEnabled,
+			sentinelMode:     cfg.UnifiedAlerting.HARedisSentinelModeEnabled,
+			masterName:       cfg.UnifiedAlerting.HARedisSentinelMasterName,
+			sentinelUsername: cfg.UnifiedAlerting.HARedisSentinelUsername,
+			sentinelPassword: cfg.UnifiedAlerting.HARedisSentinelPassword,
 		}, clusterLogger, moa.metrics.Registerer, cfg.UnifiedAlerting.HAPushPullInterval)
 		if err != nil {
 			return fmt.Errorf("unable to initialize redis: %w", err)
@@ -206,12 +237,11 @@ func (moa *MultiOrgAlertmanager) setupClustering(cfg *setting.Cfg) error {
 			true,
 			cfg.UnifiedAlerting.HALabel,
 		)
-
 		if err != nil {
 			return fmt.Errorf("unable to initialize gossip mesh: %w", err)
 		}
 
-		err = peer.Join(alertingCluster.DefaultReconnectInterval, alertingCluster.DefaultReconnectTimeout)
+		err = peer.Join(alertingCluster.DefaultReconnectInterval, cfg.UnifiedAlerting.HAReconnectTimeout)
 		if err != nil {
 			moa.logger.Error("Msg", "Unable to join gossip mesh while initializing cluster for high availability mode", "error", err)
 		}
@@ -224,6 +254,42 @@ func (moa *MultiOrgAlertmanager) setupClustering(cfg *setting.Cfg) error {
 		return nil
 	}
 	return nil
+}
+
+// initAlertBroadcast initializes the alert broadcast channel for HA mode.
+// When enabled, alerts evaluated on the primary instance are broadcast to all peers.
+func (moa *MultiOrgAlertmanager) initAlertBroadcast() {
+	if moa.peer == nil {
+		return
+	}
+	if _, ok := moa.peer.(*NilPeer); ok {
+		return
+	}
+	state := newAlertBroadcastState(moa.logger.New("component", "alert-broadcast"), moa)
+	moa.alertsBroadcastChannel = moa.peer.AddState(alertBroadcastKey, state, moa.metrics.Registerer)
+}
+
+// BroadcastAlerts sends alerts to all peers via the cluster channel.
+// This is used in HA single-node evaluation mode to propagate alerts from the
+// primary evaluator to all other instances.
+func (moa *MultiOrgAlertmanager) BroadcastAlerts(orgID int64, alerts apimodels.PostableAlerts) {
+	if moa.alertsBroadcastChannel == nil {
+		return
+	}
+	if len(alerts.PostableAlerts) == 0 {
+		return
+	}
+	payload := AlertBroadcastPayload{
+		OrgID:  orgID,
+		Alerts: alerts,
+	}
+	buf, err := json.Marshal(payload)
+	if err != nil {
+		moa.logger.Warn("Failed to encode broadcast alerts payload", "error", err)
+		return
+	}
+	moa.alertsBroadcastChannel.Broadcast(buf)
+	moa.logger.Debug("Broadcast alerts to peers", "orgID", orgID, "alerts", len(alerts.PostableAlerts))
 }
 
 func (moa *MultiOrgAlertmanager) Run(ctx context.Context) error {
@@ -245,7 +311,7 @@ func (moa *MultiOrgAlertmanager) Run(ctx context.Context) error {
 func (moa *MultiOrgAlertmanager) LoadAndSyncAlertmanagersForOrgs(ctx context.Context) error {
 	moa.logger.Debug("Synchronizing Alertmanagers for orgs")
 	// First, load all the organizations from the database.
-	orgIDs, err := moa.orgStore.GetOrgs(ctx)
+	orgIDs, err := moa.orgStore.FetchOrgIds(ctx)
 	if err != nil {
 		return err
 	}
@@ -353,8 +419,9 @@ func (moa *MultiOrgAlertmanager) SyncAlertmanagersForOrgs(ctx context.Context, o
 // active organizations. The original intention for this was the cleanup deleted orgs, that have had their states
 // saved to the kvstore after deletion on instance shutdown.
 func (moa *MultiOrgAlertmanager) cleanupOrphanLocalOrgState(ctx context.Context,
-	activeOrganizations map[int64]struct{}) {
-	storedFiles := []string{NotificationLogFilename, SilencesFilename}
+	activeOrganizations map[int64]struct{},
+) {
+	storedFiles := []string{NotificationLogFilename, SilencesFilename, FlushLogFilename}
 	for _, fileName := range storedFiles {
 		keys, err := moa.kvStore.Keys(ctx, kvstore.AllOrganizations, KVNamespace, fileName)
 		if err != nil {
@@ -394,6 +461,12 @@ func (moa *MultiOrgAlertmanager) StopAndWait() {
 		moa.settleCancel()
 		r.Shutdown()
 	}
+}
+
+// Peer returns the cluster peer for this Alertmanager.
+// Returns nil if clustering is not configured.
+func (moa *MultiOrgAlertmanager) Peer() alertingNotify.ClusterPeer {
+	return moa.peer
 }
 
 // AlertmanagerFor returns the Alertmanager instance for the organization provided.

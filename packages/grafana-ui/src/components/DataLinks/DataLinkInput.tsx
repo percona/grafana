@@ -1,20 +1,23 @@
 import { css, cx } from '@emotion/css';
-import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/react';
+import { autoUpdate, offset, useFloating } from '@floating-ui/react';
 import Prism, { Grammar, LanguageMap } from 'prismjs';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import usePrevious from 'react-use/lib/usePrevious';
+import { memo, useEffect, useRef, useState } from 'react';
+import * as React from 'react';
+import { usePrevious } from 'react-use';
 import { Value } from 'slate';
 import Plain from 'slate-plain-serializer';
 import { Editor } from 'slate-react';
 
 import { DataLinkBuiltInVars, GrafanaTheme2, VariableOrigin, VariableSuggestion } from '@grafana/data';
 
-import { SlatePrism } from '../../slate-plugins';
-import { useStyles2 } from '../../themes';
+import { SlatePrism } from '../../slate-plugins/slate-prism';
+import { useStyles2 } from '../../themes/ThemeContext';
+import { getFocusStyles } from '../../themes/mixins';
+import { getPositioningMiddleware } from '../../utils/floating';
 import { SCHEMA, makeValue } from '../../utils/slate';
-import CustomScrollbar from '../CustomScrollbar/CustomScrollbar';
 import { getInputStyles } from '../Input/Input';
 import { Portal } from '../Portal/Portal';
+import { ScrollContainer } from '../ScrollContainer/ScrollContainer';
 
 import { DataLinkSuggestions } from './DataLinkSuggestions';
 import { SelectionReference } from './SelectionReference';
@@ -65,6 +68,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
       padding: 0,
       backgroundColor: 'transparent',
       border: 'none',
+      '&:focus-within': getFocusStyles(theme),
     },
   }),
 });
@@ -85,19 +89,18 @@ export const DataLinkInput = memo(
     const [linkUrl, setLinkUrl] = useState<Value>(makeValue(value));
     const prevLinkUrl = usePrevious<Value>(linkUrl);
     const [scrollTop, setScrollTop] = useState(0);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      scrollRef.current?.scrollTo(0, scrollTop);
+    }, [scrollTop]);
 
     // the order of middleware is important!
     const middleware = [
       offset(({ rects }) => ({
         alignmentAxis: rects.reference.width,
       })),
-      flip({
-        fallbackAxisSideDirection: 'start',
-        // see https://floating-ui.com/docs/flip#combining-with-shift
-        crossAxis: false,
-        boundary: document.body,
-      }),
-      shift(),
+      ...getPositioningMiddleware(),
     ];
 
     const { refs, floatingStyles } = useFloating({
@@ -131,6 +134,9 @@ export const DataLinkInput = memo(
 
       switch (event.key) {
         case 'Backspace':
+          if (stateRef.current.linkUrl.focusText.getText().length === 1) {
+            next();
+          }
         case 'Escape':
           setShowingSuggestions(false);
           return setSuggestionsIndex(0);
@@ -204,10 +210,10 @@ export const DataLinkInput = memo(
             {showingSuggestions && (
               <Portal>
                 <div ref={refs.setFloating} style={floatingStyles}>
-                  <CustomScrollbar
-                    scrollTop={scrollTop}
-                    autoHeightMax="300px"
-                    setScrollTop={({ scrollTop }) => setScrollTop(scrollTop)}
+                  <ScrollContainer
+                    maxHeight="300px"
+                    ref={scrollRef}
+                    onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
                   >
                     <DataLinkSuggestions
                       activeRef={activeRef}
@@ -216,7 +222,7 @@ export const DataLinkInput = memo(
                       onClose={() => setShowingSuggestions(false)}
                       activeIndex={suggestionsIndex}
                     />
-                  </CustomScrollbar>
+                  </ScrollContainer>
                 </div>
               </Portal>
             )}

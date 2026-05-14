@@ -1,9 +1,9 @@
 import { css } from '@emotion/css';
-import React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { Button, Drawer, Dropdown, Icon, LinkButton, Menu, Stack, Text, Tooltip, useStyles2 } from '@grafana/ui';
-import { createUrl } from 'app/features/alerting/unified/utils/url';
+import { RelativeUrl, createRelativeUrl } from 'app/features/alerting/unified/utils/url';
 
 import { SectionDto, SectionDtoStep, SectionsDto, StepButtonDto } from '../irmHooks';
 
@@ -18,7 +18,11 @@ export interface EssentialsProps {
 
 export function Essentials({ onClose, essentialsConfig, stepsDone, totalStepsToDo }: EssentialsProps) {
   return (
-    <Drawer title="Essentials" subtitle="Complete the following configuration tasks" onClose={onClose}>
+    <Drawer
+      title={t('gops.essentials.title-essentials', 'Essentials')}
+      subtitle="Complete the following configuration tasks"
+      onClose={onClose}
+    >
       <EssentialContent essentialContent={essentialsConfig} stepsDone={stepsDone} totalStepsToDo={totalStepsToDo} />
     </Drawer>
   );
@@ -49,9 +53,13 @@ function Section({ section }: SectionProps) {
   const styles = useStyles2(getStyles);
   return (
     <div className={styles.wrapper}>
-      <Text element="h4">{section.title}</Text>
+      <Text element="h4">
+        <span className="fs-unmask">{section.title}</span>
+      </Text>
 
-      <Text color="secondary">{section.description}</Text>
+      <Text color="secondary">
+        <span className="fs-unmask">{section.description}</span>
+      </Text>
       <Stack direction={'column'} gap={2}>
         {section.steps.map((step, index) => (
           <Step key={index} step={step} />
@@ -62,9 +70,9 @@ function Section({ section }: SectionProps) {
 }
 function DoneIcon({ done }: { done: boolean }) {
   return done ? (
-    <Icon name="check-circle" color="green" data-testid="checked-step" />
+    <Icon name="check-circle" color="green" data-testid="checked-step" className="fs-unmask" />
   ) : (
-    <Icon name="circle" data-testid="unckecked-step" />
+    <Icon name="circle" data-testid="unckecked-step" className="fs-unmask" />
   );
 }
 interface StepProps {
@@ -76,7 +84,9 @@ function Step({ step }: StepProps) {
     <Stack direction={'row'} justifyContent={'space-between'} data-testid="step">
       <Stack direction={'row'} alignItems="center">
         {step.done !== undefined && <DoneIcon done={step.done} />}
-        <Text variant="body">{step.title}</Text>
+        <Text variant="body">
+          <span className="fs-unmask">{step.title}</span>
+        </Text>
         <Tooltip content={step.description} placement="right">
           <Icon name="question-circle" />
         </Tooltip>
@@ -87,30 +97,30 @@ function Step({ step }: StepProps) {
 }
 
 interface LinkButtonProps {
-  urlLink?: { url: string; queryParams?: Record<string, string> };
+  urlLink?: { url: RelativeUrl; queryParams?: Record<string, string> };
   label: string;
-  urlLinkOnDone?: { url: string; queryParams?: Record<string, string> };
+  urlLinkOnDone?: { url: RelativeUrl; queryParams?: Record<string, string> };
   labelOnDone?: string;
   done?: boolean;
 }
 function OpenLinkButton(props: LinkButtonProps) {
   const { urlLink, label, urlLinkOnDone, labelOnDone, done } = props;
   const urlToGoWhenNotDone = urlLink?.url
-    ? createUrl(urlLink.url, {
-        returnTo: location.pathname + location.search,
+    ? createRelativeUrl(urlLink.url, {
+        returnTo: window.location.pathname + window.location.search,
         ...urlLink.queryParams,
       })
     : '';
   const urlToGoWhenDone = urlLinkOnDone?.url
-    ? createUrl(urlLinkOnDone.url, {
-        returnTo: location.pathname + location.search,
+    ? createRelativeUrl(urlLinkOnDone.url, {
+        returnTo: window.location.pathname + window.location.search,
         ...urlLinkOnDone.queryParams,
       })
     : '';
   const urlToGo = done ? urlToGoWhenDone : urlToGoWhenNotDone;
   return (
-    <LinkButton href={urlToGo} variant="secondary">
-      {done ? labelOnDone ?? label : label}
+    <LinkButton href={urlToGo} variant="secondary" className="fs-unmask">
+      {done ? (labelOnDone ?? label) : label}
     </LinkButton>
   );
 }
@@ -145,11 +155,12 @@ function StepButton({
         return (
           <Dropdown
             overlay={
-              <Menu>
+              <Menu className="fs-unmask">
                 {options?.map((option) => (
                   <Menu.Item
                     label={option.label}
                     key={option.value}
+                    className="fs-unmask"
                     onClick={() => {
                       onClickOption?.(option.value);
                     }}
@@ -158,7 +169,7 @@ function StepButton({
               </Menu>
             }
           >
-            <Button variant="secondary" size="md">
+            <Button variant="secondary" size="md" className="fs-unmask">
               {label}
               <Icon name="angle-down" />
             </Button>
@@ -173,7 +184,7 @@ function StepButton({
 function ProgressStatus({ stepsDone, totalStepsToDo }: { stepsDone: number; totalStepsToDo: number }) {
   return (
     <Stack direction={'row'} gap={1} alignItems="center">
-      Your progress
+      <Trans i18nKey="gops.progress-status.your-progress">Your progress</Trans>
       <ProgressBar stepsDone={stepsDone} totalStepsToDo={totalStepsToDo} />
       <StepsStatus stepsDone={stepsDone} totalStepsToDo={totalStepsToDo} />
     </Stack>

@@ -1,12 +1,10 @@
-import React from 'react';
-
 import { Field, LinkModel } from '@grafana/data';
 
-import { ButtonProps, Button } from '../Button';
+import { ButtonProps, Button } from '../Button/Button';
 
 type DataLinkButtonProps = {
   link: LinkModel<Field>;
-  buttonProps?: ButtonProps;
+  buttonProps?: Omit<ButtonProps, 'children'>;
 };
 
 /**
@@ -30,7 +28,7 @@ export function DataLinkButton({ link, buttonProps }: DataLinkButtonProps) {
       }
     >
       <Button
-        icon={link.target === '_blank' ? 'external-link-alt' : undefined}
+        icon={link.target === '_blank' ? 'external-link-alt' : 'link'}
         variant="primary"
         size="sm"
         {...buttonProps}

@@ -1,6 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FormApi, FormState } from 'final-form';
-import React from 'react';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 
@@ -12,6 +11,7 @@ import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDet
 import { trackingOptions, rdsTrackingOptions } from './FormParts.constants';
 import { LabelsFormPart } from './Labels/Labels';
 import { MainDetailsFormPart } from './MainDetails/MainDetails';
+import { instanceList } from '../../AddInstance/AddInstance.constants';
 
 jest.mock('app/percona/inventory/Inventory.service');
 
@@ -61,6 +61,55 @@ describe('MainDetailsFormPart ::', () => {
     expect(screen.getByTestId('username-text-input')).not.toBeDisabled();
     expect(screen.getByTestId('password-password-input')).not.toBeDisabled();
   });
+
+  it('username and password should be optional for valkey', async () => {
+    render(
+      <Provider store={configureStore()}>
+        <Form
+          onSubmit={jest.fn()}
+          render={({ form, handleSubmit }) => (
+            <form data-testid="valkey-form" onSubmit={handleSubmit}>
+              <MainDetailsFormPart form={form} type={Databases.valkey} remoteInstanceCredentials={{}} />
+            </form>
+          )}
+        />
+      </Provider>
+    );
+
+    const form = screen.getByTestId('valkey-form');
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(screen.getByTestId('username-field-error-message')).toHaveTextContent(''));
+    await waitFor(() => expect(screen.getByTestId('password-field-error-message')).toHaveTextContent(''));
+  });
+
+  fit.each(instanceList.filter((i) => i.type !== Databases.valkey))(
+    'username and password field should be required for other service types',
+    async (service) => {
+      render(
+        <Provider store={configureStore()}>
+          <Form
+            onSubmit={jest.fn()}
+            render={({ form, handleSubmit }) => (
+              <form data-testid="service-form" onSubmit={handleSubmit}>
+                <MainDetailsFormPart form={form} type={service.type} remoteInstanceCredentials={{}} />
+              </form>
+            )}
+          />
+        </Provider>
+      );
+
+      const form = screen.getByTestId('service-form');
+      fireEvent.submit(form);
+
+      await waitFor(() =>
+        expect(screen.getByTestId('username-field-error-message')).toHaveTextContent('Required field')
+      );
+      await waitFor(() =>
+        expect(screen.getByTestId('password-field-error-message')).toHaveTextContent('Required field')
+      );
+    }
+  );
 });
 
 describe('ExternalServiceConnectionDetails ::', () => {
@@ -156,8 +205,9 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
 
     expect(screen.getByTestId('qan_mysql_perfschema-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('disable_query_examples-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_comments_parsing-checkbox-input')).toBeInTheDocument();
-    expect(fields.length).toBe(9);
+    expect(fields.length).toBe(10);
   });
   it('should render correct for RDS MySQL', async () => {
     const type = Databases.mysql;
@@ -173,10 +223,11 @@ describe('getAdditionalOptions ::', () => {
     );
     const fields = container.querySelectorAll('input');
     expect(screen.getByTestId('qan_mysql_perfschema-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('disable_query_examples-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_comments_parsing-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_basic_metrics-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_enhanced_metrics-checkbox-input')).toBeInTheDocument();
-    expect(fields.length).toBe(11);
+    expect(fields.length).toBe(12);
   });
   it('should render correct for PostgreSQL', async () => {
     const type = Databases.postgresql;
@@ -193,7 +244,7 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(trackingOptions.length);
-    expect(fields.length).toBe(16);
+    expect(fields.length).toBe(17);
   });
   it('should render correct for RDS PostgreSQL', async () => {
     const type = Databases.postgresql;
@@ -210,6 +261,6 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(rdsTrackingOptions.length);
-    expect(fields.length).toBe(17);
+    expect(fields.length).toBe(18);
   });
 });

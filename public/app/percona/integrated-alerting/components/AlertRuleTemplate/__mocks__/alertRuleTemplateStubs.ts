@@ -38,7 +38,7 @@ export const templateStubs: Template[] = [
   {
     name: 'template_2',
     created_at: '2020-11-25T16:53:39.366Z',
-    source: SourceDescription.SAAS,
+    source: SourceDescription.BUILT_IN,
     summary: 'MongoDB database down',
     yaml: 'yaml file content',
     params: [],
@@ -96,7 +96,7 @@ export const templateStubs: Template[] = [
   {
     name: 'template_5',
     created_at: '2020-12-25T16:53:39.366Z',
-    source: SourceDescription.SAAS,
+    source: SourceDescription.BUILT_IN,
     summary: 'Template',
     yaml: 'yaml file content',
     severity: 'SEVERITY_ERROR',

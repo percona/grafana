@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/models"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/rendering"
 	"github.com/grafana/grafana/pkg/util"
@@ -65,9 +65,9 @@ func (hs *HTTPServer) RenderHandler(c *contextmodel.ReqContext) {
 		headers["Accept-Language"] = acceptLanguageHeader
 	}
 
-	userID, errID := identity.UserIdentifier(c.SignedInUser.GetNamespacedID())
-	if errID != nil {
-		hs.log.Error("Failed to parse user id", "err", errID)
+	userID, err := identity.UserIdentifier(c.GetID())
+	if err != nil {
+		hs.log.Debug("Failed to parse user id", "err", err)
 	}
 
 	encoding := queryReader.Get("encoding", "")
@@ -83,9 +83,9 @@ func (hs *HTTPServer) RenderHandler(c *contextmodel.ReqContext) {
 				Timeout: time.Duration(timeout) * time.Second,
 			},
 			AuthOpts: rendering.AuthOpts{
-				OrgID:   c.SignedInUser.GetOrgID(),
+				OrgID:   c.GetOrgID(),
 				UserID:  userID,
-				OrgRole: c.SignedInUser.GetOrgRole(),
+				OrgRole: c.GetOrgRole(),
 			},
 			Path:            web.Params(c.Req)["*"] + queryParams,
 			Timezone:        queryReader.Get("tz", ""),
@@ -98,6 +98,11 @@ func (hs *HTTPServer) RenderHandler(c *contextmodel.ReqContext) {
 		Theme:             themeModel,
 	}, nil)
 	if err != nil {
+		if errors.Is(err, rendering.ErrTooManyRequests) {
+			c.JsonApiErr(http.StatusTooManyRequests, "Too many rendering requests", err)
+			return
+		}
+
 		if errors.Is(err, rendering.ErrTimeout) {
 			c.Handle(hs.Cfg, http.StatusInternalServerError, err.Error(), err)
 			return

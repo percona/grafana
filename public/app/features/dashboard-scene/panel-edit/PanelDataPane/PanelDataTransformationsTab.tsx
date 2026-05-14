@@ -1,57 +1,70 @@
 import { css } from '@emotion/css';
-import React, { useState } from 'react';
-import { DragDropContext, DropResult, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
+import { useCallback, useMemo, useState } from 'react';
 
-import { DataTransformerConfig, GrafanaTheme2, IconName, PanelData } from '@grafana/data';
+import { DataTransformerConfig, GrafanaTheme2, PanelData } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { SceneObjectBase, SceneComponentProps, SceneDataTransformer, SceneQueryRunner } from '@grafana/scenes';
+import { Trans, t } from '@grafana/i18n';
+import {
+  SceneComponentProps,
+  SceneDataTransformer,
+  SceneObjectBase,
+  SceneObjectRef,
+  SceneObjectState,
+  SceneQueryRunner,
+  VizPanel,
+} from '@grafana/scenes';
 import { Button, ButtonGroup, ConfirmModal, Tab, useStyles2 } from '@grafana/ui';
 import { TransformationOperationRows } from 'app/features/dashboard/components/TransformationsEditor/TransformationOperationRows';
+import { ExpressionQueryType } from 'app/features/expressions/types';
 
-import { VizPanelManager } from '../VizPanelManager';
+import { getQueryRunnerFor } from '../../utils/utils';
 
 import { EmptyTransformationsMessage } from './EmptyTransformationsMessage';
+import { PanelDataPane } from './PanelDataPane';
+import { PanelDataQueriesTab } from './PanelDataQueriesTab';
 import { TransformationsDrawer } from './TransformationsDrawer';
-import { PanelDataPaneTabState, PanelDataPaneTab, TabId, PanelDataTabHeaderProps } from './types';
+import { PanelDataPaneTab, PanelDataTabHeaderProps, TabId } from './types';
+import { scrollToQueryRow } from './utils';
 
-interface PanelDataTransformationsTabState extends PanelDataPaneTabState {}
+const SET_TIMEOUT = 750;
+
+interface PanelDataTransformationsTabState extends SceneObjectState {
+  panelRef: SceneObjectRef<VizPanel>;
+}
 
 export class PanelDataTransformationsTab
   extends SceneObjectBase<PanelDataTransformationsTabState>
   implements PanelDataPaneTab
 {
   static Component = PanelDataTransformationsTabRendered;
-  TabComponent: (props: PanelDataTabHeaderProps) => React.JSX.Element;
-
   tabId = TabId.Transformations;
-  icon: IconName = 'process';
-  private _panelManager: VizPanelManager;
 
   getTabLabel() {
-    return 'Transformations';
+    return t('dashboard-scene.panel-data-transformations-tab.tab-label', 'Transformations');
   }
 
-  constructor(panelManager: VizPanelManager) {
-    super({});
-    this.TabComponent = (props: PanelDataTabHeaderProps) => TransformationsTab({ ...props, model: this });
-
-    this._panelManager = panelManager;
+  public renderTab(props: PanelDataTabHeaderProps) {
+    return <TransformationsTab key={this.getTabLabel()} model={this} {...props} />;
   }
 
   public getQueryRunner(): SceneQueryRunner {
-    return this._panelManager.queryRunner;
+    return getQueryRunnerFor(this.state.panelRef.resolve())!;
   }
 
   public getDataTransformer(): SceneDataTransformer {
-    return this._panelManager.dataTransformer;
+    const provider = this.state.panelRef.resolve().state.$data;
+
+    if (!provider || !(provider instanceof SceneDataTransformer)) {
+      throw new Error('Could not find SceneDataTransformer for panel');
+    }
+    return provider;
   }
 
   public onChangeTransformations(transformations: DataTransformerConfig[]) {
-    this._panelManager.changeTransformations(transformations);
-  }
-
-  get panelManager() {
-    return this._panelManager;
+    const transformer = this.getDataTransformer();
+    transformer.setState({ transformations });
+    transformer.reprocessTransformations();
   }
 }
 
@@ -59,14 +72,59 @@ export function PanelDataTransformationsTabRendered({ model }: SceneComponentPro
   const styles = useStyles2(getStyles);
   const sourceData = model.getQueryRunner().useState();
   const { data, transformations: transformsWrongType } = model.getDataTransformer().useState();
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const transformations: DataTransformerConfig[] = transformsWrongType as unknown as DataTransformerConfig[];
+
+  // Type guard to ensure transformations are DataTransformerConfig[]
+  const transformations = useMemo<DataTransformerConfig[]>(() => {
+    return Array.isArray(transformsWrongType)
+      ? transformsWrongType.filter(
+          (t): t is DataTransformerConfig =>
+            t !== null && typeof t === 'object' && 'id' in t && typeof t.id === 'string'
+        )
+      : [];
+  }, [transformsWrongType]);
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
 
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
+
+  const onGoToQueries = useCallback(() => {
+    const parent = model.parent;
+    if (!(parent instanceof PanelDataPane)) {
+      return;
+    }
+
+    const queriesTab = parent.state.tabs.find((tab) => tab.tabId === TabId.Queries);
+    if (!(queriesTab instanceof PanelDataQueriesTab)) {
+      return;
+    }
+
+    // Always create a new SQL expression (it will be added to the end of the queries array)
+    queriesTab.onAddExpressionOfType(ExpressionQueryType.sql);
+
+    // Navigate to the Queries tab
+    parent.onChangeTab(queriesTab);
+
+    // Scroll to the newly created SQL query after tab renders
+    setTimeout(() => {
+      const queries = queriesTab.getQueries();
+      // The newly added query is the last one in the array
+      if (queries.length > 0) {
+        const newQuery = queries[queries.length - 1];
+        if (newQuery?.refId) {
+          scrollToQueryRow(newQuery.refId);
+        }
+      }
+    }, SET_TIMEOUT);
+  }, [model]);
+
+  const onAddTransformation = useCallback(
+    (transformationId: string) => {
+      model.onChangeTransformations([...transformations, { id: transformationId, options: {} }]);
+    },
+    [model, transformations]
+  );
 
   if (!data || !sourceData.data) {
     return;
@@ -84,13 +142,20 @@ export function PanelDataTransformationsTabRendered({ model }: SceneComponentPro
       }}
       isOpen={drawerOpen}
       series={data.series}
-    ></TransformationsDrawer>
+    />
   );
 
   if (transformations.length < 1) {
     return (
       <>
-        <EmptyTransformationsMessage onShowPicker={openDrawer}></EmptyTransformationsMessage>
+        <EmptyTransformationsMessage
+          onShowPicker={openDrawer}
+          onGoToQueries={onGoToQueries}
+          onAddTransformation={onAddTransformation}
+          data={sourceData.data.series}
+          datasourceUid={sourceData.datasource?.uid}
+          queries={sourceData.queries}
+        />
         {transformationsDrawer}
       </>
     );
@@ -106,7 +171,9 @@ export function PanelDataTransformationsTabRendered({ model }: SceneComponentPro
           onClick={openDrawer}
           data-testid={selectors.components.Transforms.addTransformationButton}
         >
-          Add another transformation
+          <Trans i18nKey="dashboard-scene.panel-data-transformations-tab-rendered.add-another-transformation">
+            Add another transformation
+          </Trans>
         </Button>
         <Button
           data-testid={selectors.components.Transforms.removeAllTransformationsButton}
@@ -115,14 +182,22 @@ export function PanelDataTransformationsTabRendered({ model }: SceneComponentPro
           variant="secondary"
           onClick={() => setConfirmModalOpen(true)}
         >
-          Delete all transformations
+          <Trans i18nKey="dashboard-scene.panel-data-transformations-tab-rendered.delete-all-transformations">
+            Delete all transformations
+          </Trans>
         </Button>
       </ButtonGroup>
       <ConfirmModal
         isOpen={confirmModalOpen}
-        title="Delete all transformations?"
-        body="By deleting all transformations, you will go back to the main selection screen."
-        confirmText="Delete all"
+        title={t(
+          'dashboard-scene.panel-data-transformations-tab-rendered.title-delete-all-transformations',
+          'Delete all transformations?'
+        )}
+        body={t(
+          'dashboard-scene.panel-data-transformations-tab-rendered.body-delete-all-transformations',
+          'By deleting all transformations, you will go back to the main selection screen.'
+        )}
+        confirmText={t('dashboard-scene.panel-data-transformations-tab-rendered.confirmText-delete-all', 'Delete all')}
         onConfirm={() => {
           model.onChangeTransformations([]);
           setConfirmModalOpen(false);
@@ -200,11 +275,10 @@ interface TransformationsTabProps extends PanelDataTabHeaderProps {
 
 function TransformationsTab(props: TransformationsTabProps) {
   const { model } = props;
-
   const transformerState = model.getDataTransformer().useState();
+
   return (
     <Tab
-      key={props.key}
       label={model.getTabLabel()}
       icon="process"
       counter={transformerState.transformations.length}

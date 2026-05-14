@@ -1,28 +1,24 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
-import { match } from 'react-router-dom';
 import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
 
 import { Dashboard } from '@grafana/schema';
 import { GrafanaContext } from 'app/core/context/GrafanaContext';
 import { RouteDescriptor } from 'app/core/navigation/types';
-import { DashboardMeta, DashboardRoutes } from 'app/types';
+import { DashboardMeta, DashboardRoutes } from 'app/types/dashboard';
 
-import { getRouteComponentProps } from '../../../core/navigation/__mocks__/routeProps';
+import { getRouteComponentProps } from '../../../core/navigation/mocks/routeProps';
 import { Props as DashboardPanelProps } from '../dashgrid/DashboardPanel';
-import { DashboardModel } from '../state';
+import { DashboardModel } from '../state/DashboardModel';
 import { createDashboardModelFixture } from '../state/__fixtures__/dashboardFixtures';
 
 import { Props, SoloPanelPage } from './SoloPanelPage';
 
 jest.mock('app/features/dashboard/components/DashboardSettings/GeneralSettings', () => ({}));
 jest.mock('app/features/dashboard/dashgrid/DashboardPanel', () => {
-  class DashboardPanel extends React.Component<DashboardPanelProps> {
-    render() {
-      // In this test we only check whether a new panel has arrived in the props
-      return <>{this.props.panel?.title}</>;
-    }
-  }
+  const DashboardPanel = (props: DashboardPanelProps) => {
+    // In this test we only check whether a new panel has arrived in the props
+    return <>{props.panel?.title}</>;
+  };
 
   return { DashboardPanel };
 });
@@ -73,9 +69,6 @@ function soloPanelPageScenario(description: string, scenarioFn: (ctx: ScenarioCo
       mount: (propOverrides?: Partial<Props>) => {
         const props: Props = {
           ...getRouteComponentProps({
-            match: {
-              params: { slug: 'my-dash', uid: '11' },
-            } as unknown as match,
             queryParams: {
               panelId: '1',
             },
@@ -131,8 +124,12 @@ describe('SoloPanelPage', () => {
   soloPanelPageScenario('Dashboard init completed ', (ctx) => {
     ctx.setup(() => {
       // Needed for AutoSizer to work in test
-      Object.defineProperty(HTMLElement.prototype, 'offsetHeight', { configurable: true, value: 500 });
-      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, value: 500 });
+      Object.defineProperty(Element.prototype, 'getBoundingClientRect', {
+        value: jest.fn(() => ({
+          width: 500,
+          height: 500,
+        })),
+      });
 
       ctx.mount();
       ctx.setDashboard();

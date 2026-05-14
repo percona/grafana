@@ -1,17 +1,16 @@
 import { Observable } from 'rxjs';
 
 import {
-  DataQuery,
   DataQueryRequest,
   DataQueryResponse,
   DataSourceApi,
   DataSourceInstanceSettings,
   DataSourceJsonData,
   DataSourcePluginMeta,
-  PluginMetaInfo,
-  PluginType,
   TestDataSourceResponse,
-} from '../../types';
+} from '../../types/datasource';
+import { PluginMetaInfo, PluginType } from '../../types/plugin';
+import { DataQuery } from '../../types/query';
 
 export interface TestQuery extends DataQuery {
   query: string;
@@ -47,7 +46,6 @@ export const meta: DataSourcePluginMeta<DataSourceJsonData> = {
 
 export const TestDataSettings: DataSourceInstanceSettings<TestJsonData> = {
   jsonData: { url: 'http://localhost:3000' },
-  id: 0,
   uid: '',
   type: '',
   name: 'Test Datasource',

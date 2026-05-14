@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import { css } from '@emotion/css';
-import React, { RefObject } from 'react';
+import { PureComponent, RefObject } from 'react';
 
-import { GrafanaTheme2, LinkModel } from '@grafana/data';
+import { CoreApp, GrafanaTheme2, LinkModel, TimeRange, TraceLog } from '@grafana/data';
 import { SpanBarOptions, TraceToProfilesOptions } from '@grafana/o11y-ds-frontend';
 import { config, reportInteraction } from '@grafana/runtime';
 import { TimeZone } from '@grafana/schema';
@@ -23,50 +23,48 @@ import { stylesFactory, withTheme2 } from '@grafana/ui';
 
 import { autoColor } from '../Theme';
 import { merge as mergeShortcuts } from '../keyboard-shortcuts';
-import { CriticalPathSection, SpanLinkFunc, TNil } from '../types';
+import TNil from '../types/TNil';
 import TTraceTimeline from '../types/TTraceTimeline';
-import { TraceSpan, Trace, TraceLog, TraceKeyValuePair, TraceLink, TraceSpanReference } from '../types/trace';
+import { SpanLinkFunc } from '../types/links';
+import { TraceSpan, Trace, TraceSpanReference, CriticalPathSection } from '../types/trace';
 
 import { TraceFlameGraphs } from './SpanDetail';
-import TimelineHeaderRow from './TimelineHeaderRow';
+import TimelineHeaderRow from './TimelineHeaderRow/TimelineHeaderRow';
 import VirtualizedTraceView from './VirtualizedTraceView';
 import { TUpdateViewRangeTimeFunction, ViewRange, ViewRangeTimeUpdate } from './types';
 
-const getStyles = stylesFactory((theme: GrafanaTheme2) => {
-  return {
-    TraceTimelineViewer: css`
-      label: TraceTimelineViewer;
-      border-bottom: 1px solid ${autoColor(theme, '#bbb')};
+const getStyles = stylesFactory((theme: GrafanaTheme2) => ({
+  TraceTimelineViewer: css({
+    label: 'TraceTimelineViewer',
+    borderBottom: `1px solid ${autoColor(theme, '#bbb')}`,
 
-      & .json-markup {
-        line-height: 17px;
-        font-size: 13px;
-        font-family: monospace;
-        white-space: pre-wrap;
-      }
+    '& .json-markup': {
+      lineHeight: '17px',
+      fontFamily: 'monospace',
+      whiteSpace: 'pre-wrap',
+    },
 
-      & .json-markup-key {
-        font-weight: bold;
-      }
+    '& .json-markup-key': {
+      fontWeight: 'bold',
+    },
 
-      & .json-markup-bool {
-        color: ${autoColor(theme, 'firebrick')};
-      }
+    '& .json-markup-bool': {
+      color: autoColor(theme, 'firebrick'),
+    },
 
-      & .json-markup-string {
-        color: ${autoColor(theme, 'teal')};
-      }
+    '& .json-markup-string': {
+      color: autoColor(theme, 'teal'),
+    },
 
-      & .json-markup-null {
-        color: ${autoColor(theme, 'teal')};
-      }
+    '& .json-markup-null': {
+      color: autoColor(theme, 'teal'),
+    },
 
-      & .json-markup-number {
-        color: ${autoColor(theme, 'blue', 'black')};
-      }
-    `,
-  };
-});
+    '& .json-markup-number': {
+      color: autoColor(theme, 'blue', 'black'),
+    },
+  }),
+}));
 
 export type TProps = {
   findMatchesIDs: Set<string> | TNil;
@@ -74,6 +72,7 @@ export type TProps = {
   trace: Trace;
   traceToProfilesOptions?: TraceToProfilesOptions;
   datasourceType: string;
+  datasourceUid: string;
   spanBarOptions: SpanBarOptions | undefined;
   updateNextViewRangeTime: (update: ViewRangeTimeUpdate) => void;
   updateViewRangeTime: TUpdateViewRangeTimeFunction;
@@ -98,22 +97,22 @@ export type TProps = {
   detailToggle: (spanID: string) => void;
   addHoverIndentGuideId: (spanID: string) => void;
   removeHoverIndentGuideId: (spanID: string) => void;
-  linksGetter: (span: TraceSpan, items: TraceKeyValuePair[], itemIndex: number) => TraceLink[];
   theme: GrafanaTheme2;
   createSpanLink?: SpanLinkFunc;
   scrollElement?: Element;
   focusedSpanId?: string;
   focusedSpanIdForSearch: string;
   showSpanFilterMatchesOnly: boolean;
-  showCriticalPathSpansOnly: boolean;
   createFocusSpanLink: (traceId: string, spanId: string) => LinkModel;
-  topOfViewRef?: RefObject<HTMLDivElement>;
+  topOfViewRef?: RefObject<HTMLDivElement | null>;
   headerHeight: number;
   criticalPath: CriticalPathSection[];
   traceFlameGraphs: TraceFlameGraphs;
   setTraceFlameGraphs: (flameGraphs: TraceFlameGraphs) => void;
   redrawListView: {};
   setRedrawListView: (redraw: {}) => void;
+  timeRange: TimeRange;
+  app: CoreApp;
 };
 
 type State = {
@@ -129,7 +128,7 @@ const NUM_TICKS = 5;
  * re-render the ListView every time the cursor is moved on the trace minimap
  * or `TimelineHeaderRow`.
  */
-export class UnthemedTraceTimelineViewer extends React.PureComponent<TProps, State> {
+export class UnthemedTraceTimelineViewer extends PureComponent<TProps, State> {
   constructor(props: TProps) {
     super(props);
     this.state = { height: 0 };
@@ -198,7 +197,11 @@ export class UnthemedTraceTimelineViewer extends React.PureComponent<TProps, Sta
     return (
       <div
         className={styles.TraceTimelineViewer}
-        ref={(ref: HTMLDivElement | null) => ref && this.setState({ height: ref.getBoundingClientRect().height })}
+        ref={(ref) => {
+          if (ref) {
+            this.setState({ height: ref.getBoundingClientRect().height });
+          }
+        }}
       >
         <TimelineHeaderRow
           duration={trace.duration}
@@ -222,6 +225,7 @@ export class UnthemedTraceTimelineViewer extends React.PureComponent<TProps, Sta
           topOfViewRef={topOfViewRef}
           focusedSpanIdForSearch={focusedSpanIdForSearch}
           datasourceType={this.props.datasourceType}
+          datasourceUid={this.props.datasourceUid}
         />
       </div>
     );

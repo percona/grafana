@@ -14,7 +14,6 @@
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import { createTheme } from '@grafana/data';
 
@@ -68,8 +67,8 @@ describe('<TraceTimelineViewer>', () => {
 
     const expandOne = screen.getByRole('button', { name: 'Expand +1' });
     const collapseOne = screen.getByRole('button', { name: 'Collapse +1' });
-    const expandAll = screen.getByRole('button', { name: 'Expand All' });
-    const collapseAll = screen.getByRole('button', { name: 'Collapse All' });
+    const expandAll = screen.getByRole('button', { name: 'Expand all' });
+    const collapseAll = screen.getByRole('button', { name: 'Collapse all' });
 
     expect(expandOne).toBeInTheDocument();
     expect(collapseOne).toBeInTheDocument();

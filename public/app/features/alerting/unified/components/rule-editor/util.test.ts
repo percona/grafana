@@ -1,9 +1,10 @@
-import { ExpressionDatasourceRef } from '@grafana/runtime/src/utils/DataSourceWithBackend';
+import { ExpressionDatasourceRef } from '@grafana/runtime/internal';
 import { ClassicCondition, ExpressionQuery } from 'app/features/expressions/types';
 import { AlertQuery } from 'app/types/unified-alerting-dto';
 
+import { NEW_REDUCER_REF } from './query-and-alert-condition/reducer';
 import {
-  checkForPathSeparator,
+  containsPathSeparator,
   findRenamedDataQueryReferences,
   getThresholdsForQueries,
   queriesWithUpdatedReferences,
@@ -163,10 +164,10 @@ describe('rule-editor', () => {
 
     it('should rewire threshold expressions', () => {
       const queries: AlertQuery[] = [dataSource, reduceExpression, thresholdExpression];
-      const rewiredQueries = queriesWithUpdatedReferences(queries, 'B', 'REDUCER');
+      const rewiredQueries = queriesWithUpdatedReferences(queries, 'B', NEW_REDUCER_REF);
 
       const queryModel = rewiredQueries[2].model as ExpressionQuery;
-      expect(queryModel.expression).toBe('REDUCER');
+      expect(queryModel.expression).toBe(NEW_REDUCER_REF);
     });
 
     it('should rewire multiple expressions', () => {
@@ -229,17 +230,15 @@ describe('rule-editor', () => {
   });
 });
 
-describe('checkForPathSeparator', () => {
-  it('should not allow strings with /', () => {
-    expect(checkForPathSeparator('foo / bar')).not.toBe(true);
-    expect(typeof checkForPathSeparator('foo / bar')).toBe('string');
+describe('containsPathSeparator', () => {
+  it('should return true for strings with /', () => {
+    expect(containsPathSeparator('foo / bar')).toBe(true);
   });
-  it('should not allow strings with \\', () => {
-    expect(checkForPathSeparator('foo \\ bar')).not.toBe(true);
-    expect(typeof checkForPathSeparator('foo \\ bar')).toBe('string');
+  it('should return true for strings with \\', () => {
+    expect(containsPathSeparator('foo \\ bar')).toBe(true);
   });
-  it('should allow anything without / or \\', () => {
-    expect(checkForPathSeparator('foo bar')).toBe(true);
+  it('should return false for strings without / or \\', () => {
+    expect(containsPathSeparator('foo !@#$%^&*() <> [] {} bar')).toBe(false);
   });
 });
 
@@ -424,7 +423,7 @@ describe('findRenamedReferences', () => {
       { refId: 'MATH', model: { datasource: '-100' } },
       { refId: 'B' },
       { refId: 'C' },
-    ] as AlertQuery[];
+    ] as Array<AlertQuery<ExpressionQuery>>;
 
     // @ts-expect-error
     const updated = [
@@ -432,7 +431,7 @@ describe('findRenamedReferences', () => {
       { refId: 'REDUCE', model: { datasource: '-100' } },
       { refId: 'B' },
       { refId: 'C' },
-    ] as AlertQuery[];
+    ] as Array<AlertQuery<ExpressionQuery>>;
 
     expect(findRenamedDataQueryReferences(previous, updated)).toEqual(['A', 'FOO']);
   });

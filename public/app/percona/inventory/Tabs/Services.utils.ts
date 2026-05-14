@@ -2,7 +2,7 @@ import { BadgeColor, IconName } from '@grafana/ui';
 import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { DbAgent, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 
-import { FlattenService, MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
+import { AgentType, FlattenService, MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
 
 const SERVICE_STATUS_TO_BADGE_COLOR: Record<ServiceStatus, BadgeColor> = {
   [ServiceStatus.UP]: 'green',
@@ -41,11 +41,37 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
 };
 
 export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
-  const allAgentsOk = agents?.every(
-    (agent) =>
-      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected
-  );
-  return allAgentsOk ? MonitoringStatus.OK : MonitoringStatus.FAILED;
+  if (agents.length === 0) {
+    return MonitoringStatus.OK;
+  }
+
+  const allAgentsOk = agents?.every((agent) => {
+    const ok =
+      agent.status === ServiceAgentStatus.RUNNING ||
+      agent.status === ServiceAgentStatus.STARTING ||
+      (agent.disabled && agent.status === ServiceAgentStatus.DONE) ||
+      !!agent.isConnected;
+
+    return ok;
+  });
+
+  if (!allAgentsOk) {
+    return MonitoringStatus.FAILED;
+  }
+
+  const disabledAgents = agents.filter((a) => a.disabled && a.agentType !== AgentType.rtaMongoDBAgent);
+
+  if (disabledAgents.length === 1) {
+    const agent = disabledAgents[0];
+
+    return agent.agentType === AgentType.qanPostgresql_pgstatements_agent
+      ? MonitoringStatus.OK
+      : MonitoringStatus.WARNING;
+  } else if (disabledAgents.length > 1) {
+    return MonitoringStatus.WARNING;
+  }
+
+  return MonitoringStatus.OK;
 };
 
 export const getNodeLink = (service: FlattenService) => {

@@ -23,16 +23,16 @@ func (s *Service) supportBundleCollector(context.Context) (*supportbundles.Suppo
 
 		ldapStatus, err := ldapClient.Ping()
 		if err != nil {
-			bWriter.WriteString(
-				fmt.Sprintf("Unable to ping server\n Err: %s", err))
+			fmt.Fprintf(bWriter,
+				"Unable to ping server\n Err: %s", err)
 		}
 
 		for _, server := range ldapStatus {
-			bWriter.WriteString(fmt.Sprintf("\nHost: %s  \n", server.Host))
-			bWriter.WriteString(fmt.Sprintf("Port: %d  \n", server.Port))
-			bWriter.WriteString(fmt.Sprintf("Available: %v  \n", server.Available))
+			fmt.Fprintf(bWriter, "\nHost: %s  \n", server.Host)
+			fmt.Fprintf(bWriter, "Port: %d  \n", server.Port)
+			fmt.Fprintf(bWriter, "Available: %v  \n", server.Available)
 			if server.Error != nil {
-				bWriter.WriteString(fmt.Sprintf("Error: %s\n", server.Error))
+				fmt.Fprintf(bWriter, "Error: %s\n", server.Error)
 			}
 		}
 
@@ -42,14 +42,15 @@ func (s *Service) supportBundleCollector(context.Context) (*supportbundles.Suppo
 		for _, server := range ldapConfig.Servers {
 			server.BindPassword = "********" // censor password on config dump
 			server.ClientKey = "********"    // censor client key on config dump
+			server.ClientKeyValue = "********"
 
 			if !strings.Contains(server.SearchFilter, server.Attr.Username) {
-				bWriter.WriteString(fmt.Sprintf(
+				fmt.Fprintf(bWriter,
 					"Search filter does not match username attribute  \n"+
 						"Server: %s  \n"+
 						"Search filter: %s  \n"+
 						"Username attribute: %s  \n",
-					server.Host, server.SearchFilter, server.Attr.Username))
+					server.Host, server.SearchFilter, server.Attr.Username)
 				issue = true
 			}
 		}
@@ -63,8 +64,8 @@ func (s *Service) supportBundleCollector(context.Context) (*supportbundles.Suppo
 	bWriter.WriteString("```toml\n")
 	errM := toml.NewEncoder(bWriter).Encode(ldapConfig)
 	if errM != nil {
-		bWriter.WriteString(
-			fmt.Sprintf("Unable to encode LDAP configuration  \n Err: %s", errM))
+		fmt.Fprintf(bWriter,
+			"Unable to encode LDAP configuration  \n Err: %s", errM)
 	}
 	bWriter.WriteString("```\n\n")
 
@@ -72,12 +73,12 @@ func (s *Service) supportBundleCollector(context.Context) (*supportbundles.Suppo
 
 	bWriter.WriteString("```ini\n")
 
-	bWriter.WriteString(fmt.Sprintf("enabled = %v\n", s.cfg.LDAPAuthEnabled))
-	bWriter.WriteString(fmt.Sprintf("config_file = %s\n", s.cfg.LDAPConfigFilePath))
-	bWriter.WriteString(fmt.Sprintf("allow_sign_up = %v\n", s.cfg.LDAPAllowSignup))
-	bWriter.WriteString(fmt.Sprintf("sync_cron = %s\n", s.cfg.LDAPSyncCron))
-	bWriter.WriteString(fmt.Sprintf("active_sync_enabled = %v\n", s.cfg.LDAPActiveSyncEnabled))
-	bWriter.WriteString(fmt.Sprintf("skip_org_role_sync = %v\n", s.cfg.LDAPSkipOrgRoleSync))
+	fmt.Fprintf(bWriter, "enabled = %v\n", s.cfg.Enabled)
+	fmt.Fprintf(bWriter, "config_file = %s\n", s.cfg.ConfigFilePath)
+	fmt.Fprintf(bWriter, "allow_sign_up = %v\n", s.cfg.AllowSignUp)
+	fmt.Fprintf(bWriter, "sync_cron = %s\n", s.cfg.SyncCron)
+	fmt.Fprintf(bWriter, "active_sync_enabled = %v\n", s.cfg.ActiveSyncEnabled)
+	fmt.Fprintf(bWriter, "skip_org_role_sync = %v\n", s.cfg.SkipOrgRoleSync)
 
 	bWriter.WriteString("```\n\n")
 

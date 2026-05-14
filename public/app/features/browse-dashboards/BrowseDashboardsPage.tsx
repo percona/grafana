@@ -1,44 +1,49 @@
 import { css } from '@emotion/css';
-import React, { memo, useEffect, useMemo } from 'react';
+import { useBooleanFlagValue } from '@openfeature/react-sdk';
+import { memo, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useParams } from 'react-router-dom-v5-compat';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { GrafanaTheme2 } from '@grafana/data';
-import { reportInteraction } from '@grafana/runtime';
-import { FilterInput, useStyles2 } from '@grafana/ui';
+import { config, reportInteraction } from '@grafana/runtime';
+import { FilterInput, useStyles2, Text, Stack } from '@grafana/ui';
+import { useGetFolderQueryFacade, useUpdateFolder } from 'app/api/clients/folder/v1beta1/hooks';
 import { Page } from 'app/core/components/Page/Page';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import { useDispatch } from 'app/types';
+import { useDispatch } from 'app/types/store';
 
+import { FolderRepo } from '../../core/components/NestedFolderPicker/FolderRepo';
+import { ManagerKind } from '../apiserver/types';
+import { TemplateDashboardModal } from '../dashboard/dashgrid/DashboardLibrary/TemplateDashboardModal';
 import { buildNavModel, getDashboardsTabID } from '../folders/state/navModel';
+import { ProvisionedFolderPreviewBanner } from '../provisioning/components/Folders/ProvisionedFolderPreviewBanner';
+import { useGetResourceRepositoryView } from '../provisioning/hooks/useGetResourceRepositoryView';
 import { useSearchStateManager } from '../search/state/SearchStateManager';
 import { getSearchPlaceholder } from '../search/tempI18nPhrases';
 
-import { skipToken, useGetFolderQuery, useSaveFolderMutation } from './api/browseDashboardsAPI';
 import { BrowseActions } from './components/BrowseActions/BrowseActions';
 import { BrowseFilters } from './components/BrowseFilters';
 import { BrowseView } from './components/BrowseView';
-import CreateNewButton from './components/CreateNewButton';
-import { FolderActionsButton } from './components/FolderActionsButton';
+import { FolderDetailsActions } from './components/FolderDetailsActions/FolderDetailsActions';
+import { RecentlyViewedDashboards } from './components/RecentlyViewedDashboards';
 import { SearchView } from './components/SearchView';
 import { getFolderPermissions } from './permissions';
-import { setAllSelection, useHasSelection } from './state';
-
-export interface BrowseDashboardsPageRouteParams {
-  uid?: string;
-  slug?: string;
-}
-
-export interface Props extends GrafanaRouteComponentProps<BrowseDashboardsPageRouteParams> {}
+import { useHasSelection } from './state/hooks';
+import { setAllSelection } from './state/slice';
 
 // New Browse/Manage/Search Dashboards views for nested folders
-
-const BrowseDashboardsPage = memo(({ match }: Props) => {
-  const { uid: folderUID } = match.params;
+const BrowseDashboardsPage = memo(({ queryParams }: { queryParams: Record<string, string> }) => {
+  const { uid: folderUID } = useParams();
   const dispatch = useDispatch();
 
   const styles = useStyles2(getStyles);
   const [searchState, stateManager] = useSearchStateManager();
   const isSearching = stateManager.hasSearchFilters();
+  const location = useLocation();
+  const search = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const { isReadOnlyRepo } = useGetResourceRepositoryView({ folderName: folderUID });
+  const isRecentlyViewedEnabledValue = useBooleanFlagValue('recentlyViewedDashboards', false);
+  const isExperimentRecentlyViewedDashboards = useBooleanFlagValue('experimentRecentlyViewedDashboards', false);
+  const isRecentlyViewedEnabled = !folderUID && isRecentlyViewedEnabledValue;
 
   useEffect(() => {
     stateManager.initStateFromUrl(folderUID);
@@ -52,16 +57,41 @@ const BrowseDashboardsPage = memo(({ match }: Props) => {
     );
   }, [dispatch, folderUID, stateManager]);
 
+  // Trigger search when "starred" query param changes
+  useEffect(() => {
+    stateManager.onSetStarred(search.has('starred'));
+  }, [search, stateManager]);
+
   useEffect(() => {
     // Clear the search results when we leave SearchView to prevent old results flashing
     // when starting a new search
     if (!isSearching && searchState.result) {
       stateManager.setState({ result: undefined, includePanels: undefined });
     }
+    if (isSearching && searchState.result?.totalRows === 0) {
+      reportInteraction('grafana_empty_state_shown', { source: 'browse_dashboards' });
+    }
   }, [isSearching, searchState.result, stateManager]);
 
-  const { data: folderDTO } = useGetFolderQuery(folderUID ?? skipToken);
-  const [saveFolder] = useSaveFolderMutation();
+  // Emit exposure event for A/A test once when page loads
+  const hasEmittedExposureEvent = useRef(false);
+
+  useEffect(() => {
+    if (!isRecentlyViewedEnabled || hasEmittedExposureEvent.current) {
+      return;
+    }
+
+    hasEmittedExposureEvent.current = true;
+    const isExperimentTreatment = isExperimentRecentlyViewedDashboards;
+
+    reportInteraction('dashboards_browse_list_viewed', {
+      experiment_dashboard_list_recently_viewed: isExperimentTreatment ? 'treatment' : 'control',
+      has_recently_viewed_component: isExperimentTreatment,
+    });
+  }, [isRecentlyViewedEnabled, isExperimentRecentlyViewedDashboards]);
+
+  const { data: folderDTO } = useGetFolderQueryFacade(folderUID);
+  const [saveFolder] = useUpdateFolder();
   const navModel = useMemo(() => {
     if (!folderDTO) {
       return undefined;
@@ -79,10 +109,20 @@ const BrowseDashboardsPage = memo(({ match }: Props) => {
 
   const hasSelection = useHasSelection();
 
-  const { canEditFolders, canEditDashboards, canCreateDashboards, canCreateFolders } = getFolderPermissions(folderDTO);
+  // Fetch the root (aka general) folder if we're not in a specific folder
+  const { data: rootFolderDTO } = useGetFolderQueryFacade(folderDTO ? undefined : 'general');
+  const folder = folderDTO ?? rootFolderDTO;
 
-  const showEditTitle = canEditFolders && folderUID;
-  const canSelect = canEditFolders || canEditDashboards;
+  const { canEditFolders, canDeleteFolders, canDeleteDashboards, canEditDashboards } = getFolderPermissions(folder);
+  const isProvisionedFolder = folder?.managedBy === ManagerKind.Repo;
+  const showEditTitle = canEditFolders && folderUID && !isProvisionedFolder;
+  const permissions = {
+    canEditFolders,
+    canEditDashboards,
+    canDeleteFolders,
+    canDeleteDashboards,
+    isReadOnlyRepo,
+  };
   const onEditTitle = async (newValue: string) => {
     if (folderDTO) {
       const result = await saveFolder({
@@ -92,7 +132,6 @@ const BrowseDashboardsPage = memo(({ match }: Props) => {
       if ('error' in result) {
         reportInteraction('grafana_browse_dashboards_page_edit_folder_name', {
           status: 'failed_with_error',
-          error: result.error,
         });
         throw result.error;
       } else {
@@ -103,51 +142,67 @@ const BrowseDashboardsPage = memo(({ match }: Props) => {
     }
   };
 
+  const renderTitle = (title: string) => {
+    return (
+      <Stack alignItems={'center'} gap={2}>
+        <Text element={'h1'}>{title}</Text> <FolderRepo folder={folder} />
+      </Stack>
+    );
+  };
+
   return (
     <Page
       navId="dashboards/browse"
       pageNav={navModel}
       onEditTitle={showEditTitle ? onEditTitle : undefined}
-      actions={
-        <>
-          {folderDTO && <FolderActionsButton folder={folderDTO} />}
-          {(canCreateDashboards || canCreateFolders) && (
-            <CreateNewButton
-              parentFolder={folderDTO}
-              canCreateDashboard={canCreateDashboards}
-              canCreateFolder={canCreateFolders}
-            />
-          )}
-        </>
-      }
+      renderTitle={renderTitle}
+      actions={<FolderDetailsActions folderDTO={folderDTO} />}
     >
       <Page.Contents className={styles.pageContents}>
-        <FilterInput
-          placeholder={getSearchPlaceholder(searchState.includePanels)}
-          value={searchState.query}
-          escapeRegex={false}
-          onChange={(e) => stateManager.onQueryChange(e)}
-        />
+        <ProvisionedFolderPreviewBanner queryParams={queryParams} />
+        {/* only show recently viewed dashboards when in root and flag is enabled */}
+        {isRecentlyViewedEnabled && <RecentlyViewedDashboards />}
+        <div>
+          <FilterInput
+            placeholder={getSearchPlaceholder(searchState.includePanels)}
+            value={searchState.query}
+            escapeRegex={false}
+            onChange={(e) => stateManager.onQueryChange(e)}
+          />
+        </div>
 
-        {hasSelection ? <BrowseActions /> : <BrowseFilters />}
+        {hasSelection ? (
+          <BrowseActions folderDTO={folderDTO} />
+        ) : (
+          <div className={styles.filters}>
+            <BrowseFilters />
+          </div>
+        )}
 
         <div className={styles.subView}>
           <AutoSizer>
             {({ width, height }) =>
               isSearching ? (
                 <SearchView
-                  canSelect={canSelect}
+                  permissions={permissions}
                   width={width}
                   height={height}
                   searchState={searchState}
                   searchStateManager={stateManager}
                 />
               ) : (
-                <BrowseView canSelect={canSelect} width={width} height={height} folderUID={folderUID} />
+                <BrowseView
+                  permissions={permissions}
+                  width={width}
+                  height={height}
+                  folderUID={folderUID}
+                  isReadOnlyRepo={isReadOnlyRepo}
+                />
               )
             }
           </AutoSizer>
         </div>
+        {config.featureToggles.dashboardTemplates && <TemplateDashboardModal />}
       </Page.Contents>
     </Page>
   );
@@ -155,15 +210,23 @@ const BrowseDashboardsPage = memo(({ match }: Props) => {
 
 const getStyles = (theme: GrafanaTheme2) => ({
   pageContents: css({
-    display: 'grid',
-    gridTemplateRows: 'auto auto 1fr',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(1),
     height: '100%',
-    rowGap: theme.spacing(1),
   }),
 
   // AutoSizer needs an element to measure the full height available
   subView: css({
     height: '100%',
+  }),
+
+  filters: css({
+    display: 'none',
+
+    [theme.breakpoints.up('md')]: {
+      display: 'block',
+    },
   }),
 });
 

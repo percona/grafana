@@ -2,17 +2,24 @@ package teamimpl
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/grafana/grafana/pkg/infra/db"
+	"github.com/grafana/grafana/pkg/infra/localcache"
 	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/services/team"
 	"github.com/grafana/grafana/pkg/setting"
 )
 
+// At package level
+const defaultCacheDuration = 5 * time.Minute
+
 type Service struct {
+	cache  *localcache.CacheService
 	store  store
 	tracer tracing.Tracer
 }
@@ -20,22 +27,24 @@ type Service struct {
 func ProvideService(db db.DB, cfg *setting.Cfg, tracer tracing.Tracer) (team.Service, error) {
 	store := &xormStore{db: db, cfg: cfg, deletes: []string{}}
 
-	if err := store.uidMigration(); err != nil {
+	if err := store.teamMemberUidMigration(); err != nil {
 		return nil, err
 	}
+
 	return &Service{
-		store:  &xormStore{db: db, cfg: cfg, deletes: []string{}},
+		cache:  localcache.New(defaultCacheDuration, 2*defaultCacheDuration),
+		store:  store,
 		tracer: tracer,
 	}, nil
 }
 
-func (s *Service) CreateTeam(ctx context.Context, name, email string, orgID int64) (team.Team, error) {
+func (s *Service) CreateTeam(ctx context.Context, cmd *team.CreateTeamCommand) (team.Team, error) {
 	_, span := s.tracer.Start(ctx, "team.CreateTeam", trace.WithAttributes(
-		attribute.Int64("orgID", orgID),
-		attribute.String("name", name),
+		attribute.Int64("orgID", cmd.OrgID),
+		attribute.String("name", cmd.Name),
 	))
 	defer span.End()
-	return s.store.Create(name, email, orgID)
+	return s.store.Create(ctx, cmd)
 }
 
 func (s *Service) UpdateTeam(ctx context.Context, cmd *team.UpdateTeamCommand) error {
@@ -69,6 +78,7 @@ func (s *Service) GetTeamByID(ctx context.Context, query *team.GetTeamByIDQuery)
 	ctx, span := s.tracer.Start(ctx, "team.GetTeamByID", trace.WithAttributes(
 		attribute.Int64("orgID", query.OrgID),
 		attribute.Int64("teamID", query.ID),
+		attribute.String("teamUID", query.UID),
 	))
 	defer span.End()
 	return s.store.GetByID(ctx, query)
@@ -110,13 +120,35 @@ func (s *Service) RemoveUsersMemberships(ctx context.Context, userID int64) erro
 	return s.store.RemoveUsersMemberships(ctx, userID)
 }
 
-func (s *Service) GetUserTeamMemberships(ctx context.Context, orgID, userID int64, external bool) ([]*team.TeamMemberDTO, error) {
+func (s *Service) GetUserTeamMemberships(ctx context.Context, orgID, userID int64, external bool, bypassCache bool) ([]*team.TeamMemberDTO, error) {
 	ctx, span := s.tracer.Start(ctx, "team.GetUserTeamMemberships", trace.WithAttributes(
 		attribute.Int64("orgID", orgID),
 		attribute.Int64("userID", userID),
 	))
 	defer span.End()
-	return s.store.GetMemberships(ctx, orgID, userID, external)
+	cacheKey := fmt.Sprintf("teams:%d:%d:%t", orgID, userID, external)
+	if !bypassCache {
+		if cached, found := s.cache.Get(cacheKey); found {
+			if teams, ok := cached.([]*team.TeamMemberDTO); ok {
+				return teams, nil
+			}
+			s.cache.Delete(cacheKey)
+		}
+	}
+	teams, err := s.store.GetMemberships(ctx, orgID, userID, external)
+	if err != nil {
+		return nil, err
+	}
+	if len(teams) == 0 {
+		// Cache empty headers if no teams found
+		s.cache.Set(cacheKey, []*team.TeamMemberDTO{}, defaultCacheDuration)
+		return []*team.TeamMemberDTO{}, nil
+	}
+
+	if !bypassCache {
+		s.cache.Set(cacheKey, teams, defaultCacheDuration)
+	}
+	return teams, nil
 }
 
 func (s *Service) GetTeamMembers(ctx context.Context, query *team.GetTeamMembersQuery) ([]*team.TeamMemberDTO, error) {

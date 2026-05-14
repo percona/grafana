@@ -1,4 +1,6 @@
+import { ScopedVars } from './ScopedVars';
 import { ExploreCorrelationHelperData, ExplorePanelsState } from './explore';
+import { LinkTarget } from './linkTarget';
 import { InterpolateFunction } from './panel';
 import { DataQuery } from './query';
 import { TimeRange } from './time';
@@ -51,6 +53,12 @@ export interface DataLink<T extends DataQuery = any> {
   internal?: InternalDataLink<T>;
 
   origin?: DataLinkConfigOrigin;
+  meta?: {
+    correlationData?: ExploreCorrelationHelperData;
+    transformations?: DataLinkTransformationConfig[];
+  };
+
+  oneClick?: boolean;
 }
 
 /**
@@ -74,18 +82,12 @@ export interface DataLinkTransformationConfig {
 
 /** @internal */
 export interface InternalDataLink<T extends DataQuery = any> {
-  query: T;
+  query: T | ((options: { replaceVariables: InterpolateFunction; scopedVars: ScopedVars }) => T);
   datasourceUid: string;
   datasourceName: string; // used as a title if `DataLink.title` is empty
   panelsState?: ExplorePanelsState;
-  meta?: {
-    correlationData?: ExploreCorrelationHelperData;
-  };
-  transformations?: DataLinkTransformationConfig[];
   range?: TimeRange;
 }
-
-export type LinkTarget = '_blank' | '_self' | undefined;
 
 /**
  * Processed Link Model. The values are ready to use
@@ -98,6 +100,15 @@ export interface LinkModel<T = any> {
 
   // When a click callback exists, this is passed the raw mouse|react event
   onClick?: (e: any, origin?: any) => void;
+  oneClick?: boolean;
+
+  /**
+   * @alpha
+   */
+  interpolatedParams?: {
+    query?: DataQuery;
+    timeRange?: TimeRange;
+  };
 }
 
 /**
@@ -127,4 +138,10 @@ export interface VariableSuggestion {
 
 export enum VariableSuggestionsScope {
   Values = 'values',
+}
+
+export enum OneClickMode {
+  Action = 'action',
+  Link = 'link',
+  Off = 'off',
 }

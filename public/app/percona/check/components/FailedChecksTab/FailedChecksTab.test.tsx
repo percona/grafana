@@ -1,12 +1,13 @@
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import React from 'react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
+import { OrgRole } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { CheckService } from 'app/percona/check/Check.service';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { FailedChecksTab } from './FailedChecksTab';
 
@@ -30,8 +31,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -53,8 +54,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -71,8 +72,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -83,5 +84,45 @@ describe('FailedChecksTab::', () => {
     await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.queryByTestId('table-no-data')).toBeInTheDocument();
+  });
+
+  it('editors should be able to to access advisors', async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: false },
+            settings: { result: { advisorEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(<FailedChecksTab />)}
+      </Provider>
+    );
+
+    await waitFor(() => expect(screen.queryByTestId('unauthorized')).not.toBeInTheDocument());
+  });
+
+  it("viewers shouldn't be able to to access advisors", async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Viewer;
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: false },
+            settings: { result: { advisorEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(<FailedChecksTab />)}
+      </Provider>
+    );
+
+    await waitFor(() => expect(screen.getByTestId('unauthorized')).toBeInTheDocument());
   });
 });

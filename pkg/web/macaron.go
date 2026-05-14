@@ -66,7 +66,7 @@ type Macaron struct {
 // Use this method if you want to have full control over the middleware that is used.
 func New() *Macaron {
 	m := &Macaron{Router: NewRouter()}
-	m.Router.m = m
+	m.m = m
 	m.NotFound(http.NotFound)
 	return m
 }
@@ -137,6 +137,17 @@ func mwFromHandler(handler Handler) Middleware {
 			next.ServeHTTP(ctx.Resp, ctx.Req)
 		})
 	}
+}
+
+// a convenience function that is provided for users of contexthandler package (standalone apiservers)
+// who have an implicit dependency on Macron in context but don't want to take a dependency on
+// router additionally
+func EmptyMacaronMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		m := New()
+		c := m.createContext(writer, request)
+		next.ServeHTTP(writer, c.Req) // since c.Req has the newer context attached
+	})
 }
 
 func (m *Macaron) createContext(rw http.ResponseWriter, req *http.Request) *Context {

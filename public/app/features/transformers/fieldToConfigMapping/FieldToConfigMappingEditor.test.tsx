@@ -1,6 +1,5 @@
 import { fireEvent, render, screen, getByText, getByLabelText } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { selectOptionInTest } from 'test/helpers/selectOptionInTest';
 
 import { toDataFrame, FieldType } from '@grafana/data';
@@ -57,7 +56,7 @@ describe('FieldToConfigMappingEditor', () => {
     setup({ mappings: [{ fieldName: 'max', handlerKey: 'min' }] });
 
     const select = (await screen.findByTestId('max-config-key')).childNodes[0];
-    await userEvent.click(getByLabelText(select as HTMLElement, 'select-clear-value'));
+    await userEvent.click(getByLabelText(select as HTMLElement, 'Clear value'));
 
     expect(mockOnChange).toHaveBeenCalledWith(expect.arrayContaining([]));
   });

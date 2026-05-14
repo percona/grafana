@@ -1,11 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { UserService } from 'app/percona/shared/services/user/__mocks__/User.service';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { stubRoles, stubUsers, stubUsersMap } from '../../../__mocks__/stubs';
 

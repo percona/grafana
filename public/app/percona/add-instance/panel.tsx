@@ -1,16 +1,17 @@
 /* eslint-disable react/display-name,@typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import React, { MouseEventHandler, useMemo, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import { PageLayoutType } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { PageToolbar, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Databases } from '../../percona/shared/core';
 import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
-import { PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 
 import { AddInstance } from './components/AddInstance/AddInstance';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
@@ -37,19 +38,21 @@ const availableInstanceTypes: AvailableTypes[] = [
   Databases.mongodb,
   InstanceTypesExtra.external,
   Databases.haproxy,
+  Databases.valkey,
 ];
 
 const AddInstancePanel = () => {
   const { result: settings } = useSelector(getPerconaSettings);
   const { azureDiscoverEnabled } = settings!;
-  const { instanceType = '' } = useParams<AddInstanceRouteParams>();
+  const { instanceType = '' } = useParams() as AddInstanceRouteParams;
   const [selectedInstance, selectInstance] = useState<InstanceAvailable>({
     type: availableInstanceTypes.includes(instanceType as AvailableTypes) ? instanceType : '',
   });
   const [showSelection, setShowSelection] = useState(!instanceType);
   const [submitting, setSubmitting] = useState(false);
-  const history = useHistory();
   const styles = useStyles2(getStyles);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (submitPromise: Promise<void>) => {
     setSubmitting(true);
@@ -86,16 +89,16 @@ const AddInstancePanel = () => {
 
   const handleCancel: MouseEventHandler = (e) => {
     if (showSelection) {
-      history.push('/inventory/services');
+      locationService.push('/inventory/services');
     } else {
-      history.push('/add-instance');
+      locationService.push('/add-instance');
     }
     selectInstance({ type: '' });
     setShowSelection(true);
   };
 
   const handleSelectInstance = (instance: InstanceAvailable) => {
-    history.push('/add-instance/' + instance.type);
+    locationService.push('/add-instance/' + instance.type);
     selectInstance(instance);
     setShowSelection(false);
   };
@@ -110,6 +113,11 @@ const AddInstancePanel = () => {
     return `Configuring ${INSTANCE_TYPES_LABELS[databaseType]} service`;
   };
 
+  useEffect(() => {
+    // reset selection based on the url to fix browser back button
+    setShowSelection(location.pathname.endsWith('/add-instance'));
+  }, [location.pathname]);
+
   return (
     <Page
       navId={PMM_SERVICES_PAGE.id}
@@ -122,13 +130,13 @@ const AddInstancePanel = () => {
     >
       <PageToolbar
         title={showSelection ? Messages.pageTitleSelection : Messages.pageTitleConfiguration}
-        onGoBack={history.goBack}
+        onGoBack={() => navigate(-1)}
       >
         <ToolbarButton onClick={handleCancel} variant="canvas">
           {showSelection ? Messages.selectionStep.cancel : Messages.configurationStep.cancel}
         </ToolbarButton>
         {!showSelection && (
-          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary">
+          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary" type="submit">
             {submitLabel}
           </ToolbarButton>
         )}

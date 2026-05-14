@@ -1,6 +1,7 @@
 import { calculateFieldTransformer } from './transformers/calculateField';
 import { concatenateTransformer } from './transformers/concat';
 import { convertFieldTypeTransformer } from './transformers/convertFieldType';
+import { convertFrameTypeTransformer } from './transformers/convertFrameType';
 import { ensureColumnsTransformer } from './transformers/ensureColumns';
 import { filterFieldsTransformer, filterFramesTransformer } from './transformers/filter';
 import { filterFieldsByNameTransformer } from './transformers/filterByName';
@@ -24,6 +25,7 @@ import { renameFieldsTransformer } from './transformers/rename';
 import { renameByRegexTransformer } from './transformers/renameByRegex';
 import { seriesToRowsTransformer } from './transformers/seriesToRows';
 import { sortByTransformer } from './transformers/sortBy';
+import { transposeTransformer } from './transformers/transpose';
 
 export const standardTransformers = {
   noopTransformer,
@@ -52,7 +54,9 @@ export const standardTransformers = {
   renameByRegexTransformer,
   histogramTransformer,
   convertFieldTypeTransformer,
+  convertFrameTypeTransformer,
   groupingToMatrixTransformer,
   limitTransformer,
   groupToNestedTable,
+  transposeTransformer,
 };

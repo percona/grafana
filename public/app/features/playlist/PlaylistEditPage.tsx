@@ -1,28 +1,28 @@
-import React from 'react';
-import { useAsync } from 'react-use';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { NavModelItem } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
-import { t, Trans } from 'app/core/internationalization';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
+
+import { Playlist, useGetPlaylistQuery, useReplacePlaylistMutation } from '../../api/clients/playlist/v1';
 
 import { PlaylistForm } from './PlaylistForm';
-import { getPlaylistAPI } from './api';
-import { Playlist } from './types';
 
 export interface RouteParams {
   uid: string;
 }
 
-interface Props extends GrafanaRouteComponentProps<RouteParams> {}
-
-export const PlaylistEditPage = ({ match }: Props) => {
-  const api = getPlaylistAPI();
-  const playlist = useAsync(() => api.getPlaylist(match.params.uid), [match.params]);
+export const PlaylistEditPage = () => {
+  const { uid = '' } = useParams();
+  const { data, isLoading, isError, error } = useGetPlaylistQuery({ name: uid });
+  const [replacePlaylist] = useReplacePlaylistMutation();
 
   const onSubmit = async (playlist: Playlist) => {
-    await api.updatePlaylist(playlist);
+    replacePlaylist({
+      name: playlist.metadata?.name ?? '',
+      playlist,
+    });
     locationService.push('/playlists');
   };
 
@@ -36,14 +36,14 @@ export const PlaylistEditPage = ({ match }: Props) => {
 
   return (
     <Page navId="dashboards/playlists" pageNav={pageNav}>
-      <Page.Contents isLoading={playlist.loading}>
-        {playlist.error && (
+      <Page.Contents isLoading={isLoading}>
+        {isError && (
           <div>
             <Trans i18nKey="playlist-edit.error-prefix">Error loading playlist:</Trans>
-            {JSON.stringify(playlist.error)}
+            {JSON.stringify(error)}
           </div>
         )}
-        {playlist.value && <PlaylistForm onSubmit={onSubmit} playlist={playlist.value} />}
+        {data && <PlaylistForm onSubmit={onSubmit} playlist={data} />}
       </Page.Contents>
     </Page>
   );

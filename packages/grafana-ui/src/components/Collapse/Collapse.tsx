@@ -1,11 +1,11 @@
 import { css, cx } from '@emotion/css';
-import React, { useState } from 'react';
+import { useId, useState } from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
 import { useStyles2 } from '../../themes/ThemeContext';
-import { clearButtonStyles } from '../Button';
-import { Icon } from '../Icon/Icon';
+import { IconButton } from '../IconButton/IconButton';
 
 const getStyles = (theme: GrafanaTheme2) => ({
   collapse: css({
@@ -32,7 +32,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
   bodyContentWrapper: css({
     label: 'bodyContentWrapper',
     flex: 1,
-    overflow: 'hidden',
   }),
   loader: css({
     label: 'collapse__loader',
@@ -51,8 +50,14 @@ const getStyles = (theme: GrafanaTheme2) => ({
       top: 0,
       height: '250%',
       position: 'absolute',
-      animation: 'loader 2s cubic-bezier(0.17, 0.67, 0.83, 0.67) 500ms',
-      animationIterationCount: 100,
+      [theme.transitions.handleMotion('no-preference', 'reduce')]: {
+        animation: 'loader 2s cubic-bezier(0.17, 0.67, 0.83, 0.67) 500ms',
+        animationIterationCount: 100,
+      },
+      [theme.transitions.handleMotion('reduce')]: {
+        animationDuration: '10s',
+        animationIterationCount: 20,
+      },
       left: '-25%',
       background: theme.colors.primary.main,
     },
@@ -68,25 +73,21 @@ const getStyles = (theme: GrafanaTheme2) => ({
     },
   }),
   header: css({
+    cursor: 'pointer',
     label: 'collapse__header',
-    padding: theme.spacing(1, 2, 1, 2),
+    padding: theme.spacing(1),
     display: 'flex',
+    gap: theme.spacing(1),
   }),
-  headerCollapsed: css({
-    label: 'collapse__header--collapsed',
-    padding: theme.spacing(1, 2, 1, 2),
+  button: css({
+    marginRight: 0,
   }),
   headerLabel: css({
     label: 'collapse__header-label',
     fontWeight: theme.typography.fontWeightMedium,
-    marginRight: theme.spacing(1),
     fontSize: theme.typography.size.md,
     display: 'flex',
-    flex: '0 0 100%',
-  }),
-  icon: css({
-    label: 'collapse__icon',
-    margin: theme.spacing(0.25, 1, 0, -1),
+    flex: 1,
   }),
 });
 
@@ -97,17 +98,17 @@ export interface Props {
   label: React.ReactNode;
   /** Indicates loading state of the content */
   loading?: boolean;
-  /** Toggle collapsed header icon */
-  collapsible?: boolean;
   /** Callback for the toggle functionality */
   onToggle?: (isOpen: boolean) => void;
   /** Additional class name for the root element */
   className?: string;
+  /** @deprecated this prop is no longer used and will be removed in Grafana 13 */
+  collapsible?: boolean;
   // @Percona
   headerCustomClass?: string;
   bodyCustomClass?: string;
   headerLabelCustomClass?: string;
-  disabled?: boolean;
+  buttonCustomClass?: string;
 }
 
 export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.PropsWithChildren<Props>) => {
@@ -115,7 +116,6 @@ export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.Pr
   return (
     <Collapse
       isOpen={open}
-      collapsible
       {...otherProps}
       onToggle={() => {
         setOpen(!open);
@@ -127,46 +127,57 @@ export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.Pr
   );
 };
 
+/**
+ * A content area, which can be horizontally collapsed and expanded. Can be used to hide extra information on the page.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/layout-collapse--docs
+ */
 export const Collapse = ({
   isOpen,
   label,
   loading,
-  collapsible,
   onToggle,
   className,
+  children,
   // @Percona
   headerCustomClass,
   headerLabelCustomClass,
   bodyCustomClass,
-  disabled = false,
-  children,
+  buttonCustomClass,
 }: React.PropsWithChildren<Props>) => {
-  const buttonStyles = useStyles2(clearButtonStyles);
   const style = useStyles2(getStyles);
+  const labelId = useId();
+  const contentId = useId();
+
   const onClickToggle = () => {
-    if (onToggle && collapsible && !disabled) {
+    if (onToggle) {
       onToggle(!isOpen);
     }
   };
-
   const panelClass = cx([style.collapse, className]);
-  const loaderClass = loading ? cx([style.loader, style.loaderActive]) : cx([style.loader]);
-  const headerClass = collapsible ? cx([style.header]) : cx([style.headerCollapsed]);
+  const loaderClass = loading ? cx([style.loader, style.loaderActive]) : style.loader;
 
   return (
     <div className={panelClass}>
-      <button
-        type="button"
-        data-testid="collapse-clickable"
-        className={cx(buttonStyles, headerClass, headerCustomClass)}
-        onClick={onClickToggle}
-      >
-        {collapsible && !disabled && <Icon className={style.icon} name={isOpen ? 'angle-down' : 'angle-right'} />}
-        <div className={cx([style.headerLabel, headerLabelCustomClass])}>{label}</div>
-      </button>
+      {/* the inner button handles keyboard a11y. this is a convenience for mouse users */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div className={cx([style.header, headerCustomClass])} onClick={onClickToggle}>
+        <IconButton
+          aria-describedby={labelId}
+          aria-expanded={isOpen}
+          aria-controls={contentId}
+          className={cx([style.button, buttonCustomClass])}
+          aria-labelledby={labelId}
+          name={isOpen ? 'angle-down' : 'angle-right'}
+          data-testid="collapse-clickable"
+        />
+        <div id={labelId} className={cx([style.headerLabel, headerLabelCustomClass])}>
+          {label}
+        </div>
+      </div>
       {isOpen && (
-        <div className={cx([style.collapseBody, bodyCustomClass])}>
-          {loading && <div className={loaderClass} />}
+        <div className={cx([style.collapseBody, bodyCustomClass])} id={contentId}>
+          <div className={loaderClass} />
           <div className={style.bodyContentWrapper}>{children}</div>
         </div>
       )}

@@ -1,27 +1,29 @@
-import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { noop } from 'lodash';
-import React, { ComponentProps, PropsWithChildren } from 'react';
-import { TestProvider } from 'test/helpers/TestProvider';
+import { MemoryHistoryBuildOptions } from 'history';
+import { ComponentProps, ReactNode } from 'react';
+import { render, screen, userEvent, waitFor, waitForElementToBeRemoved, within } from 'test/test-utils';
 
 import { selectors } from '@grafana/e2e-selectors';
-import { locationService } from '@grafana/runtime';
+import { MIMIR_DATASOURCE_UID } from 'app/features/alerting/unified/mocks/server/constants';
+import { flushMicrotasks } from 'app/features/alerting/unified/test/test-utils';
+import { K8sAnnotations } from 'app/features/alerting/unified/utils/k8s/constants';
 import { AlertManagerDataSourceJsonData, AlertManagerImplementation } from 'app/plugins/datasource/alertmanager/types';
-import { AccessControlAction } from 'app/types';
+import { AccessControlAction } from 'app/types/accessControl';
 
 import { setupMswServer } from '../../mockApi';
 import { grantUserPermissions, mockDataSource } from '../../mocks';
 import { AlertmanagerProvider } from '../../state/AlertmanagerContext';
 import { setupDataSources } from '../../testSetup/datasources';
-import { DataSourceType } from '../../utils/datasource';
+import { KnownProvenance } from '../../types/knownProvenance';
+import { DataSourceType, GRAFANA_RULES_SOURCE_NAME } from '../../utils/datasource';
 
-import ContactPoints, { ContactPoint } from './ContactPoints';
-import setupGrafanaManagedServer from './__mocks__/grafanaManagedServer';
-import setupMimirFlavoredServer, { MIMIR_DATASOURCE_UID } from './__mocks__/mimirFlavoredServer';
+import { ContactPoint } from './ContactPoint';
+import { ContactPointsPageContents } from './ContactPoints';
+import { RECEIVER_META_KEY } from './constants';
+import setupMimirFlavoredServer from './mocks/mimirFlavoredServer';
 import setupVanillaAlertmanagerFlavoredServer, {
   VANILLA_ALERTMANAGER_DATASOURCE_UID,
-} from './__mocks__/vanillaAlertmanagerServer';
-import { RouteReference } from './utils';
+} from './mocks/vanillaAlertmanagerServer';
+import { ContactPointWithMetadata, ReceiverConfigWithMetadata, RouteReference } from './utils';
 
 /**
  * There are lots of ways in which we test our pages and components. Here's my opinionated approach to testing them.
@@ -41,73 +43,151 @@ import { RouteReference } from './utils';
  */
 const server = setupMswServer();
 
-const renderWithProvider = (
-  providerProps?: Partial<ComponentProps<typeof AlertmanagerProvider>>,
-  contactPointProps?: Partial<ComponentProps<typeof ContactPoints>>
+export const renderWithProvider = (
+  children: ReactNode,
+  historyOptions?: MemoryHistoryBuildOptions,
+  providerProps?: Partial<ComponentProps<typeof AlertmanagerProvider>>
 ) =>
   render(
-    <TestProvider>
-      <AlertmanagerProvider accessType={'notification'} {...providerProps}>
-        <ContactPoints {...contactPointProps} />
-      </AlertmanagerProvider>
-    </TestProvider>
+    <AlertmanagerProvider accessType="notification" {...providerProps}>
+      {children}
+    </AlertmanagerProvider>,
+    { historyOptions }
   );
+
+const basicContactPoint: ContactPointWithMetadata = {
+  name: 'my-contact-point',
+  id: 'foo',
+  grafana_managed_receiver_configs: [],
+};
+
+const basicContactPointInUse: ContactPointWithMetadata = {
+  ...basicContactPoint,
+  metadata: {
+    annotations: {
+      [K8sAnnotations.InUseRules]: '1',
+      [K8sAnnotations.InUseRoutes]: '1',
+    },
+  },
+};
+
+const contactPointWithEverything: ContactPointWithMetadata = {
+  ...basicContactPoint,
+  metadata: {
+    annotations: {
+      [K8sAnnotations.InUseRules]: '3',
+      [K8sAnnotations.InUseRoutes]: '1',
+      [K8sAnnotations.AccessAdmin]: 'true',
+      [K8sAnnotations.AccessDelete]: 'true',
+      [K8sAnnotations.AccessWrite]: 'true',
+    },
+  },
+};
+
+const clickMoreActionsButton = async (name: string) => {
+  const user = userEvent.setup();
+  const moreActions = await screen.findByRole('button', { name: `More actions for contact point "${name}"` });
+  await user.click(moreActions);
+  await flushMicrotasks();
+};
+
+const attemptDeleteContactPoint = async (name: string) => {
+  const user = userEvent.setup();
+
+  await clickMoreActionsButton(name);
+
+  const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
+  await user.click(deleteButton);
+
+  await screen.findByRole('heading', { name: /delete contact point/i });
+  return user.click(await screen.findByRole('button', { name: /delete contact point/i }));
+};
+
+const alertManager = mockDataSource<AlertManagerDataSourceJsonData>({
+  name: VANILLA_ALERTMANAGER_DATASOURCE_UID,
+  uid: VANILLA_ALERTMANAGER_DATASOURCE_UID,
+  type: DataSourceType.Alertmanager,
+  jsonData: {
+    implementation: AlertManagerImplementation.prometheus,
+    handleGrafanaManagedAlerts: true,
+  },
+});
+
+const mimirDatasource = mockDataSource({
+  type: DataSourceType.Alertmanager,
+  name: MIMIR_DATASOURCE_UID,
+  uid: MIMIR_DATASOURCE_UID,
+});
 
 describe('contact points', () => {
   beforeEach(() => {
-    // The location service is stateful between tests - `TestProvider` uses the same instance between each test
-    // and this results in the query params being persisted between tests
-    // To get round this for now, we can push "/" onto the history so there are no query params
-    locationService.push('/');
+    setupDataSources(alertManager, mimirDatasource);
   });
-
   describe('Contact points with Grafana managed alertmanager', () => {
     beforeEach(() => {
       grantUserPermissions([
         AccessControlAction.AlertingNotificationsRead,
         AccessControlAction.AlertingNotificationsWrite,
       ]);
-
-      setupGrafanaManagedServer(server);
     });
 
     describe('tabs behaviour', () => {
       test('loads contact points tab', async () => {
-        locationService.push('/?tab=contact_points');
-        renderWithProvider();
+        renderWithProvider(<ContactPointsPageContents />, { initialEntries: ['/?tab=contact_points'] });
 
-        expect(await screen.findByText(/add contact point/i)).toBeInTheDocument();
+        expect(await screen.findByText(/create contact point/i)).toBeInTheDocument();
       });
 
       test('loads templates tab', async () => {
-        locationService.push('/?tab=templates');
-        renderWithProvider();
+        renderWithProvider(<ContactPointsPageContents />, { initialEntries: ['/?tab=templates'] });
 
         expect(await screen.findByText(/add notification template/i)).toBeInTheDocument();
       });
 
       test('defaults to contact points tab with invalid query param', async () => {
-        locationService.push('/?tab=foo_bar');
-        renderWithProvider();
+        renderWithProvider(<ContactPointsPageContents />, { initialEntries: ['/?tab=foo_bar'] });
 
-        expect(await screen.findByText(/add contact point/i)).toBeInTheDocument();
+        expect(await screen.findByText(/create contact point/i)).toBeInTheDocument();
       });
 
       test('defaults to contact points tab with no query param', async () => {
-        renderWithProvider();
+        renderWithProvider(<ContactPointsPageContents />);
 
-        expect(await screen.findByText(/add contact point/i)).toBeInTheDocument();
+        expect(await screen.findByText(/create contact point/i)).toBeInTheDocument();
+      });
+
+      test('defaults to contact points tab if user has only read permission', async () => {
+        grantUserPermissions([AccessControlAction.AlertingReceiversRead]);
+        renderWithProvider(<ContactPointsPageContents />);
+
+        expect(await screen.findByText(/create contact point/i)).toBeInTheDocument();
+      });
+
+      test('defaults to contact points tab if user has only create permission', async () => {
+        grantUserPermissions([AccessControlAction.AlertingReceiversCreate]);
+        renderWithProvider(<ContactPointsPageContents />);
+
+        expect(await screen.findByText(/create contact point/i)).toBeInTheDocument();
+      });
+    });
+
+    describe('templates tab', () => {
+      it('does not show a warning for a "misconfigured" template', async () => {
+        renderWithProvider(
+          <ContactPointsPageContents />,
+          { initialEntries: ['/?tab=templates'] },
+          { alertmanagerSourceName: GRAFANA_RULES_SOURCE_NAME }
+        );
+        await screen.findByText(/create notification templates/i);
+        expect(screen.queryByText(/^misconfigured$/i)).not.toBeInTheDocument();
       });
     });
 
     it('should show / hide loading states, have all actions enabled', async () => {
-      renderWithProvider();
+      renderWithProvider(<ContactPointsPageContents />);
 
-      await waitFor(async () => {
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
-        await waitForElementToBeRemoved(screen.getByText('Loading...'));
-        expect(screen.queryByTestId(selectors.components.Alert.alertV2('error'))).not.toBeInTheDocument();
-      });
+      await waitForElementToBeRemoved(screen.queryByText('Loading...'));
+      expect(screen.queryByTestId(selectors.components.Alert.alertV2('error'))).not.toBeInTheDocument();
 
       expect(screen.getByText('grafana-default-email')).toBeInTheDocument();
       expect(screen.getAllByTestId('contact-point')).toHaveLength(5);
@@ -116,98 +196,119 @@ describe('contact points', () => {
       expect(screen.getByRole('link', { name: 'add contact point' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'export all' })).toBeInTheDocument();
 
-      // 2 of them are unused by routes in the mock response
       const unusedBadge = screen.getAllByLabelText('unused');
-      expect(unusedBadge).toHaveLength(3);
+      expect(unusedBadge).toHaveLength(4);
 
-      const viewProvisioned = screen.getByRole('link', { name: 'view-action' });
-      expect(viewProvisioned).toBeInTheDocument();
-      expect(viewProvisioned).not.toBeDisabled();
+      // Two contact points should have view buttons: grafana-default-email (cannot be edited) and provisioned-contact-point (provisioned)
+      const viewButtons = screen.getAllByRole('link', { name: /^view$/i });
+      expect(viewButtons).toHaveLength(2);
 
-      const editButtons = screen.getAllByRole('link', { name: 'edit-action' });
-      expect(editButtons).toHaveLength(4);
+      // Check view buttons by their href to verify which contact points they belong to
+      // The url is the same but the form should be readonly
+      expect(viewButtons[0]).toHaveAttribute('href', '/alerting/notifications/receivers/grafana-default-email/edit');
+      expect(viewButtons[1]).toHaveAttribute(
+        'href',
+        '/alerting/notifications/receivers/provisioned-contact-point/edit'
+      );
+
+      viewButtons.forEach((button) => {
+        expect(button).toBeEnabled();
+      });
+
+      // Three contact points should have edit buttons: lotsa-emails, Slack with multiple channels, OnCall Contact point
+      const editButtons = screen.getAllByRole('link', { name: /^edit$/i });
+      expect(editButtons).toHaveLength(3);
+
+      // Check edit buttons by their href to verify which contact points they belong to
+      expect(editButtons[0]).toHaveAttribute('href', '/alerting/notifications/receivers/lotsa-emails/edit');
+      expect(editButtons[1]).toHaveAttribute(
+        'href',
+        '/alerting/notifications/receivers/OnCall%20Conctact%20point/edit'
+      );
+      expect(editButtons[2]).toHaveAttribute(
+        'href',
+        '/alerting/notifications/receivers/Slack%20with%20multiple%20channels/edit'
+      );
+
       editButtons.forEach((button) => {
-        expect(button).not.toBeDisabled();
+        expect(button).toBeEnabled();
       });
 
       const moreActionsButtons = screen.getAllByRole('button', { name: /More/ });
       expect(moreActionsButtons).toHaveLength(5);
       moreActionsButtons.forEach((button) => {
-        expect(button).not.toBeDisabled();
+        expect(button).toBeEnabled();
       });
     });
 
     it('should disable certain actions if the user has no write permissions', async () => {
       grantUserPermissions([AccessControlAction.AlertingNotificationsRead]);
 
-      renderWithProvider();
+      const { user } = renderWithProvider(<ContactPointsPageContents />);
 
       // wait for loading to be done
-      await waitFor(async () => {
-        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-      });
+      await waitForElementToBeRemoved(screen.queryByText('Loading...'));
 
       // should disable create contact point
       expect(screen.getByRole('link', { name: 'add contact point' })).toHaveAttribute('aria-disabled', 'true');
 
-      // there should be no edit buttons
-      expect(screen.queryAllByRole('link', { name: 'edit-action' })).toHaveLength(0);
+      // edit permission is based on API response - we should have 3 buttons
+      const editButtons = await screen.findAllByRole('link', { name: /^edit$/i });
+      expect(editButtons).toHaveLength(3);
 
-      // there should be view buttons though
-      const viewButtons = screen.getAllByRole('link', { name: 'view-action' });
-      expect(viewButtons).toHaveLength(5);
-
-      // delete should be disabled in the "more" actions
-      const moreButtons = screen.queryAllByRole('button', { name: /More/ });
-      expect(moreButtons).toHaveLength(5);
-
-      // check if all of the delete buttons are disabled
-      for await (const button of moreButtons) {
-        await userEvent.click(button);
-        const deleteButton = screen.queryByRole('menuitem', { name: 'delete' });
-        expect(deleteButton).toBeDisabled();
-        // click outside the menu to close it otherwise we can't interact with the rest of the page
-        await userEvent.click(document.body);
-      }
+      // there should be view buttons though - one for provisioned, and one for the un-editable contact point
+      const viewButtons = screen.getAllByRole('link', { name: /^view$/i });
+      expect(viewButtons).toHaveLength(2);
 
       // check buttons in Notification Templates
-      const notificationTemplatesTab = screen.getByRole('tab', { name: 'Tab Notification Templates' });
-      await userEvent.click(notificationTemplatesTab);
-      expect(screen.getByRole('link', { name: 'Add notification template' })).toHaveAttribute('aria-disabled', 'true');
+      const notificationTemplatesTab = screen.getByRole('tab', { name: 'Notification Templates' });
+      await user.click(notificationTemplatesTab);
+      expect(screen.getByRole('link', { name: 'Add notification template group' })).toHaveAttribute(
+        'aria-disabled',
+        'true'
+      );
     });
 
-    it('should call delete when clicked and not disabled', async () => {
-      const onDelete = jest.fn();
+    it('allows deleting when not disabled', async () => {
+      renderWithProvider(
+        <ContactPointsPageContents />,
+        { initialEntries: ['/?tab=contact_points'] },
+        { alertmanagerSourceName: GRAFANA_RULES_SOURCE_NAME }
+      );
 
-      render(<ContactPoint name={'my-contact-point'} receivers={[]} onDelete={onDelete} />, {
-        wrapper,
-      });
+      await attemptDeleteContactPoint('lotsa-emails');
 
-      const moreActions = screen.getByRole('button', { name: /More/ });
-      await userEvent.click(moreActions);
-
-      const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
-      await userEvent.click(deleteButton);
-
-      expect(onDelete).toHaveBeenCalledWith('my-contact-point');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('should disable edit button', async () => {
-      render(<ContactPoint name={'my-contact-point'} disabled={true} receivers={[]} onDelete={noop} />, {
-        wrapper,
-      });
+    it('should show warning when no receivers are configured', async () => {
+      renderWithProvider(<ContactPoint contactPoint={basicContactPoint} />);
 
-      const moreActions = screen.getByRole('button', { name: /More/ });
-      expect(moreActions).not.toBeDisabled();
+      expect(screen.getByText(/No integrations configured/i)).toBeInTheDocument();
+    });
 
-      const editAction = screen.getByTestId('edit-action');
-      expect(editAction).toHaveAttribute('aria-disabled', 'true');
+    it('should not show warning when at least one receiver is configured', async () => {
+      const receiver: ReceiverConfigWithMetadata = {
+        name: 'email',
+        provenance: undefined,
+        type: 'email',
+        disableResolveMessage: false,
+        settings: { addresses: 'test1@test.com,test2@test.com,test3@test.com,test4@test.com' },
+        [RECEIVER_META_KEY]: {
+          name: 'Email',
+          description: 'The email receiver',
+        },
+      };
+      renderWithProvider(
+        <ContactPoint contactPoint={{ ...basicContactPoint, grafana_managed_receiver_configs: [receiver] }} />
+      );
+      expect(screen.queryByText(/No integrations configured/i)).not.toBeInTheDocument();
     });
 
     it('should disable buttons when provisioned', async () => {
-      render(<ContactPoint name={'my-contact-point'} provisioned={true} receivers={[]} onDelete={noop} />, {
-        wrapper,
-      });
+      const { user } = renderWithProvider(
+        <ContactPoint contactPoint={{ ...basicContactPoint, provenance: KnownProvenance.File }} />
+      );
 
       expect(screen.getByText(/provisioned/i)).toBeInTheDocument();
 
@@ -218,8 +319,8 @@ describe('contact points', () => {
       expect(viewAction).toBeInTheDocument();
 
       const moreActions = screen.getByRole('button', { name: /More/ });
-      expect(moreActions).not.toBeDisabled();
-      await userEvent.click(moreActions);
+      expect(moreActions).toBeEnabled();
+      await user.click(moreActions);
 
       const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
       expect(deleteButton).toBeDisabled();
@@ -235,14 +336,12 @@ describe('contact points', () => {
         },
       ];
 
-      render(<ContactPoint name={'my-contact-point'} receivers={[]} policies={policies} onDelete={noop} />, {
-        wrapper,
-      });
+      const { user } = renderWithProvider(<ContactPoint contactPoint={{ ...basicContactPointInUse, policies }} />);
 
-      expect(screen.getByRole('link', { name: /1 notification policy/ })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /1 notification policies/ })).toBeInTheDocument();
 
       const moreActions = screen.getByRole('button', { name: /More/ });
-      await userEvent.click(moreActions);
+      await user.click(moreActions);
 
       const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
       expect(deleteButton).toBeDisabled();
@@ -258,32 +357,41 @@ describe('contact points', () => {
         },
       ];
 
-      render(<ContactPoint name={'my-contact-point'} receivers={[]} policies={policies} onDelete={noop} />, {
-        wrapper,
-      });
+      // Add the necessary K8s annotations to allow deletion
+      const contactPointWithDeletePermission: ContactPointWithMetadata = {
+        ...basicContactPoint,
+        metadata: {
+          annotations: {
+            [K8sAnnotations.AccessDelete]: 'true',
+          },
+        },
+        policies,
+      };
+
+      const { user } = renderWithProvider(<ContactPoint contactPoint={contactPointWithDeletePermission} />);
 
       const moreActions = screen.getByRole('button', { name: /More/ });
-      await userEvent.click(moreActions);
+      await user.click(moreActions);
 
       const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
-      expect(deleteButton).not.toBeDisabled();
+      expect(deleteButton).toBeEnabled();
     });
 
     it('should be able to search', async () => {
-      renderWithProvider();
+      const { user } = renderWithProvider(<ContactPointsPageContents />);
 
-      const searchInput = screen.getByRole('textbox', { name: 'search contact points' });
-      await userEvent.type(searchInput, 'slack');
+      const searchInput = await screen.findByRole('textbox', { name: 'search contact points' });
+      await user.type(searchInput, 'slack');
       expect(searchInput).toHaveValue('slack');
 
+      expect(await screen.findByText('Slack with multiple channels')).toBeInTheDocument();
       await waitFor(() => {
-        expect(screen.getByText('Slack with multiple channels')).toBeInTheDocument();
         expect(screen.getAllByTestId('contact-point')).toHaveLength(1);
       });
 
       // ⚠️ for some reason, the query params are preserved for all tests so don't forget to clear the input
       const clearButton = screen.getByRole('button', { name: 'clear' });
-      await userEvent.click(clearButton);
+      await user.click(clearButton);
       expect(searchInput).toHaveValue('');
     });
   });
@@ -298,23 +406,13 @@ describe('contact points', () => {
         AccessControlAction.AlertingNotificationsExternalRead,
         AccessControlAction.AlertingNotificationsExternalWrite,
       ]);
-      setupDataSources(
-        mockDataSource({
-          type: DataSourceType.Alertmanager,
-          name: MIMIR_DATASOURCE_UID,
-          uid: MIMIR_DATASOURCE_UID,
-        })
-      );
     });
 
     it('should show / hide loading states, have the right actions enabled', async () => {
-      renderWithProvider({ alertmanagerSourceName: MIMIR_DATASOURCE_UID });
+      renderWithProvider(<ContactPointsPageContents />, undefined, { alertmanagerSourceName: MIMIR_DATASOURCE_UID });
 
-      await waitFor(async () => {
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
-        await waitForElementToBeRemoved(screen.getByText('Loading...'));
-        expect(screen.queryByTestId(selectors.components.Alert.alertV2('error'))).not.toBeInTheDocument();
-      });
+      await waitForElementToBeRemoved(screen.queryByText('Loading...'));
+      expect(screen.queryByTestId(selectors.components.Alert.alertV2('error'))).not.toBeInTheDocument();
 
       expect(screen.getByText('mixed')).toBeInTheDocument();
       expect(screen.getByText('some webhook')).toBeInTheDocument();
@@ -328,16 +426,27 @@ describe('contact points', () => {
       const unusedBadge = screen.getAllByLabelText('unused');
       expect(unusedBadge).toHaveLength(1);
 
-      const editButtons = screen.getAllByRole('link', { name: 'edit-action' });
+      const editButtons = screen.getAllByRole('link', { name: /^edit$/i });
       expect(editButtons).toHaveLength(2);
       editButtons.forEach((button) => {
-        expect(button).not.toBeDisabled();
+        expect(button).toBeEnabled();
       });
 
       const moreActionsButtons = screen.getAllByRole('button', { name: /More/ });
       expect(moreActionsButtons).toHaveLength(2);
       moreActionsButtons.forEach((button) => {
-        expect(button).not.toBeDisabled();
+        expect(button).toBeEnabled();
+      });
+    });
+
+    describe('templates tab', () => {
+      it('shows a warning when a template is misconfigured', async () => {
+        renderWithProvider(
+          <ContactPointsPageContents />,
+          { initialEntries: ['/?tab=templates'] },
+          { alertmanagerSourceName: MIMIR_DATASOURCE_UID }
+        );
+        expect((await screen.findAllByText(/^misconfigured$/i))[0]).toBeInTheDocument();
       });
     });
   });
@@ -349,54 +458,166 @@ describe('contact points', () => {
         AccessControlAction.AlertingNotificationsExternalRead,
         AccessControlAction.AlertingNotificationsExternalWrite,
       ]);
-
-      const alertManager = mockDataSource<AlertManagerDataSourceJsonData>({
-        name: VANILLA_ALERTMANAGER_DATASOURCE_UID,
-        uid: VANILLA_ALERTMANAGER_DATASOURCE_UID,
-        type: DataSourceType.Alertmanager,
-        jsonData: {
-          implementation: AlertManagerImplementation.prometheus,
-          handleGrafanaManagedAlerts: true,
-        },
-      });
-
-      setupDataSources(alertManager);
     });
 
     it("should not allow any editing because it's not supported", async () => {
-      render(
-        <TestProvider>
-          <AlertmanagerProvider
-            accessType={'notification'}
-            alertmanagerSourceName={VANILLA_ALERTMANAGER_DATASOURCE_UID}
-          >
-            <ContactPoints />
-          </AlertmanagerProvider>
-        </TestProvider>
-      );
-
-      await waitFor(async () => {
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
-        await waitForElementToBeRemoved(screen.getByText('Loading...'));
-        expect(screen.queryByTestId(selectors.components.Alert.alertV2('error'))).not.toBeInTheDocument();
+      const { user } = renderWithProvider(<ContactPointsPageContents />, undefined, {
+        alertmanagerSourceName: alertManager.name,
       });
+
+      await waitForElementToBeRemoved(screen.queryByText('Loading...'));
+      expect(screen.queryByTestId(selectors.components.Alert.alertV2('error'))).not.toBeInTheDocument();
 
       expect(screen.queryByRole('link', { name: 'add contact point' })).not.toBeInTheDocument();
 
-      const viewProvisioned = screen.getByRole('link', { name: 'view-action' });
-      expect(viewProvisioned).toBeInTheDocument();
-      expect(viewProvisioned).not.toBeDisabled();
+      const viewButton = screen.getByRole('link', { name: /^view$/i });
+      expect(viewButton).toBeInTheDocument();
+      expect(viewButton).toBeEnabled();
 
       // check buttons in Notification Templates
-      const notificationTemplatesTab = screen.getByRole('tab', { name: 'Tab Notification Templates' });
-      await userEvent.click(notificationTemplatesTab);
-      expect(screen.queryByRole('link', { name: 'Add notification template' })).not.toBeInTheDocument();
+      const notificationTemplatesTab = screen.getByRole('tab', { name: 'Notification Templates' });
+      await user.click(notificationTemplatesTab);
+      expect(screen.queryByRole('link', { name: 'Add notification template group' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Grafana alertmanager', () => {
+    beforeEach(() => {
+      grantUserPermissions([
+        AccessControlAction.AlertingNotificationsRead,
+        AccessControlAction.AlertingNotificationsWrite,
+      ]);
+    });
+
+    const renderGrafanaContactPoints = () =>
+      renderWithProvider(
+        <ContactPointsPageContents />,
+        { initialEntries: ['/?tab=contact_points'] },
+        { alertmanagerSourceName: GRAFANA_RULES_SOURCE_NAME }
+      );
+
+    it('renders list view correctly', async () => {
+      renderGrafanaContactPoints();
+      // Check for a specific contact point that we expect to exist in the mock AM config/k8s response
+      expect(await screen.findByRole('heading', { name: 'lotsa-emails' })).toBeInTheDocument();
+    });
+
+    it('allows deleting', async () => {
+      renderGrafanaContactPoints();
+
+      await attemptDeleteContactPoint('lotsa-emails');
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('does not allow deletion of provisioned contact points', async () => {
+      renderGrafanaContactPoints();
+
+      return expect(attemptDeleteContactPoint('provisioned-contact-point')).rejects.toBeTruthy();
+    });
+
+    it('renders number of alert rules and policies and does not permit deletion', async () => {
+      const { user } = renderWithProvider(<ContactPoint contactPoint={contactPointWithEverything} />);
+
+      expect(screen.getByText(/used by 3 alert rules/i)).toBeInTheDocument();
+      expect(screen.getByText(/used by 1 notification policies/i)).toBeInTheDocument();
+
+      await clickMoreActionsButton(contactPointWithEverything.name);
+      const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
+      expect(deleteButton).toBeDisabled();
+      await user.hover(deleteButton);
+
+      expect(await screen.findByText(/Contact point is referenced by one or more alert rules/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/Contact point is referenced by one or more notification policies/i)
+      ).toBeInTheDocument();
+    });
+
+    it('does not permit deletion when contact point is only referenced by a rule', async () => {
+      const contactPointWithRule: ContactPointWithMetadata = {
+        ...basicContactPoint,
+        metadata: {
+          annotations: {
+            [K8sAnnotations.InUseRules]: '1',
+          },
+        },
+      };
+      const { user } = renderWithProvider(<ContactPoint contactPoint={contactPointWithRule} />);
+
+      expect(screen.getByText(/used by 1 alert rule/i)).toBeInTheDocument();
+
+      await clickMoreActionsButton(contactPointWithEverything.name);
+      const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
+      expect(deleteButton).toBeDisabled();
+      await user.hover(deleteButton);
+
+      expect(await screen.findByText(/Contact point is referenced by one or more alert rules/i)).toBeInTheDocument();
+    });
+
+    it('does not permit deletion when lacking permissions to delete', async () => {
+      grantUserPermissions([AccessControlAction.AlertingNotificationsRead]);
+      const contactPointWithoutPermissions: ContactPointWithMetadata = {
+        ...contactPointWithEverything,
+        metadata: {
+          annotations: {
+            [K8sAnnotations.AccessDelete]: 'false',
+          },
+        },
+      };
+
+      const { user } = renderWithProvider(<ContactPoint contactPoint={contactPointWithoutPermissions} />);
+
+      await clickMoreActionsButton(contactPointWithEverything.name);
+
+      const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
+      await waitFor(() => expect(deleteButton).toBeDisabled());
+
+      await user.hover(deleteButton);
+
+      expect(
+        await screen.findByText(/You do not have the required permission to delete this contact point/i)
+      ).toBeInTheDocument();
+    });
+
+    it('allows deletion when there are no rules or policies referenced, and user has permission', async () => {
+      grantUserPermissions([AccessControlAction.AlertingNotificationsRead]);
+      const contactPointWithoutPermissions: ContactPointWithMetadata = {
+        ...contactPointWithEverything,
+        metadata: {
+          annotations: {
+            [K8sAnnotations.AccessDelete]: 'false',
+          },
+        },
+      };
+
+      const { user } = renderWithProvider(<ContactPoint contactPoint={contactPointWithoutPermissions} />);
+
+      await clickMoreActionsButton(contactPointWithEverything.name);
+
+      const deleteButton = screen.getByRole('menuitem', { name: /delete/i });
+      await waitFor(() => expect(deleteButton).toBeDisabled());
+
+      await user.hover(deleteButton);
+
+      expect(
+        await screen.findByText(/You do not have the required permission to delete this contact point/i)
+      ).toBeInTheDocument();
+    });
+
+    it('shows manage permissions and allows closing', async () => {
+      const { user } = renderGrafanaContactPoints();
+
+      await clickMoreActionsButton('lotsa-emails');
+
+      await user.click(await screen.findByRole('menuitem', { name: /manage permissions/i }));
+
+      const permissionsDialog = await screen.findByRole('dialog', { name: /manage permissions/i });
+
+      expect(permissionsDialog).toBeInTheDocument();
+      expect(await screen.findByRole('table')).toBeInTheDocument();
+
+      await user.click(within(permissionsDialog).getAllByRole('button', { name: /close/i })[0]);
+      expect(permissionsDialog).not.toBeInTheDocument();
     });
   });
 });
-
-const wrapper = ({ children }: PropsWithChildren) => (
-  <TestProvider>
-    <AlertmanagerProvider accessType={'notification'}>{children}</AlertmanagerProvider>
-  </TestProvider>
-);

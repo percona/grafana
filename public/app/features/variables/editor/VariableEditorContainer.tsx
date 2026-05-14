@@ -1,12 +1,12 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import { locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
 import { SettingsPageProps } from 'app/features/dashboard/components/DashboardSettings/types';
+import { StoreState, ThunkDispatch } from 'app/types/store';
 
-import { StoreState, ThunkDispatch } from '../../../types';
 import { VariablesUnknownTable } from '../inspect/VariablesUnknownTable';
 import { toKeyedAction } from '../state/keyedVariablesReducer';
 import { getEditorVariables, getVariablesState } from '../state/selectors';
@@ -108,12 +108,7 @@ class VariableEditorContainerUnconnected extends PureComponent<Props, State> {
     const { editIndex, variables, sectionNav } = this.props;
     const variableToEdit = editIndex != null ? variables[editIndex] : undefined;
     const node = sectionNav.node;
-    const parentItem = node.parentItem
-      ? {
-          ...node.parentItem,
-          url: node.url,
-        }
-      : undefined;
+    const parentItem = node.parentItem;
     const subPageNav = variableToEdit ? { text: variableToEdit.name, parentItem } : parentItem;
 
     return (

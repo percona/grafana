@@ -1,3 +1,4 @@
+import { MetricsResolutions } from '../settings/Settings.types';
 import { Databases } from '../shared/core';
 import { DbNode, NodeType } from '../shared/services/nodes/Nodes.types';
 import {
@@ -25,29 +26,27 @@ export interface Service {
 export type DBServiceList = { [key in Databases]?: Service[] };
 
 export enum AgentType {
-  amazonRdsMysql = 'amazon_rds_mysql',
-  container = 'container',
-  externalExporter = 'externalExporter',
-  generic = 'generic',
-  mongodb = 'mongodb',
-  mongodbExporter = 'mongodbExporter',
-  mysql = 'mysql',
-  mysqldExporter = 'mysqldExporter',
-  nodeExporter = 'nodeExporter',
   pmmAgent = 'pmm-agent',
-  postgresExporter = 'postgresExporter',
-  postgresql = 'postgresql',
-  proxysql = 'proxysql',
-  proxysqlExporter = 'proxysqlExporter',
-  qanMongodb_profiler_agent = 'qan_mongodb_profiler_agent',
-  qanMysql_perfschema_agent = 'qan_mysql_perfschema_agent',
-  qanMysql_slowlog_agent = 'qan_mysql_slowlog_agent',
-  qanPostgresql_pgstatements_agent = 'qan_postgresql_pgstatements_agent',
-  qanPostgresql_pgstatmonitor_agent = 'qan_postgresql_pgstatmonitor_agent',
-  rdsExporter = 'rdsExporter',
+  nodeExporter = 'node_exporter',
+  mysqldExporter = 'mysqld_exporter',
+  mongodbExporter = 'mongodb_exporter',
+  postgresExporter = 'postgres_exporter',
+  proxysqlExporter = 'proxysql_exporter',
+  rdsExporter = 'rds_exporter',
+  azureDatabaseExporter = 'azure_database_exporter',
+  qanMysql_perfschema_agent = 'qan-mysql-perfschema-agent',
+  qanMysql_slowlog_agent = 'qan-mysql-slowlog-agent',
+  qanMongodb_profiler_agent = 'qan-mongodb-profiler-agent',
+  qanMongodb_mongolog_agent = 'qan-mongodb-mongolog-agent',
+  qanPostgresql_pgstatements_agent = 'qan-postgresql-pgstatements-agent',
+  qanPostgresql_pgstatmonitor_agent = 'qan-postgresql-pgstatmonitor-agent',
   remote = 'remote',
-  remote_rds = 'remote_rds',
-  vmAgent = 'vm_agent',
+  remote_rds = 'remote-rds',
+  vmAgent = 'vm-agent',
+  externalExporter = 'external-exporter',
+  nomadAgent = 'nomad-agent',
+  valkeyExporter = 'valkey_exporter',
+  rtaMongoDBAgent = 'rta-mongodb-agent',
 }
 
 export enum ServiceAgentStatus {
@@ -62,6 +61,7 @@ export enum ServiceAgentStatus {
 export enum MonitoringStatus {
   OK = 'OK',
   FAILED = 'Failed',
+  WARNING = 'Warning',
 }
 
 export interface ServiceAgentPayload {
@@ -138,6 +138,7 @@ export interface Node {
   services?: ServiceNodeList[];
   properties?: Record<string, string>;
   agentsStatus?: string;
+  isPmmServerNode: boolean;
 }
 
 export interface NodeDB {
@@ -158,6 +159,7 @@ export interface NodeDB {
   updated_at: string;
   status: ServiceStatus;
   services?: ServiceNodeListDB[];
+  is_pmm_server_node: boolean;
 }
 
 export interface NodeListDBPayload {
@@ -181,9 +183,43 @@ export interface NodesOption {
   value: string;
   label: string;
   agents?: AgentsOption[];
+  isPMMServerNode?: boolean;
 }
 
 export interface AgentsOption {
   value: string;
   label: string;
+}
+
+export interface UpdateAgentItem {
+  enable?: boolean;
+  custom_labels?: Record<string, string>;
+  enable_push_metrics?: boolean;
+  metrics_resolutions?: MetricsResolutions;
+}
+
+export interface UpdateAgentBody {
+  node_exporter?: UpdateAgentItem;
+  mysqld_exporter?: UpdateAgentItem;
+  mongodb_exporter?: UpdateAgentItem;
+  postgres_exporter?: UpdateAgentItem;
+  proxysql_exporter?: UpdateAgentItem;
+  external_exporter?: UpdateAgentItem;
+  rds_exporter?: UpdateAgentItem;
+  azure_database_exporter?: UpdateAgentItem;
+  qan_mysql_perfschema_agent?: UpdateAgentItem;
+  qan_mysql_slowlog_agent?: UpdateAgentItem;
+  qan_mongodb_profiler_agent?: UpdateAgentItem;
+  qan_mongodb_mongolog_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatements_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatmonitor_agent?: UpdateAgentItem;
+  nomad_agent?: {
+    enable?: boolean;
+  };
+}
+
+export enum MetricsMode {
+  UNSPECIFIED = 0,
+  PULL = 1,
+  PUSH = 2,
 }

@@ -1,11 +1,9 @@
 import { Meta, StoryFn } from '@storybook/react';
-import React from 'react';
 
-import { EmotionPerfTest } from './EmotionPerfTest';
 import { ThemeDemo as NewThemeDemoComponent } from './ThemeDemo';
 
 const meta: Meta = {
-  title: 'Docs Overview/Theme',
+  title: 'Foundations/Theme',
   component: NewThemeDemoComponent,
   decorators: [],
   parameters: {
@@ -18,10 +16,6 @@ const meta: Meta = {
 
 export const ThemeDemo: StoryFn = () => {
   return <NewThemeDemoComponent />;
-};
-
-export const PerfTest: StoryFn = () => {
-  return <EmotionPerfTest />;
 };
 
 export default meta;

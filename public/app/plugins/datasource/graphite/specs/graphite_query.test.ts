@@ -1,4 +1,4 @@
-import { TemplateSrvStub } from 'test/specs/helpers';
+import { getTemplateSrv } from '@grafana/runtime';
 
 import gfunc from '../gfunc';
 import GraphiteQuery from '../graphite_query';
@@ -12,7 +12,7 @@ describe('Graphite query model', () => {
       createFuncInstance: gfunc.createFuncInstance,
     },
     // @ts-ignore
-    templateSrv: new TemplateSrvStub(),
+    templateSrv: getTemplateSrv(),
     targets: [],
   };
 
@@ -50,6 +50,21 @@ describe('Graphite query model', () => {
       ctx.queryModel.updateRenderedTarget(ctx.target, ctx.targets);
       const targetFullExpected =
         'scale(asPercent(diffSeries(second.query.count, first.query.count), second.query.count), 100)';
+      expect(ctx.queryModel.target.targetFull).toBe(targetFullExpected);
+    });
+
+    it('targetFull should include nested queries at any level with repeated subqueries', () => {
+      ctx.target = { refId: 'C', target: 'aggregateSeriesLists(#B, #C, "sum")' };
+      ctx.targets = [
+        { refId: 'A', target: 'first.query.count' },
+        { refId: 'B', target: "alias(timeShift(#A, '-1min', true), '-1min')" },
+        { refId: 'C', target: "alias(timeShift(#A, '-2min', true), '-2min')" },
+        { refId: 'D', target: 'aggregateSeriesLists(#B, #C, "sum")' },
+      ];
+      ctx.queryModel = new GraphiteQuery(ctx.datasource, ctx.target, ctx.templateSrv);
+      ctx.queryModel.updateRenderedTarget(ctx.target, ctx.targets);
+      const targetFullExpected =
+        "aggregateSeriesLists(alias(timeShift(first.query.count, '-1min', true), '-1min'), alias(timeShift(first.query.count, '-2min', true), '-2min'), \"sum\")";
       expect(ctx.queryModel.target.targetFull).toBe(targetFullExpected);
     });
 
@@ -242,6 +257,20 @@ describe('Graphite query model', () => {
         expect(ctx.queryModel.functions.length).toBe(1);
         ctx.queryModel.updateModelTarget(targets);
         expect(ctx.queryModel.target.target).toContain(nestedFunctionAsParam);
+      });
+
+      //This is not preferred behavior. The query builder cannot parse `maxSeries(sum(testSeries1), sum(testSeries2))` and when it can, remove this test
+      it('should return an error when visual query builder query does not match raw query', () => {
+        jest.spyOn(console, 'error').mockImplementation();
+        ctx.target = {
+          refId: 'A',
+          target: 'maxSeries(sum(testSeries1), sum(testSeries2))',
+        };
+        ctx.targets = [ctx.target];
+        ctx.queryModel = new GraphiteQuery(ctx.datasource, ctx.target, ctx.templateSrv);
+        expect(ctx.queryModel.error).toBe(
+          'Failed to make a visual query builder query that is equivalent to the query.\nOriginal query: maxSeries(sum(testSeries1), sum(testSeries2))\nQuery builder query: maxSeries(sumSeries(sumSeries(testSeries1), testSeries2))'
+        );
       });
     });
   });

@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -14,25 +14,32 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
-import { getNodes } from 'app/percona/shared/core/selectors';
+import { getHighAvailability, getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { NodeType } from 'app/percona/shared/services/nodes/Nodes.types';
 import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { appEvents } from '../../../core/app_events';
-import { CLUSTERS_SWITCH_KEY, GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
+import {
+  CLUSTERS_SWITCH_KEY,
+  GET_HIGH_AVAILABILITY_NODES_CANCEL_TOKEN,
+  GET_NODES_CANCEL_TOKEN,
+} from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 
-import { getServiceLink } from './Nodes.utils';
+import { InventoryNode } from './Nodes.types';
+import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -40,30 +47,37 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
 
 export const NodesTab = () => {
-  const { isLoading, nodes } = useSelector(getNodes);
+  const { nodes } = useSelector(getNodes);
+  const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const [actionItem, setActionItem] = useState<Node | null>(null);
   const navModel = usePerconaNavModel('inventory-nodes');
+  const [triggerTimeout, , stopTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
+  const { nodes: highAvailabilityNodes, isEnabled: isHighAvailabilityEnabled } = useSelector(getHighAvailability);
 
   const mappedNodes = useMemo(
-    () => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
-    [nodes]
+    () =>
+      mapNodesToInventoryNodes(nodeFromDbMapper(nodes), highAvailabilityNodes).sort((a, b) =>
+        a.nodeName.localeCompare(b.nodeName)
+      ),
+    [nodes, highAvailabilityNodes]
   );
 
   const getActions = useCallback(
     (row: Row<Node>): Action[] => [
       {
         content: (
-          <HorizontalGroup spacing="sm">
+          <Stack direction="column">
             <Icon name="trash-alt" />
             <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
-          </HorizontalGroup>
+          </Stack>
         ),
         action: () => {
           setActionItem(row.original);
@@ -80,7 +94,7 @@ export const NodesTab = () => {
   }, []);
 
   const columns = useMemo(
-    (): Array<ExtendedColumn<Node>> => [
+    (): Array<ExtendedColumn<InventoryNode>> => [
       {
         Header: Messages.services.columns.nodeId,
         id: 'nodeId',
@@ -102,6 +116,15 @@ export const NodesTab = () => {
       {
         Header: Messages.nodes.columns.nodeName,
         accessor: 'nodeName',
+        Cell: ({ value, row }) =>
+          isHighAvailabilityEnabled ? (
+            <Stack>
+              <span>{value}</span>
+              {row.original.haRole && <Badge text={getHaRoleBadgeText(row.original.haRole)} color="darkgrey" />}
+            </Stack>
+          ) : (
+            value
+          ),
         type: FilterFieldTypes.TEXT,
       },
       {
@@ -139,7 +162,7 @@ export const NodesTab = () => {
           <StatusLink
             type="nodes"
             strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : row.original.nodeId}
-            agentsStatus={value}
+            agentsStatus={value as MonitoringStatus}
           />
         ),
         type: FilterFieldTypes.RADIO_BUTTON,
@@ -178,22 +201,40 @@ export const NodesTab = () => {
           return <div>{Messages.nodes.servicesCount(value.length)}</div>;
         },
       },
+      ...((isHighAvailabilityEnabled
+        ? [
+            {
+              Header: Messages.nodes.columns.isPmmServerNode,
+              id: 'isPmmServerNode',
+              accessor: 'isPmmServerNode',
+              hidden: true,
+              type: FilterFieldTypes.BOOLEAN,
+            },
+          ]
+        : []) as Array<ExtendedColumn<InventoryNode>>),
       getExpandAndActionsCol(getActions),
     ],
-    [styles, getActions, clearClusterToggle]
+    [styles, getActions, clearClusterToggle, isHighAvailabilityEnabled]
   );
 
+  // FIX PMM-14640: Added all captured variables to dependency array to prevent stale closures.
+  // Problem: Empty dependency array [] caused loadData to capture initial values and never update.
+  // Solution: Include all used variables (dispatch, generateToken) in dependencies.
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
+      await Promise.all([
+        dispatch(
+          fetchHighAvailabilityNodes({ token: generateToken(GET_HIGH_AVAILABILITY_NODES_CANCEL_TOKEN) })
+        ).unwrap(),
+        dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap(),
+      ]);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
       }
       logger.error(e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch, generateToken]);
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<Node>) => {
@@ -254,7 +295,11 @@ export const NodesTab = () => {
   }, [actionItem, selected]);
 
   useEffect(() => {
-    loadData();
+    setIsLoading(true);
+    loadData()
+      .then(() => setIsLoading(false))
+      .then(() => triggerTimeout(loadData, DATA_INTERVAL));
+    return () => stopTimeout();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -321,6 +366,7 @@ export const NodesTab = () => {
             </Button>
           </div>
           <Modal
+            ariaLabel={Messages.confirmAction}
             title={
               <div className="modal-header-title">
                 <span className="p-l-1">{Messages.confirmAction}</span>
@@ -340,14 +386,14 @@ export const NodesTab = () => {
                       label={Messages.forceMode}
                       element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
                     />
-                    <HorizontalGroup justify="space-between" spacing="md">
+                    <Stack direction="column" justifyContent="space-between">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                         {Messages.cancel}
                       </Button>
                       <Button type="submit" size="md" variant="destructive">
                         {Messages.proceed}
                       </Button>
-                    </HorizontalGroup>
+                    </Stack>
                   </>
                 </form>
               )}
@@ -359,6 +405,8 @@ export const NodesTab = () => {
             totalItems={mappedNodes.length}
             rowSelection
             autoResetSelectedRows={false}
+            autoResetExpanded={false}
+            autoResetPage={false}
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}

@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
@@ -30,7 +30,16 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           label={Messages.form.labels.mainDetails.serviceName}
           tooltipText={Messages.form.tooltips.mainDetails.serviceName}
         />
-        <div />
+        {remoteInstanceCredentials.isRDS ? (
+          <TextInputField
+            name="instance_id"
+            placeholder={Messages.form.placeholders.mainDetails.instanceID}
+            label={Messages.form.labels.mainDetails.instanceID}
+            tooltipText={Messages.form.tooltips.mainDetails.instanceID}
+          />
+        ) : (
+          <div />
+        )}
       </div>
       <NodesAgents form={form} />
       <div className={styles.group}>

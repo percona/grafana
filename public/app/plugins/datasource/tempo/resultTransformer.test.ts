@@ -14,11 +14,10 @@ import {
   otlpDataFrameFromResponse,
   otlpResponse,
   traceQlResponse,
-} from './testResponse';
+} from './test/testResponse';
 import { TraceSearchMetadata } from './types';
 
 const defaultSettings: DataSourceInstanceSettings = {
-  id: 0,
   uid: '0',
   type: 'tracing',
   name: 'tempo',

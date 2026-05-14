@@ -1,11 +1,10 @@
 import { StoryFn, Meta } from '@storybook/react';
-import React from 'react';
 
 import { LoadingPlaceholder, LoadingPlaceholderProps } from './LoadingPlaceholder';
 import mdx from './LoadingPlaceholder.mdx';
 
 const meta: Meta<typeof LoadingPlaceholder> = {
-  title: 'General/LoadingPlaceholder',
+  title: 'Information/LoadingPlaceholder',
   component: LoadingPlaceholder,
   parameters: {
     docs: {

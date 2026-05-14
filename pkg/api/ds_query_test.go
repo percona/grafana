@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -14,18 +13,20 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
+	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/db/dbtest"
 	"github.com/grafana/grafana/pkg/infra/localcache"
+	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin"
 	pluginClient "github.com/grafana/grafana/pkg/plugins/manager/client"
 	"github.com/grafana/grafana/pkg/plugins/manager/registry"
 	"github.com/grafana/grafana/pkg/services/datasources"
 	fakeDatasources "github.com/grafana/grafana/pkg/services/datasources/fakes"
-	"github.com/grafana/grafana/pkg/services/featuremgmt"
+	"github.com/grafana/grafana/pkg/services/dsquerierclient"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginconfig"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/plugincontext"
-	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginsettings"
 	pluginSettings "github.com/grafana/grafana/pkg/services/pluginsintegration/pluginsettings/service"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginstore"
 	"github.com/grafana/grafana/pkg/services/query"
@@ -33,20 +34,14 @@ import (
 	secretstest "github.com/grafana/grafana/pkg/services/secrets/fakes"
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/setting"
-	"github.com/grafana/grafana/pkg/util/errutil"
 	"github.com/grafana/grafana/pkg/web/webtest"
 )
 
-type fakePluginRequestValidator struct {
+type fakeDataSourceRequestValidator struct {
 	err error
 }
 
-type secretsErrorResponseBody struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
-}
-
-func (rv *fakePluginRequestValidator) Validate(dsURL string, req *http.Request) error {
+func (rv *fakeDataSourceRequestValidator) Validate(dsURL string, dsJsonData *simplejson.Json, req *http.Request) error {
 	return rv.err
 }
 
@@ -57,7 +52,7 @@ func TestAPIEndpoint_Metrics_QueryMetricsV2(t *testing.T) {
 		cfg,
 		nil,
 		nil,
-		&fakePluginRequestValidator{},
+		&fakeDataSourceRequestValidator{},
 		&fakePluginClient{
 			QueryDataHandlerFunc: func(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 				resp := backend.Responses{
@@ -68,102 +63,41 @@ func TestAPIEndpoint_Metrics_QueryMetricsV2(t *testing.T) {
 				return &backend.QueryDataResponse{Responses: resp}, nil
 			},
 		},
-		plugincontext.ProvideService(cfg, localcache.ProvideService(), &pluginstore.FakePluginStore{
-			PluginList: []pluginstore.Plugin{
-				{
-					JSONData: plugins.JSONData{
-						ID: "grafana",
+		plugincontext.ProvideService(
+			cfg,
+			localcache.ProvideService(),
+			&pluginstore.FakePluginStore{
+				PluginList: []pluginstore.Plugin{
+					{
+						JSONData: plugins.JSONData{
+							ID: "grafana",
+						},
 					},
 				},
 			},
-		}, &fakeDatasources.FakeCacheService{}, &fakeDatasources.FakeDataSourceService{},
-			pluginSettings.ProvideService(dbtest.NewFakeDB(), secretstest.NewFakeSecretsService()), pluginconfig.NewFakePluginRequestConfigProvider()),
+			&fakeDatasources.FakeCacheService{},
+			&fakeDatasources.FakeDataSourceService{},
+			pluginSettings.ProvideService(
+				dbtest.NewFakeDB(),
+				secretstest.NewFakeSecretsService(),
+			),
+			pluginconfig.NewFakePluginRequestConfigProvider(),
+		),
+		dsquerierclient.NewNullQSDatasourceClientBuilder(),
 	)
-	serverFeatureEnabled := SetupAPITestServer(t, func(hs *HTTPServer) {
+	server := SetupAPITestServer(t, func(hs *HTTPServer) {
 		hs.queryDataService = qds
-		hs.Features = featuremgmt.WithFeatures(featuremgmt.FlagDatasourceQueryMultiStatus, true)
 		hs.QuotaService = quotatest.New(false, nil)
-	})
-	serverFeatureDisabled := SetupAPITestServer(t, func(hs *HTTPServer) {
-		hs.queryDataService = qds
-		hs.Features = featuremgmt.WithFeatures(featuremgmt.FlagDatasourceQueryMultiStatus, false)
-		hs.QuotaService = quotatest.New(false, nil)
+		hs.log = log.New("test-logger")
 	})
 
-	t.Run("Status code is 400 when data source response has an error and feature toggle is disabled", func(t *testing.T) {
-		req := serverFeatureDisabled.NewPostRequest("/api/ds/query", strings.NewReader(reqValid))
+	t.Run("Status code is 400 when data source response has an error", func(t *testing.T) {
+		req := server.NewPostRequest("/api/ds/query", strings.NewReader(reqValid))
 		webtest.RequestWithSignedInUser(req, &user.SignedInUser{UserID: 1, OrgID: 1, Permissions: map[int64]map[string][]string{1: {datasources.ActionQuery: []string{datasources.ScopeAll}}}})
-		resp, err := serverFeatureDisabled.SendJSON(req)
+		resp, err := server.SendJSON(req)
 		require.NoError(t, err)
 		require.NoError(t, resp.Body.Close())
 		require.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	})
-
-	t.Run("Status code is 207 when data source response has an error and feature toggle is enabled", func(t *testing.T) {
-		req := serverFeatureEnabled.NewPostRequest("/api/ds/query", strings.NewReader(reqValid))
-		webtest.RequestWithSignedInUser(req, &user.SignedInUser{UserID: 1, OrgID: 1, Permissions: map[int64]map[string][]string{1: {datasources.ActionQuery: []string{datasources.ScopeAll}}}})
-		resp, err := serverFeatureEnabled.SendJSON(req)
-		require.NoError(t, err)
-		require.NoError(t, resp.Body.Close())
-		require.Equal(t, http.StatusMultiStatus, resp.StatusCode)
-	})
-}
-
-func TestAPIEndpoint_Metrics_PluginDecryptionFailure(t *testing.T) {
-	cfg := setting.NewCfg()
-	ds := &fakeDatasources.FakeDataSourceService{SimulatePluginFailure: true}
-	db := &dbtest.FakeDB{ExpectedError: pluginsettings.ErrPluginSettingNotFound}
-	pcp := plugincontext.ProvideService(cfg, localcache.ProvideService(),
-		&pluginstore.FakePluginStore{
-			PluginList: []pluginstore.Plugin{
-				{
-					JSONData: plugins.JSONData{
-						ID: "grafana",
-					},
-				},
-			},
-		},
-		&fakeDatasources.FakeCacheService{},
-		ds, pluginSettings.ProvideService(db, secretstest.NewFakeSecretsService()), pluginconfig.NewFakePluginRequestConfigProvider(),
-	)
-	qds := query.ProvideService(
-		cfg,
-		nil,
-		nil,
-		&fakePluginRequestValidator{},
-		&fakePluginClient{
-			QueryDataHandlerFunc: func(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-				resp := backend.Responses{
-					"A": backend.DataResponse{
-						Error: errors.New("query failed"),
-					},
-				}
-				return &backend.QueryDataResponse{Responses: resp}, nil
-			},
-		},
-		pcp,
-	)
-	httpServer := SetupAPITestServer(t, func(hs *HTTPServer) {
-		hs.queryDataService = qds
-		hs.QuotaService = quotatest.New(false, nil)
-		hs.pluginContextProvider = pcp
-	})
-
-	t.Run("Status code is 500 and a secrets plugin error is returned if there is a problem getting secrets from the remote plugin", func(t *testing.T) {
-		req := httpServer.NewPostRequest("/api/ds/query", strings.NewReader(reqValid))
-		webtest.RequestWithSignedInUser(req, &user.SignedInUser{UserID: 1, OrgID: 1, Permissions: map[int64]map[string][]string{1: {datasources.ActionQuery: []string{datasources.ScopeAll}}}})
-		resp, err := httpServer.SendJSON(req)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-		buf := new(bytes.Buffer)
-		_, err = buf.ReadFrom(resp.Body)
-		require.NoError(t, err)
-		require.NoError(t, resp.Body.Close())
-		var resObj secretsErrorResponseBody
-		err = json.Unmarshal(buf.Bytes(), &resObj)
-		require.NoError(t, err)
-		require.Equal(t, "", resObj.Error)
-		require.Contains(t, resObj.Message, "Secrets Plugin error:")
 	})
 }
 
@@ -227,49 +161,79 @@ var reqDatasourceByIdNotFound = `{
 }`
 
 func TestDataSourceQueryError(t *testing.T) {
+	type body struct {
+		Message    string `json:"message"`
+		MessageId  string `json:"messageId"`
+		StatusCode int    `json:"statusCode"`
+	}
+
 	tcs := []struct {
 		request        string
 		clientErr      error
 		expectedStatus int
-		expectedBody   string
+		expectedBody   body
 	}{
 		{
 			request:        reqValid,
 			clientErr:      plugins.ErrPluginUnavailable,
 			expectedStatus: http.StatusInternalServerError,
-			expectedBody:   `{"message":"Plugin unavailable","messageId":"plugin.unavailable","statusCode":500,"traceID":""}`,
+			expectedBody: body{
+				Message:    "Plugin unavailable",
+				MessageId:  "plugin.unavailable",
+				StatusCode: 500,
+			},
 		},
 		{
 			request:        reqValid,
 			clientErr:      plugins.ErrMethodNotImplemented,
 			expectedStatus: http.StatusNotFound,
-			expectedBody:   `{"message":"Method not implemented","messageId":"plugin.notImplemented","statusCode":404,"traceID":""}`,
+			expectedBody: body{
+				Message:    "Method not implemented",
+				MessageId:  "plugin.notImplemented",
+				StatusCode: 404,
+			},
 		},
 		{
 			request:        reqValid,
 			clientErr:      errors.New("surprise surprise"),
 			expectedStatus: errutil.StatusInternal.HTTPStatus(),
-			expectedBody:   `{"message":"An error occurred within the plugin","messageId":"plugin.downstreamError","statusCode":500,"traceID":""}`,
+			expectedBody: body{
+				Message:    "An error occurred within the plugin",
+				MessageId:  "plugin.requestFailureError",
+				StatusCode: 500,
+			},
 		},
 		{
 			request:        reqNoQueries,
 			expectedStatus: http.StatusBadRequest,
-			expectedBody:   `{"message":"No queries found","messageId":"query.noQueries","statusCode":400,"traceID":""}`,
+			expectedBody: body{
+				Message:    "No queries found",
+				MessageId:  "query.noQueries",
+				StatusCode: 400,
+			},
 		},
 		{
 			request:        reqQueryWithInvalidDatasourceID,
 			expectedStatus: http.StatusBadRequest,
-			expectedBody:   `{"message":"Query does not contain a valid data source identifier","messageId":"query.invalidDatasourceId","statusCode":400,"traceID":""}`,
+			expectedBody: body{
+				Message:    "Query does not contain a valid data source identifier",
+				MessageId:  "query.invalidDatasourceId",
+				StatusCode: 400,
+			},
 		},
 		{
 			request:        reqDatasourceByUidNotFound,
 			expectedStatus: http.StatusNotFound,
-			expectedBody:   `{"message":"Data source not found","traceID":""}`,
+			expectedBody: body{
+				Message: "Data source not found",
+			},
 		},
 		{
 			request:        reqDatasourceByIdNotFound,
 			expectedStatus: http.StatusNotFound,
-			expectedBody:   `{"message":"Data source not found","traceID":""}`,
+			expectedBody: body{
+				Message: "Data source not found",
+			},
 		},
 	}
 
@@ -291,11 +255,12 @@ func TestDataSourceQueryError(t *testing.T) {
 				err := r.Add(context.Background(), p)
 				require.NoError(t, err)
 				ds := &fakeDatasources.FakeDataSourceService{}
+				hs.log = log.New("test-logger")
 				hs.queryDataService = query.ProvideService(
 					cfg,
 					&fakeDatasources.FakeCacheService{},
 					nil,
-					&fakePluginRequestValidator{},
+					&fakeDataSourceRequestValidator{},
 					pluginClient.ProvideService(r),
 					plugincontext.ProvideService(cfg, localcache.ProvideService(), &pluginstore.FakePluginStore{
 						PluginList: []pluginstore.Plugin{pluginstore.ToGrafanaDTO(p)},
@@ -303,18 +268,29 @@ func TestDataSourceQueryError(t *testing.T) {
 						&fakeDatasources.FakeCacheService{}, ds,
 						pluginSettings.ProvideService(dbtest.NewFakeDB(),
 							secretstest.NewFakeSecretsService()), pluginconfig.NewFakePluginRequestConfigProvider()),
+					dsquerierclient.NewNullQSDatasourceClientBuilder(),
 				)
 				hs.QuotaService = quotatest.New(false, nil)
 			})
 			req := srv.NewPostRequest("/api/ds/query", strings.NewReader(tc.request))
+
 			webtest.RequestWithSignedInUser(req, &user.SignedInUser{UserID: 1, OrgID: 1, Permissions: map[int64]map[string][]string{1: {datasources.ActionQuery: []string{datasources.ScopeAll}}}})
 			resp, err := srv.SendJSON(req)
 			require.NoError(t, err)
 
 			require.Equal(t, tc.expectedStatus, resp.StatusCode)
-			body, err := io.ReadAll(resp.Body)
+
+			bodyBytes, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
-			require.Equal(t, tc.expectedBody, string(body))
+
+			var responseBody body
+			err = json.Unmarshal(bodyBytes, &responseBody)
+			require.NoError(t, err)
+
+			require.Equal(t, tc.expectedBody.Message, responseBody.Message)
+			require.Equal(t, tc.expectedBody.MessageId, responseBody.MessageId)
+			require.Equal(t, tc.expectedBody.StatusCode, responseBody.StatusCode)
+
 			require.NoError(t, resp.Body.Close())
 		})
 	}

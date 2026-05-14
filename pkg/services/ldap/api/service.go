@@ -29,7 +29,8 @@ import (
 )
 
 type Service struct {
-	cfg                  *setting.Cfg
+	cfg                  *ldap.Config
+	adminUser            string
 	userService          user.Service
 	authInfoService      login.AuthInfoService
 	ldapGroupsService    ldap.Groups
@@ -47,7 +48,8 @@ func ProvideService(
 	sessionService auth.UserTokenService, bundleRegistry supportbundles.Service,
 ) *Service {
 	s := &Service{
-		cfg:                  cfg,
+		cfg:                  ldap.GetLDAPConfig(cfg),
+		adminUser:            cfg.AdminUser,
 		userService:          userService,
 		authInfoService:      authInfoService,
 		ldapGroupsService:    ldapGroupsService,
@@ -91,20 +93,16 @@ func ProvideService(
 // - basic:
 //
 // Responses:
-// 200: okResponse
-// 401: unauthorisedError
-// 403: forbiddenError
-// 500: internalServerError
+// 410: goneError
 func (s *Service) ReloadLDAPCfg(c *contextmodel.ReqContext) response.Response {
-	if !s.cfg.LDAPAuthEnabled {
-		return response.Error(http.StatusBadRequest, "LDAP is not enabled", nil)
-	}
+	s.log.Warn("Obsolete and Permanently moved API endpoint called", "path", c.Req.URL.Path)
 
-	if err := s.ldapService.ReloadConfig(); err != nil {
-		return response.Error(http.StatusInternalServerError, "Failed to reload LDAP config", err)
-	}
-
-	return response.Success("LDAP config reloaded")
+	// Respond with a 410 Gone status code
+	return response.Error(
+		http.StatusGone,
+		"This endpoint has been removed. LDAP configuration is now loaded from SSO settings.",
+		nil,
+	)
 }
 
 // swagger:route GET /admin/ldap/status admin_ldap getLDAPStatus
@@ -122,7 +120,7 @@ func (s *Service) ReloadLDAPCfg(c *contextmodel.ReqContext) response.Response {
 // 403: forbiddenError
 // 500: internalServerError
 func (s *Service) GetLDAPStatus(c *contextmodel.ReqContext) response.Response {
-	if !s.cfg.LDAPAuthEnabled {
+	if !s.cfg.Enabled {
 		return response.Error(http.StatusBadRequest, "LDAP is not enabled", nil)
 	}
 
@@ -169,7 +167,7 @@ func (s *Service) GetLDAPStatus(c *contextmodel.ReqContext) response.Response {
 // 403: forbiddenError
 // 500: internalServerError
 func (s *Service) PostSyncUserWithLDAP(c *contextmodel.ReqContext) response.Response {
-	if !s.cfg.LDAPAuthEnabled {
+	if !s.cfg.Enabled {
 		return response.Error(http.StatusBadRequest, "LDAP is not enabled", nil)
 	}
 
@@ -206,7 +204,7 @@ func (s *Service) PostSyncUserWithLDAP(c *contextmodel.ReqContext) response.Resp
 	userInfo, _, err := ldapClient.User(usr.Login)
 	if err != nil {
 		if errors.Is(err, multildap.ErrDidNotFindUser) { // User was not in the LDAP server - we need to take action:
-			if s.cfg.AdminUser == usr.Login { // User is *the* Grafana Admin. We cannot disable it.
+			if s.adminUser == usr.Login { // User is *the* Grafana Admin. We cannot disable it.
 				errMsg := fmt.Sprintf(`Refusing to sync grafana super admin "%s" - it would be disabled`, usr.Login)
 				s.log.Error(errMsg)
 				return response.Error(http.StatusBadRequest, errMsg, err)
@@ -250,7 +248,7 @@ func (s *Service) PostSyncUserWithLDAP(c *contextmodel.ReqContext) response.Resp
 // 403: forbiddenError
 // 500: internalServerError
 func (s *Service) GetUserFromLDAP(c *contextmodel.ReqContext) response.Response {
-	if !s.cfg.LDAPAuthEnabled {
+	if !s.cfg.Enabled {
 		return response.Error(http.StatusBadRequest, "LDAP is not enabled", nil)
 	}
 
@@ -330,8 +328,8 @@ func (s *Service) identityFromLDAPUser(user *login.ExternalUserInfo) *authn.Iden
 			SyncUser:     true,
 			SyncTeams:    true,
 			EnableUser:   true,
-			SyncOrgRoles: !s.cfg.LDAPSkipOrgRoleSync,
-			AllowSignUp:  s.cfg.LDAPAllowSignup,
+			SyncOrgRoles: !s.cfg.SkipOrgRoleSync,
+			AllowSignUp:  s.cfg.AllowSignUp,
 		},
 	}
 }

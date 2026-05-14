@@ -10,10 +10,10 @@ import (
 
 	"github.com/grafana/grafana/pkg/api/dtos"
 	"github.com/grafana/grafana/pkg/api/response"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/events"
 	"github.com/grafana/grafana/pkg/infra/metrics"
 	ac "github.com/grafana/grafana/pkg/services/accesscontrol"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/notifications"
 	"github.com/grafana/grafana/pkg/services/org"
@@ -24,7 +24,7 @@ import (
 	"github.com/grafana/grafana/pkg/web"
 )
 
-// swagger:route GET /org/invites org_invites getPendingOrgInvites
+// swagger:route GET /org/invites org invites getPendingOrgInvites
 //
 // Get pending invites.
 //
@@ -34,7 +34,7 @@ import (
 // 403: forbiddenError
 // 500: internalServerError
 func (hs *HTTPServer) GetPendingOrgInvites(c *contextmodel.ReqContext) response.Response {
-	query := tempuser.GetTempUsersQuery{OrgID: c.SignedInUser.GetOrgID(), Status: tempuser.TmpUserInvitePending}
+	query := tempuser.GetTempUsersQuery{OrgID: c.GetOrgID(), Status: tempuser.TmpUserInvitePending}
 
 	queryResult, err := hs.tempUserService.GetTempUsersQuery(c.Req.Context(), &query)
 	if err != nil {
@@ -48,7 +48,7 @@ func (hs *HTTPServer) GetPendingOrgInvites(c *contextmodel.ReqContext) response.
 	return response.JSON(http.StatusOK, queryResult)
 }
 
-// swagger:route POST /org/invites org_invites addOrgInvite
+// swagger:route POST /org/invites org invites addOrgInvite
 //
 // Add invite.
 //
@@ -67,7 +67,7 @@ func (hs *HTTPServer) AddOrgInvite(c *contextmodel.ReqContext) response.Response
 	if !inviteDto.Role.IsValid() {
 		return response.Error(http.StatusBadRequest, "Invalid role specified", nil)
 	}
-	if !c.SignedInUser.GetOrgRole().Includes(inviteDto.Role) && !c.SignedInUser.GetIsGrafanaAdmin() {
+	if !c.SignedInUser.GetOrgRole().Includes(inviteDto.Role) && !c.GetIsGrafanaAdmin() {
 		return response.Error(http.StatusForbidden, "Cannot assign a role higher than user's role", nil)
 	}
 
@@ -96,19 +96,14 @@ func (hs *HTTPServer) AddOrgInvite(c *contextmodel.ReqContext) response.Response
 	}
 
 	cmd := tempuser.CreateTempUserCommand{}
-	cmd.OrgID = c.SignedInUser.GetOrgID()
+	cmd.OrgID = c.GetOrgID()
 	cmd.Email = inviteDto.LoginOrEmail
 	cmd.Name = inviteDto.Name
 	cmd.Status = tempuser.TmpUserInvitePending
 
-	namespace, identifier := c.SignedInUser.GetNamespacedID()
 	var userID int64
-	if namespace == identity.NamespaceUser || namespace == identity.NamespaceServiceAccount {
-		var err error
-		userID, err = strconv.ParseInt(identifier, 10, 64)
-		if err != nil {
-			return response.Error(http.StatusInternalServerError, "Unrecognized user", err)
-		}
+	if id, err := identity.UserIdentifier(c.GetID()); err == nil {
+		userID = id
 	}
 
 	cmd.InvitedByUserID = userID
@@ -131,10 +126,10 @@ func (hs *HTTPServer) AddOrgInvite(c *contextmodel.ReqContext) response.Response
 			Template: "new_user_invite",
 			Data: map[string]any{
 				"Name":      util.StringsFallback2(cmd.Name, cmd.Email),
-				"OrgName":   c.SignedInUser.GetOrgName(),
-				"Email":     c.SignedInUser.GetEmail(),
+				"OrgName":   c.GetOrgName(),
+				"Email":     c.GetEmail(),
 				"LinkUrl":   setting.ToAbsUrl("invite/" + cmd.Code),
-				"InvitedBy": c.SignedInUser.GetDisplayName(),
+				"InvitedBy": c.GetName(),
 			},
 		}
 
@@ -159,7 +154,7 @@ func (hs *HTTPServer) AddOrgInvite(c *contextmodel.ReqContext) response.Response
 
 func (hs *HTTPServer) inviteExistingUserToOrg(c *contextmodel.ReqContext, user *user.User, inviteDto *dtos.AddInviteForm) response.Response {
 	// user exists, add org role
-	createOrgUserCmd := org.AddOrgUserCommand{OrgID: c.SignedInUser.GetOrgID(), UserID: user.ID, Role: inviteDto.Role}
+	createOrgUserCmd := org.AddOrgUserCommand{OrgID: c.GetOrgID(), UserID: user.ID, Role: inviteDto.Role}
 	if err := hs.orgService.AddOrgUser(c.Req.Context(), &createOrgUserCmd); err != nil {
 		if errors.Is(err, org.ErrOrgUserAlreadyAdded) {
 			return response.Error(http.StatusPreconditionFailed, fmt.Sprintf("User %s is already added to organization", inviteDto.LoginOrEmail), err)
@@ -173,8 +168,8 @@ func (hs *HTTPServer) inviteExistingUserToOrg(c *contextmodel.ReqContext, user *
 			Template: "invited_to_org",
 			Data: map[string]any{
 				"Name":      user.NameOrFallback(),
-				"OrgName":   c.SignedInUser.GetOrgName(),
-				"InvitedBy": c.SignedInUser.GetDisplayName(),
+				"OrgName":   c.GetOrgName(),
+				"InvitedBy": c.GetName(),
 			},
 		}
 
@@ -184,12 +179,12 @@ func (hs *HTTPServer) inviteExistingUserToOrg(c *contextmodel.ReqContext, user *
 	}
 
 	return response.JSON(http.StatusOK, util.DynMap{
-		"message": fmt.Sprintf("Existing Grafana user %s added to org %s", user.NameOrFallback(), c.SignedInUser.GetOrgName()),
+		"message": fmt.Sprintf("Existing Grafana user %s added to org %s", user.NameOrFallback(), c.GetOrgName()),
 		"userId":  user.ID,
 	})
 }
 
-// swagger:route DELETE /org/invites/{invitation_code}/revoke org_invites revokeInvite
+// swagger:route DELETE /org/invites/{invitation_code}/revoke org invites revokeInvite
 //
 // Revoke invite.
 //
@@ -200,6 +195,20 @@ func (hs *HTTPServer) inviteExistingUserToOrg(c *contextmodel.ReqContext, user *
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) RevokeInvite(c *contextmodel.ReqContext) response.Response {
+	query := tempuser.GetTempUserByCodeQuery{Code: web.Params(c.Req)[":code"]}
+	queryResult, err := hs.tempUserService.GetTempUserByCode(c.Req.Context(), &query)
+	if err != nil {
+		if errors.Is(err, tempuser.ErrTempUserNotFound) {
+			return response.Error(http.StatusNotFound, "Invite not found", nil)
+		}
+		return response.Error(http.StatusInternalServerError, "Failed to get invite", err)
+	}
+
+	canRevoke := c.GetOrgID() == queryResult.OrgID || c.GetIsGrafanaAdmin()
+	if !canRevoke {
+		return response.Error(http.StatusForbidden, "Permission denied: not permitted to revoke invite", nil)
+	}
+
 	if ok, rsp := hs.updateTempUserStatus(c.Req.Context(), web.Params(c.Req)[":code"], tempuser.TmpUserRevoked); !ok {
 		return rsp
 	}
@@ -225,11 +234,22 @@ func (hs *HTTPServer) GetInviteInfoByCode(c *contextmodel.ReqContext) response.R
 		return response.Error(http.StatusNotFound, "Invite not found", nil)
 	}
 
+	orgResult, err := hs.orgService.GetByID(c.Req.Context(), &org.GetOrgByIDQuery{
+		ID: invite.OrgID,
+	})
+	if err != nil {
+		if errors.Is(err, org.ErrOrgNotFound) {
+			return response.Error(http.StatusNotFound, "org not found", nil)
+		}
+		return response.Error(http.StatusInternalServerError, "Failed to get org", err)
+	}
+
 	return response.JSON(http.StatusOK, dtos.InviteInfo{
 		Email:     invite.Email,
 		Name:      invite.Name,
 		Username:  invite.Email,
 		InvitedBy: util.StringsFallback3(invite.InvitedByName, invite.InvitedByLogin, invite.InvitedByEmail),
+		OrgName:   orgResult.Name,
 	})
 }
 

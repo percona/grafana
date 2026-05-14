@@ -1,12 +1,12 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
-import { AppEvents, UrlQueryMap } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
+import { AppEvents, OrgRole, UrlQueryMap } from '@grafana/data';
+import { config, locationService } from '@grafana/runtime';
 import { useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
@@ -17,20 +17,21 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { getAdvisors, getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { dispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
-import { ChecksInfoAlert } from '../CheckInfoAlert/CheckInfoAlert';
 
 import { Messages } from './AllChecksTab.messages';
 import { getStyles } from './AllChecksTab.styles';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { CheckActions } from './CheckActions/CheckActions';
 
-export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> = ({ match }) => {
-  const category = match.params.category;
+export const AllChecksTab: FC = () => {
+  const [queryParams] = useQueryParams();
+  const { category } = useParams();
   const navModel = usePerconaNavModel(`advisors-${category}`);
   const [runChecksPending, setRunChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
@@ -38,8 +39,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   const styles = useStyles2(getStyles);
   const { loading: advisorsPending } = useSelector(getAdvisors);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
-  const advisors = categorizedAdvisors[category];
-  const [queryParams] = useQueryParams();
+  const advisors = category ? categorizedAdvisors[category] : {};
 
   if (navModel.main.id === 'not-found') {
     locationService.push('/advisors');
@@ -74,9 +74,8 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   };
 
   const changeCheck = useCallback(async (check: CheckDetails) => {
-    const action = !!check.disabled ? 'enable' : 'disable';
     try {
-      await CheckService.changeCheck({ params: [{ name: check.name, [action]: true }] });
+      await CheckService.changeCheck({ params: [{ name: check.name, enable: !check.enabled }] });
       await dispatch(fetchAdvisors({}));
     } catch (e) {
       logger.error(e);
@@ -116,17 +115,17 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
       },
       {
         Header: Messages.table.columns.status,
-        accessor: 'disabled',
-        Cell: ({ value }) => <>{!!value ? Messages.disabled : Messages.enabled}</>,
+        accessor: 'enabled',
+        Cell: ({ value }) => <>{value ? Messages.enabled : Messages.disabled}</>,
         type: FilterFieldTypes.RADIO_BUTTON,
         options: [
           {
             label: Messages.enabled,
-            value: false,
+            value: true,
           },
           {
             label: Messages.disabled,
-            value: true,
+            value: false,
           },
         ],
       },
@@ -160,20 +159,24 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           },
         ],
       },
-      {
-        Header: Messages.table.columns.actions,
-        accessor: 'name',
-        id: 'actions',
-        // eslint-disable-next-line react/display-name
-        Cell: ({ row }) => (
-          <CheckActions
-            check={row.original}
-            onChangeCheck={changeCheck}
-            onIntervalChangeClick={handleIntervalChangeClick}
-            onIndividualRunCheckClick={runIndividualCheck}
-          />
-        ),
-      },
+      ...(isPmmAdmin(config.bootData.user)
+        ? [
+            {
+              Header: Messages.table.columns.actions,
+              accessor: 'name',
+              id: 'actions',
+              // eslint-disable-next-line react/display-name
+              Cell: ({ row }) => (
+                <CheckActions
+                  check={row.original}
+                  onChangeCheck={changeCheck}
+                  onIntervalChangeClick={handleIntervalChangeClick}
+                  onIndividualRunCheckClick={runIndividualCheck}
+                />
+              ),
+            } as ExtendedColumn<CheckDetails>,
+          ]
+        : []),
     ],
     [changeCheck, handleIntervalChangeClick]
   );
@@ -192,23 +195,25 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           messagedataTestId="db-check-panel-settings-link"
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
+          allowedRoles={[OrgRole.Admin, OrgRole.Editor]}
         >
-          <ChecksInfoAlert />
           <div className={styles.wrapper}>
             <div className={styles.header}>
               <h1>{Messages.availableHeader}</h1>
-              <div className={styles.actionButtons} data-testid="db-check-panel-actions">
-                <LoaderButton
-                  type="button"
-                  variant="secondary"
-                  size="md"
-                  loading={runChecksPending}
-                  onClick={handleRunChecksClick}
-                  className={styles.runChecksButton}
-                >
-                  {Messages.runDbChecks}
-                </LoaderButton>
-              </div>
+              {isPmmAdmin(config.bootData.user) && (
+                <div className={styles.actionButtons} data-testid="db-check-panel-actions">
+                  <LoaderButton
+                    type="button"
+                    variant="secondary"
+                    size="md"
+                    loading={runChecksPending}
+                    onClick={handleRunChecksClick}
+                    className={styles.runChecksButton}
+                  >
+                    {Messages.runDbChecks}
+                  </LoaderButton>
+                </div>
+              )}
             </div>
             {advisors &&
               Object.keys(advisors).map((summary) => (

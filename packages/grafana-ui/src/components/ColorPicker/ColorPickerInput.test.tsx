@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import { ColorPickerInput } from './ColorPickerInput';
 
@@ -10,6 +9,24 @@ describe('ColorPickerInput', () => {
     render(<ColorPickerInput onChange={noop} />);
     expect(screen.queryByTestId('color-popover')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('textbox'));
+    expect(screen.getByTestId('color-popover')).toBeInTheDocument();
+  });
+
+  it('should hide color popover on blur', async () => {
+    render(<ColorPickerInput onChange={noop} />);
+    expect(screen.queryByTestId('color-popover')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('textbox'));
+    expect(screen.getByTestId('color-popover')).toBeInTheDocument();
+    await userEvent.click(document.body);
+    expect(screen.queryByTestId('color-popover')).not.toBeInTheDocument();
+  });
+
+  it('should not hide color popover on blur if clicked inside the color picker', async () => {
+    render(<ColorPickerInput onChange={noop} />);
+    expect(screen.queryByTestId('color-popover')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('textbox'));
+    expect(screen.getByTestId('color-popover')).toBeInTheDocument();
+    await userEvent.click(screen.getAllByRole('slider')[0]);
     expect(screen.getByTestId('color-popover')).toBeInTheDocument();
   });
 

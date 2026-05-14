@@ -1,6 +1,4 @@
 // Core Grafana history https://github.com/grafana/grafana/blob/v11.0.0-preview/public/app/plugins/datasource/prometheus/querybuilder/components/NestedQueryList.tsx
-import React from 'react';
-
 import { Stack } from '@grafana/ui';
 
 import { PrometheusDatasource } from '../../datasource';
@@ -8,7 +6,7 @@ import { PromVisualQuery, PromVisualQueryBinary } from '../types';
 
 import { NestedQuery } from './NestedQuery';
 
-export interface NestedQueryListProps {
+interface NestedQueryListProps {
   query: PromVisualQuery;
   datasource: PrometheusDatasource;
   onChange: (query: PromVisualQuery) => void;

@@ -1,5 +1,6 @@
 import { difference, isEqual } from 'lodash';
-import React, { Component } from 'react';
+import { Component, type JSX } from 'react';
+import * as React from 'react';
 
 import { GraphSeriesXY } from '@grafana/data';
 

@@ -2,19 +2,22 @@ package state
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"path"
 	"strconv"
-	"time"
 
 	"github.com/benbjohnson/clock"
 	"github.com/go-openapi/strfmt"
-	alertingModels "github.com/grafana/alerting/models"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/common/model"
 
+	alertingModels "github.com/grafana/alerting/models"
+
+	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/ngalert/eval"
 	ngModels "github.com/grafana/grafana/pkg/services/ngalert/models"
@@ -33,7 +36,7 @@ const (
 // - if evaluation state is either NoData or Error, the resulting set of labels is changed:
 //   - original alert name (label: model.AlertNameLabel) is backed up to OriginalAlertName
 //   - label model.AlertNameLabel is overwritten to either NoDataAlertName or ErrorAlertName
-func StateToPostableAlert(transition StateTransition, appURL *url.URL) *models.PostableAlert {
+func StateToPostableAlert(transition StateTransition, appURL *url.URL, featureToggles featuremgmt.FeatureToggles) *models.PostableAlert {
 	alertState := transition.State
 	nL := alertState.Labels.Copy()
 	nA := data.Labels(alertState.Annotations).Copy()
@@ -49,8 +52,8 @@ func StateToPostableAlert(transition StateTransition, appURL *url.URL) *models.P
 		nA[alertingModels.ValueStringAnnotation] = alertState.LastEvaluationString
 	}
 
-	if alertState.Image != nil && alertState.Image.Token != "" {
-		nA[alertingModels.ImageTokenAnnotation] = alertState.Image.Token
+	if alertState.Image != nil {
+		attachImageAnnotations(alertState.Image, nA)
 	}
 
 	if alertState.StateReason != "" {
@@ -73,7 +76,7 @@ func StateToPostableAlert(transition StateTransition, appURL *url.URL) *models.P
 	}
 
 	state := alertState.State
-	if alertState.Resolved {
+	if alertState.ResolvedAt != nil {
 		// If this is a resolved alert, we need to send an alert with the correct labels such that they will expire the previous alert.
 		// In most cases the labels on the state will be correct, however when the previous alert was a NoData or Error alert, we need to
 		// ensure to modify it appropriately.
@@ -88,9 +91,17 @@ func StateToPostableAlert(transition StateTransition, appURL *url.URL) *models.P
 		return errorAlert(nL, nA, alertState, urlStr)
 	}
 
+	startsAt := strfmt.DateTime(alertState.StartsAt)
+	//nolint:staticcheck // not yet migrated to OpenFeature
+	if featureToggles.IsEnabledGlobally(featuremgmt.FlagAlertRuleUseFiredAtForStartsAt) {
+		if alertState.FiredAt != nil {
+			startsAt = strfmt.DateTime(*alertState.FiredAt)
+		}
+	}
+
 	return &models.PostableAlert{
 		Annotations: models.LabelSet(nA),
-		StartsAt:    strfmt.DateTime(alertState.StartsAt),
+		StartsAt:    startsAt,
 		EndsAt:      strfmt.DateTime(alertState.EndsAt),
 		Alert: models.Alert{
 			Labels:       models.LabelSet(nL),
@@ -139,39 +150,101 @@ func errorAlert(labels, annotations data.Labels, alertState *State, urlStr strin
 	}
 }
 
-func FromStateTransitionToPostableAlerts(firingStates []StateTransition, stateManager *Manager, appURL *url.URL) apimodels.PostableAlerts {
-	alerts := apimodels.PostableAlerts{PostableAlerts: make([]models.PostableAlert, 0, len(firingStates))}
-	var sentAlerts []*State
-	ts := time.Now()
-
-	for _, alertState := range firingStates {
-		if !alertState.NeedsSending(stateManager.ResendDelay) {
-			continue
-		}
-		alert := StateToPostableAlert(alertState, appURL)
-		alerts.PostableAlerts = append(alerts.PostableAlerts, *alert)
-		if alertState.StateReason == ngModels.StateReasonMissingSeries { // do not put stale state back to state manager
-			continue
-		}
-		alertState.LastSentAt = ts
-		sentAlerts = append(sentAlerts, alertState.State)
-	}
-	stateManager.Put(sentAlerts)
-	return alerts
-}
-
 // FromAlertsStateToStoppedAlert selects only transitions from firing states (states eval.Alerting, eval.NoData, eval.Error)
 // and converts them to models.PostableAlert with EndsAt set to time.Now
-func FromAlertsStateToStoppedAlert(firingStates []StateTransition, appURL *url.URL, clock clock.Clock) apimodels.PostableAlerts {
+func FromAlertsStateToStoppedAlert(firingStates []StateTransition, appURL *url.URL, clock clock.Clock, featureToggles featuremgmt.FeatureToggles) apimodels.PostableAlerts {
 	alerts := apimodels.PostableAlerts{PostableAlerts: make([]models.PostableAlert, 0, len(firingStates))}
 	ts := clock.Now()
 	for _, transition := range firingStates {
 		if transition.PreviousState == eval.Normal || transition.PreviousState == eval.Pending {
 			continue
 		}
-		postableAlert := StateToPostableAlert(transition, appURL)
+		postableAlert := StateToPostableAlert(transition, appURL, featureToggles)
 		postableAlert.EndsAt = strfmt.DateTime(ts)
 		alerts.PostableAlerts = append(alerts.PostableAlerts, *postableAlert)
 	}
 	return alerts
+}
+
+// attachImageAnnotations attaches image annotations to the alert.
+func attachImageAnnotations(image *ngModels.Image, a data.Labels) {
+	if image.Token != "" {
+		a[alertingModels.ImageTokenAnnotation] = image.Token
+	}
+	if image.URL != "" {
+		a[alertingModels.ImageURLAnnotation] = image.URL
+	}
+}
+
+// AlertInstanceToState converts a persisted AlertInstance to an in-memory State.
+func AlertInstanceToState(entry *ngModels.AlertInstance, logger log.Logger) *State {
+	cacheID := entry.Labels.Fingerprint()
+
+	var resultFp data.Fingerprint
+	if entry.ResultFingerprint != "" {
+		fp, err := strconv.ParseUint(entry.ResultFingerprint, 16, 64)
+		if err != nil {
+			logger.Error("Failed to parse result fingerprint of alert instance", "error", err, "rule_uid", entry.RuleUID)
+		}
+		resultFp = data.Fingerprint(fp)
+	}
+
+	var stateError error
+	if entry.LastError != "" {
+		stateError = errors.New(entry.LastError)
+	}
+
+	var values map[string]float64
+	var latestResult *Evaluation
+	if len(entry.LastResult.Values) > 0 || entry.LastResult.Condition != "" {
+		values = entry.LastResult.Values
+		latestResult = &Evaluation{
+			EvaluationTime:  entry.LastEvalTime,
+			EvaluationState: translateInstanceState(entry.CurrentState),
+			Values:          values,
+			Condition:       entry.LastResult.Condition,
+		}
+	}
+
+	return &State{
+		AlertRuleUID:         entry.RuleUID,
+		OrgID:                entry.RuleOrgID,
+		CacheID:              cacheID,
+		Labels:               map[string]string(entry.Labels),
+		State:                translateInstanceState(entry.CurrentState),
+		StateReason:          entry.CurrentReason,
+		LastEvaluationString: "",
+		StartsAt:             entry.CurrentStateSince,
+		EndsAt:               entry.CurrentStateEnd,
+		FiredAt:              entry.FiredAt,
+		LastEvaluationTime:   entry.LastEvalTime,
+		EvaluationDuration:   entry.EvaluationDuration,
+		Annotations:          entry.Annotations,
+		ResultFingerprint:    resultFp,
+		ResolvedAt:           entry.ResolvedAt,
+		LastSentAt:           entry.LastSentAt,
+		Error:                stateError,
+		Values:               values,
+		LatestResult:         latestResult,
+	}
+}
+
+// translateInstanceState converts InstanceStateType to eval.State.
+func translateInstanceState(state ngModels.InstanceStateType) eval.State {
+	switch state {
+	case ngModels.InstanceStateFiring:
+		return eval.Alerting
+	case ngModels.InstanceStateNormal:
+		return eval.Normal
+	case ngModels.InstanceStateError:
+		return eval.Error
+	case ngModels.InstanceStateNoData:
+		return eval.NoData
+	case ngModels.InstanceStatePending:
+		return eval.Pending
+	case ngModels.InstanceStateRecovering:
+		return eval.Recovering
+	default:
+		return eval.Error
+	}
 }

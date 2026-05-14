@@ -16,8 +16,10 @@ const (
 	testFileSupportedFiletypes          = "./testdata/common/supported-filetypes"
 	testFileCorrectProperties           = "./testdata/alert_rules/correct-properties"
 	testFileCorrectPropertiesWithOrg    = "./testdata/alert_rules/correct-properties-with-org"
+	testFileDasboardTypoSupport         = "./testdata/alert_rules/dasboard-typo-support"
 	testFileMultipleRules               = "./testdata/alert_rules/multiple-rules"
 	testFileMultipleFiles               = "./testdata/alert_rules/multiple-files"
+	testFileRecordingRules              = "./testdata/alert_rules/recording-rules"
 	testFileCorrectProperties_cp        = "./testdata/contact_points/correct-properties"
 	testFileCorrectPropertiesWithOrg_cp = "./testdata/contact_points/correct-properties-with-org"
 	testFileEmptyUID                    = "./testdata/contact_points/empty-uid"
@@ -158,5 +160,72 @@ func TestConfigReader(t *testing.T) {
 		file, err := configReader.readConfig(ctx, testFileMultipleTs)
 		require.NoError(t, err)
 		require.Len(t, file[0].Templates, 2)
+	})
+	t.Run("a rule file with dasboard typo", func(t *testing.T) {
+		ruleFiles, err := configReader.readConfig(ctx, testFileDasboardTypoSupport)
+		require.NoError(t, err)
+		t.Run("only dasboard present", func(t *testing.T) {
+			for _, ruleFile := range ruleFiles {
+				group := ruleFile.Groups[0]
+				t.Run(group.Title, func(t *testing.T) {
+					require.Equal(t, "dasboardUid", *group.Rules[0].DashboardUID)
+				})
+			}
+		})
+		t.Run("only dashboard present", func(t *testing.T) {
+			for _, ruleFile := range ruleFiles {
+				group := ruleFile.Groups[0]
+				t.Run(group.Title, func(t *testing.T) {
+					require.Equal(t, "dashboardUid", *group.Rules[1].DashboardUID)
+				})
+			}
+		})
+		t.Run("both dasboard and dashboard present", func(t *testing.T) {
+			for _, ruleFile := range ruleFiles {
+				group := ruleFile.Groups[0]
+				t.Run(group.Title, func(t *testing.T) {
+					require.Equal(t, "dashboardUid", *group.Rules[2].DashboardUID)
+				})
+			}
+		})
+	})
+
+	t.Run("recording rules should parse correctly", func(t *testing.T) {
+		ruleFiles, err := configReader.readConfig(ctx, testFileRecordingRules)
+		require.NoError(t, err)
+		require.Len(t, ruleFiles, 2)
+
+		findRule := func(title string) *AlertingFile {
+			for _, rf := range ruleFiles {
+				if rf.Groups[0].Title == title {
+					return rf
+				}
+			}
+			return nil
+		}
+
+		ruleWithTarget := findRule("recording_rules_group")
+		require.NotNil(t, ruleWithTarget)
+
+		require.Len(t, ruleWithTarget.Groups, 1)
+		require.Len(t, ruleWithTarget.Groups[0].Rules, 1)
+
+		ruleWith := ruleWithTarget.Groups[0].Rules[0]
+		require.NotNil(t, ruleWith.Record)
+		require.Equal(t, "my_recorded_metric", ruleWith.Record.Metric)
+		require.Equal(t, "A", ruleWith.Record.From)
+		require.Equal(t, "mimir-uid", ruleWith.Record.TargetDatasourceUID)
+
+		ruleWithoutTarget := findRule("recording_rules_group_no_target")
+		require.NotNil(t, ruleWithoutTarget)
+
+		require.Len(t, ruleWithoutTarget.Groups, 1)
+		require.Len(t, ruleWithoutTarget.Groups[0].Rules, 1)
+
+		ruleWithout := ruleWithoutTarget.Groups[0].Rules[0]
+		require.NotNil(t, ruleWithout.Record)
+		require.Equal(t, "http_requests_rate", ruleWithout.Record.Metric)
+		require.Equal(t, "A", ruleWithout.Record.From)
+		require.Equal(t, "", ruleWithout.Record.TargetDatasourceUID)
 	})
 }

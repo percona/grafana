@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/remotecache"
 	"github.com/grafana/grafana/pkg/services/login"
 	"github.com/grafana/grafana/pkg/services/secrets"
 	"github.com/grafana/grafana/pkg/services/user"
-	"github.com/grafana/grafana/pkg/util/errutil"
 )
 
 type Service struct {
@@ -47,7 +47,7 @@ func (s *Service) GetAuthInfo(ctx context.Context, query *login.GetAuthInfoQuery
 
 	authInfo, err := s.getAuthInfoFromCache(ctx, query)
 	if err != nil && !errors.Is(err, remotecache.ErrCacheItemNotFound) {
-		s.logger.Error("failed to retrieve auth info from cache", "error", err)
+		s.logger.Warn("failed to retrieve auth info from cache", "error", err)
 	} else if authInfo != nil {
 		return authInfo, nil
 	}
@@ -59,7 +59,7 @@ func (s *Service) GetAuthInfo(ctx context.Context, query *login.GetAuthInfoQuery
 
 	err = s.setAuthInfoInCache(ctx, query, authInfo)
 	if err != nil {
-		s.logger.Error("failed to set auth info in cache", "error", err)
+		s.logger.Warn("failed to set auth info in cache", "error", err)
 	} else {
 		s.logger.Debug("auth info set in cache", "cacheKey", generateCacheKey(query))
 	}
@@ -67,11 +67,28 @@ func (s *Service) GetAuthInfo(ctx context.Context, query *login.GetAuthInfoQuery
 	return authInfo, nil
 }
 
-func (s *Service) GetUserLabels(ctx context.Context, query login.GetUserLabelsQuery) (map[int64]string, error) {
+// GetUserAuthModuleLabels returns all auth modules for a user ordered by most recent first.
+func (s *Service) GetUserAuthModuleLabels(ctx context.Context, userID int64) ([]string, error) {
+	modules, err := s.authInfoStore.GetUserAuthModules(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]string, 0, len(modules))
+	// modules should be unique and should not contain empty strings
+	for _, m := range modules {
+		label := login.GetAuthProviderLabel(m)
+		result = append(result, label)
+	}
+
+	return result, nil
+}
+
+func (s *Service) GetUsersRecentlyUsedLabel(ctx context.Context, query login.GetUserLabelsQuery) (map[int64]string, error) {
 	if len(query.UserIDs) == 0 {
 		return map[int64]string{}, nil
 	}
-	return s.authInfoStore.GetUserLabels(ctx, query)
+	return s.authInfoStore.GetUsersRecentlyUsedLabel(ctx, query)
 }
 
 func (s *Service) setAuthInfoInCache(ctx context.Context, query *login.GetAuthInfoQuery, info *login.UserAuth) error {
@@ -138,8 +155,8 @@ func (s *Service) UpdateAuthInfo(ctx context.Context, cmd *login.UpdateAuthInfoC
 }
 
 func (s *Service) SetAuthInfo(ctx context.Context, cmd *login.SetAuthInfoCommand) error {
-	// Only set auth info if we have an (user id + auth module)
-	if cmd.UserId == 0 || cmd.AuthModule == "" {
+	// Only set auth info if we have an (user id + user uid + auth module)
+	if cmd.UserId == 0 || cmd.UserUID == "" || cmd.AuthModule == "" {
 		return errMissingParameters.Errorf("missing parameters for auth info %v", cmd)
 	}
 

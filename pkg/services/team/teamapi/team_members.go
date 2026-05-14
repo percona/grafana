@@ -9,10 +9,9 @@ import (
 
 	"github.com/grafana/grafana/pkg/api/dtos"
 	"github.com/grafana/grafana/pkg/api/response"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
-	"github.com/grafana/grafana/pkg/services/dashboards/dashboardaccess"
 	"github.com/grafana/grafana/pkg/services/login"
 	"github.com/grafana/grafana/pkg/services/team"
 	"github.com/grafana/grafana/pkg/services/user"
@@ -36,7 +35,7 @@ func (tapi *TeamAPI) getTeamMembers(c *contextmodel.ReqContext) response.Respons
 		return response.Error(http.StatusBadRequest, "teamId is invalid", err)
 	}
 
-	query := team.GetTeamMembersQuery{OrgID: c.SignedInUser.GetOrgID(), TeamID: teamId, SignedInUser: c.SignedInUser}
+	query := team.GetTeamMembersQuery{OrgID: c.GetOrgID(), TeamID: teamId, SignedInUser: c.SignedInUser}
 
 	queryResult, err := tapi.teamService.GetTeamMembers(c.Req.Context(), &query)
 	if err != nil {
@@ -84,7 +83,12 @@ func (tapi *TeamAPI) addTeamMember(c *contextmodel.ReqContext) response.Response
 		return response.Error(http.StatusBadRequest, "teamId is invalid", err)
 	}
 
-	isTeamMember, err := tapi.teamService.IsTeamMember(c.Req.Context(), c.SignedInUser.GetOrgID(), teamID, cmd.UserID)
+	resp := tapi.validateTeam(c, teamID, "Team memberships cannot be updated for provisioned teams")
+	if resp != nil {
+		return resp
+	}
+
+	isTeamMember, err := tapi.teamService.IsTeamMember(c.Req.Context(), c.GetOrgID(), teamID, cmd.UserID)
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, "Failed to add team member.", err)
 	}
@@ -92,7 +96,10 @@ func (tapi *TeamAPI) addTeamMember(c *contextmodel.ReqContext) response.Response
 		return response.Error(http.StatusBadRequest, "User is already added to this team", nil)
 	}
 
-	err = addOrUpdateTeamMember(c.Req.Context(), tapi.teamPermissionsService, cmd.UserID, c.SignedInUser.GetOrgID(), teamID, team.MemberPermissionName)
+	err = addOrUpdateTeamMember(
+		c.Req.Context(), tapi.teamPermissionsService,
+		cmd.UserID, c.GetOrgID(), teamID, team.PermissionTypeMember.String(),
+	)
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, "Failed to add Member to Team", err)
 	}
@@ -125,7 +132,12 @@ func (tapi *TeamAPI) updateTeamMember(c *contextmodel.ReqContext) response.Respo
 	if err != nil {
 		return response.Error(http.StatusBadRequest, "userId is invalid", err)
 	}
-	orgId := c.SignedInUser.GetOrgID()
+	orgId := c.GetOrgID()
+
+	resp := tapi.validateTeam(c, teamId, "Team memberships cannot be updated for provisioned teams")
+	if resp != nil {
+		return resp
+	}
 
 	isTeamMember, err := tapi.teamService.IsTeamMember(c.Req.Context(), orgId, teamId, userId)
 	if err != nil {
@@ -135,7 +147,7 @@ func (tapi *TeamAPI) updateTeamMember(c *contextmodel.ReqContext) response.Respo
 		return response.Error(http.StatusNotFound, "Team member not found.", nil)
 	}
 
-	err = addOrUpdateTeamMember(c.Req.Context(), tapi.teamPermissionsService, userId, orgId, teamId, getPermissionName(cmd.Permission))
+	err = addOrUpdateTeamMember(c.Req.Context(), tapi.teamPermissionsService, userId, orgId, teamId, cmd.Permission.String())
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, "Failed to update team member.", err)
 	}
@@ -164,7 +176,12 @@ func (tapi *TeamAPI) setTeamMemberships(c *contextmodel.ReqContext) response.Res
 	if err != nil {
 		return response.Error(http.StatusBadRequest, "teamId is invalid", err)
 	}
-	orgId := c.SignedInUser.GetOrgID()
+	orgId := c.GetOrgID()
+
+	resp := tapi.validateTeam(c, teamId, "Team memberships cannot be updated for provisioned teams")
+	if resp != nil {
+		return resp
+	}
 
 	teamMemberships, err := tapi.getTeamMembershipUpdates(c.Req.Context(), orgId, teamId, cmd, c.SignedInUser)
 	if err != nil {
@@ -202,13 +219,13 @@ func (tapi *TeamAPI) getTeamMembershipUpdates(ctx context.Context, orgID, teamID
 	membersToRemove := make([]int64, 0)
 	for _, member := range currentMemberships {
 		if _, ok := adminEmails[member.Email]; ok {
-			if getPermissionName(member.Permission) == team.AdminPermissionName {
+			if member.Permission == team.PermissionTypeAdmin {
 				delete(adminEmails, member.Email)
 			}
 			continue
 		}
 		if _, ok := memberEmails[member.Email]; ok {
-			if getPermissionName(member.Permission) == team.MemberPermissionName {
+			if member.Permission == team.PermissionTypeMember {
 				delete(memberEmails, member.Email)
 			}
 			continue
@@ -227,10 +244,10 @@ func (tapi *TeamAPI) getTeamMembershipUpdates(ctx context.Context, orgID, teamID
 
 	teamMemberships := make([]accesscontrol.SetResourcePermissionCommand, 0, len(adminIDs)+len(memberIDs)+len(membersToRemove))
 	for _, admin := range adminIDs {
-		teamMemberships = append(teamMemberships, accesscontrol.SetResourcePermissionCommand{Permission: team.AdminPermissionName, UserID: admin})
+		teamMemberships = append(teamMemberships, accesscontrol.SetResourcePermissionCommand{Permission: team.PermissionTypeAdmin.String(), UserID: admin})
 	}
 	for _, member := range memberIDs {
-		teamMemberships = append(teamMemberships, accesscontrol.SetResourcePermissionCommand{Permission: team.MemberPermissionName, UserID: member})
+		teamMemberships = append(teamMemberships, accesscontrol.SetResourcePermissionCommand{Permission: team.PermissionTypeMember.String(), UserID: member})
 	}
 	for _, member := range membersToRemove {
 		teamMemberships = append(teamMemberships, accesscontrol.SetResourcePermissionCommand{Permission: "", UserID: member})
@@ -252,16 +269,6 @@ func (tapi *TeamAPI) getUserIDs(ctx context.Context, emails map[string]struct{})
 	return userIDs, nil
 }
 
-func getPermissionName(permission dashboardaccess.PermissionType) string {
-	permissionName := permission.String()
-	// Team member permission is 0, which maps to an empty string.
-	// However, we want the team permission service to display "Member" for team members. This is a hack to make it work.
-	if permissionName == "" {
-		permissionName = team.MemberPermissionName
-	}
-	return permissionName
-}
-
 // swagger:route DELETE /teams/{team_id}/members/{user_id} teams removeTeamMember
 //
 // Remove Member From Team.
@@ -273,7 +280,7 @@ func getPermissionName(permission dashboardaccess.PermissionType) string {
 // 404: notFoundError
 // 500: internalServerError
 func (tapi *TeamAPI) removeTeamMember(c *contextmodel.ReqContext) response.Response {
-	orgId := c.SignedInUser.GetOrgID()
+	orgId := c.GetOrgID()
 	teamId, err := strconv.ParseInt(web.Params(c.Req)[":teamId"], 10, 64)
 	if err != nil {
 		return response.Error(http.StatusBadRequest, "teamId is invalid", err)
@@ -281,6 +288,20 @@ func (tapi *TeamAPI) removeTeamMember(c *contextmodel.ReqContext) response.Respo
 	userId, err := strconv.ParseInt(web.Params(c.Req)[":userId"], 10, 64)
 	if err != nil {
 		return response.Error(http.StatusBadRequest, "userId is invalid", err)
+	}
+
+	existingTeam, err := tapi.getTeamDTOByID(c, teamId)
+	if err != nil {
+		if errors.Is(err, team.ErrTeamNotFound) {
+			return response.Error(http.StatusNotFound, "Team not found", err)
+		}
+
+		return response.Error(http.StatusInternalServerError, "Failed to get Team", err)
+	}
+
+	isGroupSyncEnabled := tapi.cfg.Raw.Section("auth.scim").Key("group_sync_enabled").MustBool(false)
+	if isGroupSyncEnabled && existingTeam.IsProvisioned {
+		return response.Error(http.StatusBadRequest, "Team memberships cannot be updated for provisioned teams", err)
 	}
 
 	teamIDString := strconv.FormatInt(teamId, 10)

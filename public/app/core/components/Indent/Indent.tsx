@@ -1,9 +1,9 @@
 import { css } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2, ThemeSpacingTokens } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
-import { getResponsiveStyle, ResponsiveProp } from '@grafana/ui/src/components/Layout/utils/responsiveness';
+import { getResponsiveStyle, ResponsiveProp } from '@grafana/ui/internal';
 
 interface IndentProps {
   children?: React.ReactNode;

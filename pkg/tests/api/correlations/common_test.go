@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana/pkg/configprovider"
 	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/server"
 	"github.com/grafana/grafana/pkg/services/correlations"
@@ -144,7 +145,9 @@ func (c TestContext) createOrg(name string) int64 {
 	c.t.Helper()
 	store := c.env.SQLStore
 	c.env.Cfg.AutoAssignOrg = false
-	quotaService := quotaimpl.ProvideService(store, c.env.Cfg)
+	cfgProvider, err := configprovider.ProvideService(c.env.Cfg)
+	require.NoError(c.t, err)
+	quotaService := quotaimpl.ProvideService(context.Background(), store, cfgProvider)
 	orgService, err := orgimpl.ProvideService(store, c.env.Cfg, quotaService)
 	require.NoError(c.t, err)
 	orgId, err := orgService.GetOrCreate(context.Background(), name)
@@ -158,7 +161,9 @@ func (c TestContext) createUser(cmd user.CreateUserCommand) User {
 	c.env.Cfg.AutoAssignOrg = true
 	c.env.Cfg.AutoAssignOrgId = 1
 
-	quotaService := quotaimpl.ProvideService(store, c.env.Cfg)
+	cfgProvider, err := configprovider.ProvideService(c.env.Cfg)
+	require.NoError(c.t, err)
+	quotaService := quotaimpl.ProvideService(context.Background(), store, cfgProvider)
 	orgService, err := orgimpl.ProvideService(store, c.env.Cfg, quotaService)
 	require.NoError(c.t, err)
 	usrSvc, err := userimpl.ProvideService(
@@ -190,6 +195,11 @@ func (c TestContext) createCorrelation(cmd correlations.CreateCorrelationCommand
 
 	require.NoError(c.t, err)
 	return correlation
+}
+
+func (c TestContext) createCorrelationPassError(cmd correlations.CreateCorrelationCommand) (correlations.Correlation, error) {
+	c.t.Helper()
+	return c.env.Server.HTTPServer.CorrelationsService.CreateCorrelation(context.Background(), cmd)
 }
 
 func (c TestContext) createOrUpdateCorrelation(cmd correlations.CreateCorrelationCommand) {

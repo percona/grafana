@@ -30,7 +30,7 @@ The pull request title should be formatted according to `<Area>: <Summary>` (Bot
 
 Keep the summary short and understandable for the community as a whole.
 
-All commits in a pull request are squashed when merged and the pull request title will be the default subject line of the squashed commit message. It's also used for the [changelog](#include-in-changelog-and-release-notes).
+All commits in a pull request are squashed when merged and the pull request title will be the default subject line of the squashed commit message. It's also used for the [changelog](#what-to-include-in-changelog-and-release-notes).
 
 **Example:**
 
@@ -40,7 +40,7 @@ See [formatting guidelines](create-pull-request.md#formatting-guidelines) for mo
 
 ### Assign a milestone (automated)
 
-The Grafana release process uses a bot to automatically assign pull requests to a milestone to make it easier for release managers to track changes. For example, [generating changelog (release note)](#include-in-changelog-and-release-notes) must be in a milestone.
+The Grafana release process uses a bot to automatically assign pull requests to a milestone to make it easier for release managers to track changes. For example, [generating changelog (release note)](#what-to-include-in-changelog-and-release-notes) must be in a milestone.
 
 That being said, _you don't have to assign a milestone manually_ to a pull request. Instead, when it is merged and closed, a bot will then look for the most appropriate milestone and assign it to the pull request.
 
@@ -104,7 +104,7 @@ In case the pull request introduces a deprecation you should document this. Labe
 <Deprecation description>
 ```
 
-**Breaking changes:**
+**Breaking changes:**<a name="breaking-changes"></a>
 
 In case the pull request introduces a breaking change you should document this. Label the pull request with `add to changelog` and `breaking change` and use the following template at the end of the pull request description describing the breaking change:
 
@@ -118,9 +118,9 @@ In case the pull request introduces a breaking change you should document this. 
 
 Backporting is the process of copying the pull request into the version branch of one or multiple previous releases.
 
-Backporting is a rare exception, should only be done for _critical bug fixes_, and involves the intervention of a Grafana Labs employee.
+Backporting should be a rare exception, reserved only for critical bug fixes, and must be initiated by a Grafana Labs employee. We generally avoid automatic backports, as these changes carry some risk: they typically receive less manual testing than changes included in regular point releases.
 
-If your pull request fixes a critical bug and needs to be backported, add it to the "Critical Bug Release" form so the team can approve the backport and know that a release needs to be made. Specify the correct `backport vx.x` labels for the releases to which the fix needs to be backported. Once approved, the backporting process continues.
+If a pull request addresses a critical bug and backporting is warranted, a Grafana Labs team member can apply the appropriate `backport vx.x` labels for the relevant release branches. The team will review and approve the backport before proceeding. When the pull request is merged, seperate backport PRs will automatically be creataed.
 
 #### Required labels
 

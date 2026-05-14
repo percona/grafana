@@ -1,12 +1,12 @@
 import { css } from '@emotion/css';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { components, MultiValueRemoveProps } from 'react-select';
 
-import { escapeStringForRegex, GrafanaTheme2 } from '@grafana/data';
+import { escapeStringForRegex, GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { Icon, MultiSelect, useStyles2 } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
 
-import { TagBadge } from './TagBadge';
+import { TagBadge, getStyles as getTagBadgeStyles } from './TagBadge';
 import { TagOption, TagSelectOption } from './TagOption';
 
 export interface TermCount {
@@ -26,11 +26,12 @@ export interface Props {
   tagOptions: () => Promise<TermCount[]>;
   tags: string[];
   width?: number;
+  disabled?: boolean;
 }
 
-const filterOption = (option: any, searchQuery: string) => {
+const filterOption = (option: SelectableValue<string>, searchQuery: string) => {
   const regex = RegExp(escapeStringForRegex(searchQuery), 'i');
-  return regex.test(option.value);
+  return Boolean(option.value && regex.test(option.value));
 };
 
 export const TagFilter = ({
@@ -44,6 +45,7 @@ export const TagFilter = ({
   tagOptions,
   tags,
   width,
+  disabled,
 }: Props) => {
   const styles = useStyles2(getStyles);
 
@@ -116,7 +118,6 @@ export const TagFilter = ({
   };
 
   const selectOptions = {
-    key: selectKey,
     onFocus,
     isLoading,
     options,
@@ -125,8 +126,8 @@ export const TagFilter = ({
     formatCreateLabel,
     defaultOptions: true,
     filterOption,
-    getOptionLabel: (i: any) => i.label,
-    getOptionValue: (i: any) => i.value,
+    getOptionLabel: (i: SelectableValue<string>) => i.label,
+    getOptionValue: (i: SelectableValue<string>) => i.value,
     inputId,
     isMulti: true,
     onChange: onTagChange,
@@ -156,42 +157,52 @@ export const TagFilter = ({
   return (
     <div className={styles.tagFilter}>
       {isClearable && tags.length > 0 && (
-        <button className={styles.clear} onClick={() => onTagChange([])}>
-          Clear tags
+        <button className={styles.clear} onClick={() => onTagChange([])} disabled={disabled}>
+          <Trans i18nKey="tag-filter.clear-button">Clear tags</Trans>
         </button>
       )}
-      <MultiSelect {...selectOptions} prefix={<Icon name="tag-alt" />} aria-label="Tag filter" />
+      <MultiSelect
+        key={selectKey}
+        {...selectOptions}
+        prefix={<Icon name="tag-alt" />}
+        aria-label={t('tag-filter.select-aria-label', 'Tag filter')}
+        disabled={disabled}
+      />
     </div>
   );
 };
 
 TagFilter.displayName = 'TagFilter';
 
-const getStyles = (theme: GrafanaTheme2) => ({
-  tagFilter: css`
-    position: relative;
-    min-width: 180px;
-    flex-grow: 1;
+const getStyles = (theme: GrafanaTheme2) => {
+  const tagBadgeStyles = getTagBadgeStyles(theme);
 
-    .label-tag {
-      margin-left: 6px;
-      cursor: pointer;
-    }
-  `,
-  clear: css`
-    background: none;
-    border: none;
-    text-decoration: underline;
-    font-size: 12px;
-    padding: none;
-    position: absolute;
-    top: -17px;
-    right: 0;
-    cursor: pointer;
-    color: ${theme.colors.text.secondary};
+  return {
+    tagFilter: css({
+      position: 'relative',
+      minWidth: '180px',
+      flexGrow: 1,
 
-    &:hover {
-      color: ${theme.colors.text.primary};
-    }
-  `,
-});
+      [`.${tagBadgeStyles.badge}`]: {
+        marginLeft: '6px',
+        cursor: 'pointer',
+      },
+    }),
+    clear: css({
+      background: 'none',
+      border: 'none',
+      textDecoration: 'underline',
+      fontSize: '12px',
+      padding: 'none',
+      position: 'absolute',
+      top: '-17px',
+      right: 0,
+      cursor: 'pointer',
+      color: theme.colors.text.secondary,
+
+      '&:hover': {
+        color: theme.colors.text.primary,
+      },
+    }),
+  };
+};

@@ -1,5 +1,4 @@
 import { get as lodashGet } from 'lodash';
-import React from 'react';
 
 import {
   EventBus,
@@ -8,17 +7,15 @@ import {
   PanelPlugin,
   StandardEditorContext,
   VariableSuggestionsScope,
-} from '@grafana/data';
-import { PanelOptionsSupplier } from '@grafana/data/src/panel/PanelPlugin';
-import {
-  NestedValueAccess,
   PanelOptionsEditorBuilder,
-  isNestedPanelOptions,
-} from '@grafana/data/src/utils/OptionsUIBuilders';
+} from '@grafana/data';
+import { NestedValueAccess, isNestedPanelOptions, PanelOptionsSupplier } from '@grafana/data/internal';
+import { t } from '@grafana/i18n';
+import { reportInteraction } from '@grafana/runtime';
 import { VizPanel } from '@grafana/scenes';
 import { Input } from '@grafana/ui';
 import { LibraryVizPanelInfo } from 'app/features/dashboard-scene/panel-edit/LibraryVizPanelInfo';
-import { LibraryVizPanel } from 'app/features/dashboard-scene/scene/LibraryVizPanel';
+import { LibraryPanelBehavior } from 'app/features/dashboard-scene/scene/LibraryPanelBehavior';
 import { getDataLinksVariableSuggestions } from 'app/features/panel/panellinks/link_srv';
 
 import { OptionsPaneCategoryDescriptor } from './OptionsPaneCategoryDescriptor';
@@ -53,6 +50,7 @@ export function getStandardEditorContext({
     eventBus,
     getSuggestions: (scope?: VariableSuggestionsScope) => getDataLinksVariableSuggestions(dataSeries, scope),
     instanceState,
+    annotations: data?.annotations,
   };
 
   return context;
@@ -96,18 +94,21 @@ export function getVisualizationOptions(props: OptionPaneRenderProps): OptionsPa
   };
 
   // Load the options into categories
-  fillOptionsPaneItems(plugin.getPanelOptionsSupplier(), access, getOptionsPaneCategory, context);
+  fillOptionsPaneItems(plugin.meta.id, plugin.getPanelOptionsSupplier(), access, getOptionsPaneCategory, context);
 
   /**
    * Field options
    */
   for (const fieldOption of plugin.fieldConfigRegistry.list()) {
     if (fieldOption.isCustom) {
-      if (fieldOption.showIf && !fieldOption.showIf(currentFieldConfig.defaults.custom, data?.series)) {
+      if (
+        fieldOption.showIf &&
+        !fieldOption.showIf(currentFieldConfig.defaults.custom, data?.series, data?.annotations)
+      ) {
         continue;
       }
     } else {
-      if (fieldOption.showIf && !fieldOption.showIf(currentFieldConfig.defaults, data?.series)) {
+      if (fieldOption.showIf && !fieldOption.showIf(currentFieldConfig.defaults, data?.series, data?.annotations)) {
         continue;
       }
     }
@@ -130,19 +131,21 @@ export function getVisualizationOptions(props: OptionPaneRenderProps): OptionsPa
       category.props.itemsCount = fieldOption.getItemsCount(value);
     }
 
+    const htmlId = `${plugin.meta.id}-${fieldOption.path}`;
     category.addItem(
       new OptionsPaneItemDescriptor({
         title: fieldOption.name,
+        id: htmlId,
         description: fieldOption.description,
         overrides: getOptionOverrides(fieldOption, currentFieldConfig, data?.series),
         render: function renderEditor() {
-          const onChange = (v: any) => {
+          const onChange = (v: unknown) => {
             onFieldConfigsChange(
               updateDefaultFieldConfigValue(currentFieldConfig, fieldOption.path, v, fieldOption.isCustom)
             );
           };
 
-          return <Editor value={value} onChange={onChange} item={fieldOption} context={context} id={fieldOption.id} />;
+          return <Editor value={value} onChange={onChange} item={fieldOption} context={context} id={htmlId} />;
         },
       })
     );
@@ -151,9 +154,12 @@ export function getVisualizationOptions(props: OptionPaneRenderProps): OptionsPa
   return Object.values(categoryIndex);
 }
 
-export function getLibraryVizPanelOptionsCategory(libraryPanel: LibraryVizPanel): OptionsPaneCategoryDescriptor {
+export function getLibraryVizPanelOptionsCategory(libraryPanel: LibraryPanelBehavior): OptionsPaneCategoryDescriptor {
   const descriptor = new OptionsPaneCategoryDescriptor({
-    title: 'Library panel options',
+    title: t(
+      'dashboard.get-library-viz-panel-options-category.descriptor.title.library-panel-options',
+      'Library panel options'
+    ),
     id: 'Library panel options',
     isOpenDefault: true,
   });
@@ -161,13 +167,14 @@ export function getLibraryVizPanelOptionsCategory(libraryPanel: LibraryVizPanel)
   descriptor
     .addItem(
       new OptionsPaneItemDescriptor({
-        title: 'Name',
+        title: t('dashboard.get-library-viz-panel-options-category.title.name', 'Name'),
+        id: 'library-panel-name',
         value: libraryPanel,
         popularRank: 1,
-        render: function renderName() {
+        render: function renderName(descriptor) {
           return (
             <Input
-              id="LibraryPanelFrameName"
+              id={descriptor.props.id}
               data-testid="library panel name input"
               defaultValue={libraryPanel.state.name}
               onBlur={(e) => libraryPanel.setState({ name: e.currentTarget.value })}
@@ -178,7 +185,8 @@ export function getLibraryVizPanelOptionsCategory(libraryPanel: LibraryVizPanel)
     )
     .addItem(
       new OptionsPaneItemDescriptor({
-        title: 'Information',
+        title: t('dashboard.get-library-viz-panel-options-category.title.information', 'Information'),
+        id: 'library-panel-information',
         render: function renderLibraryPanelInformation() {
           return <LibraryVizPanelInfo libraryPanel={libraryPanel} />;
         },
@@ -219,6 +227,14 @@ export function getVisualizationOptions2(props: OptionPaneRenderProps2): Options
   const access: NestedValueAccess = {
     getValue: (path) => lodashGet(currentOptions, path),
     onChange: (path, value) => {
+      if (path === 'timeCompare') {
+        reportInteraction('panel_setting_interaction', {
+          viz_type: plugin.meta.id,
+          feature_type: 'time_comparison',
+          option_type: value ? 'toggle_enabled' : 'toggle_disabled',
+        });
+      }
+
       const newOptions = setOptionImmutably(currentOptions, path, value);
       panel.onOptionsChange(newOptions);
     },
@@ -233,7 +249,7 @@ export function getVisualizationOptions2(props: OptionPaneRenderProps2): Options
   });
 
   // Load the options into categories
-  fillOptionsPaneItems(plugin.getPanelOptionsSupplier(), access, getOptionsPaneCategory, context);
+  fillOptionsPaneItems(plugin.meta.id, plugin.getPanelOptionsSupplier(), access, getOptionsPaneCategory, context);
 
   // Field options
   const currentFieldConfig = panel.state.fieldConfig;
@@ -241,8 +257,8 @@ export function getVisualizationOptions2(props: OptionPaneRenderProps2): Options
     const hideOption =
       fieldOption.showIf &&
       (fieldOption.isCustom
-        ? !fieldOption.showIf(currentFieldConfig.defaults.custom, data?.series)
-        : !fieldOption.showIf(currentFieldConfig.defaults, data?.series));
+        ? !fieldOption.showIf(currentFieldConfig.defaults.custom, data?.series, data?.annotations)
+        : !fieldOption.showIf(currentFieldConfig.defaults, data?.series, data?.annotations));
     if (fieldOption.hideFromDefaults || hideOption) {
       continue;
     }
@@ -261,9 +277,11 @@ export function getVisualizationOptions2(props: OptionPaneRenderProps2): Options
       category.props.itemsCount = fieldOption.getItemsCount(value);
     }
 
+    const htmlId = `${plugin.meta.id}-${fieldOption.path}`;
     category.addItem(
       new OptionsPaneItemDescriptor({
         title: fieldOption.name,
+        id: htmlId,
         description: fieldOption.description,
         overrides: getOptionOverrides(fieldOption, currentFieldConfig, data?.series),
         render: function renderEditor() {
@@ -274,7 +292,7 @@ export function getVisualizationOptions2(props: OptionPaneRenderProps2): Options
             );
           };
 
-          return <Editor value={value} onChange={onChange} item={fieldOption} context={context} id={fieldOption.id} />;
+          return <Editor value={value} onChange={onChange} item={fieldOption} context={context} id={htmlId} />;
         },
       })
     );
@@ -289,6 +307,7 @@ export function getVisualizationOptions2(props: OptionPaneRenderProps2): Options
  * @internal
  */
 export function fillOptionsPaneItems(
+  idPrefix: string,
   supplier: PanelOptionsSupplier<any>,
   access: NestedValueAccess,
   getOptionsPaneCategory: categoryGetter,
@@ -299,9 +318,11 @@ export function fillOptionsPaneItems(
   supplier(builder, context);
 
   for (const pluginOption of builder.getItems()) {
-    if (pluginOption.showIf && !pluginOption.showIf(context.options, context.data)) {
+    if (pluginOption.showIf && !pluginOption.showIf(context.options, context.data, context.annotations)) {
       continue;
     }
+
+    const htmlId = `${idPrefix}-${pluginOption.id}`;
 
     let category = parentCategory;
     if (!category) {
@@ -318,6 +339,7 @@ export function fillOptionsPaneItems(
         : { ...context, options: access.getValue(pluginOption.path) };
 
       fillOptionsPaneItems(
+        htmlId,
         pluginOption.getBuilder(),
         subAccess,
         getOptionsPaneCategory,
@@ -331,6 +353,7 @@ export function fillOptionsPaneItems(
     category.addItem(
       new OptionsPaneItemDescriptor({
         title: pluginOption.name,
+        id: htmlId,
         description: pluginOption.description,
         render: function renderEditor() {
           return (
@@ -341,7 +364,7 @@ export function fillOptionsPaneItems(
               }}
               item={pluginOption}
               context={context}
-              id={pluginOption.id}
+              id={htmlId}
             />
           );
         },

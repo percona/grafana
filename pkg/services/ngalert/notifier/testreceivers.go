@@ -3,41 +3,21 @@ package notifier
 import (
 	"context"
 	"encoding/json"
-	"time"
 
+	"github.com/grafana/alerting/models"
 	alertingNotify "github.com/grafana/alerting/notify"
-
-	"github.com/go-openapi/strfmt"
-	"github.com/prometheus/alertmanager/api/v2/models"
-	"github.com/prometheus/alertmanager/types"
+	v2 "github.com/prometheus/alertmanager/api/v2"
 
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
+	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
 )
 
-type TestReceiversResult struct {
-	Alert     types.Alert
-	Receivers []TestReceiverResult
-	NotifedAt time.Time
-}
-
-type TestReceiverResult struct {
-	Name    string
-	Configs []TestReceiverConfigResult
-}
-
-type TestReceiverConfigResult struct {
-	Name   string
-	UID    string
-	Status string
-	Error  error
-}
-
-func (am *alertmanager) TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*TestReceiversResult, error) {
+func (am *alertmanager) TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*alertingNotify.TestReceiversResult, int, error) {
 	receivers := make([]*alertingNotify.APIReceiver, 0, len(c.Receivers))
 	for _, r := range c.Receivers {
-		integrations := make([]*alertingNotify.GrafanaIntegrationConfig, 0, len(r.GrafanaManagedReceivers))
-		for _, gr := range r.PostableGrafanaReceivers.GrafanaManagedReceivers {
-			integrations = append(integrations, &alertingNotify.GrafanaIntegrationConfig{
+		integrations := make([]*models.IntegrationConfig, 0, len(r.GrafanaManagedReceivers))
+		for _, gr := range r.GrafanaManagedReceivers {
+			integrations = append(integrations, &models.IntegrationConfig{
 				UID:                   gr.UID,
 				Name:                  gr.Name,
 				Type:                  gr.Type,
@@ -46,82 +26,41 @@ func (am *alertmanager) TestReceivers(ctx context.Context, c apimodels.TestRecei
 				SecureSettings:        gr.SecureSettings,
 			})
 		}
-		receivers = append(receivers, &alertingNotify.APIReceiver{
+		recv := &alertingNotify.APIReceiver{
 			ConfigReceiver: r.Receiver,
-			GrafanaIntegrations: alertingNotify.GrafanaIntegrations{
+			ReceiverConfig: models.ReceiverConfig{
 				Integrations: integrations,
 			},
-		})
+		}
+		err := patchNewSecureFields(ctx, recv, alertingNotify.DecodeSecretsFromBase64, am.decryptFn)
+		if err != nil {
+			return nil, 0, err
+		}
+		receivers = append(receivers, recv)
 	}
-	var alert *alertingNotify.TestReceiversConfigAlertParams
+	a := &alertingNotify.PostableAlert{}
 	if c.Alert != nil {
-		alert = &alertingNotify.TestReceiversConfigAlertParams{Annotations: c.Alert.Annotations, Labels: c.Alert.Labels}
+		a.Annotations = v2.ModelLabelSetToAPILabelSet(c.Alert.Annotations)
+		a.Labels = v2.ModelLabelSetToAPILabelSet(c.Alert.Labels)
 	}
-
-	result, err := am.Base.TestReceivers(ctx, alertingNotify.TestReceiversConfigBodyParams{
-		Alert:     alert,
+	AddDefaultLabelsAndAnnotations(a)
+	return am.Base.TestReceivers(ctx, alertingNotify.TestReceiversConfigBodyParams{
+		Alert: &models.TestReceiversConfigAlertParams{
+			Annotations: v2.APILabelSetToModelLabelSet(a.Annotations),
+			Labels:      v2.APILabelSetToModelLabelSet(a.Labels),
+		},
 		Receivers: receivers,
 	})
+}
 
+func (am *alertmanager) TestIntegration(ctx context.Context, receiverName string, integrationConfig ngmodels.Integration, alert models.TestReceiversConfigAlertParams) (models.IntegrationStatus, error) {
+	cfg, err := IntegrationToIntegrationConfig(integrationConfig)
 	if err != nil {
-		return nil, err
+		return models.IntegrationStatus{}, err
 	}
-
-	resultReceivers := make([]TestReceiverResult, 0, len(result.Receivers))
-	for _, resultReceiver := range result.Receivers {
-		configs := make([]TestReceiverConfigResult, 0, len(resultReceiver.Configs))
-		for _, c := range resultReceiver.Configs {
-			configs = append(configs, TestReceiverConfigResult{
-				Name:   c.Name,
-				UID:    c.UID,
-				Status: c.Status,
-				Error:  c.Error,
-			})
-		}
-		resultReceivers = append(resultReceivers, TestReceiverResult{
-			Name:    resultReceiver.Name,
-			Configs: configs,
-		})
-	}
-
-	return &TestReceiversResult{
-		Alert:     result.Alert,
-		Receivers: resultReceivers,
-		NotifedAt: result.NotifedAt,
-	}, err
+	return am.Base.TestIntegration(ctx, receiverName, cfg, alert)
 }
 
 func (am *alertmanager) GetReceivers(_ context.Context) ([]apimodels.Receiver, error) {
-	apiReceivers := make([]apimodels.Receiver, 0, len(am.Base.GetReceivers()))
-	for _, rcv := range am.Base.GetReceivers() {
-		// Build integrations slice for each receiver.
-		integrations := make([]*models.Integration, 0, len(rcv.Integrations()))
-		for _, integration := range rcv.Integrations() {
-			name := integration.Name()
-			sendResolved := integration.SendResolved()
-			ts, d, err := integration.GetReport()
-			integrations = append(integrations, &apimodels.Integration{
-				Name:                      &name,
-				SendResolved:              &sendResolved,
-				LastNotifyAttempt:         strfmt.DateTime(ts),
-				LastNotifyAttemptDuration: d.String(),
-				LastNotifyAttemptError: func() string {
-					if err != nil {
-						return err.Error()
-					}
-					return ""
-				}(),
-			})
-		}
-
-		active := rcv.Active()
-		name := rcv.Name()
-		apiReceivers = append(apiReceivers, apimodels.Receiver{
-			Active:       &active,
-			Integrations: integrations,
-			Name:         &name,
-		})
-	}
-
-	return apiReceivers, nil
+	return am.Base.GetReceiversStatus(), nil
 }

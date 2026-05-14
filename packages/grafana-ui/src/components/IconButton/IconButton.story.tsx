@@ -1,9 +1,8 @@
 import { css } from '@emotion/css';
 import { StoryFn, Meta } from '@storybook/react';
-import React from 'react';
 
-import { useTheme2 } from '../../themes';
-import { IconSize, IconName } from '../../types';
+import { useTheme2 } from '../../themes/ThemeContext';
+import { IconSize, IconName } from '../../types/icon';
 import { Stack } from '../Layout/Stack/Stack';
 
 import { BasePropsWithTooltip, IconButton, IconButtonVariant, Props as IconButtonProps } from './IconButton';
@@ -17,7 +16,7 @@ const defaultExcludes = ['ariaLabel', 'aria-label'];
 const additionalExcludes = ['size', 'name', 'variant', 'iconType'];
 
 const meta: Meta<typeof IconButton> = {
-  title: 'Buttons/IconButton',
+  title: 'Inputs/IconButton',
   component: IconButton,
   parameters: {
     docs: {

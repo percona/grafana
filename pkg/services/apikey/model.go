@@ -4,14 +4,13 @@ import (
 	"errors"
 	"time"
 
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/quota"
 )
 
 var (
 	ErrNotFound = errors.New("API key not found")
-	// @PERCONA
+	// ErrInvalidAuth @PERCONA
 	ErrInvalidAuth       = errors.New("invalid Service Token/API key")
 	ErrInvalidExpiration = errors.New("negative value for SecondsToLive")
 	ErrDuplicate         = errors.New("API key, organization ID and name must be unique")
@@ -33,7 +32,6 @@ type APIKey struct {
 
 func (k APIKey) TableName() string { return "api_key" }
 
-// swagger:model AddAPIKeyCommand
 type AddCommand struct {
 	Name             string       `json:"name" binding:"Required"`
 	Role             org.RoleType `json:"role" binding:"Required"`
@@ -43,16 +41,6 @@ type AddCommand struct {
 	ServiceAccountID *int64       `json:"-"`
 }
 
-type DeleteCommand struct {
-	ID    int64 `json:"id"`
-	OrgID int64 `json:"-"`
-}
-
-type GetApiKeysQuery struct {
-	OrgID          int64
-	IncludeExpired bool
-	User           identity.Requester
-}
 type GetByNameQuery struct {
 	KeyName string
 	OrgID   int64

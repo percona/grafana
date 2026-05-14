@@ -15,7 +15,7 @@
 import { uniq as _uniq } from 'lodash';
 import memoize from 'lru-memoize';
 
-import { Trace } from '../types';
+import { Trace } from '../types/trace';
 import { getConfigValue } from '../utils/config/get-config';
 
 const parameterRegExp = /#\{([^{}]*)\}/g;
@@ -124,7 +124,7 @@ function callTemplate(template: ProcessedTemplate, data: any) {
 export function computeTraceLink(linkPatterns: ProcessedLinkPattern[], trace: Trace) {
   const result: TLinksRV = [];
   const validKeys = (Object.keys(trace) as Array<keyof Trace>).filter(
-    (key) => typeof trace[key] === 'string' || trace[key] === 'number'
+    (key) => typeof trace[key] === 'string' || typeof trace[key] === 'number'
   );
 
   linkPatterns

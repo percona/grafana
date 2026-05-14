@@ -3,6 +3,8 @@ import { format } from 'date-fns';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Column } from 'react-table';
 
+import { OrgRole } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { Button, useStyles2 } from '@grafana/ui';
 import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 import { Page } from 'app/core/components/Page/Page';
@@ -12,6 +14,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
+import { isEditor, isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 
 import { useStoredTablePageSize } from '../../../shared/components/Elements/Table/Pagination';
 import { Table } from '../../../shared/components/Elements/Table/Table';
@@ -44,7 +47,7 @@ export const AlertRuleTemplate: FC = () => {
   const getAlertRuleTemplates = useCallback(async () => {
     setPendingRequest(true);
     try {
-      const { templates, totals } = await AlertRuleTemplateService.list(
+      const { templates, total_items, total_pages } = await AlertRuleTemplateService.list(
         {
           page_params: {
             index: pageIndex,
@@ -54,8 +57,8 @@ export const AlertRuleTemplate: FC = () => {
         generateToken(GET_TEMPLATES_CANCEL_TOKEN)
       );
       setData(formatTemplates(templates));
-      setTotalItems(totals.total_items || 0);
-      setTotalPages(totals.total_pages || 0);
+      setTotalItems(total_items || 0);
+      setTotalPages(total_pages || 0);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -124,13 +127,19 @@ export const AlertRuleTemplate: FC = () => {
     <Page
       navModel={navModel}
       actions={
-        <Button size="md" fill="text" onClick={handleAddButton} data-testid="alert-rule-template-add-modal-button">
-          {Messages.alertRuleTemplate.addAction}
-        </Button>
+        isEditor(config.bootData.user) || isPmmAdmin(config.bootData.user) ? (
+          <Button size="md" fill="text" onClick={handleAddButton} data-testid="alert-rule-template-add-modal-button">
+            {Messages.alertRuleTemplate.addAction}
+          </Button>
+        ) : undefined
       }
     >
       <Page.Contents>
-        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
+        <FeatureLoader
+          featureName={Messages.alerting}
+          featureSelector={featureSelector}
+          allowedRoles={[OrgRole.Admin, OrgRole.Editor]}
+        >
           <AddAlertRuleTemplateModal
             isVisible={addModalVisible}
             setVisible={setAddModalVisible}

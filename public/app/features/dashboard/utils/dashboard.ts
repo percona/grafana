@@ -1,17 +1,20 @@
 import { chain, cloneDeep, defaults, find } from 'lodash';
 
-import { PanelPluginMeta } from '@grafana/data';
+import { PanelPluginMeta, store } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { locationService } from '@grafana/runtime';
 import config from 'app/core/config';
 import { LS_PANEL_COPY_KEY } from 'app/core/constants';
-import store from 'app/core/store';
-import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
+import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
+import { PanelModel } from 'app/features/dashboard/state/PanelModel';
 import { calculateNewPanelGridPos } from 'app/features/dashboard/utils/panel';
+
+export const NEW_PANEL_TITLE = 'New panel';
 
 export function onCreateNewPanel(dashboard: DashboardModel, datasource?: string): number | undefined {
   const newPanel: Partial<PanelModel> = {
     type: 'timeseries',
-    title: 'Panel Title',
+    title: NEW_PANEL_TITLE,
     gridPos: calculateNewPanelGridPos(dashboard),
     datasource: datasource ? { uid: datasource } : null,
     isNew: true,
@@ -24,7 +27,7 @@ export function onCreateNewPanel(dashboard: DashboardModel, datasource?: string)
 export function onCreateNewWidgetPanel(dashboard: DashboardModel, widgetType: string): number | undefined {
   const newPanel: Partial<PanelModel> = {
     type: widgetType,
-    title: 'Widget title',
+    title: t('dashboard.on-create-new-widget-panel.new-panel.title.widget-title', 'Widget title'),
     gridPos: calculateNewPanelGridPos(dashboard),
     datasource: null,
     isNew: true,
@@ -37,7 +40,7 @@ export function onCreateNewWidgetPanel(dashboard: DashboardModel, widgetType: st
 export function onCreateNewRow(dashboard: DashboardModel) {
   const newRow = {
     type: 'row',
-    title: 'Row title',
+    title: t('dashboard.on-create-new-row.new-row.title.row-title', 'Row title'),
     gridPos: { x: 0, y: 0 },
   };
 
@@ -68,7 +71,7 @@ export function onPasteCopiedPanel(dashboard: DashboardModel, panelPluginInfo?: 
 
   const newPanel = {
     type: panelPluginInfo.id,
-    title: 'Panel Title',
+    title: NEW_PANEL_TITLE,
     gridPos: {
       x: gridPos.x,
       y: gridPos.y,
@@ -117,7 +120,7 @@ type LastUsedDatasource =
     }
   | undefined;
 
-const PANEL_EDIT_LAST_USED_DATASOURCE = 'grafana.dashboards.panelEdit.lastUsedDatasource';
+export const PANEL_EDIT_LAST_USED_DATASOURCE = 'grafana.dashboards.panelEdit.lastUsedDatasource';
 
 // Function that returns last used datasource from local storage
 export function getLastUsedDatasourceFromStorage(dashboardUid: string): LastUsedDatasource {

@@ -1,11 +1,11 @@
 import { css } from '@emotion/css';
-import React, { ReactElement, useId } from 'react';
+import { ReactElement, useId } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 import { Button, Input, Field, useStyles2 } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
 
 import { PasswordField } from '../PasswordField/PasswordField';
 
@@ -82,6 +82,10 @@ export const getStyles = (theme: GrafanaTheme2) => {
     submitButton: css({
       justifyContent: 'center',
       width: '100%',
+    }),
+
+    skipButton: css({
+      alignSelf: 'flex-start',
     }),
   };
 };

@@ -1,10 +1,13 @@
 // Core Grafana history https://github.com/grafana/grafana/blob/v11.0.0-preview/public/app/plugins/datasource/prometheus/components/PromExploreExtraField.tsx
 import { css, cx } from '@emotion/css';
 import { isEqual } from 'lodash';
-import React, { memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
+import * as React from 'react';
 import { usePrevious } from 'react-use';
 
-import { InlineFormLabel, RadioButtonGroup } from '@grafana/ui';
+import { GrafanaTheme2 } from '@grafana/data';
+import { t, Trans } from '@grafana/i18n';
+import { InlineFormLabel, RadioButtonGroup, useStyles2 } from '@grafana/ui';
 
 import { PrometheusDatasource } from '../datasource';
 import { PromQuery } from '../types';
@@ -21,6 +24,7 @@ export interface PromExploreExtraFieldProps {
 export const PromExploreExtraField = memo(({ query, datasource, onChange, onRunQuery }: PromExploreExtraFieldProps) => {
   const rangeOptions = getQueryTypeOptions(true);
   const prevQuery = usePrevious(query);
+  const styles = useStyles2(getStyles);
 
   const onExemplarChange = useCallback(
     (exemplar: boolean) => {
@@ -51,7 +55,10 @@ export const PromExploreExtraField = memo(({ query, datasource, onChange, onRunQ
 
   return (
     <div
-      aria-label="Prometheus extra field"
+      aria-label={t(
+        'grafana-prometheus.components.prom-explore-extra-field.aria-label-prometheus-extra-field',
+        'Prometheus extra field'
+      )}
       className="gf-form-inline"
       data-testid={promExploreExtraFieldTestIds.extraFieldEditor}
     >
@@ -59,14 +66,20 @@ export const PromExploreExtraField = memo(({ query, datasource, onChange, onRunQ
       <div
         data-testid={promExploreExtraFieldTestIds.queryTypeField}
         className={cx(
-          'gf-form explore-input-margin',
+          'gf-form',
+          styles.queryTypeField,
           css({
             flexWrap: 'nowrap',
           })
         )}
-        aria-label="Query type field"
+        aria-label={t(
+          'grafana-prometheus.components.prom-explore-extra-field.aria-label-query-type-field',
+          'Query type field'
+        )}
       >
-        <InlineFormLabel width="auto">Query type</InlineFormLabel>
+        <InlineFormLabel width="auto">
+          <Trans i18nKey="grafana-prometheus.components.prom-explore-extra-field.query-type">Query type</Trans>
+        </InlineFormLabel>
 
         <RadioButtonGroup
           options={rangeOptions}
@@ -83,20 +96,32 @@ export const PromExploreExtraField = memo(({ query, datasource, onChange, onRunQ
             flexWrap: 'nowrap',
           })
         )}
-        aria-label="Step field"
+        aria-label={t('grafana-prometheus.components.prom-explore-extra-field.aria-label-step-field', 'Step field')}
       >
         <InlineFormLabel
           width={6}
-          tooltip={
-            'Time units and built-in variables can be used here, for example: $__interval, $__rate_interval, 5s, 1m, 3h, 1d, 1y (Default if no unit is specified: s)'
-          }
+          tooltip={t(
+            'grafana-prometheus.components.prom-explore-extra-field.tooltip-units-builtin-variables-example-interval-rateinterval',
+            'Time units and built-in variables can be used here, for example: {{example1}}, {{example2}}, {{example3}}, {{example4}}, {{example5}}, {{example6}}, {{example7}} (Default if no unit is specified: {{default}})',
+            {
+              example1: '$__interval',
+              example2: '$__rate_interval',
+              example3: '5s',
+              example4: '1m',
+              example5: '3h',
+              example6: '1d',
+              example7: '1y',
+              default: 's',
+            }
+          )}
         >
-          Min step
+          <Trans i18nKey="grafana-prometheus.components.prom-explore-extra-field.min-step">Min step</Trans>
         </InlineFormLabel>
         <input
           type={'text'}
           className="gf-form-input width-4"
-          placeholder={'auto'}
+          // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
+          placeholder="auto"
           onChange={onStepChange}
           onKeyDown={onReturnKeyDown}
           value={query.interval ?? ''}
@@ -112,16 +137,30 @@ PromExploreExtraField.displayName = 'PromExploreExtraField';
 
 export function getQueryTypeOptions(includeBoth: boolean) {
   const rangeOptions = [
-    { value: 'range', label: 'Range', description: 'Run query over a range of time' },
+    {
+      value: 'range',
+      label: t('grafana-prometheus.components.get-query-type-options.range-options.label.range', 'Range'),
+      description: t(
+        'grafana-prometheus.components.get-query-type-options.range-options.description.query-range',
+        'Run query over a range of time'
+      ),
+    },
     {
       value: 'instant',
-      label: 'Instant',
+      label: t('grafana-prometheus.components.get-query-type-options.range-options.label.instant', 'Instant'),
       description: 'Run query against a single point in time. For this query, the "To" time is used',
     },
   ];
 
   if (includeBoth) {
-    rangeOptions.push({ value: 'both', label: 'Both', description: 'Run an Instant query and a Range query' });
+    rangeOptions.push({
+      value: 'both',
+      label: t('grafana-prometheus.components.get-query-type-options.label.both', 'Both'),
+      description: t(
+        'grafana-prometheus.components.get-query-type-options.description.instant-query-range',
+        'Run an Instant query and a Range query'
+      ),
+    });
   }
 
   return rangeOptions;
@@ -144,3 +183,9 @@ export const promExploreExtraFieldTestIds = {
   stepField: 'prom-editor-extra-field-step',
   queryTypeField: 'prom-editor-extra-field-query-type',
 };
+
+const getStyles = (theme: GrafanaTheme2) => ({
+  queryTypeField: css({
+    marginRight: theme.spacing(0.5),
+  }),
+});

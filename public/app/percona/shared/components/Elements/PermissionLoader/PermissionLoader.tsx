@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 import { Spinner, useStyles } from '@grafana/ui';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { EmptyBlock } from '../EmptyBlock';
 

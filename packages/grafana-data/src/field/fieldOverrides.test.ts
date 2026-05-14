@@ -1,21 +1,17 @@
-import { ArrayDataFrame, createDataFrame, toDataFrame } from '../dataframe';
-import { rangeUtil } from '../datetime';
-import { createTheme } from '../themes';
-import { FieldMatcherID } from '../transformations';
-import {
-  DataFrame,
-  Field,
-  FieldColorModeId,
-  FieldConfig,
-  FieldConfigPropertyItem,
-  FieldConfigSource,
-  FieldType,
-  GrafanaConfig,
-  InterpolateFunction,
-  ScopedVars,
-  ThresholdsMode,
-} from '../types';
-import { locationUtil, Registry } from '../utils';
+import { createDataFrame, toDataFrame } from '../dataframe/processDataFrame';
+import { relativeToTimeRange } from '../datetime/rangeutil';
+import { createTheme } from '../themes/createTheme';
+import { FieldMatcherID } from '../transformations/matchers/ids';
+import { ScopedVars } from '../types/ScopedVars';
+import { GrafanaConfig } from '../types/config';
+import { FieldType, DataFrame, Field, FieldConfig } from '../types/dataFrame';
+import { FieldColorModeId } from '../types/fieldColor';
+import { FieldConfigPropertyItem, FieldConfigSource } from '../types/fieldOverrides';
+import { InterpolateFunction } from '../types/panel';
+import { ThresholdsMode } from '../types/thresholds';
+import { MappingType } from '../types/valueMapping';
+import { Registry } from '../utils/Registry';
+import { locationUtil } from '../utils/location';
 import { mockStandardProperties } from '../utils/tests/mockStandardProperties';
 
 import { FieldConfigOptionsRegistry } from './FieldConfigOptionsRegistry';
@@ -87,7 +83,7 @@ locationUtil.initialize({
 
 describe('Global MinMax', () => {
   it('find global min max', () => {
-    const f0 = new ArrayDataFrame<{ title: string; value: number; value2: number | null }>([
+    const f0 = toDataFrame([
       { title: 'AAA', value: 100, value2: 1234 },
       { title: 'BBB', value: -20, value2: null },
       { title: 'CCC', value: 200, value2: 1000 },
@@ -99,7 +95,7 @@ describe('Global MinMax', () => {
   });
 
   it('find global min max when all values are zero', () => {
-    const f0 = new ArrayDataFrame<{ title: string; value: number; value2: number | null }>([
+    const f0 = toDataFrame([
       { title: 'AAA', value: 0, value2: 0 },
       { title: 'CCC', value: 0, value2: 0 },
     ]);
@@ -148,7 +144,7 @@ describe('Global MinMax', () => {
 });
 
 describe('applyFieldOverrides', () => {
-  const f0 = new ArrayDataFrame<{ title: string; value: number; value2: number | null }>([
+  const f0 = toDataFrame([
     { title: 'AAA', value: 100, value2: 1234 },
     { title: 'BBB', value: -20, value2: null },
     { title: 'CCC', value: 200, value2: 1000 },
@@ -249,6 +245,115 @@ describe('applyFieldOverrides', () => {
     });
   });
 
+  describe('given a frame field', () => {
+    const f0Internal = createDataFrame({
+      name: 'frame',
+      fields: [
+        { name: 'time', type: FieldType.time, values: [1752170223000, 1752170224000] },
+        { name: 'value', type: FieldType.number, values: [10, 20] },
+      ],
+    });
+
+    it('will apply default field overrides to the fields within the frame', () => {
+      const f0 = createDataFrame({
+        name: 'A',
+        fields: [
+          {
+            name: 'message',
+            type: FieldType.string,
+            values: ['foo'],
+          },
+          {
+            name: 'frame',
+            type: FieldType.frame,
+            values: [f0Internal],
+          },
+        ],
+      });
+      const withOverrides = applyFieldOverrides({
+        data: [f0],
+        fieldConfig: {
+          defaults: {
+            max: 30,
+          },
+          overrides: [],
+        },
+        replaceVariables: (value) => value,
+        theme: createTheme(),
+        fieldConfigRegistry: customFieldRegistry,
+      });
+
+      expect(withOverrides[0].fields[1].values[0].fields[1].state.range.max).toBe(30);
+    });
+
+    it('will apply targeted field overrides to the fields within the frame', () => {
+      const f0 = createDataFrame({
+        name: 'A',
+        fields: [
+          {
+            name: 'message',
+            type: FieldType.string,
+            values: ['foo'],
+          },
+          {
+            name: 'frame',
+            type: FieldType.frame,
+            values: [f0Internal],
+          },
+        ],
+      });
+      const withOverrides = applyFieldOverrides({
+        data: [f0],
+        fieldConfig: {
+          defaults: {},
+          overrides: [
+            {
+              matcher: { id: FieldMatcherID.byName, options: 'frame' },
+              properties: [{ id: 'max', value: 30 }],
+            },
+          ],
+        },
+        replaceVariables: (value) => value,
+        theme: createTheme(),
+        fieldConfigRegistry: customFieldRegistry,
+      });
+
+      expect(withOverrides[0].fields[1].values[0].fields[1].config.max).toBe(30);
+    });
+
+    it('will not crash when some of the nested frames are undefined', () => {
+      const f0 = createDataFrame({
+        name: 'A',
+        fields: [
+          {
+            name: 'message',
+            type: FieldType.string,
+            values: ['foo', 'bar'],
+          },
+          {
+            name: 'frame',
+            type: FieldType.frame,
+            values: [f0Internal, undefined],
+          },
+        ],
+      });
+      expect(() =>
+        applyFieldOverrides({
+          data: [f0],
+          fieldConfig: {
+            defaults: {
+              max: 30,
+            },
+            overrides: [],
+          },
+          replaceVariables: (value) => value,
+          theme: createTheme(),
+          fieldConfigRegistry: customFieldRegistry,
+        })
+      ).not.toThrow();
+    });
+  });
+
   it('will merge FieldConfig with default values', () => {
     const field: FieldConfig = {
       min: 0,
@@ -311,6 +416,63 @@ describe('applyFieldOverrides', () => {
 
     // The override applied
     expect(config.decimals).toEqual(1);
+  });
+
+  it('displayName should be able to reference itself', () => {
+    const data = applyFieldOverrides({
+      data: [f0], // the frame
+      fieldConfig: {
+        defaults: {
+          displayName: '${__field.displayName} and more!',
+        },
+        overrides: [],
+      },
+      replaceVariables: (v, scopedVars) => {
+        const dataContext = scopedVars?.__dataContext?.value;
+        if (dataContext) {
+          // Trying to fake what would happen with the real interpolation function
+          return getFieldDisplayName(dataContext.field, dataContext.frame) + ' and more!';
+        }
+        return v;
+      },
+      theme: createTheme(),
+      fieldConfigRegistry: customFieldRegistry,
+    })[0];
+
+    const valueColumn = data.fields[1];
+    const displayName = getFieldDisplayName(valueColumn, data);
+
+    expect(displayName).toEqual('value and more!');
+  });
+
+  it('displayName should be able to reference itself in an override', () => {
+    const data = applyFieldOverrides({
+      data: [f0], // the frame
+      fieldConfig: {
+        defaults: {},
+        overrides: [
+          {
+            matcher: { id: FieldMatcherID.byName, options: 'value' },
+            properties: [{ id: 'displayName', value: '${__field.displayName} and more!' }],
+          },
+        ],
+      },
+      replaceVariables: (v, scopedVars) => {
+        const dataContext = scopedVars?.__dataContext?.value;
+        if (dataContext) {
+          // Trying to fake what would happen with the real interpolation function
+          return getFieldDisplayName(dataContext.field, dataContext.frame) + ' and more!';
+        }
+        return v;
+      },
+      theme: createTheme(),
+      fieldConfigRegistry: customFieldRegistry,
+    })[0];
+
+    const valueColumn = data.fields[1];
+    const displayName = getFieldDisplayName(valueColumn, data);
+
+    expect(displayName).toEqual('value and more!');
   });
 
   it('will apply set min/max when asked', () => {
@@ -677,6 +839,33 @@ describe('setFieldConfigDefaults', () => {
       }
     `);
   });
+
+  it('applies the base threshold when one does not exist in the config', () => {
+    const defaultConfig: FieldConfig = {
+      thresholds: {
+        mode: ThresholdsMode.Absolute,
+        steps: [{ value: -Infinity, color: 'red' }],
+      },
+    };
+
+    const config: FieldConfig = {
+      thresholds: {
+        mode: ThresholdsMode.Absolute,
+        steps: [{ value: 50, color: 'green' }],
+      },
+    };
+
+    const context: FieldOverrideEnv = {
+      data: [],
+      field: { type: FieldType.number } as Field,
+      dataFrameIndex: 0,
+      fieldConfigRegistry: customFieldRegistry,
+    };
+
+    setFieldConfigDefaults(config, defaultConfig, context);
+
+    expect(config.thresholds).toMatchSnapshot();
+  });
 });
 
 describe('setDynamicConfigValue', () => {
@@ -811,6 +1000,45 @@ describe('setDynamicConfigValue', () => {
     expect(config.custom.property3).toEqual({});
     expect(config.displayName).toBeUndefined();
   });
+
+  it('works correctly with multiple value mappings in the same override', () => {
+    const config: FieldConfig = {
+      mappings: [{ type: MappingType.ValueToText, options: { existing: { text: 'existing' } } }],
+    };
+
+    setDynamicConfigValue(
+      config,
+      {
+        id: 'mappings',
+        value: [{ type: MappingType.ValueToText, options: { first: { text: 'first' } } }],
+      },
+      {
+        fieldConfigRegistry: customFieldRegistry,
+        data: [],
+        field: { type: FieldType.number } as Field,
+        dataFrameIndex: 0,
+      }
+    );
+
+    setDynamicConfigValue(
+      config,
+      {
+        id: 'mappings',
+        value: [{ type: MappingType.ValueToText, options: { second: { text: 'second' } } }],
+      },
+      {
+        fieldConfigRegistry: customFieldRegistry,
+        data: [],
+        field: { type: FieldType.number } as Field,
+        dataFrameIndex: 0,
+      }
+    );
+
+    expect(config.mappings).toHaveLength(3);
+    expect(config.mappings![0]).toEqual({ type: MappingType.ValueToText, options: { second: { text: 'second' } } });
+    expect(config.mappings![1]).toEqual({ type: MappingType.ValueToText, options: { first: { text: 'first' } } });
+    expect(config.mappings![2]).toEqual({ type: MappingType.ValueToText, options: { existing: { text: 'existing' } } });
+  });
 });
 
 describe('getLinksSupplier', () => {
@@ -910,7 +1138,7 @@ describe('getLinksSupplier', () => {
     });
 
     const datasourceUid = '1234';
-    const range = rangeUtil.relativeToTimeRange({ from: 600, to: 0 });
+    const range = relativeToTimeRange({ from: 600, to: 0 });
     const f0 = createDataFrame({
       name: 'A',
       fields: [

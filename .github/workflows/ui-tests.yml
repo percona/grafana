@@ -6,10 +6,10 @@ on:
 jobs:
   test:
     name: Run UI tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
     timeout-minutes: 50
 
     steps:
@@ -45,17 +45,17 @@ jobs:
         working-directory: ./grafana
         run: make run-local-env
 
-      - name: Checkout UI tests in ${{ github.head_ref }} branch
+      - name: Checkout pmm-qa in ${{ github.head_ref }} branch
         uses: percona-platform/checkout@v2
         continue-on-error: true
         id: branch_checkout
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
           ref: ${{ github.head_ref }}
-          repository: percona/pmm-ui-tests
-          path: ./pmm-ui-tests
+          repository: percona/pmm-qa
+          path: ./pmm-qa
 
-      - name: Checkout UI tests in ${{ github.base_ref }} branch
+      - name: Checkout pmm-qa in ${{ github.base_ref }} branch
         uses: percona-platform/checkout@v2
         if: ${{ steps.branch_checkout.outcome != 'success' }}
         continue-on-error: true
@@ -63,33 +63,33 @@ jobs:
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
           ref: ${{ github.base_ref }}
-          repository: percona/pmm-ui-tests
-          path: ./pmm-ui-tests
+          repository: percona/pmm-qa
+          path: ./pmm-qa
 
-      - name: Checkout UI tests in main branch
+      - name: Checkout pmm-qa in main branch
         uses: percona-platform/checkout@v2
         if: ${{ steps.branch_checkout.outcome != 'success' && steps.target_branch_checkout.outcome != 'success'  }}
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
           ref: main
-          repository: percona/pmm-ui-tests
-          path: ./pmm-ui-tests
+          repository: percona/pmm-qa
+          path: ./pmm-qa
 
       - name: Install dependencies for UI tests
-        working-directory: ./pmm-ui-tests
+        working-directory: ./pmm-qa/codeceptjs-e2e
         run: npm install
 
       - name: install playwright
-        working-directory: ./pmm-ui-tests
+        working-directory: ./pmm-qa/codeceptjs-e2e
         run: npx playwright install
 
       - name: Run UI tests
-        working-directory: ./pmm-ui-tests
+        working-directory: ./pmm-qa/codeceptjs-e2e
         run: npm run e2e:grafana-pr
 
       - name: Attaching artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ui-tests-output
-          path: ./pmm-ui-tests/tests/output
+          path:  ./pmm-qa/codeceptjs-e2e/tests/output

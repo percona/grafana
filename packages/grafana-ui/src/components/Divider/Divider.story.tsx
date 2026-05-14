@@ -1,11 +1,10 @@
 import { Meta, StoryFn } from '@storybook/react';
-import React from 'react';
 
 import { Divider } from './Divider';
 import mdx from './Divider.mdx';
 
 const meta: Meta<typeof Divider> = {
-  title: 'General/Divider',
+  title: 'Layout/Divider',
   component: Divider,
   parameters: {
     docs: {

@@ -1,10 +1,13 @@
 import { DataSourceApi, DataSourceWithQueryExportSupport, DataSourceWithQueryImportSupport } from '@grafana/data';
-import { ExpressionDatasourceRef } from '@grafana/runtime/src/utils/DataSourceWithBackend';
+import { ExpressionDatasourceRef } from '@grafana/runtime/internal';
 import { DataQuery } from '@grafana/schema';
-import { TestQuery } from 'app/core/utils/query.test';
 import { TemplateSrv } from 'app/features/templating/template_srv';
 
 import { updateQueries } from './updateQueries';
+
+interface TestQuery extends DataQuery {
+  name?: string;
+}
 
 const oldUidDS = {
   uid: 'old-uid',
@@ -12,6 +15,7 @@ const oldUidDS = {
   meta: {
     id: 'old-type',
   },
+  getRef: () => ({ uid: 'old-uid', type: 'old-type' }),
 } as DataSourceApi;
 
 const mixedDS = {
@@ -20,6 +24,7 @@ const mixedDS = {
     id: 'mixed',
     mixed: true,
   },
+  getRef: () => ({ uid: 'mixed' }),
 } as DataSourceApi;
 
 const newUidDS = {
@@ -28,6 +33,7 @@ const newUidDS = {
   meta: {
     id: 'new-type',
   },
+  getRef: () => ({ uid: 'new-uid', type: 'new-type' }),
 } as DataSourceApi;
 
 const newUidSameTypeDS = {
@@ -36,6 +42,7 @@ const newUidSameTypeDS = {
   meta: {
     id: 'old-type',
   },
+  getRef: () => ({ uid: 'new-uid-same-type', type: 'old-type' }),
 } as DataSourceApi;
 
 const templateSrv = new TemplateSrv();
@@ -376,6 +383,7 @@ describe('updateQueries with import', () => {
           const importedQueries = queries.map((q) => ({ ...q, imported: true }));
           return Promise.resolve(importedQueries);
         },
+        getRef: () => ({ uid: 'new-uid', type: 'new-type' }),
       } as DataSourceWithQueryImportSupport<DataQuery>;
 
       const oldUidDSWithAbstract = {
@@ -389,6 +397,7 @@ describe('updateQueries with import', () => {
           const exportedQueries = queries.map((q) => ({ ...q, exported: true }));
           return Promise.resolve(exportedQueries);
         },
+        getRef: () => ({ uid: 'old-uid', type: 'old-type' }),
       } as DataSourceWithQueryExportSupport<any>;
 
       const queries = [
@@ -409,10 +418,10 @@ describe('updateQueries with import', () => {
       ];
 
       const updated = await updateQueries(
-        newUidDSWithAbstract as any,
-        (newUidDSWithAbstract as any).uid,
+        newUidDSWithAbstract as unknown as DataSourceApi,
+        (newUidDSWithAbstract as unknown as DataSourceApi).uid,
         queries,
-        oldUidDSWithAbstract as any
+        oldUidDSWithAbstract as unknown as DataSourceApi
       );
 
       expect(exportSpy).toHaveBeenCalledWith(queries);
@@ -452,6 +461,7 @@ describe('updateQueries with import', () => {
         importFromAbstractQueries: () => {
           return Promise.resolve([]);
         },
+        getRef: () => ({ uid: 'new-uid', type: 'new-type' }),
       } as DataSourceWithQueryImportSupport<DataQuery>;
 
       const oldUidDSWithAbstract = {
@@ -464,6 +474,7 @@ describe('updateQueries with import', () => {
           const exportedQueries = queries.map((q) => ({ ...q, exported: true }));
           return Promise.resolve(exportedQueries);
         },
+        getRef: () => ({ uid: 'old-uid', type: 'old-type' }),
       } as DataSourceWithQueryExportSupport<any>;
 
       const queries = [
@@ -484,10 +495,10 @@ describe('updateQueries with import', () => {
       ];
 
       const updated = await updateQueries(
-        newUidDSWithAbstract as any,
-        (newUidDSWithAbstract as any).uid,
+        newUidDSWithAbstract as unknown as DataSourceApi,
+        (newUidDSWithAbstract as unknown as DataSourceApi).uid,
         queries,
-        oldUidDSWithAbstract as any
+        oldUidDSWithAbstract as unknown as DataSourceApi
       );
 
       expect(updated.length).toEqual(1);
@@ -510,6 +521,7 @@ describe('updateQueries with import', () => {
           const importedQueries = queries.map((q) => ({ ...q, imported: true }));
           return Promise.resolve(importedQueries);
         },
+        getRef: () => ({ uid: 'new-uid', type: 'new-type' }),
       } as DataSourceApi<any>;
 
       const oldUidDS = {
@@ -573,6 +585,7 @@ describe('updateQueries with import', () => {
         importQueries: (queries, origin) => {
           return Promise.resolve([] as DataQuery[]);
         },
+        getRef: () => ({ uid: 'new-uid', type: 'new-type' }),
       } as DataSourceApi;
 
       const oldUidDS = {

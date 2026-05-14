@@ -1,12 +1,14 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/urfave/cli/v2"
 
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/commands/datamigrations"
+	"github.com/grafana/grafana/pkg/cmd/grafana-cli/commands/secretsconsolidation"
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/commands/secretsmigrations"
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/logger"
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/utils"
@@ -18,7 +20,7 @@ import (
 func runRunnerCommand(command func(commandLine utils.CommandLine, runner server.Runner) error) func(context *cli.Context) error {
 	return func(context *cli.Context) error {
 		cmd := &utils.ContextCommandLine{Context: context}
-		runner, err := initializeRunner(cmd)
+		runner, err := initializeRunner(context.Context, cmd)
 		if err != nil {
 			return fmt.Errorf("%v: %w", "failed to initialize runner", err)
 		}
@@ -33,7 +35,7 @@ func runRunnerCommand(command func(commandLine utils.CommandLine, runner server.
 func runDbCommand(command func(commandLine utils.CommandLine, cfg *setting.Cfg, sqlStore db.DB) error) func(context *cli.Context) error {
 	return func(context *cli.Context) error {
 		cmd := &utils.ContextCommandLine{Context: context}
-		runner, err := initializeRunner(cmd)
+		runner, err := initializeRunner(context.Context, cmd)
 		if err != nil {
 			return fmt.Errorf("%v: %w", "failed to initialize runner", err)
 		}
@@ -49,7 +51,7 @@ func runDbCommand(command func(commandLine utils.CommandLine, cfg *setting.Cfg, 
 	}
 }
 
-func initializeRunner(cmd *utils.ContextCommandLine) (server.Runner, error) {
+func initializeRunner(ctx context.Context, cmd *utils.ContextCommandLine) (server.Runner, error) {
 	configOptions := strings.Split(cmd.String("configOverrides"), " ")
 	cfg, err := setting.NewCfgFromArgs(setting.CommandLineArgs{
 		Config:   cmd.ConfigFile(),
@@ -61,7 +63,7 @@ func initializeRunner(cmd *utils.ContextCommandLine) (server.Runner, error) {
 		return server.Runner{}, err
 	}
 
-	runner, err := server.InitializeForCLI(cfg)
+	runner, err := server.InitializeForCLI(ctx, cfg)
 	if err != nil {
 		return server.Runner{}, fmt.Errorf("%v: %w", "failed to initialize runner", err)
 	}
@@ -168,61 +170,20 @@ var adminCommands = []*cli.Command{
 		},
 	},
 	{
-		Name:  "user-manager",
-		Usage: "Runs different helpful user commands",
+		Name:  "secrets-consolidation",
+		Usage: "Runs an operation that re-encrypts all encrypted values in your database with new data keys",
 		Subcommands: []*cli.Command{
-			// TODO: reset password for user
 			{
-				Name:  "conflicts",
-				Usage: "runs a conflict resolution to find users with multiple entries",
-				CustomHelpTemplate: `
-This command will find users with multiple entries in the database and try to resolve the conflicts.
-explanation of each field:
-
-explanation of each field:
-* email - the user’s email
-* login - the user’s login/username
-* last_seen_at - the user’s last login
-* auth_module - if the user was created/signed in using an authentication provider
-* conflict_email - a boolean if we consider the email to be a conflict
-* conflict_login - a boolean if we consider the login to be a conflict
-
-# lists all the conflicting users
-grafana-cli user-manager conflicts list
-
-# creates a conflict patch file to edit
-grafana-cli user-manager conflicts generate-file
-
-# reads edited conflict patch file for validation
-grafana-cli user-manager conflicts validate-file <filepath>
-
-# validates and ingests edited patch file
-grafana-cli user-manager conflicts ingest-file <filepath>
-`,
-				Subcommands: []*cli.Command{
-					{
-						Name:   "list",
-						Usage:  "returns a list of users with more than one entry in the database",
-						Action: runListConflictUsers(),
-					},
-					{
-						Name:   "generate-file",
-						Usage:  "creates a conflict users file. Safe to execute multiple times.",
-						Action: runGenerateConflictUsersFile(),
-					},
-					{
-						Name:   "validate-file",
-						Usage:  "validates the conflict users file. Safe to execute multiple times.",
-						Action: runValidateConflictUsersFile(),
-					},
-					{
-						Name:   "ingest-file",
-						Usage:  "ingests the conflict users file. > Note: This is irreversible it will change the state of the database.",
-						Action: runIngestConflictUsersFile(),
-					},
-				},
+				Name:   "consolidate",
+				Usage:  "Re-encrypts all encrypted values with new data keys and deletes the old deactivated data keys. Returns ok unless there is an error. Safe to execute multiple times.",
+				Action: runRunnerCommand(secretsconsolidation.ConsolidateSecrets),
 			},
 		},
+	},
+	{
+		Name:   "flush-rbac-seed-assignment",
+		Usage:  "Clears RBAC seeding to force re-seeding on next startup. Use after running an Enterprise build, then an OSS build, then an Enterprise build again.",
+		Action: runDbCommand(flushSeedAssignment),
 	},
 }
 

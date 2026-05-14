@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '../../Button/Button';
 
@@ -7,7 +7,7 @@ import { DatePicker, DatePickerProps } from './DatePicker';
 import mdx from './DatePicker.mdx';
 
 const meta: Meta<typeof DatePicker> = {
-  title: 'Pickers and Editors/TimePickers/Pickers And Editors/DatePicker',
+  title: 'Date time pickers/DatePicker',
   component: DatePicker,
   argTypes: {
     minDate: { control: 'date' },

@@ -15,8 +15,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/grafana/grafana/pkg/util/xorm/core"
 	"xorm.io/builder"
-	"xorm.io/core"
 )
 
 // Engine is the major struct of xorm, it means a database manager.
@@ -30,19 +30,21 @@ type Engine struct {
 	TagIdentifier string
 	Tables        map[reflect.Type]*core.Table
 
-	mutex  *sync.RWMutex
-	Cacher core.Cacher
+	mutex *sync.RWMutex
 
 	showSQL      bool
 	showExecTime bool
 
-	logger     core.ILogger
-	TZLocation *time.Location // The timezone of the application
-	DatabaseTZ *time.Location // The timezone of the database
+	logger          core.ILogger
+	TZLocation      *time.Location // The timezone of the application
+	DatabaseTZ      *time.Location // The timezone of the database
+	timestampFormat string         // Format applied to time.Time before passing it to database in Timestamp and DateTime columns.
 
 	tagHandlers map[string]tagHandler
 
-	defaultContext context.Context
+	defaultContext    context.Context
+	sequenceGenerator SequenceGenerator // If not nil, this generator is used to generate auto-increment values for inserts.
+	randomIDGen       func() int64
 }
 
 // CondDeleted returns the conditions whether a record is soft deleted.
@@ -286,8 +288,6 @@ func (engine *Engine) loadTableInfo(table *core.Table) error {
 		for _, name := range index.Cols {
 			if col := table.GetColumn(name); col != nil {
 				col.Indexes[index.Name] = index.Type
-			} else {
-				return fmt.Errorf("unknown col %s in index %v of table %v, columns %v", name, index.Name, table.Name, table.ColumnsSeq())
 			}
 		}
 	}
@@ -371,13 +371,6 @@ func (engine *Engine) autoMapType(v reflect.Value) (*core.Table, error) {
 		}
 
 		engine.Tables[t] = table
-		if engine.Cacher != nil {
-			if v.CanAddr() {
-				engine.GobRegister(v.Addr().Interface())
-			} else {
-				engine.GobRegister(v.Interface())
-			}
-		}
 	}
 	return table, nil
 }
@@ -437,7 +430,6 @@ func (engine *Engine) mapType(v reflect.Value) (*core.Table, error) {
 				Nullable:        true,
 				IsPrimaryKey:    false,
 				IsAutoIncrement: false,
-				MapType:         core.TWOSIDES,
 				Indexes:         make(map[string]int),
 				DefaultIsEmpty:  true,
 			}
@@ -746,7 +738,9 @@ func (engine *Engine) formatTime(sqlTypeName string, t time.Time) (v any) {
 		v = s[11:19]
 	case core.Date:
 		v = t.Format("2006-01-02")
-	case core.DateTime, core.TimeStamp, core.Varchar: // !DarthPestilane! format time when sqlTypeName is core.Varchar.
+	case core.DateTime, core.TimeStamp:
+		v = t.Format(engine.timestampFormat)
+	case core.Varchar: // !DarthPestilane! format time when sqlTypeName is core.Varchar.
 		v = t.Format("2006-01-02 15:04:05")
 	case core.TimeStampz:
 		v = t.Format(time.RFC3339Nano)

@@ -1,12 +1,14 @@
 export const RULER_NOT_SUPPORTED_MSG = 'ruler not supported';
 
-export const RULE_LIST_POLL_INTERVAL_MS = 20000;
+export const RULE_LIST_POLL_INTERVAL_MS = 30000;
 
 export const ALERTMANAGER_NAME_QUERY_KEY = 'alertmanager';
 export const ALERTMANAGER_NAME_LOCAL_STORAGE_KEY = 'alerting-alertmanager';
 export const SILENCES_POLL_INTERVAL_MS = 20000;
 export const NOTIFICATIONS_POLL_INTERVAL_MS = 20000;
 export const CONTACT_POINTS_STATE_INTERVAL_MS = 20000;
+
+export const DEFAULT_PER_PAGE_PAGINATION_RULES_PER_GROUP = 100;
 
 export const TIMESERIES = 'timeseries';
 export const TABLE = 'table';

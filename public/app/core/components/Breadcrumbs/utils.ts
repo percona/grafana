@@ -22,7 +22,6 @@ export function buildBreadcrumbs(sectionNav: NavModelItem, pageNav?: NavModelIte
 
     // Check if we found home/root if if so return early
     if (homeNav && urlToMatch === homeNav.url) {
-      crumbs.unshift({ text: homeNav.text, href: node.url ?? '' });
       foundHome = true;
       return;
     }
@@ -35,6 +34,14 @@ export function buildBreadcrumbs(sectionNav: NavModelItem, pageNav?: NavModelIte
     const shouldAddCrumb = !node.hideFromBreadcrumbs && !(shouldDedupe && isSamePathAsLastBreadcrumb);
 
     if (shouldAddCrumb) {
+      const activeChildIndex = node.children?.findIndex((child) => child.active) ?? -1;
+      // Add tab to breadcrumbs if it's not the first active child
+      if (activeChildIndex > 0) {
+        const activeChild = node.children?.[activeChildIndex];
+        if (activeChild) {
+          crumbs.unshift({ text: activeChild.text, href: activeChild.url ?? '' });
+        }
+      }
       crumbs.unshift({ text: node.text, href: node.url ?? '' });
     }
 

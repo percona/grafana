@@ -24,7 +24,8 @@ const (
 
 	ManagedRolePrefix = "managed:"
 
-	PluginRolePrefix = "plugins:"
+	PluginRolePrefix    = "plugins:"
+	PluginRoleUIDPrefix = "plugins_"
 
 	BasicRoleNoneUID  = "basic_none"
 	BasicRoleNoneName = "basic:none"
@@ -33,13 +34,17 @@ const (
 	FixedCloudViewerRole = "fixed:cloud:viewer"
 	FixedCloudEditorRole = "fixed:cloud:editor"
 	FixedCloudAdminRole  = "fixed:cloud:admin"
+
+	FixedCloudSupportTicketReader = "fixed:cloud:supportticket:reader"
+	FixedCloudSupportTicketEditor = "fixed:cloud:supportticket:editor"
+	FixedCloudSupportTicketAdmin  = "fixed:cloud:supportticket:admin"
 )
 
 // Roles definition
 var (
 	ldapReaderRole = RoleDTO{
 		Name:        "fixed:ldap:reader",
-		DisplayName: "LDAP reader",
+		DisplayName: "Reader",
 		Description: "Read LDAP configuration and status.",
 		Group:       "LDAP",
 		Permissions: []Permission{
@@ -54,7 +59,7 @@ var (
 
 	ldapWriterRole = RoleDTO{
 		Name:        "fixed:ldap:writer",
-		DisplayName: "LDAP writer",
+		DisplayName: "Writer",
 		Description: "Read and update LDAP configuration and read LDAP status.",
 		Group:       "LDAP",
 		Permissions: ConcatPermissions(ldapReaderRole.Permissions, []Permission{
@@ -69,9 +74,9 @@ var (
 
 	orgUsersWriterRole = RoleDTO{
 		Name:        "fixed:org.users:writer",
-		DisplayName: "Organization user writer",
+		DisplayName: "Writer (organizational)",
 		Description: "Within a single organization, add a user, invite a user, read information about a user and their role, remove a user from that organization, or change the role of a user.",
-		Group:       "User administration (organizational)",
+		Group:       "User administration",
 		Permissions: ConcatPermissions(orgUsersReaderRole.Permissions, []Permission{
 			{
 				Action: ActionOrgUsersAdd,
@@ -90,9 +95,9 @@ var (
 
 	orgUsersReaderRole = RoleDTO{
 		Name:        "fixed:org.users:reader",
-		DisplayName: "Organization user reader",
+		DisplayName: "Reader (organizational)",
 		Description: "Read users within a single organization.",
-		Group:       "User administration (organizational)",
+		Group:       "User administration",
 		Permissions: []Permission{
 			{
 				Action: ActionOrgUsersRead,
@@ -107,7 +112,7 @@ var (
 
 	SettingsReaderRole = RoleDTO{
 		Name:        "fixed:settings:reader",
-		DisplayName: "Setting reader",
+		DisplayName: "Reader",
 		Description: "Read Grafana instance settings.",
 		Group:       "Settings",
 		Permissions: []Permission{
@@ -120,7 +125,7 @@ var (
 
 	statsReaderRole = RoleDTO{
 		Name:        "fixed:stats:reader",
-		DisplayName: "Statistics reader",
+		DisplayName: "Reader",
 		Description: "Read Grafana instance statistics.",
 		Group:       "Statistics",
 		Permissions: []Permission{
@@ -132,9 +137,9 @@ var (
 
 	usersReaderRole = RoleDTO{
 		Name:        "fixed:users:reader",
-		DisplayName: "User reader",
+		DisplayName: "Reader (global)",
 		Description: "Read all users and their information, such as team memberships, authentication tokens, and quotas.",
-		Group:       "User administration (global)",
+		Group:       "User administration",
 		Permissions: []Permission{
 			{
 				Action: ActionUsersRead,
@@ -153,9 +158,9 @@ var (
 
 	usersWriterRole = RoleDTO{
 		Name:        "fixed:users:writer",
-		DisplayName: "User writer",
+		DisplayName: "Writer (global)",
 		Description: "Read and update all attributes and settings for all users in Grafana: update user information, read user information, create or enable or disable a user, make a user a Grafana administrator, sign out a user, update a user’s authentication token, or update quotas for all users.",
-		Group:       "User administration (global)",
+		Group:       "User administration",
 		Permissions: ConcatPermissions(usersReaderRole.Permissions, []Permission{
 			{
 				Action: ActionUsersPasswordUpdate,
@@ -261,6 +266,22 @@ var (
 				Action: ActionSettingsWrite,
 				Scope:  ScopeSettingsOAuth("generic_oauth"),
 			},
+			{
+				Action: ActionSettingsRead,
+				Scope:  ScopeSettingsOAuth("ldap"),
+			},
+			{
+				Action: ActionSettingsWrite,
+				Scope:  ScopeSettingsOAuth("ldap"),
+			},
+			{
+				Action: ActionSettingsRead,
+				Scope:  ScopeSettingsSCIM,
+			},
+			{
+				Action: ActionSettingsWrite,
+				Scope:  ScopeSettingsSCIM,
+			},
 		},
 	}
 
@@ -283,7 +304,7 @@ var (
 
 	usagestatsReaderRole = RoleDTO{
 		Name:        "fixed:usagestats:reader",
-		DisplayName: "Usage stats report reader",
+		DisplayName: "Usage report reader",
 		Description: "View usage statistics report",
 		Group:       "Statistics",
 		Permissions: []Permission{

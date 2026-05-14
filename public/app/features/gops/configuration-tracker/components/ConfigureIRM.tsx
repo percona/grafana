@@ -1,9 +1,11 @@
 import { css } from '@emotion/css';
-import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Trans } from '@grafana/i18n';
 import { IconName, Text, useStyles2 } from '@grafana/ui';
+import { useURLSearchParams } from 'app/features/alerting/unified/hooks/useURLSearchParams';
 import { getFirstCompatibleDataSource } from 'app/features/alerting/unified/utils/datasource';
 import { DATASOURCES_ROUTES } from 'app/features/datasources/constants';
 
@@ -12,6 +14,7 @@ import { useGetConfigurationForUI, useGetEssentialsConfiguration } from '../irmH
 
 import { ConfigCard } from './ConfigCard';
 import { Essentials } from './Essentials';
+
 export interface IrmCardConfiguration {
   id: number;
   title: string;
@@ -39,7 +42,7 @@ function useGetDataSourceConfiguration(): DataSourceConfigurationData {
 
 export function ConfigureIRM() {
   const styles = useStyles2(getStyles);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // get all the configuration data
   const dataSourceConfigurationData = useGetDataSourceConfiguration();
@@ -58,7 +61,9 @@ export function ConfigureIRM() {
     });
   }, [dataSourceConfigurationData.dataSourceCompatibleWithAlerting]);
 
-  const [essentialsOpen, setEssentialsOpen] = useState(false);
+  // query param 'essentials' is used to open essentials drawer
+  const [queryParams, setQueryParams] = useURLSearchParams();
+  const essentialsOpen = queryParams.get('essentials') === 'open';
 
   const handleActionClick = (configID: number, isDone?: boolean) => {
     trackIrmConfigurationTrackerEvent(IRMInteractionNames.ClickDataSources, {
@@ -69,13 +74,13 @@ export function ConfigureIRM() {
     switch (configID) {
       case ConfigurationStepsEnum.CONNECT_DATASOURCE:
         if (isDone) {
-          history.push(DATASOURCES_ROUTES.List);
+          navigate(DATASOURCES_ROUTES.List);
         } else {
-          history.push(DATASOURCES_ROUTES.New);
+          navigate(DATASOURCES_ROUTES.New);
         }
         break;
       case ConfigurationStepsEnum.ESSENTIALS:
-        setEssentialsOpen(true);
+        setQueryParams({ essentials: 'open' });
         trackIrmConfigurationTrackerEvent(IRMInteractionNames.OpenEssentials, {
           essentialStepsDone: essentialsConfigurationData.stepsDone,
           essentialStepsToDo: essentialsConfigurationData.totalStepsToDo,
@@ -88,7 +93,7 @@ export function ConfigureIRM() {
   };
 
   function onCloseEssentials() {
-    setEssentialsOpen(false);
+    setQueryParams({ essentials: undefined });
     trackIrmConfigurationTrackerEvent(IRMInteractionNames.CloseEssentials, {
       essentialStepsDone: essentialsConfigurationData.stepsDone,
       essentialStepsToDo: essentialsConfigurationData.totalStepsToDo,
@@ -99,7 +104,7 @@ export function ConfigureIRM() {
   return (
     <>
       <Text element="h4" variant="h4">
-        Configure
+        <Trans i18nKey="gops.configure-irm.configure">Configure</Trans>
       </Text>
       <section className={styles.container}>
         {configuration.map((config) => (
@@ -120,7 +125,7 @@ export function ConfigureIRM() {
         )}
       </section>
       <Text element="h4" variant="h4">
-        IRM apps
+        <Trans i18nKey="gops.configure-irm.irm-apps">IRM apps</Trans>
       </Text>
     </>
   );

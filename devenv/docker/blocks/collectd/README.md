@@ -1,5 +1,4 @@
-collectd-write-graphite
-=======================
+# collectd-write-graphite
 
 Basic collectd-based server monitoring. Sends stats to Graphite.
 
@@ -14,8 +13,7 @@ Collectd metrics:
 - Network interface
 - Swap
 
-Environment variables
----------------------
+## Environment variables
 
 - `HOST_NAME`
   - Will be sent to Graphite
@@ -30,7 +28,7 @@ Environment variables
   - Graphite prefix
   - Optional, defaults to collectd.
 - `REPORT_BY_CPU`
-  - Report per-CPU metrics if true, global sum of CPU metrics if false (details: [collectd.conf man page](https://collectd.org/documentation/manpages/collectd.conf.5.shtml#plugin_cpu))
+  - Report per-CPU metrics if true, global sum of CPU metrics if false (details: [collectd.conf man page](https://www.collectd.org/documentation/manpages/collectd.conf.html))
   - Optional, defaults to false.
 - `COLLECT_INTERVAL`
   - Collection interval and thus resolution of metrics

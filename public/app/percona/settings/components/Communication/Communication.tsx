@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 
 import { Alert, Tab, TabContent, TabsBar, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
@@ -10,7 +10,7 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import { EmailPayload, SettingsAPIChangePayload } from '../../Settings.types';

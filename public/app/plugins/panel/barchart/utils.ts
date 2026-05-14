@@ -13,12 +13,12 @@ import {
   getFieldSeriesColor,
   outerJoinDataFrames,
 } from '@grafana/data';
-import { decoupleHideFromState } from '@grafana/data/src/field/fieldState';
+import { decoupleHideFromState } from '@grafana/data/internal';
+import { t } from '@grafana/i18n';
 import {
   AxisColorMode,
   AxisPlacement,
   FieldColorModeId,
-  GraphGradientMode,
   GraphThresholdsStyleMode,
   GraphTransform,
   ScaleDistribution,
@@ -34,8 +34,7 @@ import {
   UPlotConfigBuilder,
   measureText,
 } from '@grafana/ui';
-import { AxisProps, UPLOT_AXIS_FONT_SIZE } from '@grafana/ui/src/components/uPlot/config/UPlotAxisBuilder';
-import { getStackingGroups } from '@grafana/ui/src/components/uPlot/utils';
+import { AxisProps, UPLOT_AXIS_FONT_SIZE, getStackingGroups } from '@grafana/ui/internal';
 
 import { setClassicPaletteIdxs } from '../timeseries/utils';
 
@@ -52,14 +51,19 @@ interface BarSeries {
 
 export function prepSeries(
   frames: DataFrame[],
-  fieldConfig: FieldConfigSource<any>,
+  fieldConfig: FieldConfigSource,
   stacking: StackingMode,
   theme: GrafanaTheme2,
   xFieldName?: string,
   colorFieldName?: string
 ): BarSeries {
+  // this allows PanelDataErrorView to show the default noValue message
   if (frames.length === 0 || frames.every((fr) => fr.length === 0)) {
-    return { series: [], _rest: [], warn: 'No data in response' };
+    return {
+      warn: '',
+      series: [],
+      _rest: [],
+    };
   }
 
   cacheFieldDisplayNames(frames);
@@ -122,7 +126,7 @@ export function prepSeries(
     let warn: string | null = null;
 
     if (fields.length === 1) {
-      warn = 'No numeric fields found';
+      warn = t('bar-chart.warn.missing-numeric', 'No numeric fields found');
     }
 
     frame.fields = fields;
@@ -143,12 +147,13 @@ export function prepSeries(
     series: [],
     _rest: [],
     color: null,
-    warn: 'Bar charts requires a string or time field',
+    warn: t('bar-chart.warn.missing-series', 'Bar charts require a string or time field'),
   };
 }
 
 export interface PrepConfigOpts {
-  series: DataFrame[];
+  series: DataFrame[]; // series with hideFrom.viz: false
+  totalSeries: number; // total series count (including hidden)
   color?: Field | null;
   orientation: VizOrientation;
   options: Options;
@@ -156,7 +161,7 @@ export interface PrepConfigOpts {
   theme: GrafanaTheme2;
 }
 
-export const prepConfig = ({ series, color, orientation, options, timeZone, theme }: PrepConfigOpts) => {
+export const prepConfig = ({ series, totalSeries, color, orientation, options, timeZone, theme }: PrepConfigOpts) => {
   let {
     showValue,
     groupWidth,
@@ -205,8 +210,11 @@ export const prepConfig = ({ series, color, orientation, options, timeZone, them
   const vizOrientation = getScaleOrientation(orientation);
 
   // Use bar width when only one field
-  if (frame.fields.length === 2) {
-    groupWidth = barWidth;
+  if (frame.fields.length === 2 && stacking === StackingMode.None) {
+    if (totalSeries === 1) {
+      groupWidth = barWidth;
+    }
+
     barWidth = 1;
   }
 
@@ -226,9 +234,7 @@ export const prepConfig = ({ series, color, orientation, options, timeZone, them
     getColor = (seriesIdx: number, valueIdx: number) => disp(color!.values[valueIdx]).color!;
   } else {
     const hasPerBarColor = frame.fields.some((f) => {
-      const fromThresholds =
-        f.config.custom?.gradientMode === GraphGradientMode.Scheme &&
-        f.config.color?.mode === FieldColorModeId.Thresholds;
+      const fromThresholds = f.config.color?.mode === FieldColorModeId.Thresholds;
 
       return (
         fromThresholds ||
@@ -247,7 +253,7 @@ export const prepConfig = ({ series, color, orientation, options, timeZone, them
       // use opacity from first numeric field
       let opacityField = frame.fields.find((f) => f.type === FieldType.number)!;
 
-      fillOpacity = (opacityField.config.custom.fillOpacity ?? 100) / 100;
+      fillOpacity = (opacityField?.config?.custom?.fillOpacity ?? 100) / 100;
 
       getColor = (seriesIdx: number, valueIdx: number) => {
         let field = frame.fields[seriesIdx];
@@ -418,6 +424,7 @@ export const prepConfig = ({ series, color, orientation, options, timeZone, them
       direction: vizOrientation.yDir,
       distribution: customConfig.scaleDistribution?.type,
       log: customConfig.scaleDistribution?.log,
+      decimals: field.config.decimals,
     });
 
     if (customConfig.axisPlacement !== AxisPlacement.Hidden) {
@@ -444,6 +451,7 @@ export const prepConfig = ({ series, color, orientation, options, timeZone, them
         tickLabelRotation: vizOrientation.xOri === 1 ? xTickLabelRotation * -1 : 0,
         theme,
         grid: { show: customConfig.axisGridShow },
+        decimals: field.config.decimals,
       };
 
       if (customConfig.axisBorderShow) {

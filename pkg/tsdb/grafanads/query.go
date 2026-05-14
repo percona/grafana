@@ -5,9 +5,6 @@ const (
 	queryTypeRandomWalk = "randomWalk"
 
 	// QueryTypeList will list the files in a folder
-	queryTypeSearch = "search"
-
-	// QueryTypeList will list the files in a folder
 	queryTypeList = "list"
 
 	// QueryTypeRead will read a file and return it as data frames

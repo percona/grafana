@@ -1,12 +1,12 @@
 import { css } from '@emotion/css';
-import React, { FormEvent } from 'react';
+import { FormEvent } from 'react';
 
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { Button, Checkbox, Stack, RadioButtonGroup, useStyles2 } from '@grafana/ui';
 import { SortPicker } from 'app/core/components/Select/SortPicker';
 import { TagFilter, TermCount } from 'app/core/components/TagFilter/TagFilter';
-import { t, Trans } from 'app/core/internationalization';
 
 import { SearchLayout, SearchState } from '../../types';
 
@@ -21,21 +21,21 @@ function getLayoutOptions() {
   ];
 }
 
-interface Props {
+interface ActionRowProps {
+  state: SearchState;
+  showStarredFilter?: boolean;
+  showLayout?: boolean;
+  sortPlaceholder?: string;
+
   onLayoutChange: (layout: SearchLayout) => void;
   onSortChange: (value?: string) => void;
   onStarredFilterChange?: (event: FormEvent<HTMLInputElement>) => void;
   onTagFilterChange: (tags: string[]) => void;
   getTagOptions: () => Promise<TermCount[]>;
   getSortOptions: () => Promise<SelectableValue[]>;
-  sortPlaceholder?: string;
   onDatasourceChange: (ds?: string) => void;
   onPanelTypeChange: (pt?: string) => void;
-  includePanels: boolean;
   onSetIncludePanels: (v: boolean) => void;
-  state: SearchState;
-  showStarredFilter?: boolean;
-  hideLayout?: boolean;
 }
 
 export function getValidQueryLayout(q: SearchState): SearchLayout {
@@ -52,21 +52,22 @@ export function getValidQueryLayout(q: SearchState): SearchLayout {
 }
 
 export const ActionRow = ({
+  state,
+  showStarredFilter,
+  showLayout,
+  sortPlaceholder,
   onLayoutChange,
   onSortChange,
   onStarredFilterChange = () => {},
   onTagFilterChange,
   getTagOptions,
   getSortOptions,
-  sortPlaceholder,
   onDatasourceChange,
   onPanelTypeChange,
   onSetIncludePanels,
-  state,
-  showStarredFilter,
-  hideLayout,
-}: Props) => {
+}: ActionRowProps) => {
   const styles = useStyles2(getStyles);
+
   const layout = getValidQueryLayout(state);
 
   // Disabled folder layout option when query is present
@@ -76,8 +77,8 @@ export const ActionRow = ({
       : [];
 
   return (
-    <div className={styles.actionRow}>
-      <Stack gap={2} alignItems="center">
+    <Stack justifyContent="space-between" alignItems="center">
+      <Stack alignItems="center">
         <TagFilter isClearable={false} tags={state.tag} tagOptions={getTagOptions} onChange={onTagFilterChange} />
         {config.featureToggles.panelTitleSearch && (
           <Checkbox
@@ -107,13 +108,15 @@ export const ActionRow = ({
         )}
         {state.panel_type && (
           <Button icon="times" variant="secondary" onClick={() => onPanelTypeChange(undefined)}>
-            Panel: {state.panel_type}
+            <Trans i18nKey="search.action-row.panel-type" values={{ panel: state.panel_type }}>
+              Panel: {'{{panel}}'}
+            </Trans>
           </Button>
         )}
       </Stack>
 
       <Stack gap={2}>
-        {!hideLayout && (
+        {showLayout && (
           <RadioButtonGroup
             options={getLayoutOptions()}
             disabledOptions={disabledOptions}
@@ -129,7 +132,7 @@ export const ActionRow = ({
           isClearable
         />
       </Stack>
-    </div>
+    </Stack>
   );
 };
 
@@ -137,21 +140,10 @@ ActionRow.displayName = 'ActionRow';
 
 export const getStyles = (theme: GrafanaTheme2) => {
   return {
-    actionRow: css`
-      display: none;
-
-      ${theme.breakpoints.up('md')} {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: ${theme.spacing(2)};
-        width: 100%;
-      }
-    `,
-    checkboxWrapper: css`
-      label {
-        line-height: 1.2;
-      }
-    `,
+    checkboxWrapper: css({
+      label: {
+        lineHeight: '1.2',
+      },
+    }),
   };
 };

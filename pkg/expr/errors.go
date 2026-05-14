@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/grafana/grafana/pkg/util/errutil"
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
 )
 
 var ErrSeriesMustBeWide = errors.New("input data must be a wide series")
@@ -56,23 +56,42 @@ func MakeQueryError(refID, datasourceUID string, err error) error {
 	return QueryError.Build(data)
 }
 
-var depErrStr = "did not execute expression [{{ .Public.refId }}] due to a failure to of the dependent expression or query [{{.Public.depRefId}}]"
+var depErrStr = "did not execute expression [{{ .Public.refId }}] due to a failure of the dependent expression or query [{{.Public.depRefId}}]"
 
 var DependencyError = errutil.NewBase(
 	errutil.StatusBadRequest, "sse.dependencyError").MustTemplate(
 	depErrStr,
 	errutil.WithPublic(depErrStr))
 
-func makeDependencyError(refID, depRefID string) error {
+func MakeDependencyError(refID, depRefID string) error {
 	data := errutil.TemplateData{
 		Public: map[string]interface{}{
 			"refId":    refID,
 			"depRefId": depRefID,
 		},
-		Error: fmt.Errorf("did not execute expression %v due to a failure to of the dependent expression or query %v", refID, depRefID),
+		Error: fmt.Errorf("did not execute expression %v due to a failure of the dependent expression or query %v", refID, depRefID),
 	}
 
 	return DependencyError.Build(data)
+}
+
+var parsErrStr = "failed to parse expression [{{ .Public.refId }}]: {{.Public.error}}"
+
+var ParseError = errutil.NewBase(
+	errutil.StatusBadRequest, "sse.parseError").MustTemplate(
+	parsErrStr,
+	errutil.WithPublic(parsErrStr))
+
+func MakeParseError(refID string, err error) error {
+	data := errutil.TemplateData{
+		Public: map[string]interface{}{
+			"refId": refID,
+			"error": err.Error(),
+		},
+		Error: err,
+	}
+
+	return ParseError.Build(data)
 }
 
 var unexpectedNodeTypeErrString = "expected executable node type but got node type [{{ .Public.nodeType }} for refid [{{ .Public.refId}}]"

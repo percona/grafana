@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 
 import traceGenerator from '../demo/trace-generators';
 import transformTraceData from '../model/transform-trace-data';
-import { Trace } from '../types';
+import { Trace } from '../types/trace';
 import { formatDuration } from '../utils/date';
 
 import SpanTreeOffset from './SpanTreeOffset';
@@ -73,14 +72,14 @@ describe('<VirtualizedTraceViewImpl>', () => {
   it('renders without exploding', () => {
     render(<VirtualizedTraceView {...props} />);
     expect(screen.getByTestId('ListView')).toBeInTheDocument();
-    expect(screen.getByTitle('Scroll to top')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Scroll to top' })).toBeInTheDocument();
   });
 
   it('renders when a trace is not set', () => {
     props = { ...props, trace: null as unknown as Trace };
     render(<VirtualizedTraceView {...props} />);
     expect(screen.getByTestId('ListView')).toBeInTheDocument();
-    expect(screen.getByTitle('Scroll to top')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Scroll to top' })).toBeInTheDocument();
   });
 
   it('renders ListView', () => {

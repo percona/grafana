@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { forwardRef, useState } from 'react';
 
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 import { Input, IconButton } from '@grafana/ui';
-import { Props as InputProps } from '@grafana/ui/src/components/Input/Input';
+import { InputProps } from '@grafana/ui/internal';
 
 interface Props extends Omit<InputProps, 'type'> {}
 
-export const PasswordField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
+export const PasswordField = forwardRef<HTMLInputElement, Props>((props, ref) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -24,7 +25,11 @@ export const PasswordField = React.forwardRef<HTMLInputElement, Props>((props, r
           onClick={() => {
             setShowPassword(!showPassword);
           }}
-          tooltip={showPassword ? 'Hide password' : 'Show password'}
+          tooltip={
+            showPassword
+              ? t('grafana-ui.password-field.tooltip-hide', 'Hide password')
+              : t('grafana-ui.password-field.tooltip-show', 'Show password')
+          }
         />
       }
     />

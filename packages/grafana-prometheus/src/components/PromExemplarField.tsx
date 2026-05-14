@@ -1,9 +1,10 @@
 // Core Grafana history https://github.com/grafana/grafana/blob/v11.0.0-preview/public/app/plugins/datasource/prometheus/components/PromExemplarField.tsx
 import { css, cx } from '@emotion/css';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePrevious } from 'react-use';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { IconButton, InlineLabel, Tooltip, useStyles2 } from '@grafana/ui';
 
 import { PrometheusDatasource } from '../datasource';
@@ -48,10 +49,20 @@ export function PromExemplarField({ datasource, onChange, query, ...rest }: Prop
     <InlineLabel width="auto" data-testid={rest['data-testid']}>
       <Tooltip content={error ?? ''}>
         <div className={styles.iconWrapper}>
-          Exemplars
+          <Trans i18nKey="grafana-prometheus.components.prom-exemplar-field.exemplars">Exemplars</Trans>
           <IconButton
             name="eye"
-            tooltip={!!query.exemplar ? 'Disable query with exemplars' : 'Enable query with exemplars'}
+            tooltip={
+              !!query.exemplar
+                ? t(
+                    'grafana-prometheus.components.prom-exemplar-field.tooltip-disable-query',
+                    'Disable query with exemplars'
+                  )
+                : t(
+                    'grafana-prometheus.components.prom-exemplar-field.tooltip-enable-query',
+                    'Enable query with exemplars'
+                  )
+            }
             disabled={!!error}
             className={iconButtonStyles}
             onClick={() => {

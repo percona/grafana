@@ -1,12 +1,12 @@
 import { css } from '@emotion/css';
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 import { Modal, Button, Form, Field, Input, useStyles2 } from '@grafana/ui';
 import { Messages } from 'app/percona/pmm-dump/PMMDump.messages';
 import { SendToSupportForm } from 'app/percona/pmm-dump/PmmDump.types';
 import { sendToSupportAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { getDumps } from 'app/percona/shared/core/selectors';
-import { useDispatch, useSelector } from 'app/types';
+import { useDispatch, useSelector } from 'app/types/store';
 
 import { PasswordField } from '../../core/components/PasswordField/PasswordField';
 

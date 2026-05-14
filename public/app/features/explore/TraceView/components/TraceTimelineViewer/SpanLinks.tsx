@@ -1,8 +1,9 @@
 import { css } from '@emotion/css';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
+import { GrafanaTheme2 } from '@grafana/data';
 import { config, reportInteraction } from '@grafana/runtime';
-import { useStyles2, MenuItem, Icon, ContextMenu } from '@grafana/ui';
+import { useStyles2, MenuItem, Icon, ContextMenu, useTheme2 } from '@grafana/ui';
 
 import { SpanLinkDef } from '../types/links';
 
@@ -18,7 +19,8 @@ const renderMenuItems = (
   closeMenu: () => void,
   datasourceType: string
 ) => {
-  links.sort(function (linkA, linkB) {
+  links.sort((linkA, linkB) => {
+    // eslint-disable-next-line no-restricted-syntax
     return (linkA.title || 'link').toLowerCase().localeCompare((linkB.title || 'link').toLowerCase());
   });
 
@@ -42,13 +44,15 @@ const renderMenuItems = (
           : undefined
       }
       url={link.href}
+      target={link.target}
       className={styles.menuItem}
     />
   ));
 };
 
 export const SpanLinksMenu = ({ links, datasourceType, color }: SpanLinksProps) => {
-  const styles = useStyles2(() => getStyles(color));
+  const theme = useTheme2();
+  const styles = useStyles2(() => getStyles(theme, color));
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
@@ -60,8 +64,8 @@ export const SpanLinksMenu = ({ links, datasourceType, color }: SpanLinksProps) 
         onClick={(e) => {
           setIsMenuOpen(true);
           setMenuPosition({
-            x: e.pageX,
-            y: e.pageY,
+            x: e.clientX,
+            y: e.clientY,
           });
         }}
         className={styles.button}
@@ -82,27 +86,24 @@ export const SpanLinksMenu = ({ links, datasourceType, color }: SpanLinksProps) 
   );
 };
 
-const getStyles = (color: string) => {
-  return {
-    wrapper: css`
-      border: none;
-      background: ${color}10;
-      border-bottom: 1px solid ${color}CF;
-      padding-right: 4px;
-    `,
-    button: css`
-      background: transparent;
-      border: none;
-      padding: 0;
-    `,
-    icon: css`
-      background: transparent;
-      border: none;
-      padding: 0;
-    `,
-    menuItem: css`
-      max-width: 60ch;
-      overflow: hidden;
-    `,
-  };
-};
+const getStyles = (theme: GrafanaTheme2, color: string) => ({
+  wrapper: css({
+    border: 'none',
+    borderBottom: `2px solid ${color}CF`,
+    paddingInline: '4px',
+  }),
+  button: css({
+    background: 'transparent',
+    border: 'none',
+    padding: 0,
+  }),
+  icon: css({
+    background: 'transparent',
+    border: 'none',
+    padding: 0,
+  }),
+  menuItem: css({
+    maxWidth: '60ch',
+    overflow: 'hidden',
+  }),
+});

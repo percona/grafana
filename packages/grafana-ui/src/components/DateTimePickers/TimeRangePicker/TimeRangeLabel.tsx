@@ -1,9 +1,9 @@
 import { css } from '@emotion/css';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useStyles2 } from '../../../../src/themes';
+import { useStyles2 } from '../../../themes/ThemeContext';
 import { TimePickerButtonLabel, TimeRangePickerProps } from '../TimeRangePicker';
 import { isValidTimeRange } from '../utils';
 

@@ -1,9 +1,8 @@
 import { css, cx } from '@emotion/css';
-import React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 import { InlineList } from '../List/InlineList';
 import { List } from '../List/List';
 
@@ -100,14 +99,14 @@ const getStyles = (theme: GrafanaTheme2) => {
       })
     ),
     rightWrapper: css({
-      paddingLeft: theme.spacing(0.5),
+      padding: theme.spacing(0.5),
     }),
     bottomWrapper: css({
       display: 'flex',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
       width: '100%',
-      paddingLeft: theme.spacing(0.5),
+      padding: theme.spacing(0.5),
       gap: '15px 25px',
     }),
     section: css({

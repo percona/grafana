@@ -51,11 +51,13 @@ type AlertsRouter struct {
 	datasourceService datasources.DataSourceService
 	secretService     secrets.Service
 	featureManager    featuremgmt.FeatureToggles
+	broadcastAlerts   bool
 }
 
 func NewAlertsRouter(multiOrgNotifier *notifier.MultiOrgAlertmanager, store store.AdminConfigurationStore,
 	clk clock.Clock, appURL *url.URL, disabledOrgs map[int64]struct{}, configPollInterval time.Duration,
-	datasourceService datasources.DataSourceService, secretService secrets.Service, featureManager featuremgmt.FeatureToggles) *AlertsRouter {
+	datasourceService datasources.DataSourceService, secretService secrets.Service, featureManager featuremgmt.FeatureToggles,
+	broadcastAlerts bool) *AlertsRouter {
 	d := &AlertsRouter{
 		logger:           log.New("ngalert.sender.router"),
 		clock:            clk,
@@ -75,6 +77,7 @@ func NewAlertsRouter(multiOrgNotifier *notifier.MultiOrgAlertmanager, store stor
 		datasourceService: datasourceService,
 		secretService:     secretService,
 		featureManager:    featureManager,
+		broadcastAlerts:   broadcastAlerts,
 	}
 	return d
 }
@@ -89,10 +92,13 @@ func (d *AlertsRouter) SyncAndApplyConfigFromDatabase(ctx context.Context) error
 
 	d.logger.Debug("Attempting to sync admin configs", "count", len(cfgs))
 
+	//nolint:staticcheck // not yet migrated to OpenFeature
 	disableExternal := d.featureManager.IsEnabled(ctx, featuremgmt.FlagAlertingDisableSendAlertsExternal)
-
 	orgsFound := make(map[int64]struct{}, len(cfgs))
+
+	// We're holding this lock either until we return an error or right before we stop the senders.
 	d.adminConfigMtx.Lock()
+
 	for _, cfg := range cfgs {
 		_, isDisabledOrg := d.disabledOrgs[cfg.OrgID]
 		if isDisabledOrg {
@@ -167,6 +173,7 @@ func (d *AlertsRouter) SyncAndApplyConfigFromDatabase(ctx context.Context) error
 		senderLogger := log.New("ngalert.sender.external-alertmanager")
 		s, err := NewExternalAlertmanagerSender(senderLogger, prometheus.NewRegistry())
 		if err != nil {
+			d.adminConfigMtx.Unlock()
 			return err
 		}
 		d.externalAlertmanagers[cfg.OrgID] = s
@@ -190,9 +197,9 @@ func (d *AlertsRouter) SyncAndApplyConfigFromDatabase(ctx context.Context) error
 			delete(d.externalAlertmanagersCfgHash, orgID)
 		}
 	}
-	d.adminConfigMtx.Unlock()
 
-	// We can now stop these external Alertmanagers w/o having to hold a lock.
+	// We can now stop these senders w/o having to hold a lock.
+	d.adminConfigMtx.Unlock()
 	for orgID, s := range sendersToStop {
 		d.logger.Info("Stopping sender", "org", orgID)
 		s.Stop()
@@ -205,29 +212,28 @@ func (d *AlertsRouter) SyncAndApplyConfigFromDatabase(ctx context.Context) error
 }
 
 func buildRedactedAMs(l log.Logger, alertmanagers []ExternalAMcfg, ordId int64) []string {
-	var redactedAMs []string
+	redactedAMs := make([]string, 0, len(alertmanagers))
 	for _, am := range alertmanagers {
 		parsedAM, err := url.Parse(am.URL)
 		if err != nil {
 			l.Error("Failed to parse alertmanager string", "org", ordId, "error", err)
 			continue
 		}
+
 		redactedAMs = append(redactedAMs, parsedAM.Redacted())
 	}
+
 	return redactedAMs
 }
 
 func asSHA256(strings []string) string {
 	h := sha256.New()
 	sort.Strings(strings)
-	_, _ = h.Write([]byte(fmt.Sprintf("%v", strings)))
+	_, _ = fmt.Fprintf(h, "%v", strings)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (d *AlertsRouter) alertmanagersFromDatasources(orgID int64) ([]ExternalAMcfg, error) {
-	var (
-		alertmanagers []ExternalAMcfg
-	)
 	// We might have alertmanager datasources that are acting as external
 	// alertmanager, let's fetch them.
 	query := &datasources.GetDataSourcesByTypeQuery{
@@ -240,34 +246,72 @@ func (d *AlertsRouter) alertmanagersFromDatasources(orgID int64) ([]ExternalAMcf
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch datasources for org: %w", err)
 	}
+
+	alertmanagers := make([]ExternalAMcfg, 0, len(dataSources))
+
 	for _, ds := range dataSources {
 		if !ds.JsonData.Get(definitions.HandleGrafanaManagedAlerts).MustBool(false) {
 			continue
 		}
-		amURL, err := d.buildExternalURL(ds)
+
+		cfg, err := d.datasourceToExternalAMcfg(ds)
 		if err != nil {
-			d.logger.Error("Failed to build external alertmanager URL",
+			d.logger.Error("Failed to convert datasource to external alertmanager config",
 				"org", ds.OrgID,
 				"uid", ds.UID,
 				"error", err)
 			continue
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-		headers, err := d.datasourceService.CustomHeaders(ctx, ds)
-		cancel()
-		if err != nil {
-			d.logger.Error("Failed to get headers for external alertmanager",
-				"org", ds.OrgID,
-				"uid", ds.UID,
-				"error", err)
-			continue
-		}
-		alertmanagers = append(alertmanagers, ExternalAMcfg{
-			URL:     amURL,
-			Headers: headers,
-		})
+
+		alertmanagers = append(alertmanagers, cfg)
 	}
+
 	return alertmanagers, nil
+}
+
+// datasourceToExternalAMcfg converts a datasource to an ExternalAMcfg.
+func (d *AlertsRouter) datasourceToExternalAMcfg(ds *datasources.DataSource) (ExternalAMcfg, error) {
+	amURL, err := d.buildExternalURL(ds)
+	if err != nil {
+		return ExternalAMcfg{}, fmt.Errorf("failed to build external alertmanager URL: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	headers, err := d.datasourceService.CustomHeaders(ctx, ds)
+	cancel()
+	if err != nil {
+		return ExternalAMcfg{}, fmt.Errorf("failed to get custom headers: %w", err)
+	}
+
+	insecureSkipVerify := false
+
+	var tlsAuthEnabled bool
+	if ds.JsonData != nil {
+		insecureSkipVerify = ds.JsonData.Get("tlsSkipVerify").MustBool(false)
+		tlsAuthEnabled = ds.JsonData.Get("tlsAuth").MustBool(false)
+	}
+
+	var tlsClientCert, tlsClientKey string
+	if tlsAuthEnabled {
+		if ds.SecureJsonData == nil {
+			return ExternalAMcfg{}, errors.New("tlsAuth is enabled but TLS client certificate and key are not configured")
+		}
+
+		tlsClientKey = d.secretService.GetDecryptedValue(context.Background(), ds.SecureJsonData, "tlsClientKey", "")
+		tlsClientCert = d.secretService.GetDecryptedValue(context.Background(), ds.SecureJsonData, "tlsClientCert", "")
+
+		if tlsClientCert == "" || tlsClientKey == "" {
+			return ExternalAMcfg{}, errors.New("tlsAuth is enabled but TLS client certificate or key is empty")
+		}
+	}
+
+	return ExternalAMcfg{
+		URL:                amURL,
+		Headers:            headers,
+		InsecureSkipVerify: insecureSkipVerify,
+		TLSClientCert:      tlsClientCert,
+		TLSClientKey:       tlsClientKey,
+	}, nil
 }
 
 func (d *AlertsRouter) buildExternalURL(ds *datasources.DataSource) (string, error) {
@@ -314,8 +358,10 @@ func (d *AlertsRouter) Send(ctx context.Context, key models.AlertRuleKey, alerts
 	}
 	// Send alerts to local notifier if they need to be handled internally
 	// or if no external AMs have been discovered yet.
+	d.adminConfigMtx.RLock()
+	defer d.adminConfigMtx.RUnlock()
 	var localNotifierExist, externalNotifierExist bool
-	if d.sendAlertsTo[key.OrgID] == models.ExternalAlertmanagers && len(d.AlertmanagersFor(key.OrgID)) > 0 {
+	if d.sendAlertsTo[key.OrgID] == models.ExternalAlertmanagers && len(d.alertmanagersFor(key.OrgID)) > 0 {
 		logger.Debug("All alerts for the given org should be routed to external notifiers only. skipping the internal notifier.")
 	} else {
 		logger.Info("Sending alerts to local notifier", "count", len(alerts.PostableAlerts))
@@ -324,6 +370,9 @@ func (d *AlertsRouter) Send(ctx context.Context, key models.AlertRuleKey, alerts
 			localNotifierExist = true
 			if err := n.PutAlerts(ctx, alerts); err != nil {
 				logger.Error("Failed to put alerts in the local notifier", "count", len(alerts.PostableAlerts), "error", err)
+			}
+			if d.broadcastAlerts {
+				d.multiOrgNotifier.BroadcastAlerts(key.OrgID, alerts)
 			}
 		} else {
 			if errors.Is(err, notifier.ErrNoAlertmanagerForOrg) {
@@ -336,8 +385,6 @@ func (d *AlertsRouter) Send(ctx context.Context, key models.AlertRuleKey, alerts
 
 	// Send alerts to external Alertmanager(s) if we have a sender for this organization
 	// and alerts are not being handled just internally.
-	d.adminConfigMtx.RLock()
-	defer d.adminConfigMtx.RUnlock()
 	s, ok := d.externalAlertmanagers[key.OrgID]
 	if ok && d.sendAlertsTo[key.OrgID] != models.InternalAlertmanager {
 		logger.Info("Sending alerts to external notifier", "count", len(alerts.PostableAlerts))
@@ -354,6 +401,10 @@ func (d *AlertsRouter) Send(ctx context.Context, key models.AlertRuleKey, alerts
 func (d *AlertsRouter) AlertmanagersFor(orgID int64) []*url.URL {
 	d.adminConfigMtx.RLock()
 	defer d.adminConfigMtx.RUnlock()
+	return d.alertmanagersFor(orgID)
+}
+
+func (d *AlertsRouter) alertmanagersFor(orgID int64) []*url.URL {
 	s, ok := d.externalAlertmanagers[orgID]
 	if !ok {
 		return []*url.URL{}

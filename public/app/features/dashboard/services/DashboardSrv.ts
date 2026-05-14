@@ -1,13 +1,11 @@
-import { lastValueFrom } from 'rxjs';
-
 import { AppEvents } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { BackendSrvRequest } from '@grafana/runtime';
 import { Dashboard } from '@grafana/schema';
 import { appEvents } from 'app/core/app_events';
-import { t } from 'app/core/internationalization';
 import { getBackendSrv } from 'app/core/services/backend_srv';
 import { getDashboardAPI } from 'app/features/dashboard/api/dashboard_api';
-import { DashboardMeta } from 'app/types';
+import { DashboardMeta } from 'app/types/dashboard';
 
 import { RemovePanelEvent } from '../../../types/events';
 import { DashboardModel } from '../state/DashboardModel';
@@ -20,21 +18,11 @@ export interface SaveDashboardOptions {
   message?: string;
   /** The UID of the folder to save the dashboard in. Overrides `folderId`. */
   folderUid?: string;
-  /** Set to `true` if you want to overwrite existing dashboard with newer version,
-   *  same dashboard title in folder or same dashboard uid. */
+  /** Set to `true` if you want to overwrite an existing dashboard with a given dashboard UID. */
   overwrite?: boolean;
   /** Set the dashboard refresh interval.
    *  If this is lower than the minimum refresh interval, Grafana will ignore it and will enforce the minimum refresh interval. */
   refresh?: string;
-}
-
-interface SaveDashboardResponse {
-  id: number;
-  slug: string;
-  status: string;
-  uid: string;
-  url: string;
-  version: number;
 }
 
 export class DashboardSrv {
@@ -68,6 +56,8 @@ export class DashboardSrv {
     return getDashboardAPI().saveDashboard({
       dashboard: parsedJson,
       folderUid: this.dashboard?.meta.folderUid || parsedJson.folderUid,
+      message: t('dashboard.dashboard-srv.message.edit-dashboard-json', 'Edit Dashboard JSON'),
+      k8s: this.dashboard?.meta.k8s,
     });
   }
 
@@ -75,17 +65,12 @@ export class DashboardSrv {
     data: SaveDashboardOptions,
     requestOptions?: Pick<BackendSrvRequest, 'showErrorAlert' | 'showSuccessAlert'>
   ) {
-    return lastValueFrom(
-      getBackendSrv().fetch<SaveDashboardResponse>({
-        url: '/api/dashboards/db/',
-        method: 'POST',
-        data: {
-          ...data,
-          dashboard: data.dashboard.getSaveModelClone(),
-        },
-        ...requestOptions,
-      })
-    );
+    return getDashboardAPI().saveDashboard({
+      message: data.message,
+      folderUid: data.folderUid,
+      dashboard: data.dashboard.getSaveModelClone(),
+      showErrorAlert: requestOptions?.showErrorAlert,
+    });
   }
 
   starDashboard(dashboardUid: string, isStarred: boolean) {

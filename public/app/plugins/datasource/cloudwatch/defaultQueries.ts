@@ -3,11 +3,11 @@ import {
   CloudWatchLogsQuery,
   CloudWatchMetricsQuery,
   LogGroup,
+  LogsQueryLanguage,
   MetricEditorMode,
   MetricQueryType,
-  VariableQuery,
-  VariableQueryType,
-} from './types';
+} from './dataquery.gen';
+import { VariableQuery, VariableQueryType } from './types';
 
 export const DEFAULT_METRICS_QUERY: Omit<CloudWatchMetricsQuery, 'refId'> = {
   queryMode: 'Metrics',
@@ -21,8 +21,9 @@ export const DEFAULT_METRICS_QUERY: Omit<CloudWatchMetricsQuery, 'refId'> = {
   period: '',
   metricQueryType: MetricQueryType.Search,
   metricEditorMode: MetricEditorMode.Builder,
+  sql: undefined,
   sqlExpression: '',
-  matchExact: true,
+  matchExact: false,
 };
 
 export const DEFAULT_ANNOTATIONS_QUERY: Omit<CloudWatchAnnotationQuery, 'refId'> = {
@@ -32,7 +33,10 @@ export const DEFAULT_ANNOTATIONS_QUERY: Omit<CloudWatchAnnotationQuery, 'refId'>
   statistic: 'Average',
 };
 
-export const DEFAULT_LOGS_QUERY_STRING = 'fields @timestamp, @message |\n sort @timestamp desc |\n limit 20';
+export const DEFAULT_CWLI_QUERY_STRING = 'fields @timestamp, @message |\nsort @timestamp desc |\nlimit 20';
+export const DEFAULT_PPL_QUERY_STRING = 'fields `@timestamp`, `@message`\n| sort - `@timestamp`\n| head 25s';
+export const DEFAULT_SQL_QUERY_STRING =
+  'SELECT `@timestamp`, `@message`\nFROM `$__logGroups`\nORDER BY `@timestamp` DESC\nLIMIT 25;';
 
 export const getDefaultLogsQuery = (
   defaultLogGroups?: LogGroup[],
@@ -44,6 +48,7 @@ export const getDefaultLogsQuery = (
   // the migration requires async backend calls, so we don't want to do it here as it would block the UI.
   logGroupNames: legacyDefaultLogGroups,
   logGroups: defaultLogGroups ?? [],
+  queryLanguage: LogsQueryLanguage.CWLI,
 });
 
 export const DEFAULT_VARIABLE_QUERY: Partial<VariableQuery> = {

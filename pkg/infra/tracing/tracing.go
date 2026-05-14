@@ -25,14 +25,17 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	trace "go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/go-kit/log/level"
 
+	"github.com/grafana/dskit/services"
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
 	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/util/errutil"
 )
 
 const (
+	ServiceName        = "tracing"
 	envJaegerAgentHost = "JAEGER_AGENT_HOST"
 	envJaegerAgentPort = "JAEGER_AGENT_PORT"
 )
@@ -47,6 +50,8 @@ const (
 )
 
 type TracingService struct {
+	services.NamedService
+
 	cfg *TracingConfig
 	log log.Logger
 
@@ -92,6 +97,7 @@ func ProvideService(tracingCfg *TracingConfig) (*TracingService, error) {
 		cfg: tracingCfg,
 		log: log.New("tracing"),
 	}
+	ots.NamedService = services.NewBasicService(ots.starting, ots.running, ots.stopping).WithName(ServiceName)
 
 	if err := ots.initOpentelemetryTracer(); err != nil {
 		return nil, err
@@ -99,36 +105,18 @@ func ProvideService(tracingCfg *TracingConfig) (*TracingService, error) {
 	return ots, nil
 }
 
+func NewNoopTracerService() *TracingService {
+	tp := &noopTracerProvider{TracerProvider: noop.NewTracerProvider()}
+	otel.SetTracerProvider(tp)
+
+	cfg := NewEmptyTracingConfig()
+	ots := &TracingService{cfg: cfg, tracerProvider: tp}
+	_ = ots.initOpentelemetryTracer()
+	return ots
+}
+
 func (ots *TracingService) GetTracerProvider() tracerProvider {
 	return ots.tracerProvider
-}
-
-func TraceIDFromContext(ctx context.Context, requireSampled bool) string {
-	spanCtx := trace.SpanContextFromContext(ctx)
-	if !spanCtx.HasTraceID() || !spanCtx.IsValid() || (requireSampled && !spanCtx.IsSampled()) {
-		return ""
-	}
-
-	return spanCtx.TraceID().String()
-}
-
-// Error sets the status to error and record the error as an exception in the provided span.
-func Error(span trace.Span, err error) error {
-	attr := []attribute.KeyValue{}
-	grafanaErr := errutil.Error{}
-	if errors.As(err, &grafanaErr) {
-		attr = append(attr, attribute.String("message_id", grafanaErr.MessageID))
-	}
-
-	span.SetStatus(codes.Error, err.Error())
-	span.RecordError(err, trace.WithAttributes(attr...))
-	return err
-}
-
-// Errorf wraps fmt.Errorf and also sets the status to error and record the error as an exception in the provided span.
-func Errorf(span trace.Span, format string, args ...any) error {
-	err := fmt.Errorf(format, args...)
-	return Error(span, err)
 }
 
 type noopTracerProvider struct {
@@ -185,7 +173,14 @@ func (ots *TracingService) initJaegerTracerProvider() (*tracesdk.TracerProvider,
 }
 
 func (ots *TracingService) initOTLPTracerProvider() (*tracesdk.TracerProvider, error) {
-	client := otlptracegrpc.NewClient(otlptracegrpc.WithEndpoint(ots.cfg.Address), otlptracegrpc.WithInsecure())
+	opts := []otlptracegrpc.Option{otlptracegrpc.WithEndpoint(ots.cfg.Address)}
+	if ots.cfg.Insecure {
+		opts = append(opts, otlptracegrpc.WithInsecure())
+	} else {
+		opts = append(opts, otlptracegrpc.WithTLSCredentials(credentials.NewTLS(nil)))
+	}
+
+	client := otlptracegrpc.NewClient(opts...)
 	exp, err := otlptrace.New(context.Background(), client)
 	if err != nil {
 		return nil, err
@@ -214,7 +209,7 @@ func (ots *TracingService) initSampler() (tracesdk.Sampler, error) {
 	case "rateLimiting":
 		return newRateLimiter(ots.cfg.SamplerParam), nil
 	case "remote":
-		return jaegerremote.New("grafana",
+		return jaegerremote.New(ots.cfg.ServiceName,
 			jaegerremote.WithSamplingServerURL(ots.cfg.SamplerRemoteURL),
 			jaegerremote.WithInitialSampler(tracesdk.TraceIDRatioBased(ots.cfg.SamplerParam)),
 		), nil
@@ -272,7 +267,9 @@ func (ots *TracingService) initOpentelemetryTracer() error {
 		}
 	}
 
-	tp = NewProfilingTracerProvider(tp)
+	if ots.cfg.ProfilingIntegration {
+		tp = NewProfilingTracerProvider(tp)
+	}
 
 	// Register our TracerProvider as the global so any imported
 	// instrumentation in the future will default to using it
@@ -314,27 +311,35 @@ func (ots *TracingService) initOpentelemetryTracer() error {
 	return nil
 }
 
-func (ots *TracingService) Run(ctx context.Context) error {
+func (ots *TracingService) starting(ctx context.Context) error {
 	otel.SetErrorHandler(otel.ErrorHandlerFunc(func(err error) {
 		err = level.Error(ots.log).Log("msg", "OpenTelemetry handler returned an error", "err", err)
 		if err != nil {
 			ots.log.Error("OpenTelemetry log returning error", err)
 		}
 	}))
+	return nil
+}
+func (ots *TracingService) running(ctx context.Context) error {
 	<-ctx.Done()
+	return nil
+}
 
+func (ots *TracingService) stopping(_ error) error {
 	ots.log.Info("Closing tracing")
 	if ots.tracerProvider == nil {
 		return nil
 	}
-	ctxShutdown, cancel := context.WithTimeout(ctx, time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
+	return ots.tracerProvider.Shutdown(ctx)
+}
 
-	if err := ots.tracerProvider.Shutdown(ctxShutdown); err != nil {
+func (ots *TracingService) Run(ctx context.Context) error {
+	if err := ots.StartAsync(ctx); err != nil {
 		return err
 	}
-
-	return nil
+	return ots.AwaitTerminated(ctx)
 }
 
 func (ots *TracingService) Inject(ctx context.Context, header http.Header, _ trace.Span) {
@@ -387,3 +392,47 @@ func (rl *rateLimiter) ShouldSample(p tracesdk.SamplingParameters) tracesdk.Samp
 }
 
 func (rl *rateLimiter) Description() string { return rl.description }
+
+func TraceIDFromContext(ctx context.Context, requireSampled bool) string {
+	spanCtx := trace.SpanContextFromContext(ctx)
+	if !spanCtx.HasTraceID() || !spanCtx.IsValid() || (requireSampled && !spanCtx.IsSampled()) {
+		return ""
+	}
+
+	return spanCtx.TraceID().String()
+}
+
+func ServerTimingForSpan(span trace.Span) string {
+	spanCtx := span.SpanContext()
+	if !spanCtx.HasTraceID() || !spanCtx.IsValid() {
+		return ""
+	}
+
+	return fmt.Sprintf("00-%s-%s-01", spanCtx.TraceID().String(), spanCtx.SpanID().String())
+}
+
+// Error sets the status to error and record the error as an exception in the provided span.
+func Error(span trace.Span, err error) error {
+	attr := []attribute.KeyValue{}
+	grafanaErr := errutil.Error{}
+	if errors.As(err, &grafanaErr) {
+		attr = append(attr, attribute.String("message_id", grafanaErr.MessageID))
+	}
+
+	span.SetStatus(codes.Error, err.Error())
+	span.RecordError(err, trace.WithAttributes(attr...))
+	return err
+}
+
+// Errorf wraps fmt.Errorf and also sets the status to error and record the error as an exception in the provided span.
+func Errorf(span trace.Span, format string, args ...any) error {
+	err := fmt.Errorf(format, args...)
+	return Error(span, err)
+}
+
+var instrumentationScope = "github.com/grafana/grafana/pkg/infra/tracing"
+
+// Start only creates an OpenTelemetry span if the incoming context already includes a span.
+func Start(ctx context.Context, name string, attributes ...attribute.KeyValue) (context.Context, trace.Span) {
+	return trace.SpanFromContext(ctx).TracerProvider().Tracer(instrumentationScope).Start(ctx, name, trace.WithAttributes(attributes...))
+}

@@ -1,6 +1,4 @@
-import { EnhancedStore } from '@reduxjs/toolkit';
 import { fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 import { waitFor } from 'test/test-utils';
 
@@ -9,23 +7,61 @@ import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/update
 import * as User from 'app/percona/shared/core/reducers/user/user';
 import { UpdatesService } from 'app/percona/shared/services/updates';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import PerconaUpdateVersion from './PerconaUpdateVersion';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
 const setSnoozedVersionSpy = jest.spyOn(User, 'setSnoozedVersion');
 
+jest.mock('app/percona/shared/services/user/User.service');
+
 describe('PerconaUpdateVersion', () => {
-  const setup = (store: EnhancedStore) =>
+  const setup = (state: Partial<StoreState['percona']>, updatesEnabled = true) =>
     render(
-      <Provider store={store}>
+      <Provider
+        store={configureStore({
+          percona: {
+            settings: {
+              result: {
+                updatesEnabled,
+              },
+            },
+            ...state,
+          },
+        } as StoreState)}
+      >
         <PerconaUpdateVersion />
       </Provider>
     );
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('should render modal without changelogs', async () => {
+    const changeLogsAPIResponse = {
+      last_check: '',
+      updates: [],
+    };
+    const state = {
+      updates: {
+        isLoading: false,
+        updateAvailable: true,
+        latest: { version: '3.0.1' },
+        lastChecked: '',
+        showUpdateModal: true,
+      },
+    };
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve(changeLogsAPIResponse));
+
+    setup(state);
+    await waitFor(() => {
+      expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
+    });
+
+    expect(screen.queryByTestId('one-update-modal')).toBeInTheDocument();
+    expect(screen.queryByTestId('multiple-updates-modal')).not.toBeInTheDocument();
   });
 
   it('should render modal with one update', async () => {
@@ -52,15 +88,7 @@ describe('PerconaUpdateVersion', () => {
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
 
-    const defaultState = configureStore().getState();
-    const store = configureStore({
-      ...defaultState,
-      percona: {
-        ...defaultState.percona,
-        ...state,
-      },
-    } as StoreState);
-    setup(store);
+    setup(state);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
     });
@@ -100,16 +128,7 @@ describe('PerconaUpdateVersion', () => {
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
 
-    const defaultState = configureStore().getState();
-    const store = configureStore({
-      ...defaultState,
-      percona: {
-        ...defaultState.percona,
-        ...state,
-      },
-    } as StoreState);
-
-    setup(store);
+    setup(state);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
     });
@@ -142,15 +161,7 @@ describe('PerconaUpdateVersion', () => {
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
 
-    const defaultState = configureStore().getState();
-    const store = configureStore({
-      ...defaultState,
-      percona: {
-        ...defaultState.percona,
-        ...state,
-      },
-    } as StoreState);
-    setup(store);
+    setup(state);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
     });
@@ -160,5 +171,25 @@ describe('PerconaUpdateVersion', () => {
     await waitFor(() => {
       expect(setSnoozedVersionSpy).toHaveBeenCalled();
     });
+  });
+
+  it("shouldn't render modal when updates are disabled", async () => {
+    const state = {
+      updates: {
+        isLoading: false,
+        updateAvailable: true,
+        latest: { version: '3.0.1' },
+        lastChecked: '',
+        showUpdateModal: true,
+      },
+    };
+
+    setup(state, false);
+    await waitFor(() => {
+      expect(checkUpdatesChangeLogsSpy).not.toHaveBeenCalled();
+    });
+
+    expect(screen.queryByTestId('one-update-modal')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('multiple-updates-modal')).not.toBeInTheDocument();
   });
 });

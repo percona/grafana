@@ -1,39 +1,30 @@
-import { render as rtlRender, screen } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
-import { SetupServer, setupServer } from 'msw/node';
-import React from 'react';
-import { TestProvider } from 'test/helpers/TestProvider';
+import { render, screen } from 'test/test-utils';
 
-import { contextSrv } from 'app/core/core';
-import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
-import { backendSrv } from 'app/core/services/backend_srv';
+import { config } from '@grafana/runtime';
+import { contextSrv } from 'app/core/services/context_srv';
+import { setupMswServer } from 'app/features/alerting/unified/mockApi';
 
-import BrowseFolderAlertingPage, { OwnProps } from './BrowseFolderAlertingPage';
-import { getPrometheusRulesResponse, getRulerRulesResponse } from './fixtures/alertRules.fixture';
+import { rulerTestDb } from '../alerting/unified/mocks/grafanaRulerApi';
+import { alertingFactory } from '../alerting/unified/mocks/server/db';
+import { DEFAULT_FOLDERS } from '../alerting/unified/mocks/server/handlers/folders';
+
+import BrowseFolderAlertingPage from './BrowseFolderAlertingPage';
 import * as permissions from './permissions';
 
-function render(...[ui, options]: Parameters<typeof rtlRender>) {
-  rtlRender(<TestProvider>{ui}</TestProvider>, options);
-}
+// Use the folder and rules from the mocks
+const folder = DEFAULT_FOLDERS[0];
+const { uid: folderUid, title: folderTitle } = folder;
 
-jest.mock('@grafana/runtime', () => ({
-  ...jest.requireActual('@grafana/runtime'),
-  getBackendSrv: () => backendSrv,
-  config: {
-    ...jest.requireActual('@grafana/runtime').config,
-    unifiedAlertingEnabled: true,
-  },
+jest.mock('react-router-dom-v5-compat', () => ({
+  ...jest.requireActual('react-router-dom-v5-compat'),
+  useParams: jest.fn(() => ({ uid: folderUid })),
 }));
 
-const mockFolderName = 'myFolder';
-const mockFolderUid = '12345';
+config.unifiedAlertingEnabled = true;
 
-const mockRulerRulesResponse = getRulerRulesResponse(mockFolderName, mockFolderUid);
-const mockPrometheusRulesResponse = getPrometheusRulesResponse(mockFolderName);
+setupMswServer();
 
 describe('browse-dashboards BrowseFolderAlertingPage', () => {
-  let props: OwnProps;
-  let server: SetupServer;
   const mockPermissions = {
     canCreateDashboards: true,
     canEditDashboards: true,
@@ -42,59 +33,25 @@ describe('browse-dashboards BrowseFolderAlertingPage', () => {
     canEditFolders: true,
     canViewPermissions: true,
     canSetPermissions: true,
+    canDeleteDashboards: true,
   };
-
-  beforeAll(() => {
-    server = setupServer(
-      http.get('/api/folders/:uid', () => {
-        return HttpResponse.json({
-          title: mockFolderName,
-          uid: mockFolderUid,
-        });
-      }),
-      http.get('api/ruler/grafana/api/v1/rules', () => {
-        return HttpResponse.json(mockRulerRulesResponse);
-      }),
-      http.get('api/prometheus/grafana/api/v1/rules', () => {
-        return HttpResponse.json(mockPrometheusRulesResponse);
-      })
-    );
-    server.listen();
-  });
-
-  afterAll(() => {
-    server.close();
-  });
 
   beforeEach(() => {
     jest.spyOn(permissions, 'getFolderPermissions').mockImplementation(() => mockPermissions);
     jest.spyOn(contextSrv, 'hasPermission').mockReturnValue(true);
-    props = {
-      ...getRouteComponentProps({
-        match: {
-          params: {
-            uid: mockFolderUid,
-          },
-          isExact: false,
-          path: '',
-          url: '',
-        },
-      }),
-    };
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
-    server.resetHandlers();
   });
 
   it('displays the folder title', async () => {
-    render(<BrowseFolderAlertingPage {...props} />);
-    expect(await screen.findByRole('heading', { name: mockFolderName })).toBeInTheDocument();
+    render(<BrowseFolderAlertingPage />);
+    expect(await screen.findByRole('heading', { name: folderTitle })).toBeInTheDocument();
   });
 
   it('displays the "Folder actions" button', async () => {
-    render(<BrowseFolderAlertingPage {...props} />);
+    render(<BrowseFolderAlertingPage />);
     expect(await screen.findByRole('button', { name: 'Folder actions' })).toBeInTheDocument();
   });
 
@@ -108,27 +65,41 @@ describe('browse-dashboards BrowseFolderAlertingPage', () => {
         canSetPermissions: false,
       };
     });
-    render(<BrowseFolderAlertingPage {...props} />);
-    expect(await screen.findByRole('heading', { name: mockFolderName })).toBeInTheDocument();
+    render(<BrowseFolderAlertingPage />);
+    expect(await screen.findByRole('heading', { name: folderTitle })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Folder actions' })).not.toBeInTheDocument();
   });
 
   it('displays all the folder tabs and shows the "Alert rules" tab as selected', async () => {
-    render(<BrowseFolderAlertingPage {...props} />);
-    expect(await screen.findByRole('tab', { name: 'Tab Dashboards' })).toBeInTheDocument();
-    expect(await screen.findByRole('tab', { name: 'Tab Dashboards' })).toHaveAttribute('aria-selected', 'false');
+    render(<BrowseFolderAlertingPage />);
+    expect(await screen.findByRole('tab', { name: 'Dashboards' })).toBeInTheDocument();
+    expect(await screen.findByRole('tab', { name: 'Dashboards' })).toHaveAttribute('aria-selected', 'false');
 
-    expect(await screen.findByRole('tab', { name: 'Tab Panels' })).toBeInTheDocument();
-    expect(await screen.findByRole('tab', { name: 'Tab Panels' })).toHaveAttribute('aria-selected', 'false');
+    expect(await screen.findByRole('tab', { name: 'Panels' })).toBeInTheDocument();
+    expect(await screen.findByRole('tab', { name: 'Panels' })).toHaveAttribute('aria-selected', 'false');
 
-    expect(await screen.findByRole('tab', { name: 'Tab Alert rules' })).toBeInTheDocument();
-    expect(await screen.findByRole('tab', { name: 'Tab Alert rules' })).toHaveAttribute('aria-selected', 'true');
+    expect(await screen.findByRole('tab', { name: 'Alert rules' })).toBeInTheDocument();
+    expect(await screen.findByRole('tab', { name: 'Alert rules' })).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('displays the alert rules returned by the API', async () => {
-    render(<BrowseFolderAlertingPage {...props} />);
+  it('displays rules from the folder', async () => {
+    const ruleUid = 'xYz1A2b3C4';
 
-    const ruleName = mockPrometheusRulesResponse.data.groups[0].rules[0].name;
-    expect(await screen.findByRole('link', { name: ruleName })).toBeInTheDocument();
+    const group = alertingFactory.ruler.grafana.group.build({
+      name: 'test-group',
+      rules: [
+        alertingFactory.ruler.grafana.alertingRule.build({
+          grafana_alert: { title: 'Grafana-rule', namespace_uid: folderUid, rule_group: 'test-group', uid: ruleUid },
+        }),
+      ],
+    });
+    rulerTestDb.addGroup(group, { name: folderTitle, uid: folderUid });
+    render(<BrowseFolderAlertingPage />);
+
+    expect(await screen.findByRole('heading', { name: folderTitle })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Grafana-rule' })).toHaveAttribute(
+      'href',
+      `/alerting/grafana/${ruleUid}/view`
+    );
   });
 });

@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/grafana/grafana/pkg/infra/db"
+	"github.com/grafana/grafana/pkg/services/encryption"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier"
 	"github.com/grafana/grafana/pkg/services/secrets"
 	"github.com/grafana/grafana/pkg/services/secrets/manager"
@@ -24,7 +25,7 @@ func (s simpleSecret) ReEncrypt(ctx context.Context, secretsSrv *manager.Secrets
 	if err := sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		return sess.Table(s.tableName).Select(fmt.Sprintf("id, %s as secret", s.columnName)).Find(&rows)
 	}); err != nil {
-		logger.Warn("Could not find any secret to re-encrypt", "table", s.tableName)
+		logger.Warn("Could not find any secret to re-encrypt", "table", s.tableName, "error", err)
 		return false
 	}
 
@@ -83,7 +84,7 @@ func (s b64Secret) ReEncrypt(ctx context.Context, secretsSrv *manager.SecretsSer
 	if err := sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		return sess.Table(s.tableName).Select(fmt.Sprintf("id, %s as secret", s.columnName)).Find(&rows)
 	}); err != nil {
-		logger.Warn("Could not find any secret to re-encrypt", "table", s.tableName)
+		logger.Warn("Could not find any secret to re-encrypt", "table", s.tableName, "error", err)
 		return false
 	}
 
@@ -154,7 +155,7 @@ func (s jsonSecret) ReEncrypt(ctx context.Context, secretsSrv *manager.SecretsSe
 	if err := sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		return sess.Table(s.tableName).Cols("id", "secure_json_data").Find(&rows)
 	}); err != nil {
-		logger.Warn("Could not find any secret to re-encrypt", "table", s.tableName)
+		logger.Warn("Could not find any secret to re-encrypt", "table", s.tableName, "error", err)
 		return false
 	}
 
@@ -218,7 +219,7 @@ func (s alertingSecret) ReEncrypt(ctx context.Context, secretsSrv *manager.Secre
 	if err := sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		return sess.SQL(selectSQL).Find(&results)
 	}); err != nil {
-		logger.Warn("Could not find any alert_configuration secret to re-encrypt")
+		logger.Warn("Could not find any alert_configuration secret to re-encrypt", "error", err)
 		return false
 	}
 
@@ -298,9 +299,8 @@ func (s ssoSettingsSecret) ReEncrypt(ctx context.Context, secretsSrv *manager.Se
 	err := sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
 		return sess.Find(&results)
 	})
-
 	if err != nil {
-		logger.Warn("Failed to fetch SSO settings to re-encrypt", "err", err)
+		logger.Warn("Failed to fetch SSO settings to re-encrypt", "error", err)
 		return false
 	}
 
@@ -308,26 +308,10 @@ func (s ssoSettingsSecret) ReEncrypt(ctx context.Context, secretsSrv *manager.Se
 
 	for _, result := range results {
 		err := sqlStore.InTransaction(ctx, func(ctx context.Context) error {
-			for field, value := range result.Settings {
-				if ssosettingsimpl.IsSecretField(field) {
-					decrypted, err := s.decryptValue(ctx, value, secretsSrv)
-					if err != nil {
-						logger.Warn("Could not decrypt SSO settings secret", "id", result.ID, "field", field, "error", err)
-						return err
-					}
-
-					if decrypted == nil {
-						continue
-					}
-
-					reencrypted, err := secretsSrv.Encrypt(ctx, decrypted, secrets.WithoutScope())
-					if err != nil {
-						logger.Warn("Could not re-encrypt SSO settings secret", "id", result.ID, "field", field, "error", err)
-						return err
-					}
-
-					result.Settings[field] = base64.RawStdEncoding.EncodeToString(reencrypted)
-				}
+			result.Settings, err = s.reEncryptSecretsInMap(ctx, result.Settings, secretsSrv, nil, "")
+			if err != nil {
+				logger.Warn("failed re-encrypting SSO settings secret", "id", result.ID, "error", err)
+				return err
 			}
 
 			err = sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
@@ -377,4 +361,78 @@ func (s ssoSettingsSecret) decryptValue(ctx context.Context, value any, secretsS
 	}
 
 	return decrypted, nil
+}
+
+func (s ssoSettingsSecret) reEncryptSecretsInMap(ctx context.Context, m map[string]any, secretsSrv *manager.SecretsService, encryptionSrv encryption.Internal, secretKey string) (map[string]any, error) {
+	var err error
+
+	result := make(map[string]any)
+	for k, v := range m {
+		switch v := v.(type) {
+		case string:
+			result[k] = v
+			if ssosettingsimpl.IsSecretField(k) {
+				decrypted, err := s.decryptValue(ctx, v, secretsSrv)
+				if err != nil {
+					logger.Warn("Could not decrypt SSO settings secret", "field", k, "error", err)
+					return nil, err
+				}
+
+				if decrypted == nil {
+					continue
+				}
+
+				var reencrypted []byte
+				if encryptionSrv == nil {
+					reencrypted, err = secretsSrv.Encrypt(ctx, decrypted, secrets.WithoutScope())
+				} else {
+					reencrypted, err = encryptionSrv.Encrypt(ctx, decrypted, secretKey)
+				}
+				if err != nil {
+					logger.Warn("Could not re-encrypt SSO settings secret", "id", "field", k, "error", err)
+					return nil, err
+				}
+
+				result[k] = base64.RawStdEncoding.EncodeToString(reencrypted)
+			}
+		case []any:
+			result[k], err = s.reEncryptSecretsInSlice(ctx, v, secretsSrv, encryptionSrv, secretKey)
+			if err != nil {
+				return nil, err
+			}
+		case map[string]any:
+			result[k], err = s.reEncryptSecretsInMap(ctx, v, secretsSrv, encryptionSrv, secretKey)
+			if err != nil {
+				return nil, err
+			}
+		default:
+			result[k] = v
+		}
+	}
+
+	return result, nil
+}
+
+func (s ssoSettingsSecret) reEncryptSecretsInSlice(ctx context.Context, a []any, secretsSrv *manager.SecretsService, encryptionSrv encryption.Internal, secretKey string) ([]any, error) {
+	result := make([]any, 0)
+	for _, v := range a {
+		switch v := v.(type) {
+		case []any:
+			inner, err := s.reEncryptSecretsInSlice(ctx, v, secretsSrv, encryptionSrv, secretKey)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, inner)
+		case map[string]any:
+			inner, err := s.reEncryptSecretsInMap(ctx, v, secretsSrv, encryptionSrv, secretKey)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, inner)
+		default:
+			result = append(result, v)
+		}
+	}
+
+	return result, nil
 }

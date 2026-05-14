@@ -1,7 +1,7 @@
 import { memoize } from 'lodash';
 import moment from 'moment-timezone';
 
-import { TimeZone } from '../types';
+import { TimeZone } from '../types/time';
 
 import { getTimeZone } from './common';
 
@@ -436,6 +436,12 @@ const countriesByTimeZone = ((): Record<string, TimeZoneCountry[]> => {
       const name = countryByCode[code];
 
       if (!name) {
+        return all;
+      }
+
+      // Fix: Only include Antarctica if timezone starts with "Antarctica/"
+      // https://github.com/grafana/grafana/issues/104688
+      if (code === 'AQ' && !timeZone.startsWith('Antarctica/')) {
         return all;
       }
 

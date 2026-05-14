@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/grafana/grafana/pkg/util/xorm/core"
 	"xorm.io/builder"
-	"xorm.io/core"
 )
 
 // Statement save all the sql info for executing SQL
@@ -201,6 +201,13 @@ func (statement *Statement) In(column string, args ...any) *Statement {
 	return statement
 }
 
+// OrIn generate "Where column IN (?) " statement
+func (statement *Statement) OrIn(column string, args ...any) *Statement {
+	in := builder.In(statement.Engine.Quote(column), args...)
+	statement.cond = statement.cond.Or(in)
+	return statement
+}
+
 // NotIn generate "Where column NOT IN (?) " statement
 func (statement *Statement) NotIn(column string, args ...any) *Statement {
 	notIn := builder.NotIn(statement.Engine.Quote(column), args...)
@@ -267,10 +274,6 @@ func (statement *Statement) buildUpdates(bean any,
 			continue
 		}
 
-		if col.MapType == core.ONLYFROMDB {
-			continue
-		}
-
 		if statement.incrColumns.isColExist(col.Name) {
 			continue
 		} else if statement.decrColumns.isColExist(col.Name) {
@@ -320,7 +323,11 @@ func (statement *Statement) buildUpdates(bean any,
 				if err != nil {
 					engine.logger.Error(err)
 				} else {
-					val = data
+					if col.SQLType.IsText() {
+						val = string(data)
+					} else {
+						val = data
+					}
 				}
 				goto APPEND
 			}
@@ -331,7 +338,11 @@ func (statement *Statement) buildUpdates(bean any,
 			if err != nil {
 				engine.logger.Error(err)
 			} else {
-				val = data
+				if col.SQLType.IsText() {
+					val = string(data)
+				} else {
+					val = data
+				}
 			}
 			goto APPEND
 		}
@@ -808,10 +819,6 @@ func (statement *Statement) genColumnStr() string {
 			continue
 		}
 
-		if col.MapType == core.ONLYTODB {
-			continue
-		}
-
 		if buf.Len() != 0 {
 			buf.WriteString(", ")
 		}
@@ -866,7 +873,7 @@ func (statement *Statement) genUniqueSQL() []string {
 }
 
 func (statement *Statement) genDelIndexSQL() []string {
-	var sqls []string
+	sqls := make([]string, 0, len(statement.RefTable.Indexes))
 	tbName := statement.TableName()
 	idxPrefixName := strings.Replace(tbName, `"`, "", -1)
 	idxPrefixName = strings.Replace(idxPrefixName, `.`, "_", -1)

@@ -1,42 +1,34 @@
-import { isNumber, set, unset, get, cloneDeep } from 'lodash';
-import { useMemo, useRef } from 'react';
-import usePrevious from 'react-use/lib/usePrevious';
+import { isNumber, set, unset, get, cloneDeep, defaultsDeep } from 'lodash';
+import { createContext, useContext, useMemo, useRef } from 'react';
+import { usePrevious } from 'react-use';
 
-import { VariableFormatID } from '@grafana/schema';
+import { ThresholdsMode, VariableFormatID } from '@grafana/schema';
 
-import { compareArrayValues, compareDataFrameStructures, guessFieldTypeForField } from '../dataframe';
+import { compareArrayValues, compareDataFrameStructures } from '../dataframe/frameComparisons';
+import { createDataFrame, guessFieldTypeForField } from '../dataframe/processDataFrame';
 import { PanelPlugin } from '../panel/PanelPlugin';
-import { GrafanaTheme2 } from '../themes';
 import { asHexString } from '../themes/colorManipulator';
-import { fieldMatchers, reduceField, ReducerID } from '../transformations';
+import { GrafanaTheme2 } from '../themes/types';
+import { ReducerID, reduceField } from '../transformations/fieldReducer';
+import { fieldMatchers } from '../transformations/matchers';
+import { ScopedVars, DataContextScopedVar } from '../types/ScopedVars';
+import { DataFrame, NumericRange, FieldType, Field, ValueLinkConfig, FieldConfig } from '../types/dataFrame';
+import { LinkModel, DataLink } from '../types/dataLink';
+import { DisplayProcessor, DisplayValue, DecimalCount } from '../types/displayValue';
+import { FieldColorModeId } from '../types/fieldColor';
 import {
-  ApplyFieldOverrideOptions,
-  DataContextScopedVar,
-  DataFrame,
-  DataLink,
-  DecimalCount,
-  DisplayProcessor,
-  DisplayValue,
   DynamicConfigValue,
-  Field,
-  FieldColorModeId,
-  FieldConfig,
-  FieldConfigPropertyItem,
-  FieldConfigSource,
+  ApplyFieldOverrideOptions,
   FieldOverrideContext,
-  FieldType,
+  FieldConfigPropertyItem,
   DataLinkPostProcessor,
-  InterpolateFunction,
-  LinkModel,
-  NumericRange,
-  PanelData,
-  ScopedVars,
-  TimeZone,
-  ValueLinkConfig,
-} from '../types';
+  FieldConfigSource,
+} from '../types/fieldOverrides';
+import { InterpolateFunction, PanelData } from '../types/panel';
+import { TimeZone } from '../types/time';
 import { FieldMatcher } from '../types/transformations';
-import { locationUtil } from '../utils';
 import { mapInternalLinkToExplore } from '../utils/dataLinks';
+import { locationUtil } from '../utils/location';
 
 import { FieldConfigOptionsRegistry } from './FieldConfigOptionsRegistry';
 import { getDisplayProcessor, getRawDisplayProcessor } from './displayProcessor';
@@ -170,6 +162,8 @@ export function applyFieldOverrides(options: ApplyFieldOverrideOptions): DataFra
       const { range, newGlobalRange } = calculateRange(config, field, globalRange, options.data!);
       globalRange = newGlobalRange;
 
+      // Clear any cached displayName as it can change during field overrides process
+      field.state!.displayName = null;
       field.state!.seriesIndex = seriesIndex;
       field.state!.range = range;
       field.type = type;
@@ -205,6 +199,8 @@ export function applyFieldOverrides(options: ApplyFieldOverrideOptions): DataFra
       if (field.type === FieldType.nestedFrames) {
         for (const nestedFrames of field.values) {
           for (let nfIndex = 0; nfIndex < nestedFrames.length; nfIndex++) {
+            // TODO: should we apply fieldOverrides to nested frames?
+
             for (const valueField of nestedFrames[nfIndex].fields) {
               // Get display processor for nested fields
               valueField.display = getDisplayProcessor({
@@ -238,6 +234,22 @@ export function applyFieldOverrides(options: ApplyFieldOverrideOptions): DataFra
           }
         }
       }
+
+      if (field.type === FieldType.frame) {
+        field.values = applyFieldOverrides({
+          ...options,
+          // nested frames can be `undefined` in certain situations, like after `merge` transform due to padding the value array.
+          // let's replace them with empty frames to avoid errors applying overrides
+          data: field.values.map((nestedFrame: DataFrame | undefined): DataFrame => {
+            const result = nestedFrame ?? createDataFrame({ fields: [] });
+            result.fields = result.fields.map((newField) => {
+              newField.config = defaultsDeep(newField.config || {}, config);
+              return newField;
+            });
+            return result;
+          }),
+        });
+      }
     }
 
     return newFrame;
@@ -249,7 +261,13 @@ function calculateRange(
   field: Field,
   globalRange: NumericRange | undefined,
   data: DataFrame[]
-): { range?: { min?: number | null; max?: number | null; delta: number }; newGlobalRange: NumericRange | undefined } {
+): { range?: NumericRange; newGlobalRange?: NumericRange } {
+  // If range is defined with min/max, use it
+  if (isNumber(config.min) && isNumber(config.max)) {
+    const range = { min: config.min, max: config.max, delta: config.max - config.min };
+    return { range, newGlobalRange: globalRange ?? range };
+  }
+
   // Only calculate ranges when the field is a number and one of min/max is set to auto.
   if (field.type !== FieldType.number || (isNumber(config.min) && isNumber(config.max))) {
     return { newGlobalRange: globalRange };
@@ -323,7 +341,7 @@ export function setDynamicConfigValue(config: FieldConfig, value: DynamicConfigV
     return;
   }
 
-  const val = item.process(value.value, context, item.settings);
+  let val = item.process(value.value, context, item.settings);
 
   const remove = val === undefined || val === null;
 
@@ -334,6 +352,16 @@ export function setDynamicConfigValue(config: FieldConfig, value: DynamicConfigV
       unset(config, item.path);
     }
   } else {
+    // Merge arrays (e.g. mappings) when multiple overrides target the same field
+    // Override values come first so they take precedence (first match wins in getValueMappingResult)
+    if (Array.isArray(val)) {
+      const existingValue = item.isCustom ? get(config.custom, item.path) : get(config, item.path);
+
+      if (Array.isArray(existingValue)) {
+        val = [...val, ...existingValue];
+      }
+    }
+
     if (item.isCustom) {
       if (!config.custom) {
         config.custom = {};
@@ -352,6 +380,18 @@ export function setFieldConfigDefaults(config: FieldConfig, defaults: FieldConfi
   if (config.links && defaults.links) {
     // Combine the data source links and the panel default config links
     config.links = [...config.links, ...defaults.links];
+  }
+
+  // if we have a base threshold set by default but not on the config, we need to merge it in
+  const defaultBaseStep =
+    defaults?.thresholds?.mode === ThresholdsMode.Absolute &&
+    defaults.thresholds?.steps.find((step) => step.value === -Infinity);
+  if (
+    config.thresholds?.mode === ThresholdsMode.Absolute &&
+    !config.thresholds.steps.some((step) => step.value === -Infinity) &&
+    defaultBaseStep
+  ) {
+    config.thresholds.steps = [defaultBaseStep, ...config.thresholds.steps];
   }
   for (const fieldConfigProperty of context.fieldConfigRegistry.list()) {
     if (fieldConfigProperty.isCustom && !config.custom) {
@@ -479,7 +519,10 @@ export const getLinksSupplier =
       if (href) {
         href = locationUtil.assureBaseUrl(href.replace(/\n/g, ''));
         href = replaceVariables(href, dataLinkScopedVars, VariableFormatID.UriEncode);
-        href = locationUtil.processUrl(href);
+
+        if (href?.length > 0) {
+          href = locationUtil.processUrl(href);
+        }
       }
 
       if (link.onClick) {
@@ -495,6 +538,7 @@ export const getLinksSupplier =
             });
           },
           origin: field,
+          oneClick: link.oneClick ?? false,
         };
       } else {
         linkModel = {
@@ -502,6 +546,7 @@ export const getLinksSupplier =
           title: replaceVariables(link.title || '', dataLinkScopedVars),
           target: link.targetBlank ? '_blank' : undefined,
           origin: field,
+          oneClick: link.oneClick ?? false,
         };
       }
 
@@ -559,12 +604,13 @@ export function useFieldOverrides(
   data: PanelData | undefined,
   timeZone: string,
   theme: GrafanaTheme2,
-  replace: InterpolateFunction,
-  dataLinkPostProcessor?: DataLinkPostProcessor
+  replace: InterpolateFunction
 ): PanelData | undefined {
   const fieldConfigRegistry = plugin?.fieldConfigRegistry;
   const structureRev = useRef(0);
   const prevSeries = usePrevious(data?.series);
+
+  const { dataLinkPostProcessor } = useDataLinksContext();
 
   return useMemo(() => {
     if (!fieldConfigRegistry || !fieldConfig || !data) {
@@ -615,7 +661,7 @@ export function useFieldOverrides(
 /**
  * Clones the existing dataContext or creates a new one
  */
-function getFieldDataContextClone(frame: DataFrame, field: Field, fieldScopedVars: ScopedVars) {
+export function getFieldDataContextClone(frame: DataFrame, field: Field, fieldScopedVars: ScopedVars) {
   if (fieldScopedVars?.__dataContext) {
     return {
       value: {
@@ -626,3 +672,15 @@ function getFieldDataContextClone(frame: DataFrame, field: Field, fieldScopedVar
 
   return { value: { frame, field, data: [frame] } };
 }
+
+/**
+ * @internal
+ */
+export const DataLinksContext = createContext<{
+  dataLinkPostProcessor: DataLinkPostProcessor;
+}>({ dataLinkPostProcessor: defaultInternalLinkPostProcessor });
+
+/**
+ * @internal
+ */
+export const useDataLinksContext = () => useContext(DataLinksContext);

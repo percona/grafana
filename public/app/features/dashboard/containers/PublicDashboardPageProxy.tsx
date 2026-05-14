@@ -1,20 +1,12 @@
-import React from 'react';
-
-import { config } from '@grafana/runtime';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-
 import { PublicDashboardScenePage } from '../../dashboard-scene/pages/PublicDashboardScenePage';
+import { isPublicDashboardsSceneEnabled } from '../../dashboard-scene/utils/utils';
 
-import PublicDashboardPage from './PublicDashboardPage';
-import { PublicDashboardPageRouteParams, PublicDashboardPageRouteSearchParams } from './types';
+import PublicDashboardPage, { type Props } from './PublicDashboardPage';
 
-export type PublicDashboardPageProxyProps = GrafanaRouteComponentProps<
-  PublicDashboardPageRouteParams,
-  PublicDashboardPageRouteSearchParams
->;
+export type PublicDashboardPageProxyProps = Props;
 
 function PublicDashboardPageProxy(props: PublicDashboardPageProxyProps) {
-  if (config.featureToggles.publicDashboardsScene) {
+  if (isPublicDashboardsSceneEnabled()) {
     return <PublicDashboardScenePage {...props} />;
   }
 

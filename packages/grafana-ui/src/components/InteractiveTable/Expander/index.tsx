@@ -1,9 +1,7 @@
-// @PERCONA
-// Running typecheck in root of repo would yield errors here
-// @ts-nocheck
 import { css } from '@emotion/css';
-import React from 'react';
 import { CellProps, HeaderProps } from 'react-table';
+
+import { t, Trans } from '@grafana/i18n';
 
 import { IconButton } from '../../IconButton/IconButton';
 
@@ -17,13 +15,10 @@ export function ExpanderCell<K extends object>({ row, __rowID }: CellProps<K, vo
   return (
     <div className={expanderContainerStyles}>
       <IconButton
-        tooltip="toggle row expanded"
-        aria-controls={__rowID}
-        // @ts-expect-error react-table doesn't ship with useExpanded types and we can't use declaration merging without affecting the table viz
+        tooltip={t('grafana-ui.interactive-table.expand-row-tooltip', 'Toggle row expanded')}
+        aria-controls={row.isExpanded ? __rowID : undefined}
         name={row.isExpanded ? 'angle-down' : 'angle-right'}
-        // @ts-expect-error same as the line above
         aria-expanded={row.isExpanded}
-        // @ts-expect-error same as the line above
         {...row.getToggleRowExpandedProps()}
         size="lg"
       />
@@ -31,15 +26,31 @@ export function ExpanderCell<K extends object>({ row, __rowID }: CellProps<K, vo
   );
 }
 
+export function EmptyExpanderHeader() {
+  return (
+    <span className="sr-only">
+      <Trans i18nKey="grafana-ui.interactive-table.expand-row-header">Row expander</Trans>
+    </span>
+  );
+}
+
 export function ExpanderHeader<K extends object>({ isAllRowsExpanded, toggleAllRowsExpanded }: HeaderProps<K>) {
   return (
     <div className={expanderContainerStyles}>
       <IconButton
-        aria-label={!isAllRowsExpanded ? 'Expand all rows' : 'Collapse all rows'}
+        aria-label={
+          !isAllRowsExpanded
+            ? t('grafana-ui.interactive-table.aria-label-expand-all', 'Expand all rows')
+            : t('grafana-ui.interactive-table.aria-label-collapse-all', 'Collapse all rows')
+        }
         name={!isAllRowsExpanded ? 'table-expand-all' : 'table-collapse-all'}
         onClick={() => toggleAllRowsExpanded()}
         size={'lg'}
-        tooltip={!isAllRowsExpanded ? 'Expand all rows' : 'Collapse all rows'}
+        tooltip={
+          !isAllRowsExpanded
+            ? t('grafana-ui.interactive-table.tooltip-expand-all', 'Expand all rows')
+            : t('grafana-ui.interactive-table.tooltip-collapse-all', 'Collapse all rows')
+        }
         variant={'secondary'}
       />
     </div>

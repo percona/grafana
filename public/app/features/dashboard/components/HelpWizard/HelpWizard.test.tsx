@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 
 import { FieldType, getDefaultTimeRange, LoadingState, toDataFrame } from '@grafana/data';
-import { getPanelPlugin } from '@grafana/data/test/__mocks__/pluginMocks';
+import { getPanelPlugin } from '@grafana/data/test';
 
 import { PanelModel } from '../../state/PanelModel';
 
@@ -31,6 +30,6 @@ function setup() {
 describe('SupportSnapshot', () => {
   it('Can render', async () => {
     setup();
-    expect(await screen.findByRole('button', { name: /Dashboard \([\d\.]+ KiB\)/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Download snapshot \([\d\.]+ KiB\)/ })).toBeInTheDocument();
   });
 });

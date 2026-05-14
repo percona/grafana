@@ -1,12 +1,13 @@
 import { css } from '@emotion/css';
-import React, { MouseEvent, useCallback } from 'react';
+import { MouseEvent, useCallback } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 import { Icon, useStyles2 } from '@grafana/ui';
-import { LoadingIndicator } from '@grafana/ui/src/components/PanelChrome/LoadingIndicator';
-import { t } from 'app/core/internationalization';
+import { LoadingIndicator } from '@grafana/ui/internal';
 
+import { getStyles as getTagBadgeStyles } from '../../../../core/components/TagFilter/TagBadge';
 import { ALL_VARIABLE_TEXT } from '../../constants';
 
 interface Props {
@@ -69,6 +70,7 @@ interface VariableLinkTextProps {
 
 const VariableLinkText = ({ text }: VariableLinkTextProps) => {
   const styles = useStyles2(getStyles);
+
   return (
     <span className={styles.textAndTags}>
       {text === ALL_VARIABLE_TEXT ? t('variable.picker.link-all', 'All') : text}
@@ -76,34 +78,38 @@ const VariableLinkText = ({ text }: VariableLinkTextProps) => {
   );
 };
 
-const getStyles = (theme: GrafanaTheme2) => ({
-  container: css`
-    max-width: 500px;
-    padding-right: 10px;
-    padding: 0 ${theme.spacing(1)};
-    background-color: ${theme.components.input.background};
-    border: 1px solid ${theme.components.input.borderColor};
-    border-radius: ${theme.shape.radius.default};
-    display: flex;
-    align-items: center;
-    color: ${theme.colors.text};
-    height: ${theme.spacing(theme.components.height.md)};
+const getStyles = (theme: GrafanaTheme2) => {
+  const tagBadgeStyles = getTagBadgeStyles(theme);
 
-    .label-tag {
-      margin: 0 5px;
-    }
+  return {
+    container: css({
+      maxWidth: '500px',
+      paddingRight: '10px',
+      padding: theme.spacing(0, 1),
+      backgroundColor: theme.components.input.background,
+      border: `1px solid ${theme.components.input.borderColor}`,
+      borderRadius: theme.shape.radius.default,
+      display: 'flex',
+      alignItems: 'center',
+      color: theme.colors.text.primary,
+      height: theme.spacing(theme.components.height.md),
 
-    &:disabled {
-      background-color: ${theme.colors.action.disabledBackground};
-      color: ${theme.colors.action.disabledText};
-      border: 1px solid ${theme.colors.action.disabledBackground};
-    }
-  `,
-  textAndTags: css`
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-right: ${theme.spacing(0.25)};
-    user-select: none;
-  `,
-});
+      [`.${tagBadgeStyles.badge}`]: {
+        margin: '0 5px',
+      },
+
+      '&:disabled': {
+        backgroundColor: theme.colors.action.disabledBackground,
+        color: theme.colors.action.disabledText,
+        border: `1px solid ${theme.colors.action.disabledBackground}`,
+      },
+    }),
+    textAndTags: css({
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      marginRight: theme.spacing(0.25),
+      userSelect: 'none',
+    }),
+  };
+};

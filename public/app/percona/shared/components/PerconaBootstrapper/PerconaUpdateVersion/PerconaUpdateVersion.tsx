@@ -1,30 +1,35 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
+import { locationService } from '@grafana/runtime';
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
-import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import {
   checkUpdatesChangeLogs,
   setShowUpdateModal,
   UpdatesChangeLogs,
 } from 'app/percona/shared/core/reducers/updates';
 import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
-import { getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
+import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
 
 const PerconaUpdateVersion = () => {
-  const { updateAvailable, installed, latest, changeLogs, showUpdateModal } = useSelector(getUpdatesInfo);
+  const { updateAvailable, installed, latest, changeLogs, showUpdateModal, latestNewsUrl } =
+    useSelector(getUpdatesInfo);
+  const { result: settings } = useSelector(getPerconaSettings);
+  const { updatesEnabled } = settings!;
   const { snoozedPmmVersion } = useSelector(getPerconaUser);
   const dispatch = useAppDispatch();
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
     const prepareModal = async () => {
-      if (installed?.version === latest?.version || snoozedPmmVersion === latest?.version) {
+      if (installed?.version === latest?.version || snoozedPmmVersion === latest?.version || !updatesEnabled) {
         dispatch(setShowUpdateModal(false));
       } else {
         await dispatch(checkUpdatesChangeLogs());
@@ -34,7 +39,7 @@ const PerconaUpdateVersion = () => {
     if (updateAvailable) {
       prepareModal();
     }
-  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion]);
+  }, [dispatch, updatesEnabled, updateAvailable, installed, latest, snoozedPmmVersion]);
 
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
@@ -49,7 +54,12 @@ const PerconaUpdateVersion = () => {
 
   const onUpdateClick = () => {
     dispatch(setShowUpdateModal(false));
-    window.location.assign(PMM_UPDATES_LINK.url!);
+
+    if (isPmmNavEnabled()) {
+      locationService.push(PMM_UPDATES_LINK.url!);
+    } else {
+      window.location.assign(PMM_UPDATES_LINK.url!);
+    }
   };
 
   return (
@@ -57,13 +67,17 @@ const PerconaUpdateVersion = () => {
       <Modal
         onDismiss={onDismiss}
         title={Messages.titleOneUpdate}
-        isOpen={showUpdateModal && changeLogs && changeLogs?.updates?.length === 1}
+        isOpen={showUpdateModal && (changeLogs?.updates?.length || 0) <= 1}
         className={styles.updateVersionModal}
       >
         <div data-testid="one-update-modal">
           <h5 className={styles.version}>{latest?.version || ''}</h5>
           <p className={styles.releaseNotesText}>
-            <a target="_blank" rel="noopener noreferrer" href={changeLogs?.updates[0]?.releaseNotesUrl || ''}>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={changeLogs?.updates[0]?.releaseNotesUrl || latestNewsUrl}
+            >
               {Messages.fullReleaseNotes}
             </a>
           </p>

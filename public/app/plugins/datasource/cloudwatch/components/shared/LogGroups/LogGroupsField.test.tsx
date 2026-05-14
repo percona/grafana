@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 // eslint-disable-next-line lodash/import-scope
 import lodash from 'lodash';
-import React from 'react';
 
 import { config } from '@grafana/runtime';
 
@@ -9,7 +8,7 @@ import {
   logGroupNamesVariable,
   setupMockedDataSource,
   setupMockedTemplateService,
-} from '../../../__mocks__/CloudWatchDataSource';
+} from '../../../mocks/CloudWatchDataSource';
 
 import { LogGroupsField } from './LogGroupsField';
 
@@ -29,6 +28,8 @@ describe('LogGroupSelection', () => {
       fn.cancel = () => {};
       return fn;
     });
+    // Re-mock isMonitoringAccount after resetAllMocks
+    defaultProps.datasource.resources.isMonitoringAccount = jest.fn().mockResolvedValue(false);
   });
   afterEach(() => {
     config.featureToggles.cloudWatchCrossAccountQuerying = originalFeatureToggleValue;

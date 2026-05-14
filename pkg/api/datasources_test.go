@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/grafana/grafana/pkg/api/routing"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/db/dbtest"
+	"github.com/grafana/grafana/pkg/infra/metrics/metricutil"
 	ac "github.com/grafana/grafana/pkg/services/accesscontrol"
 	"github.com/grafana/grafana/pkg/services/accesscontrol/acimpl"
 	"github.com/grafana/grafana/pkg/services/accesscontrol/actest"
@@ -81,6 +83,19 @@ func TestDataSourcesProxy_userLoggedIn(t *testing.T) {
 		}, mockSQLStore)
 }
 
+// setupDsConfigMetrics creates and registers the prometheus metrics needed for HTTPServer tests
+// that call methods using dsConfigHandlerRequestsDuration.
+func setupDsConfigHandlerMetrics() (prometheus.Registerer, *prometheus.HistogramVec) {
+	promRegister := prometheus.NewRegistry()
+	dsConfigHandlerRequestsDuration := metricutil.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: "grafana",
+		Name:      "ds_config_handler_requests_duration_seconds",
+		Help:      "Duration of requests handled by datasource configuration handlers",
+	}, []string{"handler"})
+	promRegister.MustRegister(dsConfigHandlerRequestsDuration)
+	return promRegister, dsConfigHandlerRequestsDuration
+}
+
 // Adding data sources with invalid URLs should lead to an error.
 func TestAddDataSource_InvalidURL(t *testing.T) {
 	sc := setupScenarioContext(t, "/api/datasources")
@@ -88,6 +103,7 @@ func TestAddDataSource_InvalidURL(t *testing.T) {
 		DataSourcesService: &dataSourcesServiceMock{},
 		Cfg:                setting.NewCfg(),
 	}
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 
 	sc.m.Post(sc.url, routing.Wrap(func(c *contextmodel.ReqContext) response.Response {
 		c.Req.Body = mockRequestBody(datasources.AddDataSourceCommand{
@@ -118,6 +134,7 @@ func TestAddDataSource_URLWithoutProtocol(t *testing.T) {
 		AccessControl:        acimpl.ProvideAccessControl(featuremgmt.WithFeatures()),
 		accesscontrolService: actest.FakeService{},
 	}
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 
 	sc := setupScenarioContext(t, "/api/datasources")
 
@@ -143,6 +160,7 @@ func TestAddDataSource_InvalidJSONData(t *testing.T) {
 		DataSourcesService: &dataSourcesServiceMock{},
 		Cfg:                setting.NewCfg(),
 	}
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 
 	sc := setupScenarioContext(t, "/api/datasources")
 
@@ -175,6 +193,7 @@ func TestUpdateDataSource_InvalidURL(t *testing.T) {
 		DataSourcesService: &dataSourcesServiceMock{},
 		Cfg:                setting.NewCfg(),
 	}
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 	sc := setupScenarioContext(t, "/api/datasources/1234")
 
 	sc.m.Put(sc.url, routing.Wrap(func(c *contextmodel.ReqContext) response.Response {
@@ -199,6 +218,7 @@ func TestUpdateDataSource_InvalidJSONData(t *testing.T) {
 		DataSourcesService: &dataSourcesServiceMock{},
 		Cfg:                setting.NewCfg(),
 	}
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 	sc := setupScenarioContext(t, "/api/datasources/1234")
 
 	hs.Cfg.AuthProxy.Enabled = true
@@ -222,104 +242,59 @@ func TestUpdateDataSource_InvalidJSONData(t *testing.T) {
 
 	assert.Equal(t, 400, sc.resp.Code)
 }
-
-// Using a team HTTP header whose name matches the name specified for auth proxy header should fail
-func TestUpdateDataSourceTeamHTTPHeaders_InvalidJSONData(t *testing.T) {
+func TestAddDataSourceTeamHTTPHeaders(t *testing.T) {
 	tenantID := "1234"
-	testcases := []struct {
-		desc string
-		data datasources.TeamHTTPHeaders
-		want int
-	}{
-		{
-			desc: "We should only allow for headers being X-Prom-Label-Policy",
-			data: datasources.TeamHTTPHeaders{
-				Headers: datasources.TeamHeaders{
-					tenantID: []datasources.TeamHTTPHeader{
-						{
-							Header: "Authorization",
-							Value:  "foo!=bar",
-						},
-					},
-				}},
-			want: 400,
+	hs := &HTTPServer{
+		DataSourcesService: &dataSourcesServiceMock{
+			expectedDatasource: &datasources.DataSource{},
 		},
-		{
-			desc: "Allowed header but no team id",
-			data: datasources.TeamHTTPHeaders{
-				Headers: datasources.TeamHeaders{"": []datasources.TeamHTTPHeader{
-					{
-						Header: "X-Prom-Label-Policy",
-						Value:  "foo=bar",
-					},
-				},
-				}},
-			want: 400,
-		},
-		{
-			desc: "Allowed team id and header name with invalid header values ",
-			data: datasources.TeamHTTPHeaders{
-				Headers: datasources.TeamHeaders{tenantID: []datasources.TeamHTTPHeader{
-					{
-						Header: "X-Prom-Label-Policy",
-						Value:  "Bad value",
-					},
-				},
-				}},
-			want: 400,
-		},
-		// Complete valid case, with team id, header name and header value
-		{
-			desc: "Allowed header and header values ",
-			data: datasources.TeamHTTPHeaders{
-				Headers: datasources.TeamHeaders{tenantID: []datasources.TeamHTTPHeader{
-					{
-						Header: "X-Prom-Label-Policy",
-						Value:  `1234:{ name!="value",foo!~"bar" }`,
-					},
-				},
-				}},
-			want: 200,
+		Cfg:                  setting.NewCfg(),
+		Features:             featuremgmt.WithFeatures(),
+		accesscontrolService: actest.FakeService{},
+		AccessControl: actest.FakeAccessControl{
+			ExpectedEvaluate: true,
+			ExpectedErr:      nil,
 		},
 	}
-	for _, tc := range testcases {
-		t.Run(tc.desc, func(t *testing.T) {
-			hs := &HTTPServer{
-				DataSourcesService: &dataSourcesServiceMock{
-					expectedDatasource: &datasources.DataSource{},
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
+	sc := setupScenarioContext(t, fmt.Sprintf("/api/datasources/%s", tenantID))
+	hs.Cfg.AuthProxy.Enabled = true
+
+	jsonData := simplejson.New()
+	jsonData.Set("teamHttpHeaders", datasources.TeamHTTPHeaders{
+		Headers: datasources.TeamHeaders{
+			tenantID: []datasources.AccessRule{
+				{
+					Header:   "Authorization",
+					LBACRule: "foo!=bar",
 				},
-				Cfg:                  setting.NewCfg(),
-				Features:             featuremgmt.WithFeatures(featuremgmt.FlagTeamHttpHeaders),
-				accesscontrolService: actest.FakeService{},
-				AccessControl: actest.FakeAccessControl{
-					ExpectedEvaluate: true,
-					ExpectedErr:      nil,
-				},
-			}
-			sc := setupScenarioContext(t, fmt.Sprintf("/api/datasources/%s", tenantID))
-			hs.Cfg.AuthProxy.Enabled = true
-
-			jsonData := simplejson.New()
-			jsonData.Set("teamHttpHeaders", tc.data)
-			sc.m.Put(sc.url, routing.Wrap(func(c *contextmodel.ReqContext) response.Response {
-				c.Req.Body = mockRequestBody(datasources.AddDataSourceCommand{
-					Name:     "Test",
-					URL:      "localhost:5432",
-					Access:   "direct",
-					Type:     "test",
-					JsonData: jsonData,
-				})
-				c.SignedInUser = authedUserWithPermissions(1, 1, []ac.Permission{
-					{Action: datasources.ActionPermissionsWrite, Scope: datasources.ScopeAll},
-				})
-				return hs.AddDataSource(c)
-			}))
-
-			sc.fakeReqWithParams("PUT", sc.url, map[string]string{}).exec()
-
-			assert.Equal(t, tc.want, sc.resp.Code)
+			},
+		},
+	})
+	sc.m.Put(sc.url, routing.Wrap(func(c *contextmodel.ReqContext) response.Response {
+		c.Req.Body = mockRequestBody(datasources.AddDataSourceCommand{
+			Name:     "Test",
+			URL:      "localhost:5432",
+			Access:   "direct",
+			Type:     "test",
+			JsonData: jsonData,
 		})
-	}
+		c.SignedInUser = authedUserWithPermissions(1, 1, []ac.Permission{
+			{Action: datasources.ActionPermissionsWrite, Scope: datasources.ScopeAll},
+		})
+		return hs.AddDataSource(c)
+	}))
+
+	sc.fakeReqWithParams("PUT", sc.url, map[string]string{}).exec()
+	assert.Equal(t, http.StatusForbidden, sc.resp.Code)
+
+	// Parse the JSON response
+	var response map[string]string
+	err := json.Unmarshal(sc.resp.Body.Bytes(), &response)
+	assert.NoError(t, err, "Failed to parse JSON response")
+
+	// Check the error message in the JSON response
+	assert.Equal(t, "Cannot create datasource with team HTTP headers, need to use updateDatasourceLBACRules API", response["message"])
 }
 
 // Updating data sources with URLs not specifying protocol should work.
@@ -335,6 +310,7 @@ func TestUpdateDataSource_URLWithoutProtocol(t *testing.T) {
 		AccessControl:        acimpl.ProvideAccessControl(featuremgmt.WithFeatures()),
 		accesscontrolService: actest.FakeService{},
 	}
+	hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 
 	sc := setupScenarioContext(t, "/api/datasources/1234")
 
@@ -367,7 +343,7 @@ func TestUpdateDataSourceByID_DataSourceNameExists(t *testing.T) {
 		Cfg:                  setting.NewCfg(),
 		AccessControl:        acimpl.ProvideAccessControl(featuremgmt.WithFeatures()),
 		accesscontrolService: actest.FakeService{},
-		Live:                 newTestLive(t, nil),
+		Live:                 newTestLive(t),
 	}
 
 	sc := setupScenarioContext(t, "/api/datasources/1")
@@ -474,7 +450,8 @@ func TestAPI_datasources_AccessControl(t *testing.T) {
 				hs.Cfg = setting.NewCfg()
 				hs.DataSourcesService = &dataSourcesServiceMock{expectedDatasource: &datasources.DataSource{}}
 				hs.accesscontrolService = actest.FakeService{}
-				hs.Live = newTestLive(t, hs.SQLStore)
+				hs.Live = newTestLive(t)
+				hs.promRegister, hs.dsConfigHandlerRequestsDuration = setupDsConfigHandlerMetrics()
 			})
 
 			for _, url := range tt.urls {
@@ -492,33 +469,55 @@ func TestAPI_datasources_AccessControl(t *testing.T) {
 	}
 }
 
-func TestValidateLBACHeader(t *testing.T) {
-	testcases := []struct {
-		desc            string
-		teamHeaderValue string
-		want            bool
-	}{
-		{
-			desc:            "Should allow valid header",
-			teamHeaderValue: `1234:{ name!="value",foo!~"bar" }`,
-			want:            true,
-		},
-		{
-			desc:            "Should allow valid selector",
-			teamHeaderValue: `1234:{ name!="value",foo!~"bar/baz.foo" }`,
-			want:            true,
-		},
-		{
-			desc:            "Should return false for incorrect header value",
-			teamHeaderValue: `1234:!="value",foo!~"bar" }`,
-			want:            false,
-		},
-	}
-	for _, tc := range testcases {
-		t.Run(tc.desc, func(t *testing.T) {
-			assert.Equal(t, tc.want, validateLBACHeader(tc.teamHeaderValue))
-		})
-	}
+func TestDeleteDataSourceByName_IncludesUIDForPermissions(t *testing.T) {
+	t.Run("should include UID when deleting datasource by name", func(t *testing.T) {
+		const dsName = "test-datasource"
+		const dsUID = "test-uid-12345"
+		const orgID int64 = 1
+
+		var capturedDeleteCmd *datasources.DeleteDataSourceCommand
+
+		// Mock datasource service
+		mockDsService := &dataSourcesServiceMock{
+			expectedDatasource: &datasources.DataSource{
+				Name:  dsName,
+				UID:   dsUID,
+				OrgID: orgID,
+			},
+			mockDeleteDataSource: func(ctx context.Context, cmd *datasources.DeleteDataSourceCommand) error {
+				capturedDeleteCmd = cmd
+				return nil
+			},
+		}
+
+		hs := &HTTPServer{
+			Cfg:                setting.NewCfg(),
+			pluginStore:        &pluginstore.FakePluginStore{},
+			DataSourcesService: mockDsService,
+			Live:               newTestLive(t),
+			AccessControl:      acimpl.ProvideAccessControl(featuremgmt.WithFeatures()),
+		}
+
+		// Create scenario context
+		sc := setupScenarioContext(t, "/api/datasources/name/"+dsName)
+		sc.m.Delete(sc.url, routing.Wrap(func(c *contextmodel.ReqContext) response.Response {
+			c.Req = web.SetURLParams(c.Req, map[string]string{":name": dsName})
+			c.SignedInUser = authedUserWithPermissions(orgID, 1, []ac.Permission{})
+			c.OrgID = orgID
+			return hs.DeleteDataSourceByName(c)
+		}))
+
+		sc.fakeReqWithParams("DELETE", sc.url, map[string]string{":name": dsName}).exec()
+
+		// Verify the response was successful
+		assert.Equal(t, 200, sc.resp.Code)
+
+		// Verify that DeleteDataSource was called with the UID populated
+		require.NotNil(t, capturedDeleteCmd, "DeleteDataSource should have been called")
+		assert.Equal(t, dsName, capturedDeleteCmd.Name, "Command should have datasource name")
+		assert.Equal(t, dsUID, capturedDeleteCmd.UID, "Command should have datasource UID for permissions cleanup")
+		assert.Equal(t, orgID, capturedDeleteCmd.OrgID, "Command should have correct org ID")
+	})
 }
 
 type dataSourcesServiceMock struct {
@@ -529,6 +528,7 @@ type dataSourcesServiceMock struct {
 	expectedError       error
 
 	mockUpdateDataSource func(ctx context.Context, cmd *datasources.UpdateDataSourceCommand) (*datasources.DataSource, error)
+	mockDeleteDataSource func(ctx context.Context, cmd *datasources.DeleteDataSourceCommand) error
 }
 
 func (m *dataSourcesServiceMock) GetDataSource(ctx context.Context, query *datasources.GetDataSourceQuery) (*datasources.DataSource, error) {
@@ -544,6 +544,9 @@ func (m *dataSourcesServiceMock) GetDataSourcesByType(ctx context.Context, query
 }
 
 func (m *dataSourcesServiceMock) DeleteDataSource(ctx context.Context, cmd *datasources.DeleteDataSourceCommand) error {
+	if m.mockDeleteDataSource != nil {
+		return m.mockDeleteDataSource(ctx, cmd)
+	}
 	return m.expectedError
 }
 

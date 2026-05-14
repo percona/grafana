@@ -14,6 +14,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 
+	"github.com/grafana/grafana/pkg/services/authn"
+	"github.com/grafana/grafana/pkg/services/authn/authntest"
+
 	"github.com/grafana/grafana/pkg/api/dtos"
 	"github.com/grafana/grafana/pkg/api/response"
 	"github.com/grafana/grafana/pkg/api/routing"
@@ -49,12 +52,15 @@ import (
 	"github.com/grafana/grafana/pkg/services/user/userimpl"
 	"github.com/grafana/grafana/pkg/services/user/usertest"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/grafana/grafana/pkg/util/testutil"
 	"github.com/grafana/grafana/pkg/web/webtest"
 )
 
 const newEmail = "newemail@localhost"
 
-func TestUserAPIEndpoint_userLoggedIn(t *testing.T) {
+func TestIntegrationUserAPIEndpoint_userLoggedIn(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	settings := setting.NewCfg()
 	sqlStore := db.InitTestDB(t, sqlstore.InitTestDBOpt{Cfg: settings})
 	hs := &HTTPServer{
@@ -76,7 +82,8 @@ func TestUserAPIEndpoint_userLoggedIn(t *testing.T) {
 	loggedInUserScenario(t, "When calling GET on", "api/users/1", "api/users/:id", func(sc *scenarioContext) {
 		fakeNow := time.Date(2019, 2, 11, 17, 30, 40, 0, time.UTC)
 		secretsService := secretsManager.SetupTestService(t, database.ProvideSecretsStore(sqlStore))
-		authInfoStore := authinfoimpl.ProvideStore(sqlStore, secretsService)
+		authInfoStore, err := authinfoimpl.ProvideStore(sqlStore, secretsService)
+		require.NoError(t, err)
 		srv := authinfoimpl.ProvideService(
 			authInfoStore, remotecache.NewFakeCacheStorage(), secretsService)
 		hs.authInfoService = srv
@@ -90,10 +97,11 @@ func TestUserAPIEndpoint_userLoggedIn(t *testing.T) {
 		hs.userService = userSvc
 
 		createUserCmd := user.CreateUserCommand{
-			Email:   fmt.Sprint("user", "@test.com"),
-			Name:    "user",
-			Login:   "loginuser",
-			IsAdmin: true,
+			Email:      fmt.Sprint("user", "@test.com"),
+			Name:       "user",
+			Login:      "loginuser",
+			IsAdmin:    true,
+			IsDisabled: true,
 		}
 		usr, err := userSvc.Create(context.Background(), &createUserCmd)
 		require.NoError(t, err)
@@ -130,6 +138,7 @@ func TestUserAPIEndpoint_userLoggedIn(t *testing.T) {
 			Login:          "loginuser",
 			OrgID:          1,
 			IsGrafanaAdmin: true,
+			IsDisabled:     true,
 			AuthLabels:     []string{},
 			CreatedAt:      fakeNow,
 			UpdatedAt:      fakeNow,
@@ -175,6 +184,44 @@ func TestUserAPIEndpoint_userLoggedIn(t *testing.T) {
 		require.Equal(t, http.StatusOK, sc.resp.Code)
 		err = json.Unmarshal(sc.resp.Body.Bytes(), &resp)
 		require.NoError(t, err)
+	}, mock)
+
+	// Multiple historical auth labels should appear ordered by recency
+	loggedInUserScenario(t, "When calling GET returns with multiple auth labels", "/api/users/lookup", "/api/users/lookup", func(sc *scenarioContext) {
+		createUserCmd := user.CreateUserCommand{
+			Email:   fmt.Sprint("multi", "@test.com"),
+			Name:    "multi",
+			Login:   "multi",
+			IsAdmin: true,
+		}
+		orgSvc, err := orgimpl.ProvideService(sqlStore, sc.cfg, quotatest.New(false, nil))
+		require.NoError(t, err)
+		userSvc, err := userimpl.ProvideService(
+			sqlStore, orgSvc, sc.cfg, nil, nil, tracing.InitializeTracerForTest(),
+			quotatest.New(false, nil), supportbundlestest.NewFakeBundleService(),
+		)
+		require.NoError(t, err)
+		usr, err := userSvc.Create(context.Background(), &createUserCmd)
+		require.Nil(t, err)
+
+		sc.handlerFunc = hs.GetUserByLoginOrEmail
+
+		userMock := usertest.NewUserServiceFake()
+		userMock.ExpectedUser = &user.User{ID: usr.ID, Email: usr.Email, Login: usr.Login, Name: usr.Name}
+		sc.userService = userMock
+		hs.userService = userMock
+
+		fakeAuth := &authinfotest.FakeService{ExpectedAuthModuleLabels: []string{login.GetAuthProviderLabel(login.OktaAuthModule), login.GetAuthProviderLabel(login.LDAPAuthModule), login.GetAuthProviderLabel(login.SAMLAuthModule)}}
+		hs.authInfoService = fakeAuth
+
+		sc.fakeReqWithParams("GET", sc.url, map[string]string{"loginOrEmail": usr.Email}).exec()
+
+		var resp user.UserProfileDTO
+		require.Equal(t, http.StatusOK, sc.resp.Code)
+		err = json.Unmarshal(sc.resp.Body.Bytes(), &resp)
+		require.NoError(t, err)
+		expected := []string{login.GetAuthProviderLabel(login.OktaAuthModule), login.GetAuthProviderLabel(login.LDAPAuthModule), login.GetAuthProviderLabel(login.SAMLAuthModule)}
+		require.Equal(t, expected, resp.AuthLabels)
 	}, mock)
 
 	loggedInUserScenario(t, "When calling GET on", "/api/users", "/api/users", func(sc *scenarioContext) {
@@ -242,6 +289,7 @@ func Test_GetUserByID(t *testing.T) {
 		authEnabled                  bool
 		skipOrgRoleSync              bool
 		expectedIsGrafanaAdminSynced bool
+		expectedIsExternallySynced   bool
 	}{
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = false for an externally synced OAuth user if Grafana Admin role is not synced",
@@ -250,6 +298,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      false,
 			skipOrgRoleSync:              false,
 			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   true,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = false for an externally synced OAuth user if OAuth provider is not enabled",
@@ -258,6 +307,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      true,
 			skipOrgRoleSync:              false,
 			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   false,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = false for an externally synced OAuth user if org roles are not being synced",
@@ -266,6 +316,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      true,
 			skipOrgRoleSync:              true,
 			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   false,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = true for an externally synced OAuth user",
@@ -274,6 +325,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      true,
 			skipOrgRoleSync:              false,
 			expectedIsGrafanaAdminSynced: true,
+			expectedIsExternallySynced:   true,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = false for an externally synced JWT user if Grafana Admin role is not synced",
@@ -282,6 +334,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      false,
 			skipOrgRoleSync:              false,
 			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   true,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = false for an externally synced JWT user if JWT provider is not enabled",
@@ -290,6 +343,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      true,
 			skipOrgRoleSync:              false,
 			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   false,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = false for an externally synced JWT user if org roles are not being synced",
@@ -298,6 +352,7 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      true,
 			skipOrgRoleSync:              true,
 			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   false,
 		},
 		{
 			name:                         "Should return IsGrafanaAdminExternallySynced = true for an externally synced JWT user",
@@ -306,6 +361,31 @@ func Test_GetUserByID(t *testing.T) {
 			allowAssignGrafanaAdmin:      true,
 			skipOrgRoleSync:              false,
 			expectedIsGrafanaAdminSynced: true,
+			expectedIsExternallySynced:   true,
+		},
+		{
+			name:                         "Should return IsExternallySynced = true for an externally synced SAML user",
+			authModule:                   login.SAMLAuthModule,
+			authEnabled:                  true,
+			skipOrgRoleSync:              false,
+			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   true,
+		},
+		{
+			name:                         "Should return IsExternallySynced = false for an externally synced SAML user if SAML provider is not enabled",
+			authModule:                   login.SAMLAuthModule,
+			authEnabled:                  false,
+			skipOrgRoleSync:              false,
+			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   false,
+		},
+		{
+			name:                         "Should return IsExternallySynced = false for an externally synced SAML user if  if org roles are not being synced",
+			authModule:                   login.SAMLAuthModule,
+			authEnabled:                  true,
+			skipOrgRoleSync:              true,
+			expectedIsGrafanaAdminSynced: false,
+			expectedIsExternallySynced:   false,
 		},
 	}
 	for _, tc := range testcases {
@@ -314,15 +394,28 @@ func Test_GetUserByID(t *testing.T) {
 			authInfoService := &authinfotest.FakeService{ExpectedUserAuth: userAuth}
 			socialService := &socialtest.FakeSocialService{}
 			userService := &usertest.FakeUserService{ExpectedUserProfileDTO: &user.UserProfileDTO{}}
+			authnService := &authntest.FakeService{
+				ExpectedClientConfig: &authntest.FakeSSOClientConfig{
+					ExpectedIsSkipOrgRoleSyncEnabled:         tc.skipOrgRoleSync,
+					ExpectedIsAllowAssignGrafanaAdminEnabled: tc.allowAssignGrafanaAdmin,
+				},
+				EnabledClients: []string{},
+			}
 			cfg := setting.NewCfg()
 
 			switch tc.authModule {
 			case login.GenericOAuthModule:
-				socialService.ExpectedAuthInfoProvider = &social.OAuthInfo{AllowAssignGrafanaAdmin: tc.allowAssignGrafanaAdmin, Enabled: tc.authEnabled, SkipOrgRoleSync: tc.skipOrgRoleSync}
+				if tc.authEnabled {
+					authnService.EnabledClients = []string{authn.ClientWithPrefix("generic_oauth")}
+				}
 			case login.JWTModule:
 				cfg.JWTAuth.Enabled = tc.authEnabled
 				cfg.JWTAuth.SkipOrgRoleSync = tc.skipOrgRoleSync
 				cfg.JWTAuth.AllowAssignGrafanaAdmin = tc.allowAssignGrafanaAdmin
+			case login.SAMLAuthModule:
+				if tc.authEnabled {
+					authnService.EnabledClients = []string{authn.ClientSAML}
+				}
 			}
 
 			hs := &HTTPServer{
@@ -330,6 +423,7 @@ func Test_GetUserByID(t *testing.T) {
 				authInfoService: authInfoService,
 				SocialService:   socialService,
 				userService:     userService,
+				authnService:    authnService,
 			}
 
 			sc := setupScenarioContext(t, "/api/users/1")
@@ -347,13 +441,15 @@ func Test_GetUserByID(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, tc.expectedIsGrafanaAdminSynced, resp.IsGrafanaAdminExternallySynced)
+			assert.Equal(t, tc.expectedIsExternallySynced, resp.IsExternallySynced)
 		})
 	}
 }
 
-func TestHTTPServer_UpdateUser(t *testing.T) {
+func TestIntegrationHTTPServer_UpdateUser(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	settings := setting.NewCfg()
-	settings.SAMLAuthEnabled = true
 	sqlStore := db.InitTestDB(t)
 
 	hs := &HTTPServer{
@@ -361,6 +457,9 @@ func TestHTTPServer_UpdateUser(t *testing.T) {
 		SQLStore:      sqlStore,
 		AccessControl: acmock.New(),
 		SocialService: &socialtest.FakeSocialService{ExpectedAuthInfoProvider: &social.OAuthInfo{Enabled: true}},
+		authnService: &authntest.FakeService{
+			EnabledClients: []string{authn.ClientSAML},
+		},
 	}
 
 	updateUserCommand := user.UpdateUserCommand{
@@ -410,7 +509,7 @@ func setupUpdateEmailTests(t *testing.T, cfg *setting.Cfg) (*user.User, *HTTPSer
 	require.NoError(t, err)
 
 	nsMock := notifications.MockNotificationService()
-	verifier := userimpl.ProvideVerifier(cfg, userSvc, tempUserService, nsMock, &idtest.MockService{})
+	verifier := userimpl.ProvideVerifier(cfg, userSvc, tempUserService, nsMock, &idtest.FakeService{})
 
 	hs := &HTTPServer{
 		Cfg:                 cfg,
@@ -423,7 +522,9 @@ func setupUpdateEmailTests(t *testing.T, cfg *setting.Cfg) (*user.User, *HTTPSer
 	return usr, hs, nsMock
 }
 
-func TestUser_UpdateEmail(t *testing.T) {
+func TestIntegrationUser_UpdateEmail(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	cases := []struct {
 		Name  string
 		Field user.UpdateEmailActionType
@@ -635,7 +736,7 @@ func TestUser_UpdateEmail(t *testing.T) {
 			hs.tempUserService = tempUserSvc
 			hs.NotificationService = nsMock
 			hs.SecretsService = fakes.NewFakeSecretsService()
-			hs.userVerifier = userimpl.ProvideVerifier(settings, userSvc, tempUserSvc, nsMock, &idtest.MockService{})
+			hs.userVerifier = userimpl.ProvideVerifier(settings, userSvc, tempUserSvc, nsMock, &idtest.FakeService{})
 			// User is internal
 			hs.authInfoService = &authinfotest.FakeService{ExpectedError: user.ErrUserNotFound}
 		})
@@ -1098,16 +1199,20 @@ func updateUserScenario(t *testing.T, ctx updateUserContext, hs *HTTPServer) {
 	})
 }
 
-func TestHTTPServer_UpdateSignedInUser(t *testing.T) {
+func TestIntegrationHTTPServer_UpdateSignedInUser(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	settings := setting.NewCfg()
 	sqlStore := db.InitTestDB(t)
-	settings.SAMLAuthEnabled = true
 
 	hs := &HTTPServer{
 		Cfg:           settings,
 		SQLStore:      sqlStore,
 		AccessControl: acmock.New(),
 		SocialService: &socialtest.FakeSocialService{},
+		authnService: &authntest.FakeService{
+			EnabledClients: []string{authn.ClientSAML},
+		},
 	}
 
 	updateUserCommand := user.UpdateUserCommand{

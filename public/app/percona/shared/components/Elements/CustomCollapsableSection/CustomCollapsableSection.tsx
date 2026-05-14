@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { ControlledCollapse, useTheme2 } from '@grafana/ui';
 
@@ -30,7 +30,7 @@ export const CustomCollapsableSection = ({
       bodyCustomClass={styles.collapsableBody}
       headerCustomClass={styles.collapsableHeader}
       headerLabelCustomClass={styles.collapsableHeaderLabel}
-      disabled={disabled}
+      buttonCustomClass={styles.collapsableButton}
       isOpen={isInitOpen}
     >
       {children}

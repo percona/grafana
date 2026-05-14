@@ -1,12 +1,15 @@
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { TestProvider } from 'test/helpers/TestProvider';
+import { byTestId, byText } from 'testing-library-selector';
 
 import { selectors } from '@grafana/e2e-selectors';
-import { sceneGraph, SceneRefreshPicker } from '@grafana/scenes';
-import { SaveDashboardResponseDTO } from 'app/types';
+import { config } from '@grafana/runtime';
+import { ConstantVariable, sceneGraph, SceneRefreshPicker } from '@grafana/scenes';
+import { AnnoKeyManagerKind, ManagerKind } from 'app/features/apiserver/types';
+import { SaveDashboardResponseDTO } from 'app/types/dashboard';
 
+import { DashboardSceneState } from '../scene/DashboardScene';
 import { transformSaveModelToScene } from '../serialization/transformSaveModelToScene';
 import { transformSceneToSaveModel } from '../serialization/transformSceneToSaveModel';
 
@@ -25,15 +28,21 @@ jest.mock('app/features/browse-dashboards/api/browseDashboardsAPI', () => ({
   useSaveDashboardMutation: () => [saveDashboardMutationMock],
 }));
 
+const ui = {
+  saveDashbordText: byText('Save dashboard'),
+  saveVariablesCheckbox: byTestId(selectors.pages.SaveDashboardModal.saveVariables),
+  variablesWarningAlert: byTestId(selectors.pages.SaveDashboardModal.variablesWarningAlert),
+};
+
 describe('SaveDashboardDrawer', () => {
   describe('Given an already saved dashboard', () => {
     it('should render save drawer with only message textarea', async () => {
       setup().openAndRender();
 
-      expect(await screen.findByText('Save dashboard')).toBeInTheDocument();
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
       expect(screen.queryByTestId(selectors.pages.SaveDashboardModal.saveTimerange)).not.toBeInTheDocument();
       expect(screen.getByText('No changes to save')).toBeInTheDocument();
-      expect(screen.queryByLabelText('Tab Changes')).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /Changes/ })).not.toBeInTheDocument();
     });
 
     it('When there are no changes', async () => {
@@ -48,8 +57,55 @@ describe('SaveDashboardDrawer', () => {
 
       openAndRender();
 
-      expect(await screen.findByText('Save dashboard')).toBeInTheDocument();
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
       expect(screen.queryByTestId(selectors.pages.SaveDashboardModal.saveTimerange)).toBeInTheDocument();
+    });
+
+    it('When variable changed show save variables option', async () => {
+      const { dashboard, openAndRender } = setup();
+
+      sceneGraph
+        .getVariables(dashboard)
+        .setState({ variables: [new ConstantVariable({ name: 'constant', type: 'constant', value: 'new value' })] });
+
+      openAndRender();
+
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
+      expect(ui.saveVariablesCheckbox.get()).toBeInTheDocument();
+      expect(ui.variablesWarningAlert.query()).not.toBeInTheDocument(); // the alert shouldn't show as default
+
+      // checking the checkbox shouldn't show the alert because there are no variables with errors
+      await userEvent.click(ui.saveVariablesCheckbox.get());
+      expect(ui.variablesWarningAlert.query()).not.toBeInTheDocument();
+    });
+
+    it('When variable has error show save variables warning', async () => {
+      const { dashboard, openAndRender } = setup();
+
+      sceneGraph.getVariables(dashboard).setState({
+        variables: [
+          new ConstantVariable({
+            name: 'constant',
+            type: 'constant',
+            value: 'new value',
+            error: new Error('Some error'),
+          }),
+        ],
+      });
+
+      openAndRender();
+
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
+      expect(ui.saveVariablesCheckbox.get()).toBeInTheDocument();
+      expect(ui.variablesWarningAlert.query()).not.toBeInTheDocument(); // the alert shouldn't show as default
+
+      // checking the save variables checkbox should show the alert
+      await userEvent.click(ui.saveVariablesCheckbox.get());
+      await waitFor(() => expect(ui.variablesWarningAlert.query()).toBeInTheDocument());
+
+      // unchecking the save variables checkbox should hide the alert
+      await userEvent.click(ui.saveVariablesCheckbox.get());
+      expect(ui.variablesWarningAlert.query()).not.toBeInTheDocument();
     });
 
     it('Should update diff when including time range is', async () => {
@@ -59,13 +115,13 @@ describe('SaveDashboardDrawer', () => {
 
       openAndRender();
 
-      expect(await screen.findByText('Save dashboard')).toBeInTheDocument();
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
       expect(screen.queryByTestId(selectors.pages.SaveDashboardModal.saveTimerange)).toBeInTheDocument();
-      expect(screen.queryByLabelText('Tab Changes')).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /Changes/ })).not.toBeInTheDocument();
 
       await userEvent.click(screen.getByTestId(selectors.pages.SaveDashboardModal.saveTimerange));
 
-      expect(await screen.findByLabelText('Tab Changes')).toBeInTheDocument();
+      expect(await screen.findByRole('tab', { name: /Changes/ })).toBeInTheDocument();
     });
 
     it('When refresh changed show save refresh option', async () => {
@@ -78,7 +134,7 @@ describe('SaveDashboardDrawer', () => {
 
       openAndRender();
 
-      expect(await screen.findByText('Save dashboard')).toBeInTheDocument();
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
       expect(screen.queryByTestId(selectors.pages.SaveDashboardModal.saveRefresh)).toBeInTheDocument();
     });
 
@@ -92,13 +148,13 @@ describe('SaveDashboardDrawer', () => {
 
       openAndRender();
 
-      expect(await screen.findByText('Save dashboard')).toBeInTheDocument();
+      expect(await ui.saveDashbordText.find()).toBeInTheDocument();
       expect(screen.getByTestId(selectors.pages.SaveDashboardModal.saveRefresh)).toBeInTheDocument();
-      expect(screen.queryByLabelText('Tab Changes')).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /Changes/ })).not.toBeInTheDocument();
 
       await userEvent.click(screen.getByTestId(selectors.pages.SaveDashboardModal.saveRefresh));
 
-      expect(await screen.findByLabelText('Tab Changes')).toBeInTheDocument();
+      expect(await screen.findByRole('tab', { name: /Changes/ })).toBeInTheDocument();
     });
 
     it('Can show changes', async () => {
@@ -108,7 +164,7 @@ describe('SaveDashboardDrawer', () => {
 
       openAndRender();
 
-      await userEvent.click(await screen.findByLabelText('Tab Changes'));
+      await userEvent.click(await screen.findByRole('tab', { name: /Changes/ }));
 
       expect(await screen.findByText('Full JSON diff')).toBeInTheDocument();
     });
@@ -150,6 +206,70 @@ describe('SaveDashboardDrawer', () => {
 
       const dataSent = saveDashboardMutationMock.mock.calls[1][0];
       expect(dataSent.overwrite).toEqual(true);
+    });
+  });
+
+  describe('When a dashboard is managed by an external system', () => {
+    beforeEach(() => {
+      config.featureToggles.provisioning = true;
+    });
+
+    afterEach(() => {
+      config.featureToggles.provisioning = false;
+    });
+
+    it('It should show the changes tab if the resource can be edited', async () => {
+      const { dashboard, openAndRender } = setup({
+        meta: {
+          k8s: {
+            annotations: {
+              [AnnoKeyManagerKind]: ManagerKind.Repo,
+            },
+          },
+        },
+      });
+
+      // just changing the title here, in real case scenario changes are reflected through migrations
+      // eg. panel version - same for other manager tests below
+      dashboard.setState({ title: 'updated title' });
+      openAndRender();
+
+      expect(screen.queryByRole('tab', { name: /Changes/ })).toBeInTheDocument();
+    });
+
+    it('It should not show the changes tab if the resource cannot be edited; kubectl', async () => {
+      const { dashboard, openAndRender } = setup({
+        meta: { k8s: { annotations: { [AnnoKeyManagerKind]: ManagerKind.Kubectl } } },
+      });
+
+      dashboard.setState({ title: 'updated title' });
+      openAndRender();
+
+      expect(screen.queryByRole('tab', { name: /Changes/ })).not.toBeInTheDocument();
+    });
+
+    it('It should not show the changes tab if the resource cannot be edited; terraform', async () => {
+      const { dashboard, openAndRender } = setup({
+        meta: { k8s: { annotations: { [AnnoKeyManagerKind]: ManagerKind.Terraform } } },
+      });
+
+      dashboard.setState({ title: 'updated title' });
+      openAndRender();
+
+      expect(screen.queryByRole('tab', { name: /Changes/ })).not.toBeInTheDocument();
+    });
+
+    it('It should not show the changes tab if the resource cannot be edited; plugin', async () => {
+      const { dashboard, openAndRender } = setup({
+        meta: {
+          k8s: { annotations: { [AnnoKeyManagerKind]: ManagerKind.Plugin } },
+        },
+      });
+
+      dashboard.setState({ title: 'updated title' });
+      openAndRender();
+
+      expect(screen.queryByRole('tab', { name: /Changes/ })).not.toBeInTheDocument();
     });
   });
 
@@ -200,7 +320,7 @@ function mockSaveDashboard(options: Partial<MockBackendApiOptions> = {}) {
 
 let cleanUp = () => {};
 
-function setup() {
+function setup(overrides?: Partial<DashboardSceneState>) {
   const dashboard = transformSaveModelToScene({
     dashboard: {
       title: 'hello',
@@ -208,8 +328,18 @@ function setup() {
       schemaVersion: 30,
       panels: [],
       version: 10,
+      templating: {
+        list: [
+          {
+            name: 'constant',
+            query: 'a constant value',
+            type: 'constant',
+          },
+        ],
+      },
     },
     meta: {},
+    ...overrides,
   });
 
   // Clear any data layers

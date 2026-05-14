@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import { useGrafana } from 'app/core/context/GrafanaContext';
 import { useAppNotification } from 'app/core/copy/appNotification';
-import { addListener, ExploreQueryParams, useDispatch, useSelector } from 'app/types';
+import { ExploreQueryParams } from 'app/types/explore';
+import { addListener, useDispatch, useSelector } from 'app/types/store';
 
 import { selectPanes } from '../../state/selectors';
 
@@ -11,8 +12,6 @@ import { syncFromURL } from './synchronizer/fromURL';
 import { initializeFromURL } from './synchronizer/init';
 import { syncToURL, syncToURLPredicate } from './synchronizer/toURL';
 
-export { getUrlStateFromPaneState } from './external.utils';
-
 /**
  * Bi-directionally syncs URL changes with Explore's state.
  */
@@ -20,6 +19,7 @@ export function useStateSync(params: ExploreQueryParams) {
   const { location } = useGrafana();
   const dispatch = useDispatch();
   const panesState = useSelector(selectPanes);
+  const panesStateRef = useRef(panesState);
   const orgId = useSelector((state) => state.user.orgId);
   const prevParams = useRef(params);
   const initState = useRef<'notstarted' | 'pending' | 'done'>('notstarted');
@@ -54,6 +54,10 @@ export function useStateSync(params: ExploreQueryParams) {
   }, [dispatch, location]);
 
   useEffect(() => {
+    panesStateRef.current = panesState;
+  }, [panesState]);
+
+  useEffect(() => {
     const isURLOutOfSync = prevParams.current?.panes !== params.panes;
 
     const [urlState, hasParseError] = parseURL(params);
@@ -74,7 +78,7 @@ export function useStateSync(params: ExploreQueryParams) {
     prevParams.current = params;
 
     if (isURLOutOfSync && initState.current === 'done') {
-      syncFromURL(urlState, panesState, dispatch);
+      syncFromURL(urlState, panesStateRef.current, dispatch);
     }
-  }, [dispatch, panesState, orgId, location, params, warning]);
+  }, [dispatch, orgId, location, params, warning]);
 }

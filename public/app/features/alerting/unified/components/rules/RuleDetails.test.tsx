@@ -1,27 +1,26 @@
-import React from 'react';
 import { render } from 'test/test-utils';
 import { byRole } from 'testing-library-selector';
 
 import { PluginExtensionTypes } from '@grafana/data';
-import { usePluginLinkExtensions, setBackendSrv } from '@grafana/runtime';
-import { backendSrv } from 'app/core/services/backend_srv';
+import { usePluginLinks } from '@grafana/runtime';
 import { setupMswServer } from 'app/features/alerting/unified/mockApi';
 
 import { useIsRuleEditable } from '../../hooks/useIsRuleEditable';
 import { getCloudRule, getGrafanaRule } from '../../mocks';
+import { mimirDataSource } from '../../mocks/server/configure';
 
 import { RuleDetails } from './RuleDetails';
 
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
-  usePluginLinkExtensions: jest.fn(),
+  usePluginLinks: jest.fn(),
   useReturnToPrevious: jest.fn(),
 }));
 
 jest.mock('../../hooks/useIsRuleEditable');
 
 const mocks = {
-  usePluginLinkExtensionsMock: jest.mocked(usePluginLinkExtensions),
+  usePluginLinksMock: jest.mocked(usePluginLinks),
   useIsRuleEditable: jest.mocked(useIsRuleEditable),
 };
 
@@ -34,14 +33,15 @@ const ui = {
 
 setupMswServer();
 
+const { dataSource: mimirDs } = mimirDataSource();
+
 beforeAll(() => {
-  setBackendSrv(backendSrv);
   jest.clearAllMocks();
 });
 
 beforeEach(() => {
-  mocks.usePluginLinkExtensionsMock.mockReturnValue({
-    extensions: [
+  mocks.usePluginLinksMock.mockReturnValue({
+    links: [
       {
         pluginId: 'grafana-ml-app',
         id: '1',
@@ -84,7 +84,7 @@ describe('RuleDetails RBAC', () => {
   });
 
   describe('Cloud rules action buttons', () => {
-    const cloudRule = getCloudRule({ name: 'Cloud' });
+    const cloudRule = getCloudRule({ name: 'Cloud' }, { rulesSource: mimirDs });
 
     it('Should not render Edit button for users with the update permission', async () => {
       // Arrange

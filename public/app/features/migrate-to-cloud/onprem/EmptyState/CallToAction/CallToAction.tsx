@@ -1,24 +1,27 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
+import { useCreateSessionMutation } from '@grafana/api-clients/rtkq/legacy/migrate-to-cloud';
+import { Trans } from '@grafana/i18n';
 import { Box, Button, Text } from '@grafana/ui';
-import { Trans } from 'app/core/internationalization';
-
-import { useCreateMigrationMutation } from '../../../api';
 
 import { ConnectModal } from './ConnectModal';
 
 export const CallToAction = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [createMigration, createMigrationResponse] = useCreateMigrationMutation();
+  const [createMigration, createMigrationResponse] = useCreateSessionMutation();
 
   return (
     <>
-      <Box display="flex" padding={5} gap={2} direction="column" alignItems="center" backgroundColor="secondary">
+      <Box display="flex" gap={2} direction="column" alignItems="center" backgroundColor="secondary">
         <Text variant="h3" textAlignment="center">
           <Trans i18nKey="migrate-to-cloud.cta.header">Let us manage your Grafana stack</Trans>
         </Text>
 
-        <Button disabled={createMigrationResponse.isLoading} onClick={() => setModalOpen(true)}>
+        <Button
+          data-testid="migrate-to-cloud-connect-session-modal-button"
+          disabled={createMigrationResponse.isLoading}
+          onClick={() => setModalOpen(true)}
+        >
           <Trans i18nKey="migrate-to-cloud.cta.button">Migrate this instance to Cloud</Trans>
         </Button>
       </Box>
@@ -26,7 +29,7 @@ export const CallToAction = () => {
       <ConnectModal
         isOpen={modalOpen}
         isLoading={createMigrationResponse.isLoading}
-        isError={createMigrationResponse.isError}
+        error={createMigrationResponse.error}
         onConfirm={createMigration}
         hideModal={() => setModalOpen(false)}
       />

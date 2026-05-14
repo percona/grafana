@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, fireEvent, screen, waitFor, userEvent } from 'test/test-utils';
 
-import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
+import { getRouteComponentProps } from 'app/core/navigation/mocks/routeProps';
 
 import { SignupPage } from './SignupPage';
 

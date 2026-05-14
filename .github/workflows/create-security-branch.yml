@@ -1,0 +1,46 @@
+name: Create security branch
+on:
+  # @PERCONA - disable workflow
+  workflow_dispatch:
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.branch.outputs.branch }}
+    steps:
+      - name: "Get vault secrets"
+        id: vault-secrets
+        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        with:
+          # Secrets placed in the ci/data/repo/grafana/grafana/delivery-bot-app path in Vault
+          repo_secrets: |
+            GRAFANA_DELIVERY_BOT_APP_PEM=delivery-bot-app:PRIVATE_KEY
+
+      - name: "Generate token"
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ vars.DELIVERY_BOT_APP_ID }}
+          private_key: ${{ env.GRAFANA_DELIVERY_BOT_APP_PEM }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.release_branch }}
+
+      - name: Create security branch
+        id: branch
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          INPUT_RELEASE_BRANCH: ${{ inputs.release_branch }}
+          INPUT_SECURITY_BRANCH_NUMBER: ${{ inputs.security_branch_number }}
+          INPUT_REPOSITORY: ${{ inputs.repository }}
+        run: |
+          chmod +x .github/workflows/scripts/create-security-branch/create-security-branch.sh
+          .github/workflows/scripts/create-security-branch/create-security-branch.sh

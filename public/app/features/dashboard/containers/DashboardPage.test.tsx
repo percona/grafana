@@ -1,29 +1,23 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { KBarProvider } from 'kbar';
-import React from 'react';
-import { Provider } from 'react-redux';
-import { match, Router } from 'react-router-dom';
 import { useEffectOnce } from 'react-use';
 import { mockToolkitActionCreator } from 'test/core/redux/mocks';
-import { TestProvider } from 'test/helpers/TestProvider';
-import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
+import { render } from 'test/test-utils';
 
 import { createTheme } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { config, locationService, setDataSourceSrv } from '@grafana/runtime';
+import { config, setDataSourceSrv } from '@grafana/runtime';
 import { Dashboard } from '@grafana/schema';
-import { notifyApp } from 'app/core/actions';
 import { AppChrome } from 'app/core/components/AppChrome/AppChrome';
-import { GrafanaContext } from 'app/core/context/GrafanaContext';
-import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
+import { getRouteComponentProps } from 'app/core/navigation/mocks/routeProps';
 import { RouteDescriptor } from 'app/core/navigation/types';
+import { notifyApp } from 'app/core/reducers/appNotification';
 import { HOME_NAV_ID } from 'app/core/reducers/navModel';
-import { DashboardInitPhase, DashboardMeta, DashboardRoutes } from 'app/types';
+import { DashboardInitPhase, DashboardMeta, DashboardRoutes } from 'app/types/dashboard';
 
-import { configureStore } from '../../../store/configureStore';
 import { Props as LazyLoaderProps } from '../dashgrid/LazyLoader';
 import { DashboardSrv, setDashboardSrv } from '../services/DashboardSrv';
-import { DashboardModel } from '../state';
+import { DashboardModel } from '../state/DashboardModel';
 import { createDashboardModelFixture } from '../state/__fixtures__/dashboardFixtures';
 
 import { Props, UnthemedDashboardPage } from './DashboardPage';
@@ -39,11 +33,9 @@ jest.mock('app/features/dashboard/dashgrid/LazyLoader', () => {
 });
 
 jest.mock('app/features/dashboard/components/DashboardSettings/GeneralSettings', () => {
-  class GeneralSettings extends React.Component<{}, {}> {
-    render() {
-      return <>general settings</>;
-    }
-  }
+  const GeneralSettings = () => {
+    return <>general settings</>;
+  };
 
   return { GeneralSettings };
 });
@@ -54,21 +46,18 @@ jest.mock('app/features/query/components/QueryGroup', () => {
   };
 });
 
-jest.mock('app/core/core', () => ({
+jest.mock('app/core/app_events', () => ({
   appEvents: {
     subscribe: () => {
       return { unsubscribe: () => {} };
     },
-  },
-  contextSrv: {
-    user: { orgId: 1 },
   },
 }));
 
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
   getPluginLinkExtensions: jest.fn().mockReturnValue({ extensions: [] }),
-  usePluginLinkExtensions: jest.fn().mockReturnValue({ extensions: [] }),
+  usePluginLinks: jest.fn().mockReturnValue({ links: [] }),
 }));
 
 function getTestDashboard(overrides?: Partial<Dashboard>, metaOverrides?: Partial<DashboardMeta>): DashboardModel {
@@ -96,26 +85,25 @@ const mockCleanUpDashboardAndVariables = jest.fn();
 function setup(propOverrides?: Partial<Props>) {
   config.bootData.navTree = [
     { text: 'Dashboards', id: 'dashboards/browse' },
-    { text: 'Home', id: HOME_NAV_ID },
+    { text: 'Home', id: HOME_NAV_ID, url: '/' },
     {
       text: 'Help',
       id: 'help',
     },
   ];
 
-  const store = configureStore();
   const props: Props = {
     ...getRouteComponentProps({
-      match: { params: { slug: 'my-dash', uid: '11' } } as unknown as match,
       route: { routeName: DashboardRoutes.Normal } as RouteDescriptor,
     }),
+    params: { slug: 'my-dash', uid: '11' },
     navIndex: {
       'dashboards/browse': {
         text: 'Dashboards',
         id: 'dashboards/browse',
-        parentItem: { text: 'Home', id: HOME_NAV_ID },
+        parentItem: { text: 'Home', id: HOME_NAV_ID, url: '/' },
       },
-      [HOME_NAV_ID]: { text: 'Home', id: HOME_NAV_ID },
+      [HOME_NAV_ID]: { text: 'Home', id: HOME_NAV_ID, url: '/' },
     },
     initPhase: DashboardInitPhase.NotStarted,
     initError: null,
@@ -130,29 +118,11 @@ function setup(propOverrides?: Partial<Props>) {
 
   Object.assign(props, propOverrides);
 
-  const context = getGrafanaContextMock();
-
-  const { unmount, rerender } = render(
-    <GrafanaContext.Provider value={context}>
-      <Provider store={store}>
-        <Router history={locationService.getHistory()}>
-          <UnthemedDashboardPage {...props} />
-        </Router>
-      </Provider>
-    </GrafanaContext.Provider>
-  );
+  const { unmount, rerender } = render(<UnthemedDashboardPage {...props} />);
 
   const wrappedRerender = (newProps: Partial<Props>) => {
     Object.assign(props, newProps);
-    return rerender(
-      <GrafanaContext.Provider value={context}>
-        <Provider store={store}>
-          <Router history={locationService.getHistory()}>
-            <UnthemedDashboardPage {...props} />
-          </Router>
-        </Provider>
-      </GrafanaContext.Provider>
-    );
+    return rerender(<UnthemedDashboardPage {...props} />);
   };
 
   return { rerender: wrappedRerender, unmount };
@@ -190,9 +160,9 @@ describe('DashboardPage', () => {
     it('only calls initDashboard once when wrapped in AppChrome', async () => {
       const props: Props = {
         ...getRouteComponentProps({
-          match: { params: { slug: 'my-dash', uid: '11' } } as unknown as match,
           route: { routeName: DashboardRoutes.Normal } as RouteDescriptor,
         }),
+        params: { slug: 'my-dash', uid: '11' },
         navIndex: {
           'dashboards/browse': {
             text: 'Dashboards',
@@ -214,11 +184,9 @@ describe('DashboardPage', () => {
 
       render(
         <KBarProvider>
-          <TestProvider>
-            <AppChrome>
-              <UnthemedDashboardPage {...props} />
-            </AppChrome>
-          </TestProvider>
+          <AppChrome>
+            <UnthemedDashboardPage {...props} />
+          </AppChrome>
         </KBarProvider>
       );
 
@@ -230,6 +198,7 @@ describe('DashboardPage', () => {
   describe('When going into view mode', () => {
     beforeEach(() => {
       setDataSourceSrv({
+        registerRuntimeDataSource: jest.fn(),
         get: jest.fn().mockResolvedValue({ getRef: jest.fn(), query: jest.fn().mockResolvedValue([]) }),
         getInstanceSettings: jest.fn().mockReturnValue({ meta: {} }),
         getList: jest.fn(),
@@ -296,7 +265,7 @@ describe('DashboardPage', () => {
       const { rerender } = setup();
       rerender({ dashboard: getTestDashboard() });
       rerender({
-        match: { params: { uid: 'new-uid' } } as unknown as match,
+        params: { uid: 'new-uid' },
         dashboard: getTestDashboard({ title: 'Another dashboard' }),
       });
       await waitFor(() => {

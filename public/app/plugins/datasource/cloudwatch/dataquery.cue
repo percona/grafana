@@ -56,7 +56,7 @@ composableKinds: DataQuery: {
 
 					// Whether a query is a Metrics, Logs, or Annotations query
 					queryMode?: #CloudWatchQueryMode
-					// Whether to use a metric search or metric query. Metric query is referred to as "Metrics Insights" in the AWS console.
+					// Whether to use a metric search or metric insights query
 					metricQueryType?: #MetricQueryType
 					// Whether to use the query builder or code editor to create the query
 					metricEditorMode?: #MetricEditorMode
@@ -69,14 +69,14 @@ composableKinds: DataQuery: {
 					label?: string
 					// Math expression query
 					expression?: string
-					// When the metric query type is `metricQueryType` is set to `Query`, this field is used to specify the query string.
+					// When the metric query type is set to `Insights`, this field is used to specify the query string.
 					sqlExpression?: string
-					// When the metric query type is `metricQueryType` is set to `Query` and the `metricEditorMode` is set to `Builder`, this field is used to build up an object representation of a SQL query.
+					// When the metric query type is set to `Insights` and the `metricEditorMode` is set to `Builder`, this field is used to build up an object representation of a SQL query.
 					sql?: #SQLExpression
 				} @cuetsy(kind="interface")
 
 				#CloudWatchQueryMode: "Metrics" | "Logs" | "Annotations" @cuetsy(kind="type")
-				#MetricQueryType:     0 | 1                              @cuetsy(kind="enum", memberNames="Search|Query")
+				#MetricQueryType:     0 | 1                              @cuetsy(kind="enum", memberNames="Search|Insights")
 				#MetricEditorMode:    0 | 1                              @cuetsy(kind="enum", memberNames="Builder|Code")
 				#SQLExpression: {
 					// SELECT part of the SQL expression
@@ -146,6 +146,12 @@ composableKinds: DataQuery: {
 				} @cuetsy(kind="interface")
 
 				#QueryEditorExpression: #QueryEditorArrayExpression | #QueryEditorPropertyExpression | #QueryEditorGroupByExpression | #QueryEditorFunctionExpression | #QueryEditorFunctionParameterExpression | #QueryEditorOperatorExpression @cuetsy(kind="type")
+				#LogsMode: "Insights" | "Anomalies" @cuetsy(kind="enum")
+				#LogsQueryLanguage: "CWLI" | "SQL" | "PPL" @cuetsy(kind="enum")
+				// Log group selection scope - determines how log groups are selected for the query
+				#LogsQueryScope: "logGroupName" | "namePrefix" | "allLogGroups" @cuetsy(kind="type")
+				// Log group class filter
+				#LogGroupClass: "STANDARD" | "INFREQUENT_ACCESS" @cuetsy(kind="type")
 
 				// Shape of a CloudWatch Logs query
 				#CloudWatchLogsQuery: {
@@ -153,6 +159,8 @@ composableKinds: DataQuery: {
 
 					// Whether a query is a Metrics, Logs, or Annotations query
 					queryMode: #CloudWatchQueryMode
+					// Whether a query is a Logs Insights or Log Anomalies query
+					logsMode?: #LogsMode
 					id:        string
 					// AWS region to query for the logs
 					region: string
@@ -164,7 +172,36 @@ composableKinds: DataQuery: {
 					logGroups?: [...#LogGroup]
 					// @deprecated use logGroups
 					logGroupNames?: [...string]
+
+					// Language used for querying logs, can be CWLI, SQL, or PPL. If empty, the default language is CWLI.
+					queryLanguage?: #LogsQueryLanguage
+
+					// Log group selection scope - determines how log groups are selected for the query
+					logsQueryScope?: #LogsQueryScope
+					// Log group name prefixes for namePrefix scope mode (max 5)
+					logGroupPrefixes?: [...string]
+					// Log group class filter for namePrefix and allLogGroups scope modes
+					logGroupClass?: #LogGroupClass
+					// Selected account IDs for cross-account queries (max 20)
+					selectedAccountIds?: [...string]
 				} @cuetsy(kind="interface")
+
+				// Shape of a Cloudwatch Log Anomalies query
+				#CloudWatchLogsAnomaliesQuery: {
+					common.DataQuery
+					id:        string
+					// AWS region to query for the logs
+					region: string
+					// Whether a query is a Metrics, Logs or Annotations query
+					queryMode?: #CloudWatchQueryMode
+					// Whether a query is a Logs Insights or Log Anomalies query
+					logsMode?: #LogsMode
+					// Filter to return only anomalies that are 'SUPPRESSED', 'UNSUPPRESSED', or 'ALL' (default)
+					suppressionState?: string
+					// Used to filter only the anomalies found by a certain anomaly detector
+					anomalyDetectionARN?: string
+				} @cuetsy(kind="interface")
+
 				#LogGroup: {
 					// ARN of the log group
 					arn: string

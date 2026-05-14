@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
@@ -18,9 +18,9 @@ const TemplateFiltersField: FC = () => {
   } = useFormContext();
   const filterOptions: Array<SelectableValue<AlertRuleFilterType>> = useMemo(
     () =>
-      Object.entries(AlertRuleFilterType).map(([, value]) => ({
-        label: value,
-        value: value,
+      Object.entries(AlertRuleFilterType).map(([label, value]) => ({
+        label,
+        value,
       })),
     []
   );

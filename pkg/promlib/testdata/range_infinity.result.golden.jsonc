@@ -4,14 +4,15 @@
 //      "type": "timeseries-multi",
 //      "typeVersion": [
 //          0,
-//          0
+//          1
 //      ],
 //      "custom": {
+//          "calculatedMinStep": 1000,
 //          "resultType": "matrix"
 //      },
 //      "executedQueryString": "Expr: 1 / 0\nStep: 1s"
 //  }
-//  Name: 1 / 0
+//  Name: 
 //  Dimensions: 2 Fields by 3 Rows
 //  +-------------------------------+-----------------+
 //  | Name: Time                    | Name: Value     |
@@ -30,14 +31,14 @@
   "frames": [
     {
       "schema": {
-        "name": "1 / 0",
         "meta": {
           "type": "timeseries-multi",
           "typeVersion": [
             0,
-            0
+            1
           ],
           "custom": {
+            "calculatedMinStep": 1000,
             "resultType": "matrix"
           },
           "executedQueryString": "Expr: 1 / 0\nStep: 1s"

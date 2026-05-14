@@ -1,7 +1,6 @@
 import uPlot, { Axis, AlignedData, Scale } from 'uplot';
 
-import { DataFrame, dateTimeFormat, GrafanaTheme2, systemDateFormats, TimeZone } from '@grafana/data';
-import { alpha } from '@grafana/data/src/themes/colorManipulator';
+import { colorManipulator, DataFrame, dateTimeFormat, GrafanaTheme2, systemDateFormats, TimeZone } from '@grafana/data';
 import {
   StackingMode,
   VisibilityMode,
@@ -11,8 +10,7 @@ import {
   VizLegendOptions,
 } from '@grafana/schema';
 import { measureText } from '@grafana/ui';
-import { timeUnitSize } from '@grafana/ui/src/components/uPlot/config/UPlotAxisBuilder';
-import { StackingGroup, preparePlotData2 } from '@grafana/ui/src/components/uPlot/utils';
+import { timeUnitSize, StackingGroup, preparePlotData2 } from '@grafana/ui/internal';
 
 const intervals = systemDateFormats.interval;
 
@@ -399,7 +397,7 @@ export function getConfig(opts: BarsOptions, theme: GrafanaTheme2) {
           // Calculate final co-ordinates for text position
           const x =
             u.bbox.left + (isXHorizontal ? lft + wid / 2 : value < 0 ? lft - labelOffset : lft + wid + labelOffset);
-          const y =
+          let y =
             u.bbox.top +
             (isXHorizontal ? (value < 0 ? top + hgt + labelOffset : top - labelOffset) : top + hgt / 2 - middleShift);
 
@@ -434,6 +432,11 @@ export function getConfig(opts: BarsOptions, theme: GrafanaTheme2) {
 
             // Adjust for baseline being "right" in the x direction
             xAdjust = value < 0 ? textMetrics.width * scaleFactor : 0;
+          }
+
+          // Force label bounding box y position to not be negative
+          if (y - yAdjust < 0) {
+            y = yAdjust;
           }
 
           // Construct final bounding box for the label text
@@ -541,7 +544,8 @@ export function getConfig(opts: BarsOptions, theme: GrafanaTheme2) {
         });
 
         barsColors.push({
-          fill: fillOpacity < 1 ? colors.map((c) => (c != null ? alpha(c, fillOpacity) : null)) : colors,
+          fill:
+            fillOpacity < 1 ? colors.map((c) => (c != null ? colorManipulator.alpha(c, fillOpacity) : null)) : colors,
           stroke: colors,
         });
       }

@@ -1,5 +1,4 @@
 import debounce from 'debounce-promise';
-import React from 'react';
 
 import { SelectableValue, toOption } from '@grafana/data';
 import { Select, Input, InlineFormLabel, AsyncSelect, Stack, InlineLabel } from '@grafana/ui';
@@ -32,7 +31,7 @@ export function MetricSection({ query, onChange, onRunQuery, suggestMetrics, agg
           placeholder="Metric name"
           allowCustomValue
           loadOptions={metricSearch}
-          defaultOptions={[]}
+          defaultOptions={true}
           onChange={({ value }) => {
             if (value) {
               onChange({ ...query, metric: value });

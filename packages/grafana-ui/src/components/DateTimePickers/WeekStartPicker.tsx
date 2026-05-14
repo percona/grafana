@@ -1,13 +1,14 @@
-import React, { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { SelectableValue } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 
-import { Select } from '../Select/Select';
+import { Combobox } from '../Combobox/Combobox';
+import { ComboboxOption } from '../Combobox/types';
 
 export interface Props {
-  onChange: (weekStart: string) => void;
-  value: string;
+  onChange: (weekStart?: WeekStart) => void;
+  value?: WeekStart;
   width?: number;
   autoFocus?: boolean;
   onBlur?: () => void;
@@ -15,32 +16,61 @@ export interface Props {
   inputId?: string;
 }
 
-const weekStarts: Array<SelectableValue<string>> = [
-  { value: '', label: 'Default' },
-  { value: 'saturday', label: 'Saturday' },
-  { value: 'sunday', label: 'Sunday' },
-  { value: 'monday', label: 'Monday' },
-];
+export type WeekStart = 'saturday' | 'sunday' | 'monday';
 
+export function isWeekStart(value: string): value is WeekStart {
+  return ['saturday', 'sunday', 'monday'].includes(value);
+}
+
+/**
+ * Returns the system or user defined week start (as defined in bootData)
+ * Or you can pass in an override weekStart string and have it be validated and returned as WeekStart type if valid
+ */
+export function getWeekStart(override?: string): WeekStart {
+  if (override && isWeekStart(override)) {
+    return override;
+  }
+
+  const preference = window?.grafanaBootData?.user?.weekStart;
+  if (preference && isWeekStart(preference)) {
+    return preference;
+  }
+
+  return 'monday';
+}
+
+/**
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/date-time-pickers-weekstartpicker--docs
+ */
 export const WeekStartPicker = (props: Props) => {
   const { onChange, width, autoFocus = false, onBlur, value, disabled = false, inputId } = props;
+  const weekStarts: ComboboxOption[] = useMemo(
+    () => [
+      { value: '', label: t('grafana-ui.week-start-picker.weekStarts-label-default', 'Default') },
+      { value: 'saturday', label: t('grafana-ui.week-start-picker.weekStarts-label-saturday', 'Saturday') },
+      { value: 'sunday', label: t('grafana-ui.week-start-picker.weekStarts-label-sunday', 'Sunday') },
+      { value: 'monday', label: t('grafana-ui.week-start-picker.weekStarts-label-monday', 'Monday') },
+    ],
+    []
+  );
 
   const onChangeWeekStart = useCallback(
-    (selectable: SelectableValue<string>) => {
-      if (selectable.value !== undefined) {
-        onChange(selectable.value);
+    (selectable: ComboboxOption | null) => {
+      if (selectable && selectable.value !== undefined) {
+        onChange(isWeekStart(selectable.value) ? selectable.value : undefined);
       }
     },
     [onChange]
   );
 
+  const selected = useMemo(() => weekStarts.find((item) => item.value === value)?.value ?? '', [value, weekStarts]);
+
   return (
-    <Select
-      inputId={inputId}
-      value={weekStarts.find((item) => item.value === value)?.value}
+    <Combobox
+      id={inputId}
+      value={selected}
       placeholder={selectors.components.WeekStartPicker.placeholder}
       autoFocus={autoFocus}
-      openMenuOnFocus={true}
       width={width}
       options={weekStarts}
       onChange={onChangeWeekStart}

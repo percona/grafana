@@ -1,79 +1,97 @@
-import { render } from '@testing-library/react';
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { render, screen } from '@testing-library/react';
 
-import { PluginSignatureStatus } from '@grafana/data';
+import { PluginSignatureStatus, PluginSignatureType, PluginType } from '@grafana/data';
 import { config } from '@grafana/runtime';
 
-import { CatalogPlugin, PluginListDisplayMode } from '../types';
+import { CatalogPlugin } from '../types';
 
 import { PluginList } from './PluginList';
 
-jest.mock('react-router-dom', () => ({
-  useLocation: jest.fn(),
-}));
+jest.mock('react-router-dom-v5-compat', () => ({ useLocation: jest.fn(), useSearchParams: jest.fn() }));
 
-jest.mock('@grafana/runtime', () => ({
-  ...jest.requireActual('@grafana/runtime'),
-  config: {
-    appSubUrl: '',
-  },
-}));
+const mockUseLocation = jest.requireMock('react-router-dom-v5-compat').useLocation;
+const mockUseSearchParams = jest.requireMock('react-router-dom-v5-compat').useSearchParams;
 
-const useLocationMock = useLocation as jest.Mock;
-
-const getMockPlugin = (id: string): CatalogPlugin => {
-  return {
-    description: 'The test plugin',
-    downloads: 5,
-    id,
-    info: {
-      logos: {
-        small: 'https://grafana.com/api/plugins/test-plugin/versions/0.0.10/logos/small',
-        large: 'https://grafana.com/api/plugins/test-plugin/versions/0.0.10/logos/large',
-      },
-      keywords: ['test', 'plugin'],
-    },
-    name: 'Testing Plugin',
-    orgName: 'Test',
-    popularity: 0,
-    signature: PluginSignatureStatus.valid,
-    publishedAt: '2020-09-01',
-    updatedAt: '2021-06-28',
-    hasUpdate: false,
-    isInstalled: false,
-    isCore: false,
-    isDev: false,
-    isEnterprise: false,
-    isDisabled: false,
-    isDeprecated: false,
-    isPublished: true,
-  };
+const mockPlugin: CatalogPlugin = {
+  description: 'Test plugin description',
+  downloads: 1000,
+  hasUpdate: false,
+  id: 'test-plugin',
+  info: { logos: { small: 'small-logo-url', large: 'large-logo-url' }, keywords: ['test', 'plugin'] },
+  isDev: false,
+  isCore: false,
+  isEnterprise: false,
+  isInstalled: true,
+  isDisabled: false,
+  isDeprecated: false,
+  isManaged: false,
+  isPreinstalled: { found: false, withVersion: false },
+  isPublished: true,
+  name: 'Test Plugin',
+  orgName: 'Test Org',
+  signature: PluginSignatureStatus.valid,
+  signatureType: PluginSignatureType.grafana,
+  signatureOrg: 'Test Signature Org',
+  popularity: 4,
+  publishedAt: '2023-01-01',
+  type: PluginType.app,
+  updatedAt: '2023-12-01',
+  installedVersion: '1.0.0',
+  angularDetected: false,
+  isFullyInstalled: true,
+  accessControl: {},
 };
 
-const plugins = [getMockPlugin('test1'), getMockPlugin('test2'), getMockPlugin('test3')];
+const mockPlugin2: CatalogPlugin = {
+  ...mockPlugin,
+  id: 'test-plugin-2',
+  name: 'Test Plugin 2',
+  type: PluginType.datasource,
+};
+
 describe('PluginList', () => {
-  beforeAll(() => {
-    useLocationMock.mockImplementation(() => ({
-      pathname: '/plugins',
-    }));
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseLocation.mockReturnValue({ pathname: '/plugins' });
+    mockUseSearchParams.mockReturnValue([new URLSearchParams(), jest.fn()]);
+    config.appSubUrl = '';
   });
 
-  it('renders a plugin list', () => {
-    const result = render(<PluginList plugins={plugins} displayMode={PluginListDisplayMode.List} />);
-    expect(result.getByTestId('plugin-list')).toBeTruthy();
-    const links = result.getAllByRole('link');
-    for (const link of links) {
-      expect(link).toHaveAttribute('href', expect.stringMatching(/^\/plugins\/test\d/));
-    }
+  afterEach(() => {
+    jest.clearAllMocks();
   });
-  it('renders a plugin list with a subAppUrl', () => {
-    config.appSubUrl = 'test-sub-url';
-    const result = render(<PluginList plugins={plugins} displayMode={PluginListDisplayMode.List} />);
-    expect(result.getByTestId('plugin-list')).toBeTruthy();
-    const links = result.getAllByRole('link');
-    for (const link of links) {
-      expect(link).toHaveAttribute('href', expect.stringMatching(/^test-sub-url\/plugins\/test\d/));
-    }
+
+  it('should render plugins when not loading and plugins exist', () => {
+    const plugins = [mockPlugin, mockPlugin2];
+    render(<PluginList plugins={plugins} isLoading={false} />);
+
+    expect(screen.getByTestId('plugin-list')).toBeInTheDocument();
+    expect(screen.getByText('Test Plugin')).toBeInTheDocument();
+    expect(screen.getByText('Test Plugin 2')).toBeInTheDocument();
+  });
+
+  it('should show "All plugins are up to date" message when filterBy=has-update and no plugins', () => {
+    mockUseSearchParams.mockReturnValue([new URLSearchParams('filterBy=has-update'), jest.fn()]);
+
+    render(<PluginList plugins={[]} isLoading={false} />);
+
+    expect(screen.getByText('All plugins are up to date')).toBeInTheDocument();
+  });
+
+  it('should show "No plugins found" message when filterBy=all and not loading', () => {
+    mockUseSearchParams.mockReturnValue([new URLSearchParams('filterBy=all'), jest.fn()]);
+
+    render(<PluginList plugins={[]} isLoading={false} />);
+
+    expect(screen.getByText('No plugins found')).toBeInTheDocument();
+  });
+
+  it('should not show empty state when filterBy=has-update but plugins exist', () => {
+    mockUseSearchParams.mockReturnValue([new URLSearchParams('filterBy=has-update'), jest.fn()]);
+
+    render(<PluginList plugins={[mockPlugin]} isLoading={false} />);
+
+    expect(screen.queryByText('All plugins are up to date')).not.toBeInTheDocument();
+    expect(screen.getByText('Test Plugin')).toBeInTheDocument();
   });
 });

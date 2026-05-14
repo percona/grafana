@@ -1,0 +1,33 @@
+name: PR Checks
+on:
+  # @PERCONA - disable workflow
+  workflow_dispatch:
+concurrency:
+  group: pr-checks-${{ github.event.number }}
+
+permissions:
+  statuses: write
+  checks: write
+  actions: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout Actions
+        uses: actions/checkout@v5
+        with:
+          repository: "grafana/grafana-github-actions"
+          path: ./actions
+          ref: main
+          persist-credentials: false
+      - name: Install Actions
+        run: npm install --production --prefix ./actions
+      - name: Run PR Checks
+        uses: ./actions/pr-checks
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          configPath: pr-checks

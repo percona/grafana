@@ -5,6 +5,7 @@ export enum Databases {
   mariadb = 'mariadb',
   proxysql = 'proxysql',
   haproxy = 'haproxy',
+  valkey = 'valkey',
 }
 
 export enum ApiErrorCode {
@@ -75,12 +76,6 @@ export interface PrioritizedLabels {
   secondary: string[];
 }
 
-export interface ServerInfo {
-  serverName: string;
-  serverId: string;
-  serverTelemetryId: string;
-}
-
 export enum Severity {
   SEVERITY_EMERGENCY = 'Emergency',
   SEVERITY_ALERT = 'Alert',
@@ -105,8 +100,8 @@ export enum AlertRuleParamType {
 }
 
 export enum AlertRuleFilterType {
-  MATCH = 'MATCH',
-  MISMATCH = 'MISMATCH',
+  MATCH = 'FILTER_TYPE_MATCH',
+  MISMATCH = 'FILTER_TYPE_MISMATCH',
 }
 
 export type AlertRulesParsedParam = TemplateParam & { value: string | boolean | number };

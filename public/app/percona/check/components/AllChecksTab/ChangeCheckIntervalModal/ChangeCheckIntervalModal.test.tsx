@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
 
 import { CheckDetails } from 'app/percona/check/types';
 
@@ -19,7 +18,7 @@ const TEST_CHECK: CheckDetails = {
   name: 'test',
   interval: 'ADVISOR_CHECK_INTERVAL_STANDARD',
   description: 'test description',
-  disabled: false,
+  enabled: true,
   category: '',
   family: 'ADVISOR_CHECK_FAMILY_MONGODB',
 };

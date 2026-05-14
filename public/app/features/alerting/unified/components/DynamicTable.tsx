@@ -1,8 +1,10 @@
 import { css, cx } from '@emotion/css';
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 import { IconButton, Pagination, useStyles2 } from '@grafana/ui';
 
 import { usePagination } from '../hooks/usePagination';
@@ -14,7 +16,9 @@ interface DynamicTablePagination {
 
 export interface DynamicTableColumnProps<T = unknown> {
   id: string | number;
+  /** Column header to display */
   label: string;
+  alignColumn?: 'end' | string;
 
   renderCell: (item: DynamicTableItemProps<T>, index: number) => ReactNode;
   size?: number | string;
@@ -40,7 +44,6 @@ export interface DynamicTableProps<T = unknown> {
   onCollapse?: (item: DynamicTableItemProps<T>) => void;
   onExpand?: (item: DynamicTableItemProps<T>) => void;
   isExpanded?: (item: DynamicTableItemProps<T>) => boolean;
-
   renderExpandedContent?: (
     item: DynamicTableItemProps<T>,
     index: number,
@@ -105,9 +108,9 @@ export const DynamicTable = <T extends object>({
       <div className={styles.container} data-testid={dataTestId ?? 'dynamic-table'}>
         <div className={styles.row} data-testid="header">
           {renderPrefixHeader && renderPrefixHeader()}
-          {isExpandable && <div className={styles.cell} />}
+          {isExpandable && <div className={styles.cell()} />}
           {cols.map((col) => (
-            <div className={styles.cell} key={col.id}>
+            <div className={styles.cell(col.alignColumn)} key={col.id}>
               {col.label}
             </div>
           ))}
@@ -123,9 +126,13 @@ export const DynamicTable = <T extends object>({
             >
               {renderPrefixCell && renderPrefixCell(item, index, items)}
               {isExpandable && (
-                <div className={cx(styles.cell, styles.expandCell)}>
+                <div className={cx(styles.cell(), styles.expandCell)}>
                   <IconButton
-                    tooltip={`${isItemExpanded ? 'Collapse' : 'Expand'} row`}
+                    tooltip={
+                      isItemExpanded
+                        ? t('alerting.dynamic-table.tooltip-collapse-row', 'Collapse row')
+                        : t('alerting.dynamic-table.tooltip-expand-row', 'Expand row')
+                    }
                     data-testid={selectors.components.AlertRules.toggle}
                     name={isItemExpanded ? 'angle-down' : 'angle-right'}
                     onClick={() => toggleExpanded(item)}
@@ -134,7 +141,7 @@ export const DynamicTable = <T extends object>({
               )}
               {cols.map((col) => (
                 <div
-                  className={cx(styles.cell, styles.bodyCell, col.className)}
+                  className={cx(styles.cell(col.alignColumn), styles.bodyCell, col.className)}
                   data-column={col.label}
                   key={`${item.id}-${col.id}`}
                 >
@@ -229,16 +236,18 @@ const getStyles = <T extends unknown>(
       display: 'flex',
       padding: theme.spacing(1),
     }),
-    cell: css({
-      display: 'flex',
-      alignItems: 'center',
-      padding: theme.spacing(1),
+    cell: (alignColumn?: string) =>
+      css({
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(1),
+        justifyContent: alignColumn || 'initial',
 
-      [theme.breakpoints.down('sm')]: {
-        padding: `${theme.spacing(1)} 0`,
-        gridTemplateColumns: '1fr',
-      },
-    }),
+        [theme.breakpoints.down('sm')]: {
+          padding: `${theme.spacing(1)} 0`,
+          gridTemplateColumns: '1fr',
+        },
+      }),
     bodyCell: css({
       overflow: 'hidden',
       // @PERCONA

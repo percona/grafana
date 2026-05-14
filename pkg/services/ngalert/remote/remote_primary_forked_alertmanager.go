@@ -2,12 +2,18 @@ package remote
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	alertingModels "github.com/grafana/alerting/models"
 	alertingNotify "github.com/grafana/alerting/notify"
 
+	"github.com/grafana/grafana/pkg/infra/kvstore"
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/infra/tracing"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
+	"github.com/grafana/grafana/pkg/services/ngalert/metrics"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier"
 )
@@ -19,7 +25,41 @@ type RemotePrimaryForkedAlertmanager struct {
 	remote   remoteAlertmanager
 }
 
-func NewRemotePrimaryForkedAlertmanager(log log.Logger, internal notifier.Alertmanager, remote remoteAlertmanager) *RemotePrimaryForkedAlertmanager {
+// NewRemotePrimaryFactory returns a function to override the default AM factory in the multi-org Alertmanager.
+func NewRemotePrimaryFactory(
+	cfg AlertmanagerConfig,
+	store kvstore.KVStore,
+	crypto Crypto,
+	autogenFn AutogenFn,
+	m *metrics.RemoteAlertmanager,
+	t tracing.Tracer,
+	features featuremgmt.FeatureToggles,
+) func(notifier.OrgAlertmanagerFactory) notifier.OrgAlertmanagerFactory {
+	return func(factoryFn notifier.OrgAlertmanagerFactory) notifier.OrgAlertmanagerFactory {
+		return func(ctx context.Context, orgID int64) (notifier.Alertmanager, error) {
+			// Create the internal Alertmanager.
+			internalAM, err := factoryFn(ctx, orgID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Create the remote Alertmanager.
+			cfg.OrgID = orgID
+			cfg.PromoteConfig = true
+			l := log.New("ngalert.forked-alertmanager.remote-primary")
+			remoteAM, err := NewAlertmanager(ctx, cfg, notifier.NewFileStore(cfg.OrgID, store), crypto, autogenFn, m, t, features)
+			if err != nil {
+				l.Error("Failed to create remote Alertmanager, falling back to using only the internal one", "err", err)
+				return internalAM, nil
+			}
+
+			// Use both implementations in the forked Alertmanager.
+			return newRemotePrimaryForkedAlertmanager(l, internalAM, remoteAM), nil
+		}
+	}
+}
+
+func newRemotePrimaryForkedAlertmanager(log log.Logger, internal notifier.Alertmanager, remote remoteAlertmanager) *RemotePrimaryForkedAlertmanager {
 	return &RemotePrimaryForkedAlertmanager{
 		log:      log,
 		internal: internal,
@@ -72,16 +112,30 @@ func (fam *RemotePrimaryForkedAlertmanager) GetStatus(ctx context.Context) (apim
 }
 
 func (fam *RemotePrimaryForkedAlertmanager) CreateSilence(ctx context.Context, silence *apimodels.PostableSilence) (string, error) {
-	uid, err := fam.remote.CreateSilence(ctx, silence)
+	originalID := silence.ID
+	id, err := fam.remote.CreateSilence(ctx, silence)
 	if err != nil {
 		return "", err
 	}
 
-	silence.ID = uid
+	if originalID != "" && originalID != id {
+		// ID has changed, expire the old silence before creating a new one.
+		if err := fam.internal.DeleteSilence(ctx, originalID); err != nil {
+			if errors.Is(err, alertingNotify.ErrSilenceNotFound) {
+				// This can happen if the silence was created in the remote AM without using the Grafana UI
+				// in remote primary mode, or if the silence failed to be replicated in the internal AM.
+				fam.log.Warn("Failed to delete silence in the internal Alertmanager", "err", err, "id", originalID)
+			} else {
+				fam.log.Error("Failed to delete silence in the internal Alertmanager", "err", err, "id", originalID)
+			}
+		}
+	}
+
+	silence.ID = id
 	if _, err := fam.internal.CreateSilence(ctx, silence); err != nil {
 		fam.log.Error("Error creating silence in the internal Alertmanager", "err", err, "silence", silence)
 	}
-	return uid, nil
+	return id, nil
 }
 
 func (fam *RemotePrimaryForkedAlertmanager) DeleteSilence(ctx context.Context, id string) error {
@@ -118,8 +172,12 @@ func (fam *RemotePrimaryForkedAlertmanager) GetReceivers(ctx context.Context) ([
 	return fam.remote.GetReceivers(ctx)
 }
 
-func (fam *RemotePrimaryForkedAlertmanager) TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*notifier.TestReceiversResult, error) {
+func (fam *RemotePrimaryForkedAlertmanager) TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*alertingNotify.TestReceiversResult, int, error) {
 	return fam.remote.TestReceivers(ctx, c)
+}
+
+func (fam *RemotePrimaryForkedAlertmanager) TestIntegration(ctx context.Context, receiverName string, integrationConfig models.Integration, alert alertingModels.TestReceiversConfigAlertParams) (alertingModels.IntegrationStatus, error) {
+	return fam.remote.TestIntegration(ctx, receiverName, integrationConfig, alert)
 }
 
 func (fam *RemotePrimaryForkedAlertmanager) TestTemplate(ctx context.Context, c apimodels.TestTemplatesConfigBodyParams) (*notifier.TestTemplatesResults, error) {

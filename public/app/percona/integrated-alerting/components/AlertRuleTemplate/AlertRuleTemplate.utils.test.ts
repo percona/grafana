@@ -51,6 +51,5 @@ describe('AlertRuleTemplatesTable utils', () => {
 
   test('formatSource', () => {
     expect(formatSource(SourceDescription.BUILT_IN)).toBe(SOURCE_MAP.TEMPLATE_SOURCE_BUILT_IN);
-    expect(formatSource(SourceDescription.SAAS)).toBe(SOURCE_MAP.TEMPLATE_SOURCE_SAAS);
   });
 });

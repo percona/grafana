@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import { DerivedFields } from './DerivedFields';
 
@@ -45,7 +44,7 @@ describe('DerivedFields', () => {
     const onChange = jest.fn();
     render(<DerivedFields fields={testFields} onChange={onChange} />);
 
-    await userEvent.click((await screen.findAllByTitle('Remove field'))[0]);
+    await userEvent.click((await screen.findAllByLabelText('Remove field'))[0]);
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith([testFields[1]]));
   });

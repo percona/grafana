@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unsafe"
 
+	alertingModels "github.com/grafana/alerting/models"
 	"github.com/grafana/alerting/notify"
 	"github.com/grafana/alerting/receivers"
 	jsoniter "github.com/json-iterator/go"
@@ -46,174 +47,196 @@ func ContactPointToContactPointExport(cp definitions.ContactPoint) (notify.APIRe
 	// This is needed to keep the API models clean and convert from database model
 	j.RegisterExtension(&contactPointsExtension{})
 
-	var integration []*notify.GrafanaIntegrationConfig
+	contactPointsLength := len(cp.Alertmanager) + len(cp.Dingding) + len(cp.Discord) + len(cp.Email) +
+		len(cp.Googlechat) + len(cp.Kafka) + len(cp.Line) + len(cp.Opsgenie) +
+		len(cp.Pagerduty) + len(cp.OnCall) + len(cp.Pushover) + len(cp.Sensugo) +
+		len(cp.Sns) + len(cp.Slack) + len(cp.Teams) + len(cp.Telegram) +
+		len(cp.Threema) + len(cp.Victorops) + len(cp.Webhook) + len(cp.Wecom) +
+		len(cp.Webex) + len(cp.Mqtt)
+
+	integration := make([]*alertingModels.IntegrationConfig, 0, contactPointsLength)
 
 	var errs []error
 	for _, i := range cp.Alertmanager {
 		el, err := marshallIntegration(j, "prometheus-alertmanager", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Dingding {
 		el, err := marshallIntegration(j, "dingding", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Discord {
 		el, err := marshallIntegration(j, "discord", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Email {
 		el, err := marshallIntegration(j, "email", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Googlechat {
 		el, err := marshallIntegration(j, "googlechat", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
+	}
+	for _, i := range cp.Jira {
+		el, err := marshallIntegration(j, "jira", i, i.DisableResolveMessage)
+		if err != nil {
+			errs = append(errs, err)
+		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Kafka {
 		el, err := marshallIntegration(j, "kafka", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Line {
 		el, err := marshallIntegration(j, "line", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
+	}
+	for _, i := range cp.Mqtt {
+		el, err := marshallIntegration(j, "mqtt", i, i.DisableResolveMessage)
+		if err != nil {
+			errs = append(errs, err)
+		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Opsgenie {
 		el, err := marshallIntegration(j, "opsgenie", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Pagerduty {
 		el, err := marshallIntegration(j, "pagerduty", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.OnCall {
 		el, err := marshallIntegration(j, "oncall", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Pushover {
 		el, err := marshallIntegration(j, "pushover", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Sensugo {
 		el, err := marshallIntegration(j, "sensugo", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Sns {
 		el, err := marshallIntegration(j, "sns", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Slack {
 		el, err := marshallIntegration(j, "slack", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Teams {
 		el, err := marshallIntegration(j, "teams", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Telegram {
 		el, err := marshallIntegration(j, "telegram", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Threema {
 		el, err := marshallIntegration(j, "threema", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Victorops {
 		el, err := marshallIntegration(j, "victorops", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Webhook {
 		el, err := marshallIntegration(j, "webhook", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Wecom {
 		el, err := marshallIntegration(j, "wecom", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
 	for _, i := range cp.Webex {
 		el, err := marshallIntegration(j, "webex", i, i.DisableResolveMessage)
-		integration = append(integration, el)
 		if err != nil {
 			errs = append(errs, err)
 		}
+		integration = append(integration, el)
 	}
+
 	if len(errs) > 0 {
 		return notify.APIReceiver{}, errors.Join(errs...)
 	}
 	contactPoint := notify.APIReceiver{
-		ConfigReceiver:      notify.ConfigReceiver{Name: cp.Name},
-		GrafanaIntegrations: notify.GrafanaIntegrations{Integrations: integration},
+		ConfigReceiver: notify.ConfigReceiver{Name: cp.Name},
+		ReceiverConfig: alertingModels.ReceiverConfig{Integrations: integration},
 	}
 	return contactPoint, nil
 }
 
 // marshallIntegration converts the API model integration to the storage model that contains settings in the JSON format.
 // The secret fields are not encrypted.
-func marshallIntegration(json jsoniter.API, integrationType string, integration interface{}, disableResolveMessage *bool) (*notify.GrafanaIntegrationConfig, error) {
+func marshallIntegration(json jsoniter.API, integrationType string, integration interface{}, disableResolveMessage *bool) (*alertingModels.IntegrationConfig, error) {
 	data, err := json.Marshal(integration)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshall integration '%s' to JSON: %w", integrationType, err)
 	}
-	e := &notify.GrafanaIntegrationConfig{
+	e := &alertingModels.IntegrationConfig{
 		Type:     integrationType,
 		Settings: data,
 	}
@@ -256,6 +279,11 @@ func parseIntegration(json jsoniter.API, result *definitions.ContactPoint, recei
 		if err = json.Unmarshal(data, &integration); err == nil {
 			result.Googlechat = append(result.Googlechat, integration)
 		}
+	case "jira":
+		integration := definitions.JiraIntegration{DisableResolveMessage: disable}
+		if err = json.Unmarshal(data, &integration); err == nil {
+			result.Jira = append(result.Jira, integration)
+		}
 	case "kafka":
 		integration := definitions.KafkaIntegration{DisableResolveMessage: disable}
 		if err = json.Unmarshal(data, &integration); err == nil {
@@ -265,6 +293,11 @@ func parseIntegration(json jsoniter.API, result *definitions.ContactPoint, recei
 		integration := definitions.LineIntegration{DisableResolveMessage: disable}
 		if err = json.Unmarshal(data, &integration); err == nil {
 			result.Line = append(result.Line, integration)
+		}
+	case "mqtt":
+		integration := definitions.MqttIntegration{DisableResolveMessage: disable}
+		if err = json.Unmarshal(data, &integration); err == nil {
+			result.Mqtt = append(result.Mqtt, integration)
 		}
 	case "opsgenie":
 		integration := definitions.OpsgenieIntegration{DisableResolveMessage: disable}
@@ -381,6 +414,18 @@ func (c contactPointsExtension) UpdateStructDescriptor(structDescriptor *jsonite
 		desc.Decoder = codec
 		desc.Encoder = codec
 	}
+	if structDescriptor.Type == reflect2.TypeOf(definitions.MqttIntegration{}) {
+		codec := &numberAsStringCodec{ignoreError: true}
+		desc := structDescriptor.GetField("QoS")
+		desc.Decoder = codec
+		desc.Encoder = codec
+	}
+	if structDescriptor.Type == reflect2.TypeOf(definitions.JiraIntegration{}) {
+		bind := structDescriptor.GetField("Fields")
+		codec := &mapToJSONStringCodec{}
+		bind.Decoder = codec
+		bind.Encoder = codec
+	}
 }
 
 type emailAddressCodec struct{}
@@ -455,4 +500,56 @@ func (d *numberAsStringCodec) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator
 		iter.ReportError("numberAsStringCodec", "not number or string")
 	}
 	*((*(*int64))(ptr)) = &value
+}
+
+type mapToJSONStringCodec struct{}
+
+func (d *mapToJSONStringCodec) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	var str string
+	switch iter.WhatIsNext() {
+	case jsoniter.ObjectValue:
+		var raw map[string]any
+		iter.ReadVal(&raw)
+		b, err := json.Marshal(raw)
+		if err != nil {
+			iter.ReportError("mapToJSONStringCodec.Decode", err.Error())
+			return
+		}
+		str = string(b)
+	case jsoniter.NilValue:
+		iter.ReadNil()
+		*(**string)(ptr) = nil
+		return
+	default:
+		iter.ReportError("mapToJSONStringCodec.Decode", "unsupported input type")
+		return
+	}
+	// Allocate a new string and set the pointer.
+	newStr := str
+	*(**string)(ptr) = &newStr
+}
+
+// IsEmpty is used by Encoder to determine if the field is empty.
+func (d *mapToJSONStringCodec) IsEmpty(ptr unsafe.Pointer) bool {
+	strPtr := *(**string)(ptr)
+	return strPtr == nil || *strPtr == ""
+}
+
+// This method is not used in production code, but is required by a test that ensure marshalling and unmarshalling does not change the value.
+func (d *mapToJSONStringCodec) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+	strPtr := *(**string)(ptr)
+	if strPtr == nil {
+		stream.WriteNil()
+		return
+	}
+
+	// Validate the string contains valid JSON
+	var raw any
+	if err := json.Unmarshal([]byte(*strPtr), &raw); err != nil {
+		stream.Error = fmt.Errorf("invalid JSON in *string field: %w", err)
+		return
+	}
+
+	// Write the parsed value as native JSON (object, array, etc.)
+	stream.WriteVal(raw)
 }

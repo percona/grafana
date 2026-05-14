@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { PermissionLoader } from './PermissionLoader';
 
@@ -25,7 +24,7 @@ describe('PermissionLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -40,7 +39,7 @@ describe('PermissionLoader', () => {
   });
 
   it('should show loading if feature disabled and while getting settings', async () => {
-    const { container } = render(
+    render(
       <Provider store={configureStore({ percona: { settings: { loading: true } } } as StoreState)}>
         <PermissionLoader
           featureSelector={() => false}
@@ -49,7 +48,7 @@ describe('PermissionLoader', () => {
         />
       </Provider>
     );
-    expect(container.querySelector('.fa-spin')).toBeInTheDocument();
+    expect(screen.getByTestId('Spinner')).toBeInTheDocument();
   });
 
   it('should render error if feature disabled and user is authorized', async () => {

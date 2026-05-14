@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import { Unsubscribable } from 'rxjs';
 
 import {
@@ -14,15 +15,23 @@ import {
 } from '@grafana/scenes';
 import { createWorker } from 'app/features/dashboard-scene/saving/createDetectChangesWorker';
 
-import { VizPanelManager } from '../panel-edit/VizPanelManager';
+import { ConditionalRenderingData } from '../conditional-rendering/conditions/ConditionalRenderingData';
+import { ConditionalRenderingTimeRangeSize } from '../conditional-rendering/conditions/ConditionalRenderingTimeRangeSize';
+import { ConditionalRenderingVariable } from '../conditional-rendering/conditions/ConditionalRenderingVariable';
+import { ConditionalRenderingGroup } from '../conditional-rendering/group/ConditionalRenderingGroup';
 import { DashboardAnnotationsDataLayer } from '../scene/DashboardAnnotationsDataLayer';
 import { DashboardControls } from '../scene/DashboardControls';
-import { DashboardGridItem } from '../scene/DashboardGridItem';
 import { DashboardScene, PERSISTED_PROPS } from '../scene/DashboardScene';
-import { LibraryVizPanel } from '../scene/LibraryVizPanel';
+import { LibraryPanelBehavior } from '../scene/LibraryPanelBehavior';
 import { VizPanelLinks } from '../scene/PanelLinks';
-import { PanelTimeRange } from '../scene/PanelTimeRange';
-import { transformSceneToSaveModel } from '../serialization/transformSceneToSaveModel';
+import { AutoGridItem } from '../scene/layout-auto-grid/AutoGridItem';
+import { AutoGridLayoutManager } from '../scene/layout-auto-grid/AutoGridLayoutManager';
+import { DashboardGridItem } from '../scene/layout-default/DashboardGridItem';
+import { RowItem } from '../scene/layout-rows/RowItem';
+import { RowsLayoutManager } from '../scene/layout-rows/RowsLayoutManager';
+import { TabItem } from '../scene/layout-tabs/TabItem';
+import { TabsLayoutManager } from '../scene/layout-tabs/TabsLayoutManager';
+import { PanelTimeRange } from '../scene/panel-timerange/PanelTimeRange';
 import { isSceneVariableInstance } from '../settings/variables/utils';
 
 import { DashboardChangeInfo } from './shared';
@@ -37,28 +46,21 @@ export class DashboardSceneChangeTracker {
   }
 
   static isUpdatingPersistedState({ payload }: SceneObjectStateChangedEvent) {
+    const partialUpdateKeys = Object.keys(payload.partialUpdate);
+
     // If there are no changes in the state, the check is not needed
-    if (Object.keys(payload.partialUpdate).length === 0) {
+    if (partialUpdateKeys.length === 0) {
       return false;
     }
 
-    // Any change in the panel should trigger a change detection
-    // The VizPanelManager includes configuration for the panel like repeat
+    // Any change in the grid item should trigger a change detection
     // The PanelTimeRange includes the overrides configuration
-    if (
-      payload.changedObject instanceof VizPanel ||
-      payload.changedObject instanceof DashboardGridItem ||
-      payload.changedObject instanceof PanelTimeRange
-    ) {
+    if (payload.changedObject instanceof DashboardGridItem || payload.changedObject instanceof PanelTimeRange) {
       return true;
     }
-    // VizPanelManager includes the repeat configuration
-    if (payload.changedObject instanceof VizPanelManager) {
-      if (
-        Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'repeat') ||
-        Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'repeatDirection') ||
-        Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'maxPerRow')
-      ) {
+    // Panels contain a _renderCounter state prop which should not be marked as a change
+    if (payload.changedObject instanceof VizPanel) {
+      if (partialUpdateKeys.length > 1 || partialUpdateKeys[0] !== '_renderCounter') {
         return true;
       }
     }
@@ -77,16 +79,16 @@ export class DashboardSceneChangeTracker {
     if (payload.changedObject instanceof VizPanelLinks) {
       return true;
     }
-    if (payload.changedObject instanceof LibraryVizPanel) {
-      if (Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'name')) {
-        return true;
-      }
-    }
     if (payload.changedObject instanceof SceneRefreshPicker) {
       if (
         Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'intervals') ||
         Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'refresh')
       ) {
+        return true;
+      }
+    }
+    if (payload.changedObject instanceof LibraryPanelBehavior) {
+      if (Object.prototype.hasOwnProperty.call(payload.partialUpdate, 'name')) {
         return true;
       }
     }
@@ -129,29 +131,60 @@ export class DashboardSceneChangeTracker {
     if (isSceneVariableInstance(payload.changedObject)) {
       return true;
     }
+
+    if (payload.changedObject instanceof RowsLayoutManager) {
+      return true;
+    }
+    if (payload.changedObject instanceof RowItem) {
+      return true;
+    }
+    if (payload.changedObject instanceof TabsLayoutManager) {
+      return true;
+    }
+    if (payload.changedObject instanceof TabItem) {
+      return true;
+    }
+    if (payload.changedObject instanceof AutoGridLayoutManager) {
+      return true;
+    }
+    if (payload.changedObject instanceof AutoGridItem) {
+      return true;
+    }
+
+    if (payload.changedObject instanceof ConditionalRenderingVariable) {
+      return true;
+    }
+    if (payload.changedObject instanceof ConditionalRenderingTimeRangeSize) {
+      return true;
+    }
+    if (payload.changedObject instanceof ConditionalRenderingGroup) {
+      return true;
+    }
+    if (payload.changedObject instanceof ConditionalRenderingData) {
+      return true;
+    }
+
     return false;
   }
 
-  private onStateChanged(event: SceneObjectStateChangedEvent) {
-    if (DashboardSceneChangeTracker.isUpdatingPersistedState(event)) {
-      this.detectSaveModelChanges();
-    }
-  }
-
   private detectSaveModelChanges() {
-    this._changesWorker?.postMessage({
-      changed: transformSceneToSaveModel(this._dashboard),
-      initial: this._dashboard.getInitialSaveModel(),
-    });
+    const changedDashboard = this._dashboard.getSaveModel();
+    const initialDashboard = this._dashboard.getInitialSaveModel();
+
+    // Objects must be stringify to ensure they are clonable, so they don't contain functions
+    const changed =
+      typeof changedDashboard === 'object' ? JSON.parse(JSON.stringify(changedDashboard)) : changedDashboard;
+    const initial =
+      typeof initialDashboard === 'object' ? JSON.parse(JSON.stringify(initialDashboard)) : initialDashboard;
+
+    this._changesWorker?.postMessage({ initial, changed });
   }
 
   private hasMetadataChanges() {
     return this._dashboard.state.meta.folderUid !== this._dashboard.getInitialState()?.meta.folderUid;
   }
 
-  private updateIsDirty(result: DashboardChangeInfo) {
-    const { hasChanges } = result;
-
+  private updateIsDirty(hasChanges: boolean) {
     if (hasChanges || this.hasMetadataChanges()) {
       if (!this._dashboard.state.isDirty) {
         this._dashboard.setState({ isDirty: true });
@@ -171,13 +204,24 @@ export class DashboardSceneChangeTracker {
     if (!this._changesWorker) {
       this.init();
     }
+
     this._changesWorker!.onmessage = (e: MessageEvent<DashboardChangeInfo>) => {
-      this.updateIsDirty(e.data);
+      if (!this._dashboard.state.isEditing) {
+        return;
+      }
+
+      this.updateIsDirty(!!e.data.hasChanges);
     };
+
+    const performSaveModelDiff = getChangeTrackerDebouncer(this.detectSaveModelChanges.bind(this));
 
     this._changeTrackerSub = this._dashboard.subscribeToEvent(
       SceneObjectStateChangedEvent,
-      this.onStateChanged.bind(this)
+      (event: SceneObjectStateChangedEvent) => {
+        if (DashboardSceneChangeTracker.isUpdatingPersistedState(event)) {
+          performSaveModelDiff();
+        }
+      }
     );
   }
 
@@ -190,4 +234,15 @@ export class DashboardSceneChangeTracker {
     this._changesWorker?.terminate();
     this._changesWorker = undefined;
   }
+}
+
+/**
+ * The debouncer makes unit tests slower and more complex so turning it off for unit tests
+ */
+function getChangeTrackerDebouncer(fn: () => void) {
+  if (process.env.NODE_ENV === 'test') {
+    return fn;
+  }
+
+  return debounce(fn, 250);
 }

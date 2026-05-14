@@ -8,8 +8,9 @@ import (
 	"github.com/grafana/grafana/pkg/api/apierrors"
 	"github.com/grafana/grafana/pkg/api/dtos"
 	"github.com/grafana/grafana/pkg/api/response"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
+	"github.com/grafana/grafana/pkg/apimachinery/utils"
 	"github.com/grafana/grafana/pkg/infra/metrics"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/dashboards"
 	"github.com/grafana/grafana/pkg/services/dashboards/dashboardaccess"
@@ -18,7 +19,7 @@ import (
 	"github.com/grafana/grafana/pkg/web"
 )
 
-// swagger:route GET /folders/{folder_uid}/permissions folder_permissions getFolderPermissionList
+// swagger:route GET /folders/{folder_uid}/permissions folders permissions getFolderPermissionList
 //
 // Gets all existing permissions for the folder with the given `uid`.
 //
@@ -30,7 +31,7 @@ import (
 // 500: internalServerError
 func (hs *HTTPServer) GetFolderPermissionList(c *contextmodel.ReqContext) response.Response {
 	uid := web.Params(c.Req)[":uid"]
-	folder, err := hs.folderService.Get(c.Req.Context(), &folder.GetFolderQuery{OrgID: c.SignedInUser.GetOrgID(), UID: &uid, SignedInUser: c.SignedInUser})
+	folder, err := hs.folderService.Get(c.Req.Context(), &folder.GetFolderQuery{OrgID: c.GetOrgID(), UID: &uid, SignedInUser: c.SignedInUser})
 
 	if err != nil {
 		return apierrors.ToFolderErrorResponse(err)
@@ -67,7 +68,7 @@ func (hs *HTTPServer) GetFolderPermissionList(c *contextmodel.ReqContext) respon
 	return response.JSON(http.StatusOK, filteredACLs)
 }
 
-// swagger:route POST /folders/{folder_uid}/permissions folder_permissions updateFolderPermissions
+// swagger:route POST /folders/{folder_uid}/permissions folders permissions updateFolderPermissions
 //
 // Updates permissions for a folder. This operation will remove existing permissions if they’re not included in the request.
 //
@@ -87,15 +88,20 @@ func (hs *HTTPServer) UpdateFolderPermissions(c *contextmodel.ReqContext) respon
 	}
 
 	uid := web.Params(c.Req)[":uid"]
-	folder, err := hs.folderService.Get(c.Req.Context(), &folder.GetFolderQuery{OrgID: c.SignedInUser.GetOrgID(), UID: &uid, SignedInUser: c.SignedInUser})
+	folder, err := hs.folderService.Get(c.Req.Context(), &folder.GetFolderQuery{OrgID: c.GetOrgID(), UID: &uid, SignedInUser: c.SignedInUser})
 	if err != nil {
 		return apierrors.ToFolderErrorResponse(err)
+	}
+
+	// Block permission changes for folders managed by provisioning
+	if folder.ManagedBy == utils.ManagerKindRepo {
+		return response.Error(http.StatusForbidden, "Cannot update permissions for folders managed by provisioning.", nil)
 	}
 
 	items := make([]*dashboards.DashboardACL, 0, len(apiCmd.Items))
 	for _, item := range apiCmd.Items {
 		items = append(items, &dashboards.DashboardACL{
-			OrgID:       c.SignedInUser.GetOrgID(),
+			OrgID:       c.GetOrgID(),
 			DashboardID: folder.ID, // nolint:staticcheck
 			UserID:      item.UserID,
 			TeamID:      item.TeamID,
@@ -114,7 +120,7 @@ func (hs *HTTPServer) UpdateFolderPermissions(c *contextmodel.ReqContext) respon
 
 	items = append(items, hs.filterHiddenACL(c.SignedInUser, acl)...)
 
-	if err := hs.updateDashboardAccessControl(c.Req.Context(), c.SignedInUser.GetOrgID(), folder.UID, true, items, acl); err != nil {
+	if err := hs.updateDashboardAccessControl(c.Req.Context(), c.GetOrgID(), folder.UID, true, items, acl); err != nil {
 		return response.Error(http.StatusInternalServerError, "Failed to create permission", err)
 	}
 
@@ -153,10 +159,12 @@ func (hs *HTTPServer) getFolderACL(ctx context.Context, user identity.Requester,
 			FolderUID:      folder.ParentUID,
 			Created:        p.Created,
 			Updated:        p.Updated,
-			UserID:         p.UserId,
+			UserID:         p.UserID,
+			UserUID:        p.UserUID,
 			UserLogin:      p.UserLogin,
 			UserEmail:      p.UserEmail,
-			TeamID:         p.TeamId,
+			TeamID:         p.TeamID,
+			TeamUID:        p.TeamUID,
 			TeamEmail:      p.TeamEmail,
 			Team:           p.Team,
 			Role:           role,

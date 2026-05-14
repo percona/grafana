@@ -1,18 +1,18 @@
 // Core Grafana history https://github.com/grafana/grafana/blob/v11.0.0-preview/public/app/plugins/datasource/prometheus/querybuilder/QueryPatternsModal.tsx
 import { css } from '@emotion/css';
 import { capitalize } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { CoreApp, DataQuery, GrafanaTheme2 } from '@grafana/data';
+import { CoreApp, DataQuery, getNextRefId, GrafanaTheme2 } from '@grafana/data';
+import { t, Trans } from '@grafana/i18n';
 import { reportInteraction } from '@grafana/runtime';
-import { Button, Collapse, Modal, useStyles2 } from '@grafana/ui';
+import { Button, Collapse, Modal, Stack, useStyles2 } from '@grafana/ui';
 
-import { getNextRefIdChar } from '../gcopypaste/app/core/utils/query';
 import { PromQuery } from '../types';
 
-import { promQueryModeller } from './PromQueryModeller';
 import { QueryPattern } from './QueryPattern';
 import { buildVisualQueryFromString } from './parsing';
+import { promQueryModeller } from './shared/modeller_instance';
 import { PromQueryPattern, PromQueryPatternType } from './types';
 
 type Props = {
@@ -54,18 +54,21 @@ export const QueryPatternsModal = (props: Props) => {
       createNewQuery: hasNewQueryOption && selectAsNewQuery,
     });
 
+    // Apply the pattern operations before rendering the expression
     visualQuery.query.operations = pattern.operations;
     visualQuery.query.binaryQueries = pattern.binaryQueries;
+    const renderedExpr = promQueryModeller.renderQuery(visualQuery.query);
+
     if (hasNewQueryOption && selectAsNewQuery) {
       onAddQuery({
         ...query,
-        refId: getNextRefIdChar(queries ?? [query]),
-        expr: promQueryModeller.renderQuery(visualQuery.query),
+        refId: getNextRefId(queries ?? [query]),
+        expr: renderedExpr,
       });
     } else {
       onChange({
         ...query,
-        expr: promQueryModeller.renderQuery(visualQuery.query),
+        expr: renderedExpr,
       });
     }
     setSelectedPatternName(null);
@@ -73,26 +76,55 @@ export const QueryPatternsModal = (props: Props) => {
   };
 
   return (
-    <Modal aria-label="Kick start your query modal" isOpen={isOpen} title="Kick start your query" onDismiss={onClose}>
+    <Modal
+      aria-label={t(
+        'grafana-prometheus.querybuilder.query-patterns-modal.aria-label-kick-start-your-query-modal',
+        'Kick start your query modal'
+      )}
+      isOpen={isOpen}
+      title={t(
+        'grafana-prometheus.querybuilder.query-patterns-modal.title-kick-start-your-query',
+        'Kick start your query'
+      )}
+      onDismiss={onClose}
+    >
       <div className={styles.spacing}>
-        Kick start your query by selecting one of these queries. You can then continue to complete your query.
+        <Trans i18nKey="grafana-prometheus.querybuilder.query-patterns-modal.description-kick-start-your-query">
+          Kick start your query by selecting one of these queries. You can then continue to complete your query.
+        </Trans>
       </div>
       {Object.values(PromQueryPatternType).map((patternType) => {
+        const isOpen = openTabs.includes(patternType);
         return (
           <Collapse
-            aria-label={`open and close ${patternType} query starter card`}
+            aria-label={t(
+              'grafana-prometheus.querybuilder.query-patterns-modal.aria-label-toggle-query-starter',
+              'open and close {{patternType}} query starter card',
+              { patternType }
+            )}
             key={patternType}
-            label={`${capitalize(patternType)} query starters`}
-            isOpen={openTabs.includes(patternType)}
-            collapsible={true}
-            onToggle={() =>
+            label={t(
+              'grafana-prometheus.querybuilder.query-patterns-modal.label-toggle-query-starter',
+              '{{patternType}} query starters',
+              {
+                patternType: capitalize(patternType),
+              }
+            )}
+            isOpen={isOpen}
+            onToggle={() => {
+              const action = isOpen ? 'close' : 'open';
+              reportInteraction(`grafana_prom_kickstart_toggle_pattern_card`, {
+                action,
+                patternType,
+              });
+
               setOpenTabs((tabs) =>
                 // close tab if it's already open, otherwise open it
                 tabs.includes(patternType) ? tabs.filter((t) => t !== patternType) : [...tabs, patternType]
-              )
-            }
+              );
+            }}
           >
-            <div className={styles.cardsContainer}>
+            <Stack wrap justifyContent="space-between">
               {promQueryModeller
                 .getQueryPatterns()
                 .filter((pattern) => pattern.type === patternType)
@@ -107,12 +139,19 @@ export const QueryPatternsModal = (props: Props) => {
                     setSelectedPatternName={setSelectedPatternName}
                   />
                 ))}
-            </div>
+            </Stack>
           </Collapse>
         );
       })}
-      <Button aria-label="close kick start your query modal" variant="secondary" onClick={onClose}>
-        Close
+      <Button
+        aria-label={t(
+          'grafana-prometheus.querybuilder.query-patterns-modal.aria-label-close-kick-start-your-query-modal',
+          'close kick start your query modal'
+        )}
+        variant="secondary"
+        onClick={onClose}
+      >
+        <Trans i18nKey="grafana-prometheus.querybuilder.query-patterns-modal.close">Close</Trans>
       </Button>
     </Modal>
   );
@@ -120,12 +159,6 @@ export const QueryPatternsModal = (props: Props) => {
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    cardsContainer: css({
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-    }),
     spacing: css({
       marginBottom: theme.spacing(1),
     }),

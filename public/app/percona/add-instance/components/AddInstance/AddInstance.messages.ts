@@ -9,6 +9,7 @@ export const Messages = {
     mongodb: 'MongoDB',
     proxysql: 'ProxySQL',
     haproxy: 'HAProxy',
+    valkey: 'Valkey',
     external: 'External Service',
     addInstance: 'Add a remote instance',
   },

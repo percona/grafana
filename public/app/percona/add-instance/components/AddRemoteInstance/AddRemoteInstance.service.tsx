@@ -1,8 +1,10 @@
 import { CancelToken } from 'axios';
 
 import { PMM_SERVER_NODE_AGENT_ID } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
+import { MetricsMode } from 'app/percona/inventory/Inventory.types';
 import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
+import { CustomLabelsUtils } from 'app/percona/shared/helpers/customLabels';
 
 import { InstanceTypesExtra, InstanceAvailableType } from '../../panel.types';
 
@@ -26,6 +28,8 @@ import {
   ProxySQLPayload,
   MongoDBPayload,
   AddServicePayload,
+  ValkeyPayload,
+  AddValkeyResponse,
 } from './AddRemoteInstance.types';
 
 const BASE_URL = '/services';
@@ -76,6 +80,15 @@ class AddRemoteInstanceService {
     );
   }
 
+  static async addValkey(body: ValkeyPayload, token?: CancelToken) {
+    return apiManagement.post<AddValkeyResponse | ErrorResponse, AddServicePayload>(
+      BASE_URL,
+      { valkey: body },
+      false,
+      token
+    );
+  }
+
   static async addRDS(body: RDSPayload, token?: CancelToken) {
     return apiManagement.post<AddRDSResponse | ErrorResponse, AddServicePayload>(BASE_URL, { rds: body }, false, token);
   }
@@ -100,6 +113,8 @@ class AddRemoteInstanceService {
         return AddRemoteInstanceService.addProxysql(toPayload(data, '', type) as ProxySQLPayload, token);
       case Databases.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data), token);
+      case Databases.valkey:
+        return AddRemoteInstanceService.addValkey(toPayload(data, '', type) as ValkeyPayload, token);
       case InstanceTypesExtra.external:
         return AddRemoteInstanceService.addExternal(toExternalServicePayload(data), token);
       default:
@@ -114,16 +129,11 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
   const data = { ...values };
 
   if (values.custom_labels) {
-    data.custom_labels = data.custom_labels
-      .split(/[\n\s]/)
-      .filter(Boolean)
-      .reduce((acc: any, val: string) => {
-        const [key, value] = val.split(':');
+    data.custom_labels = CustomLabelsUtils.toPayload(data.custom_labels);
+  }
 
-        acc[key] = value;
-
-        return acc;
-      }, {});
+  if (values.extra_dsn_params) {
+    data.extra_dsn_params = CustomLabelsUtils.toPayload(data.extra_dsn_params);
   }
 
   if (!values.isAzure) {
@@ -145,6 +155,8 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
 
   if (data.address === '127.0.0.1' || data.address === 'localhost') {
     data.node_id = data.node.value;
+  } else if (values.isRDS) {
+    data.node_name = data.service_name;
   } else if (!values.isAzure && data.add_node === undefined) {
     data.add_node = {
       node_name: data.service_name,
@@ -184,10 +196,10 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
 
   data.pmm_agent_id = values.pmm_agent_id.value;
 
-  if (data.pmm_agent_id === PMM_SERVER_NODE_AGENT_ID) {
-    data.metrics_mode = 1;
+  if (data.pmm_agent_id === PMM_SERVER_NODE_AGENT_ID || data.node.isPMMServerNode) {
+    data.metrics_mode = MetricsMode.PULL;
   } else {
-    data.metrics_mode = 2;
+    data.metrics_mode = MetricsMode.PUSH;
   }
   delete data.tracking;
   delete data.node;
@@ -229,7 +241,7 @@ export const toExternalServicePayload = (values: any): ExternalPayload => {
   data.listen_port = data.port;
   delete data.port;
 
-  data.metrics_mode = 1;
+  data.metrics_mode = MetricsMode.PULL;
 
   return data;
 };

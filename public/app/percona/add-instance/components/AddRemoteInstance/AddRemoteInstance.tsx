@@ -1,16 +1,19 @@
 /* eslint-disable react/display-name */
 /* eslint-disable @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any */
 import { FormApi } from 'final-form';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { AppEvents } from '@grafana/data';
 import { useStyles } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
+import { ServiceAddedEvent } from 'app/percona/shared/core/events';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
+import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 
 import { ADD_INSTANCE_FORM_NAME } from '../../panel.constants';
 import { InstanceTypesExtra, InstanceTypes, INSTANCE_TYPES_LABELS } from '../../panel.types';
@@ -44,6 +47,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
   onSubmit: submitWrapper,
 }) => {
   const styles = useStyles(getStyles);
+  const navigate = useNavigate();
 
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,7 +88,14 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
           Messages.success.title(values.serviceName || values.address || ''),
           Messages.success.description(INSTANCE_TYPES_LABELS[type as Databases]),
         ]);
-        window.location.href = '/graph/inventory/';
+
+        if (isPmmNavEnabled()) {
+          appEvents.publish(new ServiceAddedEvent());
+
+          navigate('/inventory');
+        } else {
+          window.location.href = '/graph/inventory/';
+        }
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
@@ -111,7 +122,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
         case Databases.mysql:
           return <MySQLConnectionDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
         default:
-          return <MainDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
+          return <MainDetails form={form} type={type} remoteInstanceCredentials={remoteInstanceCredentials} />;
       }
     },
     [remoteInstanceCredentials]
@@ -122,14 +133,12 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
       <>
         <ConnectionDetails form={form} type={type} />
         <Labels />
-        {type !== InstanceTypesExtra.external && (
-          <AdditionalOptions
-            remoteInstanceCredentials={remoteInstanceCredentials}
-            loading={loading}
-            instanceType={type}
-            form={form}
-          />
-        )}
+        <AdditionalOptions
+          remoteInstanceCredentials={remoteInstanceCredentials}
+          loading={loading}
+          instanceType={type}
+          form={form}
+        />
       </>
     ),
     [ConnectionDetails, loading, remoteInstanceCredentials, type]

@@ -1,5 +1,4 @@
-import React from 'react';
-
+import { t } from '@grafana/i18n';
 import { Alert } from '@grafana/ui';
 
 export const missingRightsMessage =
@@ -7,7 +6,10 @@ export const missingRightsMessage =
 
 export function DataSourceMissingRightsMessage() {
   return (
-    <Alert severity="info" title="Missing rights">
+    <Alert
+      severity="info"
+      title={t('datasources.data-source-missing-rights-message.title-missing-rights', 'Missing rights')}
+    >
       {missingRightsMessage}
     </Alert>
   );

@@ -4,8 +4,12 @@ import (
 	"context"
 	"errors"
 	"net/url"
+	"strconv"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
+
+	claims "github.com/grafana/authlib/types"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/auth"
 	"github.com/grafana/grafana/pkg/services/authn"
@@ -16,12 +20,14 @@ import (
 
 var _ authn.ContextAwareClient = new(Session)
 
-func ProvideSession(cfg *setting.Cfg, sessionService auth.UserTokenService, authInfoService login.AuthInfoService) *Session {
+func ProvideSession(cfg *setting.Cfg, sessionService auth.UserTokenService,
+	authInfoService login.AuthInfoService, tracer trace.Tracer) *Session {
 	return &Session{
 		cfg:             cfg,
 		log:             log.New(authn.ClientSession),
 		sessionService:  sessionService,
 		authInfoService: authInfoService,
+		tracer:          tracer,
 	}
 }
 
@@ -30,6 +36,7 @@ type Session struct {
 	log             log.Logger
 	sessionService  auth.UserTokenService
 	authInfoService login.AuthInfoService
+	tracer          trace.Tracer
 }
 
 func (s *Session) Name() string {
@@ -57,7 +64,8 @@ func (s *Session) Authenticate(ctx context.Context, r *authn.Request) (*authn.Id
 	}
 
 	ident := &authn.Identity{
-		ID:           authn.NewNamespaceID(authn.NamespaceUser, token.UserId),
+		ID:           strconv.FormatInt(token.UserId, 10),
+		Type:         claims.TypeUser,
 		SessionToken: token,
 		ClientParams: authn.ClientParams{
 			FetchSyncedUser: true,

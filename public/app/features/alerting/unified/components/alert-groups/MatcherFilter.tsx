@@ -1,12 +1,13 @@
 import { css } from '@emotion/css';
-import React from 'react';
+import { useState } from 'react';
 import { useDebounce } from 'react-use';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { Field, Icon, Input, Label, Stack, Tooltip, useStyles2 } from '@grafana/ui';
 
-import { logInfo, LogMessages } from '../../Analytics';
-import { parseMatchers } from '../../utils/alertmanager';
+import { LogMessages, logInfo } from '../../Analytics';
+import { parsePromQLStyleMatcherLoose } from '../../utils/matchers';
 
 interface Props {
   defaultQueryString?: string;
@@ -16,7 +17,7 @@ interface Props {
 export const MatcherFilter = ({ onFilterChange, defaultQueryString }: Props) => {
   const styles = useStyles2(getStyles);
 
-  const [filterQuery, setFilterQuery] = React.useState<string>(defaultQueryString ?? '');
+  const [filterQuery, setFilterQuery] = useState<string>(defaultQueryString ?? '');
 
   useDebounce(
     () => {
@@ -28,28 +29,43 @@ export const MatcherFilter = ({ onFilterChange, defaultQueryString }: Props) => 
   );
 
   const searchIcon = <Icon name={'search'} />;
-  const inputInvalid = defaultQueryString ? parseMatchers(defaultQueryString).length === 0 : false;
+  let inputValid = Boolean(defaultQueryString && defaultQueryString.length >= 3);
+  try {
+    if (!defaultQueryString) {
+      inputValid = true;
+    } else {
+      parsePromQLStyleMatcherLoose(defaultQueryString);
+    }
+  } catch (err) {
+    inputValid = false;
+  }
 
   return (
     <Field
       className={styles.fixMargin}
-      invalid={inputInvalid || undefined}
-      error={inputInvalid ? 'Query must use valid matcher syntax. See the examples in the help tooltip.' : null}
+      invalid={!inputValid}
+      error={!inputValid ? 'Query must use valid matcher syntax. See the examples in the help tooltip.' : null}
       label={
         <Label>
           <Stack gap={0.5} alignItems="center">
-            <span>Search by label</span>
+            <span>
+              <Trans i18nKey="alerting.matcher-filter.search-by-label">Search by label</Trans>
+            </span>
             <Tooltip
               content={
                 <div>
-                  Filter alerts using label querying without spaces, ex:
+                  <Trans i18nKey="alerting.matcher-filter.filter-alerts-using-label-querying-without-spaces">
+                    Filter alerts using label querying without spaces, ex:
+                  </Trans>
                   <pre>{`{severity="critical", instance=~"cluster-us-.+"}`}</pre>
-                  Invalid use of spaces:
+                  <Trans i18nKey="alerting.matcher-filter.invalid-use-of-spaces">Invalid use of spaces:</Trans>
                   <pre>{`{severity= "critical"}`}</pre>
                   <pre>{`{severity ="critical"}`}</pre>
-                  Valid use of spaces:
+                  <Trans i18nKey="alerting.matcher-filter.valid-use-of-spaces">Valid use of spaces:</Trans>
                   <pre>{`{severity=" critical"}`}</pre>
-                  Filter alerts using label querying without braces, ex:
+                  <Trans i18nKey="alerting.matcher-filter.filter-alerts-using-label-querying-without-braces">
+                    Filter alerts using label querying without braces, ex:
+                  </Trans>
                   <pre>{`severity="critical", instance=~"cluster-us-.+"`}</pre>
                 </div>
               }
@@ -61,7 +77,7 @@ export const MatcherFilter = ({ onFilterChange, defaultQueryString }: Props) => 
       }
     >
       <Input
-        placeholder="Search"
+        placeholder={t('alerting.matcher-filter.search-query-input-placeholder-search', 'Search')}
         value={filterQuery}
         onChange={(e) => setFilterQuery(e.currentTarget.value)}
         data-testid="search-query-input"

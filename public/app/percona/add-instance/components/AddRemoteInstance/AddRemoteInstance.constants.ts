@@ -6,6 +6,7 @@ export const DEFAULT_PORTS = {
   [Databases.postgresql]: '5432',
   [Databases.proxysql]: '6032',
   [Databases.haproxy]: '8404',
+  [Databases.valkey]: '6379',
 };
 
 export const ADD_RDS_CANCEL_TOKEN = 'addRds';

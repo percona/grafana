@@ -1,25 +1,26 @@
-import React from 'react';
-
-import { PluginExtensionPoints, type PluginExtensionLinkConfig } from '@grafana/data';
-import { contextSrv } from 'app/core/core';
+import { PluginExtensionAddedLinkConfig, PluginExtensionPoints } from '@grafana/data';
+import { contextSrv } from 'app/core/services/context_srv';
 import { dispatch } from 'app/store/store';
-import { AccessControlAction } from 'app/types';
+import { AccessControlAction } from 'app/types/accessControl';
 
-import { createExtensionLinkConfig, logWarning } from '../../plugins/extensions/utils';
+import { log } from '../../plugins/extensions/logs/log';
+import { createAddedLinkConfig } from '../../plugins/extensions/utils';
 import { changeCorrelationEditorDetails } from '../state/main';
 import { runQueries } from '../state/query';
 
-import { AddToDashboardForm } from './AddToDashboard/AddToDashboardForm';
+import { ExploreToDashboardPanel } from './AddToDashboard/ExploreToDashboardPanel';
 import { getAddToDashboardTitle } from './AddToDashboard/getAddToDashboardTitle';
 import { type PluginExtensionExploreContext } from './ToolbarExtensionPoint';
 
-export function getExploreExtensionConfigs(): PluginExtensionLinkConfig[] {
+export function getExploreExtensionConfigs(): PluginExtensionAddedLinkConfig[] {
   try {
     return [
-      createExtensionLinkConfig<PluginExtensionExploreContext>({
+      createAddedLinkConfig<PluginExtensionExploreContext>({
+        // This is called at the top level, so will break if we add a translation here 😱
+        // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
         title: 'Add to dashboard',
         description: 'Use the query and panel from explore and create/add it to a dashboard',
-        extensionPointId: PluginExtensionPoints.ExploreToolbarAction,
+        targets: [PluginExtensionPoints.ExploreToolbarAction],
         icon: 'apps',
         category: 'Dashboards',
         configure: () => {
@@ -37,14 +38,17 @@ export function getExploreExtensionConfigs(): PluginExtensionLinkConfig[] {
         onClick: (_, { context, openModal }) => {
           openModal({
             title: getAddToDashboardTitle(),
-            body: ({ onDismiss }) => <AddToDashboardForm onClose={onDismiss!} exploreId={context?.exploreId!} />,
+            body: ({ onDismiss }) => <ExploreToDashboardPanel onClose={onDismiss!} exploreId={context?.exploreId!} />,
           });
         },
       }),
-      createExtensionLinkConfig<PluginExtensionExploreContext>({
+      createAddedLinkConfig<PluginExtensionExploreContext>({
+        // This is called at the top level, so will break if we add a translation here 😱
+        // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
         title: 'Add correlation',
+        // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
         description: 'Create a correlation from this query',
-        extensionPointId: PluginExtensionPoints.ExploreToolbarAction,
+        targets: [PluginExtensionPoints.ExploreToolbarAction],
         icon: 'link',
         configure: (context) => {
           return context?.shouldShowAddCorrelation ? {} : undefined;
@@ -56,7 +60,7 @@ export function getExploreExtensionConfigs(): PluginExtensionLinkConfig[] {
       }),
     ];
   } catch (error) {
-    logWarning(`Could not configure extensions for Explore due to: "${error}"`);
+    log.warning(`Could not configure extensions for Explore due to: "${error}"`);
     return [];
   }
 }

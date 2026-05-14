@@ -7,8 +7,8 @@ export const FOOTER_LINKS: FooterLink[] = [
     target: '_blank',
   },
   {
-    text: 'Prometheus',
-    url: 'https://prometheus.io',
+    text: 'VictoriaMetrics',
+    url: 'https://victoriametrics.com/products/open-source/',
     target: '_blank',
   },
   {

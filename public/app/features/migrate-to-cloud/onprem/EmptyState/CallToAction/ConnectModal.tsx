@@ -1,26 +1,73 @@
 import { css } from '@emotion/css';
-import React, { useId } from 'react';
+import { useId } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { CreateSessionApiArg } from '@grafana/api-clients/rtkq/legacy/migrate-to-cloud';
 import { GrafanaTheme2 } from '@grafana/data';
-import { Modal, Button, Stack, TextLink, Field, Input, Text, useStyles2, Alert } from '@grafana/ui';
-import { Trans, t } from 'app/core/internationalization';
+import { Trans, t } from '@grafana/i18n';
+import { Modal, Button, Stack, TextLink, Field, Input, Text, useStyles2 } from '@grafana/ui';
+import { AlertWithTraceID } from 'app/features/migrate-to-cloud/shared/AlertWithTraceID';
 
-import { CreateMigrationApiArg } from '../../../api';
+import { maybeAPIError } from '../../../api/errors';
 
 interface Props {
   isOpen: boolean;
   isLoading: boolean;
-  isError: boolean;
+  error: unknown;
   hideModal: () => void;
-  onConfirm: (connectStackData: CreateMigrationApiArg) => Promise<unknown>;
+  onConfirm: (connectStackData: CreateSessionApiArg) => Promise<unknown>;
 }
 
 interface FormData {
   token: string;
 }
 
-export const ConnectModal = ({ isOpen, isLoading, isError, hideModal, onConfirm }: Props) => {
+function getTMessage(messageId: string): string {
+  switch (messageId) {
+    case 'cloudmigrations.createMigration.tokenInvalid':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.token-invalid',
+        'Token is not valid. Generate a new token on your cloud instance and try again.'
+      );
+    case 'cloudmigrations.createMigration.tokenRequestError':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.token-request-error',
+        'An error occurred while validating the token. Please check the Grafana instance logs.'
+      );
+    case 'cloudmigrations.createMigration.tokenValidationFailure':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.token-validation-failure',
+        'Token is not valid. Please ensure the token matches the migration token on your cloud instance.'
+      );
+    case 'cloudmigrations.createMigration.instanceUnreachable':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.instance-unreachable',
+        'The cloud instance cannot be reached. Make sure the instance is running and try again.'
+      );
+    case 'cloudmigrations.createMigration.instanceRequestError':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.instance-request-error',
+        "An error occurred while attempting to verify the cloud instance's connectivity. Please check the network settings or cloud instance status."
+      );
+    case 'cloudmigrations.createMigration.sessionCreationFailure':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.session-creation-failure',
+        'There was an error creating the migration. Please try again.'
+      );
+    case 'cloudmigrations.createMigration.migrationDisabled':
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.migration-disabled',
+        'Cloud migrations are disabled on this instance.'
+      );
+    default:
+      return t(
+        'migrate-to-cloud.connect-modal.token-errors.token-not-saved',
+        'There was an error saving the token. See the Grafana server logs for more details.'
+      );
+  }
+}
+
+export const ConnectModal = ({ isOpen, isLoading, error, hideModal, onConfirm }: Props) => {
   const tokenId = useId();
   const styles = useStyles2(getStyles);
 
@@ -39,7 +86,7 @@ export const ConnectModal = ({ isOpen, isLoading, isError, hideModal, onConfirm 
 
   const onConfirmConnect: SubmitHandler<FormData> = (formData) => {
     onConfirm({
-      cloudMigrationRequest: {
+      cloudMigrationSessionRequestDto: {
         authToken: formData.token,
       },
     }).then((resp) => {
@@ -89,21 +136,23 @@ export const ConnectModal = ({ isOpen, isLoading, isError, hideModal, onConfirm 
 
             <div>
               <Trans i18nKey="migrate-to-cloud.connect-modal.body-token-instructions">
-                Log into your cloud stack and navigate to Administration, General, Migrate to Grafana Cloud. Create a
-                migration token on that screen and paste the token here.
+                Log into your cloud stack and navigate to Administration &gt; General &gt; Migrate to Grafana Cloud.
+                Create a migration token on that screen and paste the token here.
               </Trans>
             </div>
 
-            {isError && (
-              <Alert
+            {error ? (
+              <AlertWithTraceID
+                error={error}
                 severity="error"
                 title={t('migrate-to-cloud.connect-modal.token-error-title', 'Error saving token')}
               >
-                <Trans i18nKey="migrate-to-cloud.connect-modal.token-error-description">
-                  There was an error saving the token. See the Grafana server logs for more details.
-                </Trans>
-              </Alert>
-            )}
+                <Text element="p">
+                  {getTMessage(maybeAPIError(error)?.messageId || '') ||
+                    'There was an error saving the token. See the Grafana server logs for more details.'}
+                </Text>
+              </AlertWithTraceID>
+            ) : undefined}
 
             <Field
               className={styles.field}
@@ -118,6 +167,7 @@ export const ConnectModal = ({ isOpen, isLoading, isError, hideModal, onConfirm 
                 })}
                 id={tokenId}
                 placeholder={t('migrate-to-cloud.connect-modal.body-token-field-placeholder', 'Paste token here')}
+                data-testid="migrate-to-cloud-connect-session-modal-token-input"
               />
             </Field>
           </Stack>
@@ -127,7 +177,11 @@ export const ConnectModal = ({ isOpen, isLoading, isError, hideModal, onConfirm 
           <Button variant="secondary" onClick={hideModal}>
             <Trans i18nKey="migrate-to-cloud.connect-modal.cancel">Cancel</Trans>
           </Button>
-          <Button type="submit" disabled={isLoading || !token}>
+          <Button
+            type="submit"
+            disabled={isLoading || !token}
+            data-testid="migrate-to-cloud-connect-session-modal-connect-button"
+          >
             {isLoading
               ? t('migrate-to-cloud.connect-modal.connecting', 'Connecting to this stack...')
               : t('migrate-to-cloud.connect-modal.connect', 'Connect to this stack')}

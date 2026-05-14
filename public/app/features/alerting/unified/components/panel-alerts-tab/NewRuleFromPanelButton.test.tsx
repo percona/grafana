@@ -1,27 +1,21 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import { render } from 'test/test-utils';
 
-import { PanelModel } from 'app/features/dashboard/state';
+import { PanelModel } from 'app/features/dashboard/state/PanelModel';
 import { createDashboardModelFixture } from 'app/features/dashboard/state/__fixtures__/dashboardFixtures';
 
 import * as analytics from '../../Analytics';
 
 import { NewRuleFromPanelButton } from './NewRuleFromPanelButton';
 
-jest.mock('app/types', () => {
-  const original = jest.requireActual('app/types');
+jest.mock('app/types/store', () => {
+  const original = jest.requireActual('app/types/store');
   return {
     ...original,
     useSelector: jest.fn(),
   };
 });
-
-jest.mock('react-router-dom', () => ({
-  useLocation: () => ({
-    pathname: 'localhost:3000/example/path',
-  }),
-}));
 
 jest.spyOn(analytics, 'logInfo');
 

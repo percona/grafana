@@ -1,11 +1,18 @@
-import React, { FormEvent, useCallback, useEffect, useState, useRef } from 'react';
+import { FormEvent, useCallback, useEffect, useRef, useState, useSyncExternalStore, type JSX } from 'react';
 
+import { OrgRole } from '@grafana/data';
 import { ClickOutsideWrapper, Portal, useTheme2 } from '@grafana/ui';
-import { Role, OrgRole } from 'app/types';
+import { pickerStateStore } from 'app/core/utils/roles';
+import type { Role } from 'app/types/accessControl';
 
 import { RolePickerInput } from './RolePickerInput';
 import { RolePickerMenu } from './RolePickerMenu';
-import { MENU_MAX_HEIGHT, ROLE_PICKER_MAX_MENU_WIDTH, ROLE_PICKER_WIDTH } from './constants';
+import {
+  MENU_MAX_HEIGHT,
+  ROLE_PICKER_MAX_MENU_WIDTH,
+  ROLE_PICKER_MENU_MAX_WIDTH,
+  ROLE_PICKER_WIDTH,
+} from './constants';
 
 export interface Props {
   basicRole?: OrgRole;
@@ -25,6 +32,8 @@ export interface Props {
   apply?: boolean;
   maxWidth?: string | number;
   width?: string | number;
+  /** Unique identifier for this picker instance to persist open/closed state across remounts */
+  pickerId?: string;
 }
 
 export const RolePicker = ({
@@ -42,8 +51,22 @@ export const RolePicker = ({
   apply = false,
   maxWidth = ROLE_PICKER_WIDTH,
   width,
+  pickerId,
 }: Props): JSX.Element | null => {
-  const [isOpen, setOpen] = useState(false);
+  // Generate stable picker ID if not provided
+  const stablePickerIdRef = useRef(pickerId || crypto.randomUUID());
+  const stablePickerId = stablePickerIdRef.current;
+
+  // Use external store for isOpen state so it survives remounts
+  const isOpen = useSyncExternalStore(pickerStateStore.subscribe, () => pickerStateStore.getState(stablePickerId));
+
+  const setOpen = useCallback(
+    (value: boolean) => {
+      pickerStateStore.setState(stablePickerId, value);
+    },
+    [stablePickerId]
+  );
+
   const [selectedRoles, setSelectedRoles] = useState<Role[]>(appliedRoles);
   const [selectedBuiltInRole, setSelectedBuiltInRole] = useState<OrgRole | undefined>(basicRole);
   const [query, setQuery] = useState('');
@@ -53,10 +76,11 @@ export const RolePicker = ({
   const theme = useTheme2();
   const widthPx = typeof width === 'number' ? theme.spacing(width) : width;
 
+  // Sync internal state only when picker closes (transitions from open to closed)
   useEffect(() => {
     setSelectedBuiltInRole(basicRole);
     setSelectedRoles(appliedRoles);
-  }, [appliedRoles, basicRole, onBasicRoleChange]);
+  }, [appliedRoles, basicRole]);
 
   const setMenuPosition = useCallback(() => {
     const { horizontal, vertical, menuToLeft } = calculateMenuPosition();
@@ -79,39 +103,38 @@ export const RolePicker = ({
       return {};
     }
     const { bottom, top, left, right } = dimensions;
+
+    const spaceBelow = window.innerHeight - bottom;
+    const spaceAbove = top;
+    const spaceRight = window.innerWidth - right;
+    const spaceLeft = left;
+
     let horizontal = left;
+    let vertical = bottom;
     let menuToLeft = false;
+    let menuToTop = false;
 
-    const distance = window.innerHeight - bottom;
-    let vertical = bottom + 5;
-    let ToTheSide = false;
-    if (distance < MENU_MAX_HEIGHT + 20) {
-      // move the menu above the input if there is not enough space below
-      vertical = top - MENU_MAX_HEIGHT - 50;
+    // Check vertical space
+    if (spaceBelow < MENU_MAX_HEIGHT && spaceAbove > spaceBelow) {
+      vertical = top - MENU_MAX_HEIGHT;
+      menuToTop = true;
     }
 
-    // check if there is enough space above the input field
-    if (top < MENU_MAX_HEIGHT + 50) {
-      // if not, reset the vertical position
-      vertical = top;
-      // move the menu to the right edge of the input field
-      horizontal = right + 5;
-      // flag to align the menu to the right or left edge of the input field
-      ToTheSide = true;
-    }
-
-    /*
-     * This expression calculates whether there is enough place
-     * on the right of the RolePicker input to show/fit the role picker menu and its sub menu AND
-     * whether there is enough place under the RolePicker input to show/fit
-     * both (the role picker menu and its sub menu) aligned to the left edge of the input.
-     * Otherwise, it aligns the role picker menu to the right.
-     */
-    if (horizontal + ROLE_PICKER_MAX_MENU_WIDTH > window.innerWidth) {
-      horizontal = window.innerWidth - (ToTheSide ? left : right);
+    // Check horizontal space
+    if (spaceRight < ROLE_PICKER_MENU_MAX_WIDTH && spaceLeft < ROLE_PICKER_MENU_MAX_WIDTH) {
+      horizontal = right - ROLE_PICKER_MENU_MAX_WIDTH;
       menuToLeft = true;
+    } else {
+      horizontal = Math.max(0, left + (dimensions.width - ROLE_PICKER_MENU_MAX_WIDTH) / 2);
     }
 
+    // Ensure the menu stays within the viewport
+    horizontal = Math.max(0, Math.min(horizontal, window.innerWidth - ROLE_PICKER_MAX_MENU_WIDTH));
+    vertical = Math.max(0, Math.min(vertical, window.innerHeight - MENU_MAX_HEIGHT));
+    if (menuToTop) {
+      // Adjust vertical position to align with the input
+      vertical -= 48;
+    }
     return { horizontal, vertical, menuToLeft };
   };
 
@@ -124,7 +147,7 @@ export const RolePicker = ({
         setOpen(true);
       }
     },
-    [disabled, setMenuPosition]
+    [disabled, setMenuPosition, setOpen]
   );
 
   const onClose = useCallback(() => {
@@ -132,7 +155,7 @@ export const RolePicker = ({
     setQuery('');
     setSelectedRoles(appliedRoles);
     setSelectedBuiltInRole(basicRole);
-  }, [appliedRoles, basicRole]);
+  }, [appliedRoles, basicRole, setOpen]);
 
   // Only call onClose if menu is open. Prevent unnecessary calls for multiple pickers on the page.
   const onClickOutside = () => isOpen && onClose();
@@ -169,6 +192,7 @@ export const RolePicker = ({
     const options = roleOptions.map((r) => ({ ...r, delegatable: canUpdateRoles && r.delegatable }));
 
     if (query && query.trim() !== '') {
+      // TODO should this filter on `displayName` not (or in addition to) `name`?
       return options.filter((option) => option.name?.toLowerCase().includes(query.toLowerCase()));
     }
     return options;
@@ -206,6 +230,7 @@ export const RolePicker = ({
             <div onClick={(e) => e.stopPropagation()}>
               <RolePickerMenu
                 options={getOptions()}
+                isFiltered={query.trim() !== ''}
                 basicRole={selectedBuiltInRole}
                 appliedRoles={appliedRoles}
                 onBasicRoleSelect={onBasicRoleSelect}

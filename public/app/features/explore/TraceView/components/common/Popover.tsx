@@ -1,9 +1,9 @@
-import React, { ReactElement, useRef } from 'react';
+import { cloneElement, ReactElement, useRef } from 'react';
 
 import { Popover as GrafanaPopover, PopoverController } from '@grafana/ui';
 
 export type PopoverProps = {
-  children: ReactElement;
+  children: ReactElement<Record<string, unknown>>;
   content: ReactElement;
   overlayClassName?: string;
 };
@@ -26,7 +26,7 @@ export function Popover({ children, content, overlayClassName }: PopoverProps) {
               />
             )}
 
-            {React.cloneElement(children, {
+            {cloneElement(children, {
               ref: popoverRef,
               onMouseEnter: showPopper,
               onMouseLeave: hidePopper,

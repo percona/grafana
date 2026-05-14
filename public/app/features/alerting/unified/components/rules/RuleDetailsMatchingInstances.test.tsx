@@ -1,11 +1,10 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { times } from 'lodash';
-import React from 'react';
 import { byLabelText, byRole, byTestId } from 'testing-library-selector';
 
 import { PluginExtensionTypes } from '@grafana/data';
-import { usePluginLinkExtensions } from '@grafana/runtime';
+import { usePluginLinks } from '@grafana/runtime';
 
 import { CombinedRuleNamespace } from '../../../../../types/unified-alerting';
 import { GrafanaAlertState, PromAlertingRuleState } from '../../../../../types/unified-alerting-dto';
@@ -17,11 +16,11 @@ import { RuleDetailsMatchingInstances } from './RuleDetailsMatchingInstances';
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
   getPluginLinkExtensions: jest.fn(),
-  usePluginLinkExtensions: jest.fn(),
+  usePluginLinks: jest.fn(),
 }));
 
 const mocks = {
-  usePluginLinkExtensionsMock: jest.mocked(usePluginLinkExtensions),
+  usePluginLinksMock: jest.mocked(usePluginLinks),
 };
 
 const ui = {
@@ -31,6 +30,7 @@ const ui = {
     normal: byLabelText(/^Normal/),
     alerting: byLabelText(/^Alerting/),
     pending: byLabelText(/^Pending/),
+    recovering: byLabelText(/^Recovering/),
     noData: byLabelText(/^NoData/),
     error: byLabelText(/^Error/),
   },
@@ -44,8 +44,8 @@ const ui = {
 
 describe('RuleDetailsMatchingInstances', () => {
   beforeEach(() => {
-    mocks.usePluginLinkExtensionsMock.mockReturnValue({
-      extensions: [
+    mocks.usePluginLinksMock.mockReturnValue({
+      links: [
         {
           pluginId: 'grafana-ml-app',
           id: '1',
@@ -61,7 +61,7 @@ describe('RuleDetailsMatchingInstances', () => {
   });
 
   describe('Filtering', () => {
-    it('For Grafana Managed rules instances filter should contain five states', () => {
+    it('For Grafana Managed rules instances filter should contain six states', () => {
       const rule = mockCombinedRule();
 
       render(<RuleDetailsMatchingInstances rule={rule} enableFiltering />);
@@ -71,7 +71,7 @@ describe('RuleDetailsMatchingInstances', () => {
 
       const stateButtons = ui.stateButton.getAll(stateFilter);
 
-      expect(stateButtons).toHaveLength(5);
+      expect(stateButtons).toHaveLength(6);
 
       expect(ui.grafanaStateButton.normal.get(stateFilter)).toBeInTheDocument();
       expect(ui.grafanaStateButton.alerting.get(stateFilter)).toBeInTheDocument();
@@ -87,6 +87,7 @@ describe('RuleDetailsMatchingInstances', () => {
             mockPromAlert({ state: GrafanaAlertState.Normal }),
             mockPromAlert({ state: GrafanaAlertState.Alerting }),
             mockPromAlert({ state: GrafanaAlertState.Pending }),
+            mockPromAlert({ state: GrafanaAlertState.Recovering }),
             mockPromAlert({ state: GrafanaAlertState.NoData }),
             mockPromAlert({ state: GrafanaAlertState.Error }),
           ],
@@ -97,6 +98,7 @@ describe('RuleDetailsMatchingInstances', () => {
         [GrafanaAlertState.Normal]: ui.grafanaStateButton.normal,
         [GrafanaAlertState.Alerting]: ui.grafanaStateButton.alerting,
         [GrafanaAlertState.Pending]: ui.grafanaStateButton.pending,
+        [GrafanaAlertState.Recovering]: ui.grafanaStateButton.recovering,
         [GrafanaAlertState.NoData]: ui.grafanaStateButton.noData,
         [GrafanaAlertState.Error]: ui.grafanaStateButton.error,
       };

@@ -1,14 +1,15 @@
-import { AsyncThunk, createSlice, Draft, isAsyncThunkAction, PayloadAction, SerializedError } from '@reduxjs/toolkit';
+import { AsyncThunk, Draft, PayloadAction, SerializedError, createSlice, isAsyncThunkAction } from '@reduxjs/toolkit';
 
 import { AppEvents } from '@grafana/data';
 import { FetchError, isFetchError } from '@grafana/runtime';
-import { appEvents } from 'app/core/core';
-import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
-import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { appEvents } from 'app/core/app_events';
 
-import { logInfo, LogMessages } from '../Analytics';
+import { LogMessages, logInfo } from '../Analytics';
 
 import { isErrorLike } from './misc';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
+import { AxiosError } from 'axios';
 
 export interface AsyncRequestState<T> {
   result?: T;
@@ -157,7 +158,11 @@ export function withAppEvents<T>(
 }
 
 export const UNKNOW_ERROR = 'Unknown Error';
-export function messageFromError(e: Error | FetchError | SerializedError): string {
+export function messageFromError(e: Error | FetchError | SerializedError | AxiosError): string {
+  // @PERCONA temporary solution until we migrate all percona pages to new UI
+  if (e instanceof AxiosError) {
+    return e.response?.data?.message ?? e.message ?? UNKNOW_ERROR;
+  }
   if (isFetchError(e)) {
     if (e.data?.message) {
       let msg = e.data?.message;

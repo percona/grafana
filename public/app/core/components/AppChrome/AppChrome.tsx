@@ -1,51 +1,60 @@
 import { css, cx } from '@emotion/css';
 import classNames from 'classnames';
-import React, { PropsWithChildren, useEffect } from 'react';
+import { Resizable } from 're-resizable';
+import { PropsWithChildren, useEffect } from 'react';
 
-import { GrafanaTheme2 } from '@grafana/data';
-import { locationSearchToObject, locationService } from '@grafana/runtime';
-import { useStyles2, LinkButton, useTheme2 } from '@grafana/ui';
+import { GrafanaTheme2, store } from '@grafana/data';
+import { Trans } from '@grafana/i18n';
+import { locationSearchToObject, locationService, useScopes } from '@grafana/runtime';
+import { ErrorBoundaryAlert, floatingUtils, getDragStyles, LinkButton, useStyles2 } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
-import { useMediaQueryChange } from 'app/core/hooks/useMediaQueryChange';
-import store from 'app/core/store';
+import { useMediaQueryMinWidth } from 'app/core/hooks/useMediaQueryMinWidth';
 import { CommandPalette } from 'app/features/commandPalette/CommandPalette';
-import { KioskMode } from 'app/types';
+import { ScopesDashboards } from 'app/features/scopes/dashboards/ScopesDashboards';
 
 import { AppChromeMenu } from './AppChromeMenu';
-import { DOCKED_LOCAL_STORAGE_KEY, DOCKED_MENU_OPEN_LOCAL_STORAGE_KEY } from './AppChromeService';
-import { MegaMenu } from './MegaMenu/MegaMenu';
-import { NavToolbar } from './NavToolbar/NavToolbar';
+import { AppChromeService, DOCKED_LOCAL_STORAGE_KEY } from './AppChromeService';
+import {
+  ExtensionSidebar,
+  MAX_EXTENSION_SIDEBAR_WIDTH,
+  MIN_EXTENSION_SIDEBAR_WIDTH,
+} from './ExtensionSidebar/ExtensionSidebar';
+import { useExtensionSidebarContext } from './ExtensionSidebar/ExtensionSidebarProvider';
+import { MegaMenu, MENU_WIDTH } from './MegaMenu/MegaMenu';
+import { useMegaMenuFocusHelper } from './MegaMenu/utils';
 import { ReturnToPrevious } from './ReturnToPrevious/ReturnToPrevious';
-import { TopSearchBar } from './TopBar/TopSearchBar';
-import { TOP_BAR_LEVEL_HEIGHT } from './types';
+import { SingleTopBar } from './TopBar/SingleTopBar';
+import { getChromeHeaderLevelHeight, useChromeHeaderLevels } from './TopBar/useChromeHeaderHeight';
 
 export interface Props extends PropsWithChildren<{}> {}
 
 export function AppChrome({ children }: Props) {
   const { chrome } = useGrafana();
+  const {
+    isOpen: isExtensionSidebarOpen,
+    extensionSidebarWidth,
+    setExtensionSidebarWidth,
+  } = useExtensionSidebarContext();
   const state = chrome.useState();
-  const searchBarHidden = state.searchBarHidden || state.kioskMode === KioskMode.TV;
-  const theme = useTheme2();
-  const styles = useStyles2(getStyles);
+  const scopes = useScopes();
 
-  const dockedMenuBreakpoint = theme.breakpoints.values.xl;
-  const dockedMenuLocalStorageState = store.getBool(DOCKED_LOCAL_STORAGE_KEY, true);
-  useMediaQueryChange({
-    breakpoint: dockedMenuBreakpoint,
-    onChange: (e) => {
-      if (dockedMenuLocalStorageState) {
-        chrome.setMegaMenuDocked(e.matches, false);
-        chrome.setMegaMenuOpen(
-          e.matches ? store.getBool(DOCKED_MENU_OPEN_LOCAL_STORAGE_KEY, state.megaMenuOpen) : false
-        );
-      }
-    },
-  });
+  const menuDockedAndOpen = !state.chromeless && state.megaMenuDocked && state.megaMenuOpen;
+  const isScopesDashboardsOpen = Boolean(
+    scopes?.state.enabled && scopes?.state.drawerOpened && !scopes?.state.readOnly
+  );
+
+  const headerLevels = useChromeHeaderLevels();
+  const styles = useStyles2(getStyles, headerLevels, getChromeHeaderLevelHeight());
+  const contentSizeStyles = useStyles2(getContentSizeStyles, extensionSidebarWidth);
+  const dragStyles = useStyles2(getDragStyles);
+
+  useResponsiveDockedMegaMenu(chrome);
+  useMegaMenuFocusHelper(state.megaMenuOpen, state.megaMenuDocked);
 
   const contentClass = cx({
     [styles.content]: true,
-    [styles.contentNoSearchBar]: searchBarHidden,
     [styles.contentChromeless]: state.chromeless,
+    [styles.contentWithSidebar]: isExtensionSidebarOpen && !state.chromeless,
   });
 
   const handleMegaMenu = () => {
@@ -76,38 +85,70 @@ export function AppChrome({ children }: Props) {
   // doesn't get re-mounted when chromeless goes from true to false.
   return (
     <div
+      id={floatingUtils.BOUNDARY_ELEMENT_ID}
       className={classNames('main-view', {
-        'main-view--search-bar-hidden': searchBarHidden && !state.chromeless,
         'main-view--chrome-hidden': state.chromeless,
       })}
     >
       {!state.chromeless && (
         <>
           <LinkButton className={styles.skipLink} href="#pageContent">
-            Skip to main content
+            <Trans i18nKey="app-chrome.skip-content-button">Skip to main content</Trans>
           </LinkButton>
-          <header className={cx(styles.topNav)}>
-            {!searchBarHidden && <TopSearchBar />}
-            <NavToolbar
-              searchBarHidden={searchBarHidden}
+          {menuDockedAndOpen && (
+            <MegaMenu className={styles.dockedMegaMenu} onClose={() => chrome.setMegaMenuOpen(false)} />
+          )}
+          <header className={cx(styles.topNav, menuDockedAndOpen && styles.topNavMenuDocked)}>
+            <SingleTopBar
               sectionNav={state.sectionNav.node}
               pageNav={state.pageNav}
-              actions={state.actions}
-              onToggleSearchBar={chrome.onToggleSearchBar}
               onToggleMegaMenu={handleMegaMenu}
               onToggleKioskMode={chrome.onToggleKioskMode}
+              actions={state.actions}
+              breadcrumbActions={state.breadcrumbActions}
+              scopes={scopes}
+              showToolbarLevel={headerLevels === 2}
             />
           </header>
         </>
       )}
       <div className={contentClass}>
-        <div className={styles.panes}>
-          {!state.chromeless && state.megaMenuDocked && state.megaMenuOpen && (
-            <MegaMenu className={styles.dockedMegaMenu} onClose={() => chrome.setMegaMenuOpen(false)} />
+        <div className={cx(styles.panes, { [styles.panesWithSidebar]: isExtensionSidebarOpen })}>
+          {!state.chromeless && (
+            <div
+              className={cx(styles.scopesDashboardsContainer, {
+                [styles.scopesDashboardsContainerDocked]: menuDockedAndOpen,
+              })}
+            >
+              <ErrorBoundaryAlert boundaryName="scopes-dashboards">
+                <ScopesDashboards />
+              </ErrorBoundaryAlert>
+            </div>
           )}
-          <main className={styles.pageContainer} id="pageContent">
+          <main
+            className={cx(styles.pageContainer, {
+              [styles.pageContainerMenuDocked]: menuDockedAndOpen || isScopesDashboardsOpen,
+              [styles.pageContainerMenuDockedScopes]: menuDockedAndOpen && isScopesDashboardsOpen,
+              [styles.pageContainerWithSidebar]: !state.chromeless && isExtensionSidebarOpen,
+              [contentSizeStyles.contentWidth]: !state.chromeless && isExtensionSidebarOpen,
+            })}
+            id="pageContent"
+          >
             {children}
           </main>
+          {!state.chromeless && isExtensionSidebarOpen && (
+            <Resizable
+              className={styles.sidebarContainer}
+              defaultSize={{ width: extensionSidebarWidth }}
+              enable={{ left: true }}
+              onResize={(_evt, _direction, ref) => setExtensionSidebarWidth(ref.getBoundingClientRect().width)}
+              handleClasses={{ left: dragStyles.dragHandleBaseVertical }}
+              minWidth={MIN_EXTENSION_SIDEBAR_WIDTH}
+              maxWidth={MAX_EXTENSION_SIDEBAR_WIDTH}
+            >
+              <ExtensionSidebar />
+            </Resizable>
+          )}
         </div>
       </div>
       {!state.chromeless && !state.megaMenuDocked && <AppChromeMenu />}
@@ -119,17 +160,43 @@ export function AppChrome({ children }: Props) {
   );
 }
 
-const getStyles = (theme: GrafanaTheme2) => {
+/**
+ * When having docked mega menu we automatically undock it on smaller screens
+ */
+function useResponsiveDockedMegaMenu(chrome: AppChromeService) {
+  const dockedMenuLocalStorageState = store.getBool(DOCKED_LOCAL_STORAGE_KEY, true);
+  const isLargeScreen = useMediaQueryMinWidth('xl');
+
+  useEffect(() => {
+    // if undocked we do not need to do anything
+    if (!dockedMenuLocalStorageState) {
+      return;
+    }
+
+    const state = chrome.state.getValue();
+    if (isLargeScreen && !state.megaMenuDocked) {
+      chrome.setMegaMenuDocked(true, false);
+      chrome.setMegaMenuOpen(true);
+    } else if (!isLargeScreen && state.megaMenuDocked) {
+      chrome.setMegaMenuDocked(false, false);
+      chrome.setMegaMenuOpen(false);
+    }
+  }, [isLargeScreen, chrome, dockedMenuLocalStorageState]);
+}
+
+const getStyles = (theme: GrafanaTheme2, headerLevels: number, headerHeight: number) => {
   return {
     content: css({
+      label: 'page-content',
       display: 'flex',
       flexDirection: 'column',
-      paddingTop: TOP_BAR_LEVEL_HEIGHT * 2,
+      paddingTop: headerLevels * headerHeight,
       flexGrow: 1,
-      height: '100%',
+      height: 'auto',
     }),
-    contentNoSearchBar: css({
-      paddingTop: TOP_BAR_LEVEL_HEIGHT,
+    contentWithSidebar: css({
+      height: '100vh',
+      overflow: 'hidden',
     }),
     contentChromeless: css({
       paddingTop: 0,
@@ -138,11 +205,24 @@ const getStyles = (theme: GrafanaTheme2) => {
       background: theme.colors.background.primary,
       borderRight: `1px solid ${theme.colors.border.weak}`,
       display: 'none',
-      zIndex: theme.zIndex.navbarFixed,
+      height: '100%',
+      position: 'fixed',
+      top: 0,
+      width: MENU_WIDTH,
+      zIndex: 2,
 
       [theme.breakpoints.up('xl')]: {
-        display: 'block',
+        display: 'flex',
+        flexDirection: 'column',
       },
+    }),
+    scopesDashboardsContainer: css({
+      position: 'fixed',
+      height: `calc(100% - ${headerHeight}px)`,
+      zIndex: 1,
+    }),
+    scopesDashboardsContainerDocked: css({
+      left: MENU_WIDTH,
     }),
     topNav: css({
       display: 'flex',
@@ -153,37 +233,39 @@ const getStyles = (theme: GrafanaTheme2) => {
       background: theme.colors.background.primary,
       flexDirection: 'column',
     }),
+    topNavMenuDocked: css({
+      left: MENU_WIDTH,
+    }),
     panes: css({
-      label: 'page-panes',
       display: 'flex',
-      height: '100%',
-      width: '100%',
-      flexGrow: 1,
-      minHeight: 0,
       flexDirection: 'column',
-      [theme.breakpoints.up('md')]: {
-        flexDirection: 'row',
-      },
+      flexGrow: 1,
+      label: 'page-panes',
+    }),
+    panesWithSidebar: css({
+      height: '100%',
+      overflow: 'hidden',
+      position: 'relative',
+    }),
+    pageContainerMenuDocked: css({
+      paddingLeft: MENU_WIDTH,
+    }),
+    pageContainerMenuDockedScopes: css({
+      paddingLeft: `calc(${MENU_WIDTH} * 2)`,
     }),
     pageContainer: css({
       label: 'page-container',
       display: 'flex',
       flexDirection: 'column',
       flexGrow: 1,
-      minHeight: 0,
-      minWidth: 0,
+    }),
+    pageContainerWithSidebar: css({
       overflow: 'auto',
-      '@media print': {
-        overflow: 'visible',
-      },
-      '@page': {
-        margin: 0,
-        size: 'auto',
-        padding: 0,
-      },
+      height: '100%',
+      minHeight: 0,
     }),
     skipLink: css({
-      position: 'absolute',
+      position: 'fixed',
       top: -1000,
 
       ':focus': {
@@ -191,6 +273,23 @@ const getStyles = (theme: GrafanaTheme2) => {
         top: theme.spacing(1),
         zIndex: theme.zIndex.portal,
       },
+    }),
+    sidebarContainer: css({
+      // the `Resizeable` component overrides the needed `position` and `height`
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      position: 'fixed !important' as 'fixed',
+      top: headerHeight,
+      bottom: 0,
+      zIndex: theme.zIndex.navbarFixed + 1,
+      right: 0,
+    }),
+  };
+};
+
+const getContentSizeStyles = (_: GrafanaTheme2, extensionSidebarWidth = 0) => {
+  return {
+    contentWidth: css({
+      maxWidth: `calc(100% - ${extensionSidebarWidth}px) !important`,
     }),
   };
 };

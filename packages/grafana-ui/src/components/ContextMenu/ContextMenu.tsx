@@ -1,4 +1,5 @@
-import React, { useRef, useState, useLayoutEffect } from 'react';
+import { useRef, useState, useLayoutEffect } from 'react';
+import * as React from 'react';
 import { useClickAway } from 'react-use';
 
 import { selectors } from '@grafana/e2e-selectors';
@@ -21,6 +22,11 @@ export interface ContextMenuProps {
   renderHeader?: () => React.ReactNode;
 }
 
+/**
+ * A menu displaying additional options when it's not possible to show them at all times due to a space constraint.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/overlays-contextmenu--docs
+ */
 export const ContextMenu = React.memo(
   ({ x, y, onClose, focusOnOpen = true, renderMenuItems, renderHeader }: ContextMenuProps) => {
     const menuRef = useRef<HTMLDivElement>(null);

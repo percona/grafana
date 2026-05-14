@@ -1,10 +1,11 @@
+import { SQLExpression, QueryEditorExpressionType } from '../../dataquery.gen';
 import {
   aggregationvariable,
   labelsVariable,
   metricVariable,
   namespaceVariable,
   setupMockedTemplateService,
-} from '../../__mocks__/CloudWatchDataSource';
+} from '../../mocks/CloudWatchDataSource';
 import {
   createFunctionWithParameter,
   createArray,
@@ -12,9 +13,7 @@ import {
   createGroupBy,
   createFunction,
   createProperty,
-} from '../../__mocks__/sqlUtils';
-import { QueryEditorExpressionType } from '../../expressions';
-import { SQLExpression } from '../../types';
+} from '../../mocks/sqlUtils';
 
 import SQLGenerator from './SQLGenerator';
 
@@ -69,6 +68,13 @@ describe('SQLGenerator', () => {
         `SELECT COUNT("4xxErrorRate") FROM SCHEMA("AWS/EC2")`
       );
     });
+
+    it('should wrap in double quotes if metric name is a reserved keyword ', () => {
+      const select = createFunctionWithParameter('SUM', ['Count']);
+      expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery, select })).toEqual(
+        `SELECT SUM("Count") FROM SCHEMA("AWS/EC2")`
+      );
+    });
   });
 
   describe('from', () => {
@@ -110,12 +116,30 @@ describe('SQLGenerator', () => {
     });
   });
 
-  function assertQueryEndsWith(rest: Partial<SQLExpression>, expectedFilter: string) {
-    expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery, ...rest })).toEqual(
-      `SELECT SUM(CPUUtilization) FROM SCHEMA("AWS/EC2") ${expectedFilter}`
-    );
+  function assertQueryEndsWith(args: { sql: Partial<SQLExpression>; accountId?: string }, expectedFilter: string) {
+    expect(
+      new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery, ...args.sql }, args.accountId)
+    ).toEqual(`SELECT SUM(CPUUtilization) FROM SCHEMA("AWS/EC2") ${expectedFilter}`);
   }
+  describe('accountId', () => {
+    it('should add where clause if account ID is defined', () => {
+      expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery }, '12345')).toEqual(
+        'SELECT SUM(CPUUtilization) FROM SCHEMA("AWS/EC2") WHERE AWS.AccountId = \'12345\''
+      );
+    });
 
+    it('should not add where clause if account ID is not defined', () => {
+      expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery })).toEqual(
+        'SELECT SUM(CPUUtilization) FROM SCHEMA("AWS/EC2")'
+      );
+    });
+
+    it('should not add where clause if account ID is all', () => {
+      expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery })).toEqual(
+        'SELECT SUM(CPUUtilization) FROM SCHEMA("AWS/EC2")'
+      );
+    });
+  });
   describe('filter', () => {
     it('should not add WHERE clause in case its empty', () => {
       expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery })).not.toContain('WHERE');
@@ -126,6 +150,21 @@ describe('SQLGenerator', () => {
       expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery({ ...baseQuery, where })).not.toContain('WHERE');
     });
 
+    it('should add where clauses with AND if accountID is defined', () => {
+      const where = createArray([createOperator('Instance-Id', '=', 'I-123')]);
+      assertQueryEndsWith(
+        { sql: { where }, accountId: '12345' },
+        `WHERE AWS.AccountId = '12345' AND "Instance-Id" = 'I-123'`
+      );
+    });
+    it('should add where clauses with WHERE if accountID is not defined', () => {
+      const where = createArray([createOperator('Instance-Id', '=', 'I-123')]);
+      assertQueryEndsWith({ sql: { where } }, `WHERE "Instance-Id" = 'I-123'`);
+    });
+    it('should add where clauses with WHERE if accountID is all', () => {
+      const where = createArray([createOperator('Instance-Id', '=', 'I-123')]);
+      assertQueryEndsWith({ sql: { where }, accountId: 'all' }, `WHERE "Instance-Id" = 'I-123'`);
+    });
     // TODO: We should handle this scenario
     it.skip('should not add WHERE clause when the operator is incomplete', () => {
       const where = createArray([createOperator('Instance-Id', '=')]);
@@ -134,12 +173,12 @@ describe('SQLGenerator', () => {
 
     it('should handle one top level filter with AND', () => {
       const where = createArray([createOperator('Instance-Id', '=', 'I-123')]);
-      assertQueryEndsWith({ where }, `WHERE "Instance-Id" = 'I-123'`);
+      assertQueryEndsWith({ sql: { where } }, `WHERE "Instance-Id" = 'I-123'`);
     });
 
     it('should handle one top level filter with OR', () => {
       assertQueryEndsWith(
-        { where: createArray([createOperator('InstanceId', '=', 'I-123')]) },
+        { sql: { where: createArray([createOperator('InstanceId', '=', 'I-123')]) } },
         `WHERE InstanceId = 'I-123'`
       );
     });
@@ -149,7 +188,7 @@ describe('SQLGenerator', () => {
         [createOperator('InstanceId', '=', 'I-123'), createOperator('Instance-Id', '!=', 'I-456')],
         QueryEditorExpressionType.And
       );
-      assertQueryEndsWith({ where: filter }, `WHERE InstanceId = 'I-123' AND "Instance-Id" != 'I-456'`);
+      assertQueryEndsWith({ sql: { where: filter } }, `WHERE InstanceId = 'I-123' AND "Instance-Id" != 'I-456'`);
     });
 
     it('should handle multiple top level filters combined with OR', () => {
@@ -157,7 +196,7 @@ describe('SQLGenerator', () => {
         [createOperator('InstanceId', '=', 'I-123'), createOperator('InstanceId', '!=', 'I-456')],
         QueryEditorExpressionType.Or
       );
-      assertQueryEndsWith({ where: filter }, `WHERE InstanceId = 'I-123' OR InstanceId != 'I-456'`);
+      assertQueryEndsWith({ sql: { where: filter } }, `WHERE InstanceId = 'I-123' OR InstanceId != 'I-456'`);
     });
 
     it('should handle one top level filters with one nested filter', () => {
@@ -168,7 +207,7 @@ describe('SQLGenerator', () => {
         ],
         QueryEditorExpressionType.And
       );
-      assertQueryEndsWith({ where: filter }, `WHERE InstanceId = 'I-123' AND InstanceId != 'I-456'`);
+      assertQueryEndsWith({ sql: { where: filter } }, `WHERE InstanceId = 'I-123' AND InstanceId != 'I-456'`);
     });
 
     it('should handle one top level filter with two nested filters combined with AND', () => {
@@ -184,8 +223,8 @@ describe('SQLGenerator', () => {
       );
       // In this scenario, the parenthesis are redundant. However, they're not doing any harm and it would be really complicated to remove them
       assertQueryEndsWith(
-        { where: filter },
-        `WHERE "Instance.Type" = 'I-123' AND (InstanceId != 'I-456' AND Type != 'some-type')`
+        { sql: { where: filter } },
+        `WHERE "Instance.Type" = 'I-123' AND (InstanceId != 'I-456' AND "Type" != 'some-type')`
       );
     });
 
@@ -201,8 +240,8 @@ describe('SQLGenerator', () => {
         QueryEditorExpressionType.And
       );
       assertQueryEndsWith(
-        { where: filter },
-        `WHERE InstanceId = 'I-123' AND (InstanceId != 'I-456' OR Type != 'some-type')`
+        { sql: { where: filter } },
+        `WHERE InstanceId = 'I-123' AND (InstanceId != 'I-456' OR "Type" != 'some-type')`
       );
     });
 
@@ -222,8 +261,8 @@ describe('SQLGenerator', () => {
       );
 
       assertQueryEndsWith(
-        { where: filter },
-        `WHERE (InstanceId = 'I-123' AND Type != 'some-type') AND (InstanceId != 'I-456' OR Type != 'some-type')`
+        { sql: { where: filter } },
+        `WHERE (InstanceId = 'I-123' AND "Type" != 'some-type') AND (InstanceId != 'I-456' OR "Type" != 'some-type')`
       );
     });
 
@@ -242,8 +281,8 @@ describe('SQLGenerator', () => {
         QueryEditorExpressionType.Or
       );
       assertQueryEndsWith(
-        { where: filter },
-        `WHERE (InstanceId = 'I-123' OR Type != 'some-type') OR (InstanceId != 'I-456' OR Type != 'some-type')`
+        { sql: { where: filter } },
+        `WHERE (InstanceId = 'I-123' OR "Type" != 'some-type') OR (InstanceId != 'I-456' OR "Type" != 'some-type')`
       );
     });
 
@@ -257,8 +296,8 @@ describe('SQLGenerator', () => {
         QueryEditorExpressionType.Or
       );
       assertQueryEndsWith(
-        { where: filter },
-        `WHERE InstanceId = 'I-123' OR Type != 'some-type' OR InstanceId != 'I-456'`
+        { sql: { where: filter } },
+        `WHERE InstanceId = 'I-123' OR "Type" != 'some-type' OR InstanceId != 'I-456'`
       );
     });
 
@@ -272,8 +311,8 @@ describe('SQLGenerator', () => {
         QueryEditorExpressionType.And
       );
       assertQueryEndsWith(
-        { where: filter },
-        `WHERE InstanceId = 'I-123' AND Type != 'some-type' AND InstanceId != 'I-456'`
+        { sql: { where: filter } },
+        `WHERE InstanceId = 'I-123' AND "Type" != 'some-type' AND InstanceId != 'I-456'`
       );
     });
   });
@@ -284,14 +323,14 @@ describe('SQLGenerator', () => {
     });
     it('should handle single label', () => {
       const groupBy = createArray([createGroupBy('InstanceId')], QueryEditorExpressionType.And);
-      assertQueryEndsWith({ groupBy }, `GROUP BY InstanceId`);
+      assertQueryEndsWith({ sql: { groupBy } }, `GROUP BY InstanceId`);
     });
     it('should handle multiple label', () => {
       const groupBy = createArray(
         [createGroupBy('InstanceId'), createGroupBy('Type'), createGroupBy('Group')],
         QueryEditorExpressionType.And
       );
-      assertQueryEndsWith({ groupBy }, `GROUP BY InstanceId, Type, Group`);
+      assertQueryEndsWith({ sql: { groupBy } }, `GROUP BY InstanceId, "Type", "Group"`);
     });
   });
 
@@ -301,16 +340,16 @@ describe('SQLGenerator', () => {
     });
     it('should handle SUM ASC', () => {
       const orderBy = createFunction('SUM');
-      assertQueryEndsWith({ orderBy, orderByDirection: 'ASC' }, `ORDER BY SUM() ASC`);
+      assertQueryEndsWith({ sql: { orderBy, orderByDirection: 'ASC' } }, `ORDER BY SUM() ASC`);
     });
 
     it('should handle SUM ASC', () => {
       const orderBy = createFunction('SUM');
-      assertQueryEndsWith({ orderBy, orderByDirection: 'ASC' }, `ORDER BY SUM() ASC`);
+      assertQueryEndsWith({ sql: { orderBy, orderByDirection: 'ASC' } }, `ORDER BY SUM() ASC`);
     });
     it('should handle COUNT DESC', () => {
       const orderBy = createFunction('COUNT');
-      assertQueryEndsWith({ orderBy, orderByDirection: 'DESC' }, `ORDER BY COUNT() DESC`);
+      assertQueryEndsWith({ sql: { orderBy, orderByDirection: 'DESC' } }, `ORDER BY COUNT() DESC`);
     });
   });
   describe('limit', () => {
@@ -319,7 +358,7 @@ describe('SQLGenerator', () => {
     });
 
     it('should be added in case its specified', () => {
-      assertQueryEndsWith({ limit: 10 }, `LIMIT 10`);
+      assertQueryEndsWith({ sql: { limit: 10 } }, `LIMIT 10`);
     });
   });
 
@@ -347,7 +386,7 @@ describe('SQLGenerator', () => {
         limit: 100,
       };
       expect(new SQLGenerator(mockTemplateSrv).expressionToSqlQuery(query)).toEqual(
-        `SELECT COUNT(DroppedBytes) FROM SCHEMA("AWS/MQ", InstanceId, "Instance-Group") WHERE (InstanceId = 'I-123' OR Type != 'some-type') AND (InstanceId != 'I-456' OR Type != 'some-type') GROUP BY InstanceId, InstanceType ORDER BY COUNT() DESC LIMIT 100`
+        `SELECT COUNT(DroppedBytes) FROM SCHEMA("AWS/MQ", InstanceId, "Instance-Group") WHERE (InstanceId = 'I-123' OR "Type" != 'some-type') AND (InstanceId != 'I-456' OR "Type" != 'some-type') GROUP BY InstanceId, InstanceType ORDER BY COUNT() DESC LIMIT 100`
       );
     });
   });
@@ -383,7 +422,7 @@ describe('SQLGenerator', () => {
         limit: 100,
       };
       expect(new SQLGenerator(templateService).expressionToSqlQuery(query)).toEqual(
-        `SELECT $aggregation($metric) FROM SCHEMA(\"$namespace\", $labels) WHERE (InstanceId = 'I-123' OR Type != 'some-type') AND (InstanceId != 'I-456' OR Type != 'some-type') GROUP BY $labels ORDER BY $aggregation() DESC LIMIT 100`
+        `SELECT $aggregation($metric) FROM SCHEMA(\"$namespace\", $labels) WHERE (InstanceId = 'I-123' OR "Type" != 'some-type') AND (InstanceId != 'I-456' OR "Type" != 'some-type') GROUP BY $labels ORDER BY $aggregation() DESC LIMIT 100`
       );
     });
   });

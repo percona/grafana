@@ -8,7 +8,7 @@ labels:
     - enterprise
 menuTitle: Troubleshooting RBAC
 title: Troubleshooting RBAC
-weight: 80
+weight: 100
 ---
 
 # Troubleshooting RBAC
@@ -26,9 +26,9 @@ filters = accesscontrol:debug accesscontrol.evaluator:debug dashboard.permission
 
 ## Enable audit logging
 
-{{% admonition type="note" %}}
-Available in [Grafana Enterprise]({{< relref "../../../../introduction/grafana-enterprise/" >}}) version 7.3 and later, and [Grafana Cloud](/docs/grafana-cloud).
-{{% /admonition %}}
+{{< admonition type="note" >}}
+Available in [Grafana Enterprise](/docs/grafana/<GRAFANA_VERSION>/introduction/grafana-enterprise/) and [Grafana Cloud](/docs/grafana-cloud).
+{{< /admonition >}}
 
 You can enable auditing in the Grafana configuration file.
 
@@ -38,18 +38,18 @@ enabled = true
 ```
 
 All permission and role updates, and role assignments are added to audit logs.
-Learn more about [access control audit logs]({{< relref "../../../../setup-grafana/configure-security/audit-grafana/#access-control" >}}).
+Learn more about [access control audit logs](/docs/grafana/<GRAFANA_VERSION>/setup-grafana/configure-security/audit-grafana/#access-control).
 
 ## Missing dashboard, folder or data source permissions
 
-[Dashboard and folder permissions]({{< relref "../../#dashboard-permissions" >}}) and [data source permissions]({{< relref "../../#data-source-permissions" >}}) can go out of sync if a Grafana instance version is upgraded, downgraded and then upgraded again.
+[Dashboard and folder permissions](/docs/grafana/<GRAFANA_VERSION>/administration/roles-and-permissions/#dashboard-permissions) and [data source permissions](/docs/grafana/<GRAFANA_VERSION>/administration/roles-and-permissions/#data-source-permissions) can go out of sync if a Grafana instance version is upgraded, downgraded and then upgraded again.
 This happens when an instance is downgraded from a version that uses RBAC to a version that uses the legacy access control, and dashboard, folder or data source permissions are updated.
 These permission updates will not be applied to RBAC, so permissions will be out of sync when the instance is next upgraded to a version with RBAC.
 
-{{% admonition type="note" %}}
+{{< admonition type="note" >}}
 the steps provided below will set all dashboard, folder and data source permissions to what they are set to with the legacy access control.
 If you have made dashboard, folder or data source permission updates with RBAC enabled, these updates will be wiped.
-{{% /admonition %}}
+{{< /admonition >}}
 
 To resynchronize the permissions:
 

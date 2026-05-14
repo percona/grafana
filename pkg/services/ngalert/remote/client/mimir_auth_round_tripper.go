@@ -4,7 +4,9 @@ import (
 	"net/http"
 )
 
-const mimirTenantHeader = "X-Scope-OrgID"
+const (
+	MimirTenantHeader = "X-Scope-OrgID"
+)
 
 type MimirAuthRoundTripper struct {
 	TenantID string
@@ -17,7 +19,7 @@ type MimirAuthRoundTripper struct {
 // a tenantID and a password are provided.
 func (r *MimirAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	if r.TenantID != "" && r.Password == "" {
-		req.Header.Set(mimirTenantHeader, r.TenantID)
+		req.Header.Set(MimirTenantHeader, r.TenantID)
 	}
 
 	if r.TenantID != "" && r.Password != "" {

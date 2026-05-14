@@ -1,6 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import { createTheme, Threshold, ThresholdsMode } from '@grafana/data';
 import { mockThemeContext } from '@grafana/ui';
@@ -116,7 +115,7 @@ describe('ThresholdsEditor', () => {
     expect(baseThreshold).toBeDisabled();
     expect(baseThreshold).toHaveValue('Base');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Remove Threshold 1' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove threshold 1' }));
 
     expect(screen.getAllByRole('spinbutton')).toHaveLength(1);
 
@@ -130,7 +129,7 @@ describe('ThresholdsEditor', () => {
     expect(baseThreshold).toBeDisabled();
     expect(baseThreshold).toHaveValue('Base');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Remove Threshold 1' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove threshold 1' }));
 
     expect(screen.queryAllByRole('spinbutton')).toHaveLength(0);
 

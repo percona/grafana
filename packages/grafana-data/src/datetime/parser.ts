@@ -1,4 +1,4 @@
-/* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
+/* eslint-disable id-blacklist, no-restricted-imports */
 import { lowerCase } from 'lodash';
 import moment from 'moment-timezone';
 
@@ -62,9 +62,17 @@ const parseString = (value: string, options?: DateTimeOptionsWhenParsing): DateT
     return parsed || dateTime();
   }
 
-  const timeZone = getTimeZone(options);
+  let timeZone = getTimeZone(options);
+  let format = options?.format ?? systemDateFormats.fullDate;
+  if (value.endsWith('Z')) {
+    // This is a special case when we have an ISO date string
+    // In this case we want to force the format to be ISO and the timeZone to be UTC
+    // This logic is needed for initial load when parsing the URL params
+    format = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
+    timeZone = 'utc';
+  }
+
   const zone = moment.tz.zone(timeZone);
-  const format = options?.format ?? systemDateFormats.fullDate;
 
   if (zone && zone.name) {
     return dateTimeForTimeZone(zone.name, value, format);

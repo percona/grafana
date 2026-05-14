@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { AdHocVariableFilter, DataSourceRef, SelectableValue } from '@grafana/data';
 
 import { AdHocFilterKey } from './AdHocFilterKey';
@@ -14,7 +12,6 @@ interface Props {
   onOperatorChange: (item: SelectableValue<string>) => void;
   onValueChange: (item: SelectableValue<string>) => void;
   placeHolder?: string;
-  getTagKeysOptions?: any;
   disabled?: boolean;
 }
 

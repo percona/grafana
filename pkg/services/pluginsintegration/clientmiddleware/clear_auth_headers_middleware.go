@@ -5,25 +5,27 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
-	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/services/contexthandler"
+	"github.com/grafana/grafana/pkg/setting"
 )
 
-// NewClearAuthHeadersMiddleware creates a new plugins.ClientMiddleware
+// NewClearAuthHeadersMiddleware creates a new backend.HandlerMiddleware
 // that will clear any outgoing HTTP headers that was part of the incoming
 // HTTP request and used when authenticating to Grafana.
-func NewClearAuthHeadersMiddleware() plugins.ClientMiddleware {
-	return plugins.ClientMiddlewareFunc(func(next plugins.Client) plugins.Client {
+func NewClearAuthHeadersMiddleware(cfgJWTAuth *setting.AuthJWTSettings, cfgAuthProxy *setting.AuthProxySettings) backend.HandlerMiddleware {
+	return backend.HandlerMiddlewareFunc(func(next backend.Handler) backend.Handler {
 		return &ClearAuthHeadersMiddleware{
-			baseMiddleware: baseMiddleware{
-				next: next,
-			},
+			BaseHandler:  backend.NewBaseHandler(next),
+			cfgJWTAuth:   cfgJWTAuth,
+			cfgAuthProxy: cfgAuthProxy,
 		}
 	})
 }
 
 type ClearAuthHeadersMiddleware struct {
-	baseMiddleware
+	backend.BaseHandler
+	cfgJWTAuth   *setting.AuthJWTSettings
+	cfgAuthProxy *setting.AuthProxySettings
 }
 
 func (m *ClearAuthHeadersMiddleware) clearHeaders(ctx context.Context, h backend.ForwardHTTPHeaders) {
@@ -33,40 +35,68 @@ func (m *ClearAuthHeadersMiddleware) clearHeaders(ctx context.Context, h backend
 		return
 	}
 
-	list := contexthandler.AuthHTTPHeaderListFromContext(ctx)
-	if list != nil {
-		for _, k := range list.Items {
-			h.DeleteHTTPHeader(k)
-		}
+	items := contexthandler.GetAuthHTTPHeaders(m.cfgJWTAuth, m.cfgAuthProxy)
+	for _, k := range items {
+		h.DeleteHTTPHeader(k)
 	}
 }
 
 func (m *ClearAuthHeadersMiddleware) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	if req == nil {
-		return m.next.QueryData(ctx, req)
+		return m.BaseHandler.QueryData(ctx, req)
 	}
 
 	m.clearHeaders(ctx, req)
 
-	return m.next.QueryData(ctx, req)
+	return m.BaseHandler.QueryData(ctx, req)
 }
 
 func (m *ClearAuthHeadersMiddleware) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
 	if req == nil {
-		return m.next.CallResource(ctx, req, sender)
+		return m.BaseHandler.CallResource(ctx, req, sender)
 	}
 
 	m.clearHeaders(ctx, req)
 
-	return m.next.CallResource(ctx, req, sender)
+	return m.BaseHandler.CallResource(ctx, req, sender)
 }
 
 func (m *ClearAuthHeadersMiddleware) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	if req == nil {
-		return m.next.CheckHealth(ctx, req)
+		return m.BaseHandler.CheckHealth(ctx, req)
 	}
 
 	m.clearHeaders(ctx, req)
 
-	return m.next.CheckHealth(ctx, req)
+	return m.BaseHandler.CheckHealth(ctx, req)
+}
+
+func (m *ClearAuthHeadersMiddleware) SubscribeStream(ctx context.Context, req *backend.SubscribeStreamRequest) (*backend.SubscribeStreamResponse, error) {
+	if req == nil {
+		return m.BaseHandler.SubscribeStream(ctx, req)
+	}
+
+	m.clearHeaders(ctx, req)
+
+	return m.BaseHandler.SubscribeStream(ctx, req)
+}
+
+func (m *ClearAuthHeadersMiddleware) PublishStream(ctx context.Context, req *backend.PublishStreamRequest) (*backend.PublishStreamResponse, error) {
+	if req == nil {
+		return m.BaseHandler.PublishStream(ctx, req)
+	}
+
+	m.clearHeaders(ctx, req)
+
+	return m.BaseHandler.PublishStream(ctx, req)
+}
+
+func (m *ClearAuthHeadersMiddleware) RunStream(ctx context.Context, req *backend.RunStreamRequest, sender *backend.StreamSender) error {
+	if req == nil {
+		return m.BaseHandler.RunStream(ctx, req, sender)
+	}
+
+	m.clearHeaders(ctx, req)
+
+	return m.BaseHandler.RunStream(ctx, req, sender)
 }

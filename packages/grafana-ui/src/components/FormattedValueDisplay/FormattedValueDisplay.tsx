@@ -1,4 +1,4 @@
-import React, { CSSProperties, HTMLProps } from 'react';
+import { CSSProperties, HTMLProps } from 'react';
 
 import { FormattedValue } from '@grafana/data';
 
@@ -18,12 +18,17 @@ function fontSizeReductionFactor(fontSize: number) {
   return 0.6;
 }
 
+/**
+ * Used to display a value, which also supports prefix and suffix.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/plugins-formattedvaluedisplay--docs
+ */
 export const FormattedValueDisplay = ({ value, className, style, ...htmlProps }: Props) => {
   const hasPrefix = (value.prefix ?? '').length > 0;
   const hasSuffix = (value.suffix ?? '').length > 0;
   let suffixStyle;
 
-  if (style && style.fontSize && typeof style.fontSize === 'number') {
+  if (style && typeof style.fontSize === 'number' && !Number.isNaN(style.fontSize)) {
     const fontSize = style.fontSize;
     const reductionFactor = fontSizeReductionFactor(fontSize);
     suffixStyle = { fontSize: fontSize * reductionFactor };

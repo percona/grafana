@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import { render, screen } from '@testing-library/react';
 
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
@@ -18,15 +17,13 @@ jest.mock('app/percona/shared/helpers/logger', () => {
 
 describe('CheckPermissions::', () => {
   it('should render children', async () => {
-    const { container } = await waitFor(() =>
-      render(
-        <CheckPermissions>
-          <div>Test</div>
-        </CheckPermissions>
-      )
+    render(
+      <CheckPermissions>
+        <div>Test</div>
+      </CheckPermissions>
     );
 
-    expect(container.querySelector('div')).toHaveTextContent('Test');
+    expect(await screen.findByText('Test')).toBeInTheDocument();
   });
 
   it('should render unauthorized message', async () => {
@@ -34,14 +31,12 @@ describe('CheckPermissions::', () => {
     jest.spyOn(SettingsService, 'getSettings').mockImplementationOnce(() => {
       throw errorObj;
     });
-    await waitFor(() =>
-      render(
-        <CheckPermissions>
-          <div>Test</div>
-        </CheckPermissions>
-      )
+    render(
+      <CheckPermissions>
+        <div>Test</div>
+      </CheckPermissions>
     );
 
-    expect(screen.getByTestId('unauthorized')).not.toBeNull();
+    expect(await screen.findByTestId('unauthorized')).toBeInTheDocument();
   });
 });

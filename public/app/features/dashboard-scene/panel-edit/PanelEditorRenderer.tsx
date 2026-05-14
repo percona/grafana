@@ -1,39 +1,56 @@
 import { css, cx } from '@emotion/css';
-import React from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { SceneComponentProps } from '@grafana/scenes';
-import { Button, ToolbarButton, useStyles2 } from '@grafana/ui';
+import { t } from '@grafana/i18n';
+import { SceneComponentProps, VizPanel } from '@grafana/scenes';
+import { Button, Spinner, ToolbarButton, useStyles2, useTheme2 } from '@grafana/ui';
+import { MIN_SUGGESTIONS_PANE_WIDTH } from 'app/features/panel/suggestions/constants';
 
+import { useEditPaneCollapsed } from '../edit-pane/shared';
 import { NavToolbarActions } from '../scene/NavToolbarActions';
 import { UnlinkModal } from '../scene/UnlinkModal';
-import { getDashboardSceneFor, getLibraryPanel } from '../utils/utils';
+import { getDashboardSceneFor, getLibraryPanelBehavior } from '../utils/utils';
 
 import { PanelEditor } from './PanelEditor';
 import { SaveLibraryVizPanelModal } from './SaveLibraryVizPanelModal';
 import { useSnappingSplitter } from './splitter/useSnappingSplitter';
+import { scrollReflowMediaCondition, useScrollReflowLimit } from './useScrollReflowLimit';
 
 export function PanelEditorRenderer({ model }: SceneComponentProps<PanelEditor>) {
   const dashboard = getDashboardSceneFor(model);
   const { optionsPane } = model.useState();
   const styles = useStyles2(getStyles);
+  const [isInitiallyCollapsed, setIsCollapsed] = useEditPaneCollapsed();
 
+  const isScrollingLayout = useScrollReflowLimit();
+
+  const theme = useTheme2();
+  const panePadding = useMemo(() => +theme.spacing(2).replace(/px$/, ''), [theme]);
   const { containerProps, primaryProps, secondaryProps, splitterProps, splitterState, onToggleCollapse } =
     useSnappingSplitter({
       direction: 'row',
       dragPosition: 'end',
-      initialSize: 0.75,
-      paneOptions: {
-        collapseBelowPixels: 250,
-        snapOpenToPixels: 400,
-      },
+      initialSize: 330,
+      usePixels: true,
+      collapsed: isInitiallyCollapsed,
+      collapseBelowPixels: MIN_SUGGESTIONS_PANE_WIDTH + panePadding,
+      disabled: isScrollingLayout,
     });
+
+  useEffect(() => {
+    setIsCollapsed(splitterState.collapsed);
+  }, [splitterState.collapsed, setIsCollapsed]);
 
   return (
     <>
       <NavToolbarActions dashboard={dashboard} />
-      <div {...containerProps} data-testid={selectors.components.PanelEditor.General.content}>
+      <div
+        {...containerProps}
+        className={cx(containerProps.className, styles.content)}
+        data-testid={selectors.components.PanelEditor.General.content}
+      >
         <div {...primaryProps} className={cx(primaryProps.className, styles.body)}>
           <VizAndDataPane model={model} />
         </div>
@@ -42,16 +59,20 @@ export function PanelEditorRenderer({ model }: SceneComponentProps<PanelEditor>)
           {splitterState.collapsed && (
             <div className={styles.expandOptionsWrapper}>
               <ToolbarButton
-                tooltip={'Open options pane'}
+                tooltip={t('dashboard-scene.panel-editor-renderer.tooltip-open-options-pane', 'Open options pane')}
                 icon={'arrow-to-right'}
                 onClick={onToggleCollapse}
                 variant="canvas"
                 className={styles.rotate180}
-                aria-label={'Open options pane'}
+                aria-label={t(
+                  'dashboard-scene.panel-editor-renderer.aria-label-open-options-pane',
+                  'Open options pane'
+                )}
               />
             </div>
           )}
-          {!splitterState.collapsed && <optionsPane.Component model={optionsPane} />}
+          {!splitterState.collapsed && optionsPane && <optionsPane.Component model={optionsPane} />}
+          {!splitterState.collapsed && !optionsPane && <Spinner />}
         </div>
       </div>
     </>
@@ -60,45 +81,39 @@ export function PanelEditorRenderer({ model }: SceneComponentProps<PanelEditor>)
 
 function VizAndDataPane({ model }: SceneComponentProps<PanelEditor>) {
   const dashboard = getDashboardSceneFor(model);
-  const { vizManager, dataPane, showLibraryPanelSaveModal, showLibraryPanelUnlinkModal } = model.useState();
-  const { sourcePanel } = vizManager.useState();
-  const libraryPanel = getLibraryPanel(sourcePanel.resolve());
-  const { controls, scopes } = dashboard.useState();
+  const { dataPane, showLibraryPanelSaveModal, showLibraryPanelUnlinkModal, tableView, editPreview } = model.useState();
+  const panel = model.getPanel();
+  const libraryPanel = getLibraryPanelBehavior(panel);
+  const { controls } = dashboard.useState();
   const styles = useStyles2(getStyles);
+
+  const isScrollingLayout = useScrollReflowLimit();
 
   const { containerProps, primaryProps, secondaryProps, splitterProps, splitterState, onToggleCollapse } =
     useSnappingSplitter({
       direction: 'column',
       dragPosition: 'start',
       initialSize: 0.5,
-      paneOptions: {
-        collapseBelowPixels: 150,
-      },
+      collapseBelowPixels: 150,
+      disabled: isScrollingLayout,
     });
 
   containerProps.className = cx(containerProps.className, styles.container);
 
-  if (!dataPane) {
+  if (!dataPane && !isScrollingLayout) {
     primaryProps.style.flexGrow = 1;
   }
 
   return (
-    <div
-      className={cx(
-        styles.pageContainer,
-        controls && !scopes && styles.pageContainerWithControls,
-        scopes && styles.pageContainerWithScopes
-      )}
-    >
-      {scopes && <scopes.Component model={scopes} />}
+    <div className={cx(styles.pageContainer, controls && styles.pageContainerWithControls)}>
       {controls && (
-        <div className={cx(styles.controlsWrapper, scopes && styles.controlsWrapperWithScopes)}>
+        <div className={styles.controlsWrapper}>
           <controls.Component model={controls} />
         </div>
       )}
       <div {...containerProps}>
-        <div {...primaryProps}>
-          <vizManager.Component model={vizManager} />
+        <div {...primaryProps} className={cx(primaryProps.className, isScrollingLayout && styles.fixedSizeViz)}>
+          <VizWrapper panel={editPreview ?? panel} tableView={tableView} />
         </div>
         {showLibraryPanelSaveModal && libraryPanel && (
           <SaveLibraryVizPanelModal
@@ -118,20 +133,24 @@ function VizAndDataPane({ model }: SceneComponentProps<PanelEditor>) {
         {dataPane && (
           <>
             <div {...splitterProps} />
-            <div {...secondaryProps}>
+            <div
+              {...secondaryProps}
+              className={cx(secondaryProps.className, isScrollingLayout && styles.fullSizeEditor)}
+            >
               {splitterState.collapsed && (
                 <div className={styles.expandDataPane}>
                   <Button
-                    tooltip={'Open query pane'}
+                    tooltip={t('dashboard-scene.viz-and-data-pane.tooltip-open-query-pane', 'Open query pane')}
                     icon={'arrow-to-right'}
                     onClick={onToggleCollapse}
                     variant="secondary"
                     size="sm"
                     className={styles.openDataPaneButton}
-                    aria-label={'Open query pane'}
+                    aria-label={t('dashboard-scene.viz-and-data-pane.aria-label-open-query-pane', 'Open query pane')}
                   />
                 </div>
               )}
+              {/* @ts-expect-error - dataPane is a union type of PanelDataPane and PanelDataPaneNext */}
               {!splitterState.collapsed && <dataPane.Component model={dataPane} />}
             </div>
           </>
@@ -141,7 +160,24 @@ function VizAndDataPane({ model }: SceneComponentProps<PanelEditor>) {
   );
 }
 
+interface VizWrapperProps {
+  panel: VizPanel;
+  tableView?: VizPanel;
+}
+
+function VizWrapper({ panel, tableView }: VizWrapperProps) {
+  const styles = useStyles2(getStyles);
+  const panelToShow = tableView ?? panel;
+
+  return (
+    <div className={styles.vizWrapper}>
+      <panelToShow.Component model={panelToShow} />
+    </div>
+  );
+}
+
 function getStyles(theme: GrafanaTheme2) {
+  const scrollReflowMediaQuery = '@media ' + scrollReflowMediaCondition;
   return {
     pageContainer: css({
       display: 'grid',
@@ -150,18 +186,14 @@ function getStyles(theme: GrafanaTheme2) {
       gridTemplateColumns: `1fr`,
       gridTemplateRows: '1fr',
       height: '100%',
+      [scrollReflowMediaQuery]: {
+        gridTemplateColumns: `100%`,
+      },
     }),
     pageContainerWithControls: css({
       gridTemplateAreas: `
         "controls"
         "panels"`,
-      gridTemplateRows: 'auto 1fr',
-    }),
-    pageContainerWithScopes: css({
-      gridTemplateAreas: `
-        "scopes controls"
-        "panels panels"`,
-      gridTemplateColumns: `${theme.spacing(32)} 1fr`,
       gridTemplateRows: 'auto 1fr',
     }),
     container: css({
@@ -177,6 +209,21 @@ function getStyles(theme: GrafanaTheme2) {
       minHeight: 0,
       width: '100%',
     }),
+    content: css({
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      overflow: 'unset',
+      [scrollReflowMediaQuery]: {
+        height: 'auto',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(470px, 1fr) 330px',
+        gridTemplateRows: '1fr',
+        gap: theme.spacing(1),
+        position: 'static',
+        width: '100%',
+      },
+    }),
     body: css({
       label: 'body',
       flexGrow: 1,
@@ -188,6 +235,9 @@ function getStyles(theme: GrafanaTheme2) {
       flexDirection: 'column',
       borderLeft: `1px solid ${theme.colors.border.weak}`,
       background: theme.colors.background.primary,
+      marginTop: theme.spacing(2),
+      borderTop: `1px solid ${theme.colors.border.weak}`,
+      borderTopLeftRadius: theme.shape.radius.default,
     }),
     expandOptionsWrapper: css({
       display: 'flex',
@@ -212,10 +262,6 @@ function getStyles(theme: GrafanaTheme2) {
       flexDirection: 'column',
       flexGrow: 0,
       gridArea: 'controls',
-      padding: theme.spacing(2, 0, 2, 2),
-    }),
-    controlsWrapperWithScopes: css({
-      padding: theme.spacing(2, 0),
     }),
     openDataPaneButton: css({
       width: theme.spacing(8),
@@ -223,6 +269,17 @@ function getStyles(theme: GrafanaTheme2) {
       svg: {
         rotate: '-90deg',
       },
+    }),
+    vizWrapper: css({
+      height: '100%',
+      width: '100%',
+      paddingLeft: theme.spacing(2),
+    }),
+    fixedSizeViz: css({
+      height: '100vh',
+    }),
+    fullSizeEditor: css({
+      height: 'max-content',
     }),
   };
 }

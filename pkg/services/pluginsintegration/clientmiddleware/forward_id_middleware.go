@@ -5,38 +5,52 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
-	"github.com/grafana/grafana/pkg/plugins"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
+	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/contexthandler"
 )
 
 const forwardIDHeaderName = "X-Grafana-Id"
 
-// NewForwardIDMiddleware creates a new plugins.ClientMiddleware that will
-// set grafana id header on outgoing plugins.Client requests if the
-// feature toggle FlagIdForwarding is enabled
-func NewForwardIDMiddleware() plugins.ClientMiddleware {
-	return plugins.ClientMiddlewareFunc(func(next plugins.Client) plugins.Client {
+// NewForwardIDMiddleware creates a new backend.HandlerMiddleware that will
+// set grafana id header on outgoing backend.Handler requests
+func NewForwardIDMiddleware() backend.HandlerMiddleware {
+	return backend.HandlerMiddlewareFunc(func(next backend.Handler) backend.Handler {
 		return &ForwardIDMiddleware{
-			baseMiddleware: baseMiddleware{
-				next: next,
-			},
+			log:         log.New("forward_id_middleware"),
+			BaseHandler: backend.NewBaseHandler(next),
 		}
 	})
 }
 
 type ForwardIDMiddleware struct {
-	baseMiddleware
+	log log.Logger
+
+	backend.BaseHandler
 }
 
-func (m *ForwardIDMiddleware) applyToken(ctx context.Context, pCtx backend.PluginContext, req backend.ForwardHTTPHeaders) error {
-	reqCtx := contexthandler.FromContext(ctx)
-	// no HTTP request context => skip middleware
-	if req == nil || reqCtx == nil || reqCtx.SignedInUser == nil {
+func (m *ForwardIDMiddleware) applyToken(ctx context.Context, _ backend.PluginContext, req backend.ForwardHTTPHeaders) error {
+	if req == nil {
 		return nil
 	}
 
-	// token will only be present if faeturemgmt.FlagIdForwarding is enabled
-	if token := reqCtx.SignedInUser.GetIDToken(); token != "" {
+	reqCtx := contexthandler.FromContext(ctx)
+	// no HTTP request context => check requester
+	if reqCtx == nil || reqCtx.SignedInUser == nil {
+		requester, err := identity.GetRequester(ctx)
+		if err != nil {
+			m.log.Debug("Failed to get requester from context", "error", err)
+			return nil
+		}
+
+		if requester.GetIDToken() != "" {
+			req.SetHTTPHeader(forwardIDHeaderName, requester.GetIDToken())
+			return nil
+		}
+		return nil
+	}
+
+	if token := reqCtx.GetIDToken(); token != "" {
 		req.SetHTTPHeader(forwardIDHeaderName, token)
 	}
 
@@ -45,7 +59,7 @@ func (m *ForwardIDMiddleware) applyToken(ctx context.Context, pCtx backend.Plugi
 
 func (m *ForwardIDMiddleware) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	if req == nil {
-		return m.next.QueryData(ctx, req)
+		return m.BaseHandler.QueryData(ctx, req)
 	}
 
 	err := m.applyToken(ctx, req.PluginContext, req)
@@ -53,12 +67,12 @@ func (m *ForwardIDMiddleware) QueryData(ctx context.Context, req *backend.QueryD
 		return nil, err
 	}
 
-	return m.next.QueryData(ctx, req)
+	return m.BaseHandler.QueryData(ctx, req)
 }
 
 func (m *ForwardIDMiddleware) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
 	if req == nil {
-		return m.next.CallResource(ctx, req, sender)
+		return m.BaseHandler.CallResource(ctx, req, sender)
 	}
 
 	err := m.applyToken(ctx, req.PluginContext, req)
@@ -66,12 +80,12 @@ func (m *ForwardIDMiddleware) CallResource(ctx context.Context, req *backend.Cal
 		return err
 	}
 
-	return m.next.CallResource(ctx, req, sender)
+	return m.BaseHandler.CallResource(ctx, req, sender)
 }
 
 func (m *ForwardIDMiddleware) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	if req == nil {
-		return m.next.CheckHealth(ctx, req)
+		return m.BaseHandler.CheckHealth(ctx, req)
 	}
 
 	err := m.applyToken(ctx, req.PluginContext, req)
@@ -79,5 +93,44 @@ func (m *ForwardIDMiddleware) CheckHealth(ctx context.Context, req *backend.Chec
 		return nil, err
 	}
 
-	return m.next.CheckHealth(ctx, req)
+	return m.BaseHandler.CheckHealth(ctx, req)
+}
+
+func (m *ForwardIDMiddleware) SubscribeStream(ctx context.Context, req *backend.SubscribeStreamRequest) (*backend.SubscribeStreamResponse, error) {
+	if req == nil {
+		return m.BaseHandler.SubscribeStream(ctx, req)
+	}
+
+	err := m.applyToken(ctx, req.PluginContext, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.BaseHandler.SubscribeStream(ctx, req)
+}
+
+func (m *ForwardIDMiddleware) PublishStream(ctx context.Context, req *backend.PublishStreamRequest) (*backend.PublishStreamResponse, error) {
+	if req == nil {
+		return m.BaseHandler.PublishStream(ctx, req)
+	}
+
+	err := m.applyToken(ctx, req.PluginContext, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.BaseHandler.PublishStream(ctx, req)
+}
+
+func (m *ForwardIDMiddleware) RunStream(ctx context.Context, req *backend.RunStreamRequest, sender *backend.StreamSender) error {
+	if req == nil {
+		return m.BaseHandler.RunStream(ctx, req, sender)
+	}
+
+	err := m.applyToken(ctx, req.PluginContext, req)
+	if err != nil {
+		return err
+	}
+
+	return m.BaseHandler.RunStream(ctx, req, sender)
 }

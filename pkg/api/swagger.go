@@ -2,31 +2,40 @@ package api
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/grafana/grafana/pkg/api/routing"
+	"github.com/grafana/grafana/pkg/api/webassets"
+	"github.com/grafana/grafana/pkg/middleware"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
+	"github.com/grafana/grafana/pkg/util/errhttp"
 )
 
-func registerSwaggerUI(r routing.RouteRegister) {
+func (hs *HTTPServer) registerSwaggerUI(r routing.RouteRegister) {
 	// Deprecated
 	r.Get("/swagger-ui", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "swagger", http.StatusMovedPermanently)
 	})
 	// Deprecated
 	r.Get("/openapi3", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "swagger?show=v3", http.StatusMovedPermanently)
+		http.Redirect(w, r, "swagger", http.StatusMovedPermanently)
 	})
 
+	// The swagger based api navigator
 	r.Get("/swagger", func(c *contextmodel.ReqContext) {
-		data := map[string]any{
-			"Nonce": c.RequestNonce,
+		ctx := c.Req.Context()
+		assets, err := webassets.GetWebAssets(ctx, hs.Cfg, hs.License)
+		if err != nil {
+			errhttp.Write(ctx, err, c.Resp)
+			return
 		}
 
-		// Add CSP for unpkg.com to allow loading of Swagger UI assets
-		if existingCSP := c.Resp.Header().Get("Content-Security-Policy"); existingCSP != "" {
-			newCSP := strings.Replace(existingCSP, "style-src", "style-src https://unpkg.com/", 1)
-			c.Resp.Header().Set("Content-Security-Policy", newCSP)
+		data := map[string]any{
+			"Nonce":  c.RequestNonce,
+			"Assets": assets,
+		}
+		if hs.Cfg.CSPEnabled {
+			data["CSPEnabled"] = true
+			data["CSPContent"] = middleware.ReplacePolicyVariables(hs.Cfg.CSPTemplate, hs.Cfg.AppURL, c.RequestNonce)
 		}
 
 		c.HTML(http.StatusOK, "swagger", data)

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/grafana/grafana/pkg/setting"
 )
@@ -39,6 +39,8 @@ func parseRedisConnStr(connStr string) (*redis.Options, error) {
 		switch connKey {
 		case "addr":
 			options.Addr = connVal
+		case "username":
+			options.Username = connVal
 		case "password":
 			options.Password = connVal
 		case "db":
@@ -78,7 +80,7 @@ func parseRedisConnStr(connStr string) (*redis.Options, error) {
 	return options, nil
 }
 
-func newRedisStorage(opts *setting.RemoteCacheOptions) (*redisStorage, error) {
+func newRedisStorage(opts *setting.RemoteCacheSettings) (*redisStorage, error) {
 	opt, err := parseRedisConnStr(opts.ConnStr)
 	if err != nil {
 		return nil, err
@@ -109,13 +111,4 @@ func (s *redisStorage) Get(ctx context.Context, key string) ([]byte, error) {
 func (s *redisStorage) Delete(ctx context.Context, key string) error {
 	cmd := s.c.Del(ctx, key)
 	return cmd.Err()
-}
-
-func (s *redisStorage) Count(ctx context.Context, prefix string) (int64, error) {
-	cmd := s.c.Keys(ctx, prefix+"*")
-	if cmd.Err() != nil {
-		return 0, cmd.Err()
-	}
-
-	return int64(len(cmd.Val())), nil
 }

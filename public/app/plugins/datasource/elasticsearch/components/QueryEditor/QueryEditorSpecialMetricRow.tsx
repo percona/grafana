@@ -1,8 +1,6 @@
-import React from 'react';
-
 import { InlineFieldRow, InlineLabel, InlineSegmentGroup } from '@grafana/ui';
 
-import { MetricAggregation } from '../../types';
+import { MetricAggregation } from '../../dataquery.gen';
 
 import { SettingsEditor } from './MetricAggregationsEditor/SettingsEditor';
 

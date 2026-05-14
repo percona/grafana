@@ -1,23 +1,29 @@
+import { OrgRole } from '@grafana/data';
 import { PrometheusDatasource } from '@grafana/prometheus';
 import { UserItem } from 'app/percona/shared/core/reducers/users/users.types';
 import { AccessRole } from 'app/percona/shared/services/roles/Roles.types';
-import { OrgRole, OrgUser } from 'app/types';
+import { OrgUser, UserDTO } from 'app/types/user';
 
-export const stubUserSingleRole: OrgUser = {
+export const stubUserSingleRole: UserDTO = {
+  uid: '',
   avatarUrl: 'url/to/avatar',
   email: `user@test.com`,
   name: 'user test',
   lastSeenAt: '2018-10-01',
   lastSeenAtAge: '',
   login: `user`,
-  orgId: 1,
-  role: OrgRole.Admin,
-  userId: 2,
+  id: 2,
+  isGrafanaAdmin: false,
   isDisabled: false,
 };
 
 export const subUserMultipleRoles: OrgUser = {
   ...stubUserSingleRole,
+  role: OrgRole.Admin,
+  avatarUrl: '',
+  lastSeenAt: '',
+  lastSeenAtAge: '',
+  orgId: 1,
   userId: 3,
 };
 

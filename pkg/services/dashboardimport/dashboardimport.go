@@ -3,8 +3,8 @@ package dashboardimport
 import (
 	"context"
 
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/components/simplejson"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 )
 
 // ImportDashboardInput definition of input parameters when importing a dashboard.
@@ -52,4 +52,5 @@ type ImportDashboardResponse struct {
 // Service service interface for importing dashboards.
 type Service interface {
 	ImportDashboard(ctx context.Context, req *ImportDashboardRequest) (*ImportDashboardResponse, error)
+	InterpolateDashboard(ctx context.Context, req *ImportDashboardRequest) (*simplejson.Json, error)
 }

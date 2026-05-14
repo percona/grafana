@@ -1,5 +1,13 @@
-import { CoreApp, LoadingState, getDefaultTimeRange } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
+import {
+  CoreApp,
+  GrafanaConfig,
+  LiveChannelEventType,
+  LoadingState,
+  getDefaultTimeRange,
+  locationUtil,
+  store,
+} from '@grafana/data';
+import { config, locationService, RefreshEvent } from '@grafana/runtime';
 import {
   sceneGraph,
   SceneGridLayout,
@@ -11,50 +19,49 @@ import {
   SceneGridRow,
   behaviors,
   SceneDataTransformer,
+  LocalValueVariable,
 } from '@grafana/scenes';
 import { Dashboard, DashboardCursorSync, LibraryPanel } from '@grafana/schema';
-import appEvents from 'app/core/app_events';
-import { LS_PANEL_COPY_KEY } from 'app/core/constants';
-import store from 'app/core/store';
+import { Spec as DashboardV2Spec } from '@grafana/schema/apis/dashboard.grafana.app/v2';
+import { appEvents } from 'app/core/app_events';
+import { LS_PANEL_COPY_KEY, LS_STYLES_COPY_KEY } from 'app/core/constants';
+import { AnnoKeyManagerKind, ManagerKind } from 'app/features/apiserver/types';
 import { getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
+import { DecoratedRevisionModel } from 'app/features/dashboard/types/revisionModels';
+import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
+import { DashboardEventAction } from 'app/features/live/dashboard/types';
 import { VariablesChanged } from 'app/features/variables/types';
+import { ShowConfirmModalEvent } from 'app/types/events';
 
-import { PanelEditor, buildPanelEditScene } from '../panel-edit/PanelEditor';
+import { buildPanelEditScene } from '../panel-edit/PanelEditor';
+import { SaveDashboardDrawer } from '../saving/SaveDashboardDrawer';
 import { createWorker } from '../saving/createDetectChangesWorker';
-import {
-  buildGridItemForLibPanel,
-  buildGridItemForPanel,
-  transformSaveModelToScene,
-} from '../serialization/transformSaveModelToScene';
-import { DecoratedRevisionModel } from '../settings/VersionsEditView';
-import { historySrv } from '../settings/version-history/HistorySrv';
+import { buildGridItemForPanel, transformSaveModelToScene } from '../serialization/transformSaveModelToScene';
+import { getCloneKey } from '../utils/clone';
 import { dashboardSceneGraph } from '../utils/dashboardSceneGraph';
-import { djb2Hash } from '../utils/djb2Hash';
-import { findVizPanelByKey } from '../utils/utils';
+import { DashboardInteractions } from '../utils/interactions';
+import { findVizPanelByKey, getLibraryPanelBehavior, isLibraryPanel } from '../utils/utils';
+import * as utils from '../utils/utils';
 
 import { DashboardControls } from './DashboardControls';
-import { DashboardGridItem } from './DashboardGridItem';
 import { DashboardScene, DashboardSceneState } from './DashboardScene';
-import { LibraryVizPanel } from './LibraryVizPanel';
-import { PanelTimeRange } from './PanelTimeRange';
-import { RowActions } from './row-actions/RowActions';
+import { LibraryPanelBehavior } from './LibraryPanelBehavior';
+import { AutoGridItem } from './layout-auto-grid/AutoGridItem';
+import { AutoGridLayout } from './layout-auto-grid/AutoGridLayout';
+import { AutoGridLayoutManager } from './layout-auto-grid/AutoGridLayoutManager';
+import { DashboardGridItem } from './layout-default/DashboardGridItem';
+import { DefaultGridLayoutManager } from './layout-default/DefaultGridLayoutManager';
+import { RowActions } from './layout-default/row-actions/RowActions';
+import { PanelTimeRange } from './panel-timerange/PanelTimeRange';
 
-jest.mock('../settings/version-history/HistorySrv');
-jest.mock('../serialization/transformSaveModelToScene');
-jest.mock('../saving/getDashboardChangesFromScene', () => ({
-  // It compares the initial and changed save models and returns the differences
-  // By default we assume there are differences to have the dirty state test logic tested
-  getDashboardChangesFromScene: jest.fn(() => ({
-    changedSaveModel: {},
-    initialSaveModel: {},
-    diffs: [],
-    diffCount: 0,
-    hasChanges: true,
-    hasTimeChanges: false,
-    isNew: false,
-    hasVariableValueChanges: false,
-  })),
+const mockRestoreDashboardVersion = jest.fn();
+
+jest.mock('app/features/dashboard/api/dashboard_api', () => ({
+  getDashboardAPI: () => ({
+    restoreDashboardVersion: mockRestoreDashboardVersion,
+  }),
 }));
+jest.mock('../serialization/transformSaveModelToScene');
 jest.mock('../serialization/transformSceneToSaveModel');
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
@@ -62,6 +69,16 @@ jest.mock('@grafana/runtime', () => ({
     return {
       getInstanceSettings: jest.fn().mockResolvedValue({ uid: 'ds1' }),
     };
+  },
+  config: {
+    ...jest.requireActual('@grafana/runtime').config,
+    panels: {
+      'briangann-datatable-panel': {
+        id: 'briangann-datatable-panel',
+        state: 'deprecated',
+        angular: { detected: true, hideDeprecation: false },
+      },
+    },
   },
 }));
 
@@ -75,13 +92,14 @@ jest.mock('app/features/playlist/PlaylistSrv', () => ({
   },
 }));
 
-jest.mock('app/features/manage-dashboards/state/actions', () => ({
-  ...jest.requireActual('app/features/manage-dashboards/state/actions'),
-  deleteDashboard: jest.fn().mockResolvedValue({}),
-}));
+locationUtil.initialize({
+  config: { appSubUrl: '/subUrl' } as GrafanaConfig,
+  getVariablesUrlParams: jest.fn(),
+  getTimeRangeForUrl: jest.fn(),
+});
 
 const worker = createWorker();
-mockResultsOfDetectChangesWorker({ hasChanges: true, hasTimeChanges: false, hasVariableValueChanges: false });
+mockResultsOfDetectChangesWorker({ hasChanges: true });
 
 describe('DashboardScene', () => {
   describe('DashboardSrv.getCurrent compatibility', () => {
@@ -111,33 +129,13 @@ describe('DashboardScene', () => {
       });
     });
 
-    describe('Given new dashboard in edit mode', () => {
-      it('when saving it should clear isNew state', () => {
-        const scene = buildTestScene({
-          meta: { isNew: true },
-        });
-
-        scene.activate();
-        scene.onEnterEditMode();
-        scene.saveCompleted({} as Dashboard, {
-          id: 1,
-          slug: 'slug',
-          uid: 'dash-1',
-          url: 'sss',
-          version: 2,
-          status: 'aaa',
-        });
-
-        expect(scene.state.meta.isNew).toBeFalsy();
-      });
-    });
-
     describe('Given scene in edit mode', () => {
       let scene: DashboardScene;
       let deactivateScene: () => void;
 
       beforeEach(() => {
         scene = buildTestScene();
+        locationService.push('/d/dash-1');
         deactivateScene = scene.activate();
         scene.onEnterEditMode();
         jest.clearAllMocks();
@@ -147,12 +145,53 @@ describe('DashboardScene', () => {
         expect(scene.state.isEditing).toBe(true);
       });
 
+      it('Can exit edit mode', () => {
+        scene.exitEditMode({ skipConfirm: true });
+        expect(locationService.getLocation().pathname).toBe('/d/dash-1');
+      });
+
+      it('Can discard changes and keep editing', () => {
+        // @ts-expect-error private property used for unit test
+        const changeTracker = scene._changeTracker;
+        const stopSpy = jest.spyOn(changeTracker, 'stopTrackingChanges');
+        const startSpy = jest.spyOn(changeTracker, 'startTrackingChanges');
+
+        // Make a change
+        scene.setState({ title: 'Updated title' });
+        expect(scene.state.isDirty).toBe(true);
+
+        // Put the scene into panel edit to verify we clear it
+        const panel = findVizPanelByKey(scene, 'panel-1')!;
+        const editPanel = buildPanelEditScene(panel);
+        scene.setState({ editPanel });
+
+        // Add an overlay as well to verify it is cleared
+        scene.setState({ overlay: new SaveDashboardDrawer({ dashboardRef: scene.getRef() }) });
+        expect(scene.state.overlay).toBeDefined();
+
+        scene.discardChangesAndKeepEditing();
+
+        // Still editing, but no longer dirty
+        expect(scene.state.isEditing).toBe(true);
+        expect(scene.state.isDirty).toBe(false);
+
+        // Restored state from when edit mode started
+        expect(scene.state.title).toBe('hello');
+
+        // Clears edit-panel related state
+        expect(scene.state.editPanel).toBeUndefined();
+        expect(scene.state.overlay).toBeUndefined();
+
+        // Resets tracking
+        expect(stopSpy).toHaveBeenCalled();
+        expect(startSpy).toHaveBeenCalled();
+      });
+
       it('Exiting already saved dashboard should not restore initial state', () => {
         scene.setState({ title: 'Updated title' });
         expect(scene.state.isDirty).toBe(true);
 
         scene.saveCompleted({} as Dashboard, {
-          id: 1,
           slug: 'slug',
           uid: 'dash-1',
           url: 'sss',
@@ -163,6 +202,39 @@ describe('DashboardScene', () => {
         expect(scene.state.isDirty).toBe(false);
         scene.exitEditMode({ skipConfirm: true });
         expect(scene.state.title).toEqual('Updated title');
+        expect(scene.state.meta.version).toEqual(2);
+      });
+
+      it('Should exit edit mode after saving from unsaved changes modal when dashboardNewLayouts is enabled', () => {
+        const originalFeatureToggle = config.featureToggles.dashboardNewLayouts;
+        config.featureToggles.dashboardNewLayouts = true;
+
+        const publishSpy = jest.spyOn(appEvents, 'publish');
+        const hasActualSaveChangesSpy = jest.spyOn(utils, 'hasActualSaveChanges').mockReturnValue(true);
+
+        scene.setState({ title: 'Updated title' });
+        expect(scene.state.isDirty).toBe(true);
+        scene.exitEditMode({ skipConfirm: false });
+
+        const modalCall = publishSpy.mock.calls.find((call) => call[0] instanceof ShowConfirmModalEvent);
+        expect(modalCall).toBeDefined();
+
+        const modalEvent = modalCall![0] as ShowConfirmModalEvent;
+        expect(modalEvent.payload.altActionText).toBeDefined();
+
+        modalEvent.payload.onAltAction?.();
+
+        expect(scene.state.overlay).toBeDefined();
+
+        const overlay = scene.state.overlay as SaveDashboardDrawer;
+        expect(overlay.state.onSaveSuccess).toBeDefined();
+
+        overlay.state.onSaveSuccess!();
+        expect(scene.state.isEditing).toBe(false);
+
+        publishSpy.mockRestore();
+        hasActualSaveChangesSpy.mockRestore();
+        config.featureToggles.dashboardNewLayouts = originalFeatureToggle;
       });
 
       it('Should start the detect changes worker', () => {
@@ -202,6 +274,18 @@ describe('DashboardScene', () => {
         expect(resoredLayout.state.children.map((c) => c.state.key)).toEqual(originalPanelOrder);
       });
 
+      it('Should exit edit mode and discard panel changes if leaving the dashboard while in panel edit', async () => {
+        const panel = findVizPanelByKey(scene, 'panel-1')!;
+        const editPanel = buildPanelEditScene(panel!);
+        scene.setState({ editPanel });
+
+        panel.setState({ title: 'new title' });
+        scene.exitEditMode({ skipConfirm: true });
+
+        const discardPanel = findVizPanelByKey(scene, panel.state.key)!;
+        expect(discardPanel.state.title).toBe('Panel A');
+      });
+
       it.each`
         prop             | value
         ${'title'}       | ${'new title'}
@@ -225,8 +309,8 @@ describe('DashboardScene', () => {
       it('A change to folderUid should set isDirty true', () => {
         const prevMeta = { ...scene.state.meta };
 
-        // The worker only detects changes in the model, so the folder change should be detected anyway
-        mockResultsOfDetectChangesWorker({ hasChanges: false, hasTimeChanges: false, hasVariableValueChanges: false });
+        // The worker detects changes in the model, so the folder change should be detected anyway
+        mockResultsOfDetectChangesWorker({ hasChanges: false });
 
         scene.setState({
           meta: {
@@ -335,20 +419,20 @@ describe('DashboardScene', () => {
         expect(restoredDashboardGridItem.state.variableName).toBe(prevValue);
       });
 
-      it('A change to any LibraryVizPanel name should set isDirty true', () => {
-        const libraryVizPanel = sceneGraph.findObject(scene, (p) => p instanceof LibraryVizPanel) as LibraryVizPanel;
-        const prevValue = libraryVizPanel.state.name;
+      it('A change to any library panel name should set isDirty true', () => {
+        const panel = findVizPanelByKey(scene, 'panel-5')!;
+        const behavior = getLibraryPanelBehavior(panel)!;
+        const prevValue = behavior.state.name;
 
-        libraryVizPanel.setState({ name: 'new name' });
+        behavior.setState({ name: 'new name' });
 
         expect(scene.state.isDirty).toBe(true);
 
         scene.exitEditMode({ skipConfirm: true });
-        const restoredLibraryVizPanel = sceneGraph.findObject(
-          scene,
-          (p) => p instanceof LibraryVizPanel
-        ) as LibraryVizPanel;
-        expect(restoredLibraryVizPanel.state.name).toBe(prevValue);
+
+        const restoredPanel = findVizPanelByKey(scene, 'panel-5')!;
+        const restoredBehavior = getLibraryPanelBehavior(restoredPanel)!;
+        expect(restoredBehavior.state.name).toBe(prevValue);
       });
 
       it('A change to any PanelTimeRange state should set isDirty true', () => {
@@ -443,160 +527,22 @@ describe('DashboardScene', () => {
         expect(scene.state.isDirty).toBeFalsy();
       });
 
-      it('Should throw an error when adding a panel to a layout that is not SceneGridLayout', () => {
-        const scene = buildTestScene({ body: undefined });
-
-        expect(() => {
-          scene.addPanel(new VizPanel({ title: 'Panel Title', key: 'panel-4', pluginId: 'timeseries' }));
-        }).toThrow('Trying to add a panel in a layout that is not SceneGridLayout');
-      });
-
-      it('Should add a new panel to the dashboard', () => {
-        const vizPanel = new VizPanel({
-          title: 'Panel Title',
-          key: 'panel-5',
-          pluginId: 'timeseries',
-          $data: new SceneQueryRunner({ key: 'data-query-runner', queries: [{ refId: 'A' }] }),
-        });
-
-        scene.addPanel(vizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[0] as DashboardGridItem;
-
-        expect(body.state.children.length).toBe(6);
-        expect(gridItem.state.body!.state.key).toBe('panel-5');
-        expect(gridItem.state.y).toBe(0);
-      });
-
       it('Should create and add a new panel to the dashboard', () => {
         scene.exitEditMode({ skipConfirm: true });
         expect(scene.state.isEditing).toBe(false);
 
-        scene.onCreateNewPanel();
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[0] as DashboardGridItem;
+        const panel = scene.onCreateNewPanel();
 
         expect(scene.state.isEditing).toBe(true);
-        expect(body.state.children.length).toBe(6);
-        expect(gridItem.state.body!.state.key).toBe('panel-7');
+        expect(scene.state.body.getVizPanels().length).toBe(7);
+        expect(panel.state.key).toBe('panel-7');
       });
 
-      it('Should create and add a new row to the dashboard', () => {
-        scene.onCreateNewRow();
+      it('Should select new row', () => {
+        scene.state.editPane.activate();
 
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[0] as SceneGridRow;
-
-        expect(scene.state.isEditing).toBe(true);
-        expect(body.state.children.length).toBe(4);
-        expect(gridRow.state.key).toBe('panel-7');
-        expect(gridRow.state.children[0].state.key).toBe('griditem-1');
-        expect(gridRow.state.children[1].state.key).toBe('griditem-2');
-      });
-
-      it('Should create a row and add all panels in the dashboard under it', () => {
-        const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [
-              new DashboardGridItem({
-                key: 'griditem-1',
-                x: 0,
-                body: new VizPanel({
-                  title: 'Panel A',
-                  key: 'panel-1',
-                  pluginId: 'table',
-                  $data: new SceneQueryRunner({ key: 'data-query-runner', queries: [{ refId: 'A' }] }),
-                }),
-              }),
-              new DashboardGridItem({
-                key: 'griditem-2',
-                body: new VizPanel({
-                  title: 'Panel B',
-                  key: 'panel-2',
-                  pluginId: 'table',
-                }),
-              }),
-            ],
-          }),
-        });
-
-        scene.onCreateNewRow();
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[0] as SceneGridRow;
-
-        expect(body.state.children.length).toBe(1);
-        expect(gridRow.state.children.length).toBe(2);
-      });
-
-      it('Should create and add two new rows, but the second has no children', () => {
-        scene.onCreateNewRow();
-        scene.onCreateNewRow();
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[0] as SceneGridRow;
-
-        expect(body.state.children.length).toBe(5);
-        expect(gridRow.state.children.length).toBe(0);
-      });
-
-      it('Should create an empty row when nothing else in dashboard', () => {
-        const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [],
-          }),
-        });
-
-        scene.onCreateNewRow();
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[0] as SceneGridRow;
-
-        expect(body.state.children.length).toBe(1);
-        expect(gridRow.state.children.length).toBe(0);
-      });
-
-      it('Should remove a row and move its children to the grid layout', () => {
-        const body = scene.state.body as SceneGridLayout;
-        const row = body.state.children[2] as SceneGridRow;
-
-        scene.removeRow(row);
-
-        const vizPanel = (body.state.children[2] as DashboardGridItem).state.body as VizPanel;
-
-        expect(body.state.children.length).toBe(6);
-        expect(vizPanel.state.key).toBe('panel-4');
-      });
-
-      it('Should remove a row and its children', () => {
-        const body = scene.state.body as SceneGridLayout;
-        const row = body.state.children[2] as SceneGridRow;
-
-        scene.removeRow(row, true);
-
-        expect(body.state.children.length).toBe(4);
-      });
-
-      it('Should remove an empty row from the layout', () => {
-        const row = new SceneGridRow({
-          key: 'panel-1',
-        });
-
-        const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [row],
-          }),
-        });
-
-        const body = scene.state.body as SceneGridLayout;
-
-        expect(body.state.children.length).toBe(1);
-
-        scene.removeRow(row);
-
-        expect(body.state.children.length).toBe(0);
+        const row = scene.onCreateNewRow();
+        expect(scene.state.editPane.state.selection?.getFirstObject()).toBe(row);
       });
 
       it('Should fail to copy a panel if it does not have a grid item parent', () => {
@@ -612,42 +558,37 @@ describe('DashboardScene', () => {
       });
 
       it('Should fail to copy a library panel if it does not have a grid item parent', () => {
-        const libVizPanel = new LibraryVizPanel({
-          uid: 'uid',
-          name: 'libraryPanel',
-          panelKey: 'panel-4',
+        const libVizPanel = new VizPanel({
           title: 'Library Panel',
-          panel: new VizPanel({
-            title: 'Library Panel',
-            key: 'panel-4',
-            pluginId: 'table',
-          }),
+          pluginId: 'table',
+          key: 'panel-4',
+          $behaviors: [new LibraryPanelBehavior({ name: 'libraryPanel', uid: 'uid' })],
         });
 
-        scene.copyPanel(libVizPanel.state.panel as VizPanel);
+        scene.copyPanel(libVizPanel);
 
         expect(store.exists(LS_PANEL_COPY_KEY)).toBe(false);
       });
 
       it('Should copy a panel', () => {
-        const vizPanel = ((scene.state.body as SceneGridLayout).state.children[0] as DashboardGridItem).state.body;
+        const vizPanel = findVizPanelByKey(scene, 'panel-1')!;
         scene.copyPanel(vizPanel as VizPanel);
 
         expect(store.exists(LS_PANEL_COPY_KEY)).toBe(true);
       });
 
       it('Should copy a library viz panel', () => {
-        const libVizPanel = ((scene.state.body as SceneGridLayout).state.children[4] as DashboardGridItem).state
-          .body as LibraryVizPanel;
+        const libVizPanel = findVizPanelByKey(scene, 'panel-6')!;
 
-        scene.copyPanel(libVizPanel.state.panel as VizPanel);
+        expect(isLibraryPanel(libVizPanel)).toBe(true);
+
+        scene.copyPanel(libVizPanel);
 
         expect(store.exists(LS_PANEL_COPY_KEY)).toBe(true);
       });
 
       it('Should paste a panel', () => {
         store.set(LS_PANEL_COPY_KEY, JSON.stringify({ key: 'panel-7' }));
-        jest.spyOn(JSON, 'parse').mockReturnThis();
         jest.mocked(buildGridItemForPanel).mockReturnValue(
           new DashboardGridItem({
             key: 'griditem-9',
@@ -661,234 +602,267 @@ describe('DashboardScene', () => {
 
         scene.pastePanel();
 
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[0] as DashboardGridItem;
-
         expect(buildGridItemForPanel).toHaveBeenCalledTimes(1);
-        expect(body.state.children.length).toBe(6);
-        expect(gridItem.state.body!.state.key).toBe('panel-7');
-        expect(gridItem.state.y).toBe(0);
+
+        const addedPanel = findVizPanelByKey(scene, 'panel-7')!;
+        expect(addedPanel).toBeDefined();
         expect(store.exists(LS_PANEL_COPY_KEY)).toBe(false);
       });
 
       it('Should paste a library viz panel', () => {
         store.set(LS_PANEL_COPY_KEY, JSON.stringify({ key: 'panel-7' }));
-        jest.spyOn(JSON, 'parse').mockReturnValue({ libraryPanel: { uid: 'uid', name: 'libraryPanel' } });
-        jest.mocked(buildGridItemForLibPanel).mockReturnValue(
+        jest.mocked(buildGridItemForPanel).mockReturnValue(
           new DashboardGridItem({
-            body: new LibraryVizPanel({
+            body: new VizPanel({
               title: 'Library Panel',
-              uid: 'uid',
-              name: 'libraryPanel',
-              panelKey: 'panel-4',
+              pluginId: 'table',
+              key: 'panel-4',
+              $behaviors: [new LibraryPanelBehavior({ name: 'libraryPanel', uid: 'uid' })],
             }),
           })
         );
 
         scene.pastePanel();
 
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[0] as DashboardGridItem;
+        expect(buildGridItemForPanel).toHaveBeenCalledTimes(1);
 
-        const libVizPanel = gridItem.state.body as LibraryVizPanel;
-
-        expect(buildGridItemForLibPanel).toHaveBeenCalledTimes(1);
-        expect(body.state.children.length).toBe(6);
-        expect(libVizPanel.state.panelKey).toBe('panel-7');
-        expect(libVizPanel.state.panel?.state.key).toBe('panel-7');
-        expect(gridItem.state.y).toBe(0);
+        const addedPanel = findVizPanelByKey(scene, 'panel-7')!;
+        expect(addedPanel).toBeDefined();
+        expect(addedPanel.state.key).toBe('panel-7');
         expect(store.exists(LS_PANEL_COPY_KEY)).toBe(false);
       });
 
-      it('Should remove a panel', () => {
-        const vizPanel = ((scene.state.body as SceneGridLayout).state.children[0] as DashboardGridItem).state.body;
-        scene.removePanel(vizPanel as VizPanel);
+      describe('Copy/Paste panel styles', () => {
+        const createTimeseriesPanel = () => {
+          return new VizPanel({
+            title: 'Timeseries Panel',
+            key: `panel-timeseries-${Math.random()}`,
+            pluginId: 'timeseries',
+            fieldConfig: {
+              defaults: {
+                color: { mode: 'palette-classic' },
+                custom: {
+                  lineWidth: 1,
+                  fillOpacity: 10,
+                },
+              },
+              overrides: [],
+            },
+          });
+        };
 
-        const body = scene.state.body as SceneGridLayout;
-        expect(body.state.children.length).toBe(4);
-      });
-
-      it('Should remove a panel within a row', () => {
-        const vizPanel = (
-          ((scene.state.body as SceneGridLayout).state.children[2] as SceneGridRow).state
-            .children[0] as DashboardGridItem
-        ).state.body;
-        scene.removePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[2] as SceneGridRow;
-
-        expect(gridRow.state.children.length).toBe(1);
-      });
-
-      it('Should remove a library panel', () => {
-        const libraryPanel = ((scene.state.body as SceneGridLayout).state.children[4] as DashboardGridItem).state.body;
-        const vizPanel = (libraryPanel as LibraryVizPanel).state.panel;
-        scene.removePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        expect(body.state.children.length).toBe(4);
-      });
-
-      it('Should remove a library panel within a row', () => {
-        const libraryPanel = (
-          ((scene.state.body as SceneGridLayout).state.children[2] as SceneGridRow).state
-            .children[1] as DashboardGridItem
-        ).state.body;
-        const vizPanel = (libraryPanel as LibraryVizPanel).state.panel;
-
-        scene.removePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[2] as SceneGridRow;
-        expect(gridRow.state.children.length).toBe(1);
-      });
-
-      it('Should duplicate a panel', () => {
-        const vizPanel = ((scene.state.body as SceneGridLayout).state.children[0] as DashboardGridItem).state.body;
-        scene.duplicatePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[5] as DashboardGridItem;
-
-        expect(body.state.children.length).toBe(6);
-        expect(gridItem.state.body!.state.key).toBe('panel-7');
-      });
-
-      it('Should duplicate a library panel', () => {
-        const libraryPanel = ((scene.state.body as SceneGridLayout).state.children[4] as DashboardGridItem).state.body;
-        const vizPanel = (libraryPanel as LibraryVizPanel).state.panel;
-        scene.duplicatePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[5] as DashboardGridItem;
-
-        const libVizPanel = gridItem.state.body as LibraryVizPanel;
-
-        expect(body.state.children.length).toBe(6);
-        expect(libVizPanel.state.panelKey).toBe('panel-7');
-        expect(libVizPanel.state.panel?.state.key).toBe('panel-7');
-      });
-
-      it('Should duplicate a repeated panel', () => {
-        const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [
-              new DashboardGridItem({
-                key: `grid-item-1`,
-                width: 24,
-                height: 8,
-                repeatedPanels: [
-                  new VizPanel({
-                    title: 'Library Panel',
-                    key: 'panel-1',
-                    pluginId: 'table',
-                  }),
-                ],
-                body: new VizPanel({
-                  title: 'Library Panel',
-                  key: 'panel-1',
-                  pluginId: 'table',
-                }),
-                variableName: 'custom',
-              }),
-            ],
-          }),
+        beforeEach(() => {
+          store.delete(LS_STYLES_COPY_KEY);
+          config.featureToggles.panelStyleActions = true;
         });
 
-        const vizPanel = ((scene.state.body as SceneGridLayout).state.children[0] as DashboardGridItem).state
-          .repeatedPanels![0];
-
-        scene.duplicatePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[1] as DashboardGridItem;
-
-        expect(body.state.children.length).toBe(2);
-        expect(gridItem.state.body!.state.key).toBe('panel-2');
-      });
-
-      it('Should duplicate a panel in a row', () => {
-        const vizPanel = (
-          ((scene.state.body as SceneGridLayout).state.children[2] as SceneGridRow).state
-            .children[0] as DashboardGridItem
-        ).state.body;
-        scene.duplicatePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[2] as SceneGridRow;
-        const gridItem = gridRow.state.children[2] as DashboardGridItem;
-
-        expect(gridRow.state.children.length).toBe(3);
-        expect(gridItem.state.body!.state.key).toBe('panel-7');
-      });
-
-      it('Should duplicate a library panel in a row', () => {
-        const libraryPanel = (
-          ((scene.state.body as SceneGridLayout).state.children[2] as SceneGridRow).state
-            .children[1] as DashboardGridItem
-        ).state.body;
-        const vizPanel = (libraryPanel as LibraryVizPanel).state.panel;
-
-        scene.duplicatePanel(vizPanel as VizPanel);
-
-        const body = scene.state.body as SceneGridLayout;
-        const gridRow = body.state.children[2] as SceneGridRow;
-        const gridItem = gridRow.state.children[2] as DashboardGridItem;
-
-        const libVizPanel = gridItem.state.body as LibraryVizPanel;
-
-        expect(gridRow.state.children.length).toBe(3);
-        expect(libVizPanel.state.panelKey).toBe('panel-7');
-        expect(libVizPanel.state.panel?.state.key).toBe('panel-7');
-      });
-
-      it('Should fail to duplicate a panel if it does not have a grid item parent', () => {
-        const vizPanel = new VizPanel({
-          title: 'Panel Title',
-          key: 'panel-5',
-          pluginId: 'timeseries',
+        afterEach(() => {
+          config.featureToggles.panelStyleActions = false;
         });
 
-        scene.duplicatePanel(vizPanel);
+        it('Should copy panel styles when feature flag is enabled', () => {
+          const spy = jest.spyOn(DashboardInteractions, 'panelStylesMenuClicked');
+          const timeseriesPanel = createTimeseriesPanel();
 
-        const body = scene.state.body as SceneGridLayout;
+          scene.copyPanelStyles(timeseriesPanel);
 
-        // length remains unchanged
-        expect(body.state.children.length).toBe(5);
+          expect(store.exists(LS_STYLES_COPY_KEY)).toBe(true);
+          const stored = JSON.parse(store.get(LS_STYLES_COPY_KEY) || '{}');
+          expect(stored.panelType).toBe('timeseries');
+          expect(stored.styles).toBeDefined();
+          expect(spy).not.toHaveBeenCalled(); // Analytics only called from menu
+        });
+
+        it('Should not copy panel styles when feature flag is disabled', () => {
+          config.featureToggles.panelStyleActions = false;
+          const timeseriesPanel = createTimeseriesPanel();
+
+          scene.copyPanelStyles(timeseriesPanel);
+
+          expect(store.exists(LS_STYLES_COPY_KEY)).toBe(false);
+        });
+
+        it('Should not copy styles for non-timeseries panels', () => {
+          const vizPanel = findVizPanelByKey(scene, 'panel-1')!;
+          scene.copyPanelStyles(vizPanel);
+
+          expect(store.exists(LS_STYLES_COPY_KEY)).toBe(false);
+        });
+
+        it('Should return false for hasPanelStylesToPaste when no styles copied', () => {
+          expect(DashboardScene.hasPanelStylesToPaste('timeseries')).toBe(false);
+        });
+
+        it('Should return false for hasPanelStylesToPaste when feature flag is disabled', () => {
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify({ panelType: 'timeseries', styles: {} }));
+          config.featureToggles.panelStyleActions = false;
+
+          expect(DashboardScene.hasPanelStylesToPaste('timeseries')).toBe(false);
+        });
+
+        it('Should return true for hasPanelStylesToPaste when styles exist for matching panel type', () => {
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify({ panelType: 'timeseries', styles: {} }));
+
+          expect(DashboardScene.hasPanelStylesToPaste('timeseries')).toBe(true);
+        });
+
+        it('Should return false for hasPanelStylesToPaste for different panel type', () => {
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify({ panelType: 'timeseries', styles: {} }));
+
+          expect(DashboardScene.hasPanelStylesToPaste('table')).toBe(false);
+        });
+
+        it('Should paste panel styles when feature flag is enabled', () => {
+          const spy = jest.spyOn(DashboardInteractions, 'panelStylesMenuClicked');
+          const timeseriesPanel = createTimeseriesPanel();
+          const mockOnFieldConfigChange = jest.fn();
+          timeseriesPanel.onFieldConfigChange = mockOnFieldConfigChange;
+
+          const styles = {
+            panelType: 'timeseries',
+            styles: {
+              fieldConfig: {
+                defaults: {
+                  color: { mode: 'palette-classic' },
+                  custom: {
+                    lineWidth: 2,
+                    fillOpacity: 10,
+                  },
+                },
+              },
+            },
+          };
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify(styles));
+
+          scene.pastePanelStyles(timeseriesPanel);
+
+          expect(mockOnFieldConfigChange).toHaveBeenCalled();
+          expect(store.exists(LS_STYLES_COPY_KEY)).toBe(true);
+          expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('Should not paste panel styles when feature flag is disabled', () => {
+          config.featureToggles.panelStyleActions = false;
+          const timeseriesPanel = createTimeseriesPanel();
+          const mockOnFieldConfigChange = jest.fn();
+          timeseriesPanel.onFieldConfigChange = mockOnFieldConfigChange;
+
+          const styles = {
+            panelType: 'timeseries',
+            styles: { fieldConfig: { defaults: {} } },
+          };
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify(styles));
+
+          scene.pastePanelStyles(timeseriesPanel);
+
+          expect(mockOnFieldConfigChange).not.toHaveBeenCalled();
+        });
+
+        it('Should not paste styles when no styles are copied', () => {
+          const timeseriesPanel = createTimeseriesPanel();
+          const mockOnFieldConfigChange = jest.fn();
+          timeseriesPanel.onFieldConfigChange = mockOnFieldConfigChange;
+
+          scene.pastePanelStyles(timeseriesPanel);
+
+          expect(mockOnFieldConfigChange).not.toHaveBeenCalled();
+        });
+
+        it('Should not paste styles to different panel type', () => {
+          const spy = jest.spyOn(DashboardInteractions, 'panelStylesMenuClicked');
+          const timeseriesPanel = createTimeseriesPanel();
+          const mockOnFieldConfigChange = jest.fn();
+          timeseriesPanel.onFieldConfigChange = mockOnFieldConfigChange;
+
+          const styles = {
+            panelType: 'table',
+            styles: { fieldConfig: { defaults: {} } },
+          };
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify(styles));
+
+          scene.pastePanelStyles(timeseriesPanel);
+
+          expect(mockOnFieldConfigChange).not.toHaveBeenCalled();
+          expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('Should allow pasting styles multiple times', () => {
+          const spy = jest.spyOn(DashboardInteractions, 'panelStylesMenuClicked');
+          const timeseriesPanel1 = createTimeseriesPanel();
+          const timeseriesPanel2 = createTimeseriesPanel();
+          const mockOnFieldConfigChange1 = jest.fn();
+          const mockOnFieldConfigChange2 = jest.fn();
+          timeseriesPanel1.onFieldConfigChange = mockOnFieldConfigChange1;
+          timeseriesPanel2.onFieldConfigChange = mockOnFieldConfigChange2;
+
+          const styles = {
+            panelType: 'timeseries',
+            styles: { fieldConfig: { defaults: { custom: { lineWidth: 3 } } } },
+          };
+          store.set(LS_STYLES_COPY_KEY, JSON.stringify(styles));
+
+          scene.pastePanelStyles(timeseriesPanel1);
+          expect(mockOnFieldConfigChange1).toHaveBeenCalled();
+          expect(store.exists(LS_STYLES_COPY_KEY)).toBe(true);
+
+          scene.pastePanelStyles(timeseriesPanel2);
+          expect(mockOnFieldConfigChange2).toHaveBeenCalled();
+          expect(store.exists(LS_STYLES_COPY_KEY)).toBe(true);
+          expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('Should report analytics on paste error', () => {
+          const spy = jest.spyOn(DashboardInteractions, 'panelStylesMenuClicked');
+          jest.spyOn(console, 'error').mockImplementation();
+
+          store.set(LS_STYLES_COPY_KEY, 'invalid json');
+          scene.pastePanelStyles(createTimeseriesPanel());
+
+          expect(spy).toHaveBeenCalledWith('paste', 'timeseries', expect.any(Number), true);
+        });
       });
 
       it('Should unlink a library panel', () => {
-        const libPanel = new LibraryVizPanel({
-          title: 'title',
-          uid: 'abc',
-          name: 'lib panel',
-          panelKey: 'panel-1',
-          isLoaded: true,
-          panel: new VizPanel({
-            title: 'Panel B',
-            pluginId: 'table',
-          }),
+        const libPanel = new VizPanel({
+          title: 'Panel B',
+          pluginId: 'table',
+          $behaviors: [new LibraryPanelBehavior({ name: 'lib panel', uid: 'abc', isLoaded: true })],
         });
 
         const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [
-              new DashboardGridItem({
-                key: 'griditem-2',
-                body: libPanel,
-              }),
-            ],
-          }),
+          body: DefaultGridLayoutManager.fromVizPanels([libPanel]),
         });
+
+        expect(isLibraryPanel(libPanel)).toBe(true);
 
         scene.unlinkLibraryPanel(libPanel);
 
-        const body = scene.state.body as SceneGridLayout;
-        const gridItem = body.state.children[0] as DashboardGridItem;
+        expect(isLibraryPanel(libPanel)).toBe(false);
+      });
 
-        expect(body.state.children.length).toBe(1);
-        expect(gridItem.state.body).toBeInstanceOf(VizPanel);
+      it('Should unlink a library panel for auto grid panels', () => {
+        const libPanel = new VizPanel({
+          title: 'Panel B',
+          pluginId: 'table',
+          $behaviors: [new LibraryPanelBehavior({ name: 'lib panel', uid: 'abc', isLoaded: true })],
+        });
+
+        const autoGridItem = new AutoGridItem({
+          key: 'auto-grid-item-1',
+          body: libPanel,
+        });
+
+        const scene = buildTestScene({
+          body: new AutoGridLayoutManager({
+            layout: new AutoGridLayout({ children: [autoGridItem] }),
+          }),
+        });
+
+        expect(isLibraryPanel(libPanel)).toBe(true);
+
+        scene.unlinkLibraryPanel(libPanel);
+
+        expect(isLibraryPanel(libPanel)).toBe(false);
       });
 
       it('Should create a library panel', () => {
@@ -903,10 +877,9 @@ describe('DashboardScene', () => {
           body: vizPanel,
         });
 
+        const grid = new SceneGridLayout({ children: [gridItem] });
         const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [gridItem],
-          }),
+          body: new DefaultGridLayoutManager({ grid }),
         });
 
         const libPanel = {
@@ -916,35 +889,30 @@ describe('DashboardScene', () => {
 
         scene.createLibraryPanel(vizPanel, libPanel as LibraryPanel);
 
-        const layout = scene.state.body as SceneGridLayout;
-        const newGridItem = layout.state.children[0] as DashboardGridItem;
+        const newGridItem = grid.state.children[0] as DashboardGridItem;
+        const behavior = newGridItem.state.body.state.$behaviors![0] as LibraryPanelBehavior;
 
-        expect(layout.state.children.length).toBe(1);
-        expect(newGridItem.state.body).toBeInstanceOf(LibraryVizPanel);
-        expect((newGridItem.state.body as LibraryVizPanel).state.uid).toBe('uid');
-        expect((newGridItem.state.body as LibraryVizPanel).state.name).toBe('name');
+        expect(grid.state.children.length).toBe(1);
+        expect(newGridItem.state.body).toBeInstanceOf(VizPanel);
+        expect(behavior.state.uid).toBe('uid');
+        expect(behavior.state.name).toBe('name');
       });
 
-      it('Should create a library panel under a row', () => {
+      it('Should create a library panel for auto grid panels', () => {
         const vizPanel = new VizPanel({
           title: 'Panel A',
           key: 'panel-1',
           pluginId: 'table',
         });
 
-        const gridItem = new DashboardGridItem({
-          key: 'griditem-1',
+        const autoGridItem = new AutoGridItem({
+          key: 'auto-grid-item-1',
           body: vizPanel,
         });
 
         const scene = buildTestScene({
-          body: new SceneGridLayout({
-            children: [
-              new SceneGridRow({
-                key: 'row-1',
-                children: [gridItem],
-              }),
-            ],
+          body: new AutoGridLayoutManager({
+            layout: new AutoGridLayout({ children: [autoGridItem] }),
           }),
         });
 
@@ -955,14 +923,11 @@ describe('DashboardScene', () => {
 
         scene.createLibraryPanel(vizPanel, libPanel as LibraryPanel);
 
-        const layout = scene.state.body as SceneGridLayout;
-        const newGridItem = (layout.state.children[0] as SceneGridRow).state.children[0] as DashboardGridItem;
+        const behavior = autoGridItem.state.body.state.$behaviors![0] as LibraryPanelBehavior;
 
-        expect(layout.state.children.length).toBe(1);
-        expect((layout.state.children[0] as SceneGridRow).state.children.length).toBe(1);
-        expect(newGridItem.state.body).toBeInstanceOf(LibraryVizPanel);
-        expect((newGridItem.state.body as LibraryVizPanel).state.uid).toBe('uid');
-        expect((newGridItem.state.body as LibraryVizPanel).state.name).toBe('name');
+        expect(autoGridItem.state.body).toBeInstanceOf(VizPanel);
+        expect(behavior.state.uid).toBe('uid');
+        expect(behavior.state.name).toBe('name');
       });
     });
   });
@@ -973,7 +938,7 @@ describe('DashboardScene', () => {
       scene.setState({ isDirty: true });
 
       locationService.push('/d/adsdas');
-      await scene.deleteDashboard();
+      await scene.onDashboardDelete();
 
       expect(scene.state.isDirty).toBe(false);
     });
@@ -993,22 +958,26 @@ describe('DashboardScene', () => {
         expect(scene.enrichDataRequest(queryRunner)).toEqual({
           app: CoreApp.Dashboard,
           dashboardUID: 'dash-1',
+          dashboardTitle: 'hello',
           panelId: 1,
+          panelName: 'Panel A',
           panelPluginId: 'table',
         });
       });
+
       test('when editing', () => {
         const panel = findVizPanelByKey(scene, 'panel-1');
         const editPanel = buildPanelEditScene(panel!);
-        scene.setState({
-          editPanel,
-        });
+        scene.setState({ editPanel });
 
-        const queryRunner = (scene.state.editPanel as PanelEditor).state.vizManager.queryRunner;
+        const queryRunner = editPanel.getPanel().state.$data!;
+
         expect(scene.enrichDataRequest(queryRunner)).toEqual({
           app: CoreApp.Dashboard,
           dashboardUID: 'dash-1',
+          dashboardTitle: 'hello',
           panelId: 1,
+          panelName: 'Panel A',
           panelPluginId: 'table',
         });
       });
@@ -1016,8 +985,7 @@ describe('DashboardScene', () => {
 
     it('Should hash the key of the cloned panels and set it as panelId', () => {
       const queryRunner = sceneGraph.findObject(scene, (o) => o.state.key === 'data-query-runner2')!;
-      const expectedPanelId = djb2Hash('panel-2-clone-1');
-      expect(scene.enrichDataRequest(queryRunner).panelId).toEqual(expectedPanelId);
+      expect(scene.enrichDataRequest(queryRunner).panelId).toEqual(3670868617);
     });
   });
 
@@ -1058,7 +1026,7 @@ describe('DashboardScene', () => {
     });
 
     it('A change to a variable state should set isDirty true', () => {
-      mockResultsOfDetectChangesWorker({ hasChanges: true, hasTimeChanges: false, hasVariableValueChanges: true });
+      mockResultsOfDetectChangesWorker({ hasChanges: true });
       const variable = new TestVariable({ name: 'A' });
       const scene = buildTestScene({
         $variables: new SceneVariableSet({ variables: [variable] }),
@@ -1082,15 +1050,27 @@ describe('DashboardScene', () => {
       scene.activate();
       scene.onEnterEditMode();
 
-      mockResultsOfDetectChangesWorker({ hasChanges: true, hasTimeChanges: false, hasVariableValueChanges: false });
+      mockResultsOfDetectChangesWorker({ hasChanges: true });
       variable.setState({ name: 'B' });
       expect(scene.state.isDirty).toBe(true);
-      mockResultsOfDetectChangesWorker(
-        // No changes, it is the same name than before comparing saving models
-        { hasChanges: false, hasTimeChanges: false, hasVariableValueChanges: false }
-      );
+      mockResultsOfDetectChangesWorker({ hasChanges: false });
       variable.setState({ name: 'A' });
       expect(scene.state.isDirty).toBe(false);
+    });
+
+    it('should trigger scene RefreshEvent when a scene variable changes', () => {
+      const varA = new TestVariable({ name: 'A', query: 'A.*', value: 'A.AA', text: '', options: [], delayMs: 0 });
+      const scene = buildTestScene({
+        $variables: new SceneVariableSet({ variables: [varA] }),
+      });
+
+      scene.activate();
+
+      const eventHandler = jest.fn();
+      // this RefreshEvent is from the scenes library
+      scene.subscribeToEvent(RefreshEvent, eventHandler);
+      varA.changeValueTo('A.AB');
+      expect(eventHandler).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -1111,20 +1091,53 @@ describe('DashboardScene', () => {
         version: 4,
       });
 
-      jest.mocked(historySrv.restoreDashboard).mockResolvedValue({ version: newVersion });
+      mockRestoreDashboardVersion.mockResolvedValue({ version: newVersion });
       jest.mocked(transformSaveModelToScene).mockReturnValue(mockScene);
 
       return scene.onRestore(getVersionMock()).then((res) => {
         expect(res).toBe(true);
-
         expect(scene.state.version).toBe(newVersion);
         expect(scene.state.isEditing).toBe(false);
       });
     });
 
-    it('should return early if historySrv does not return a valid version number', () => {
+    it('should call dashboardWatcher.reloadPage even if dashboard is in editing mode', async () => {
+      // sometimes a dashboard can be in editing mode after user has already restored to a previous version
+
+      const newVersion = 3;
+      const mockScene = new DashboardScene({
+        title: 'new name',
+        uid: 'dash-1',
+        version: 4,
+      });
+      mockRestoreDashboardVersion.mockResolvedValue({ version: newVersion });
+      jest.mocked(transformSaveModelToScene).mockReturnValue(mockScene);
+
+      const reloadSpy = jest.spyOn(dashboardWatcher, 'reloadPage').mockImplementation(() => {});
+
+      dashboardWatcher.editing = false;
+      const dash = { uid: 'dash-1', hasUnsavedChanges: () => true };
       jest
-        .mocked(historySrv.restoreDashboard)
+        .spyOn(require('app/features/dashboard/services/DashboardSrv'), 'getDashboardSrv')
+        .mockReturnValue({ getCurrent: () => dash });
+
+      dashboardWatcher.observer.next({
+        type: LiveChannelEventType.Message,
+        message: {
+          sessionId: 'other',
+          message: 'Restored from version 3',
+          uid: 'dash-1',
+          action: DashboardEventAction.Saved,
+          timestamp: Date.now(),
+        },
+      });
+
+      expect(reloadSpy).toHaveBeenCalled();
+      reloadSpy.mockRestore();
+    });
+
+    it('should return early if API does not return a valid version number', () => {
+      mockRestoreDashboardVersion
         .mockResolvedValueOnce({ version: null })
         .mockResolvedValueOnce({ version: undefined })
         .mockResolvedValueOnce({ version: Infinity })
@@ -1139,53 +1152,798 @@ describe('DashboardScene', () => {
     });
   });
 
-  describe('When coming from explore', () => {
-    // When coming from Explore the first panel in a dashboard is a temporary panel
-    it('should remove first panel from the grid when discarding changes', () => {
-      const scene = new DashboardScene({
-        title: 'hello',
-        uid: 'dash-1',
-        description: 'hello description',
-        editable: true,
-        $timeRange: new SceneTimeRange({
-          timeZone: 'browser',
-        }),
-        controls: new DashboardControls({}),
-        $behaviors: [new behaviors.CursorSync({})],
-        body: new SceneGridLayout({
-          children: [
-            new DashboardGridItem({
-              key: 'griditem-1',
-              x: 0,
-              body: new VizPanel({
-                title: 'Panel A',
-                key: 'panel-1',
-                pluginId: 'table',
-                $data: new SceneQueryRunner({ key: 'data-query-runner', queries: [{ refId: 'A' }] }),
-              }),
-            }),
-            new DashboardGridItem({
-              key: 'griditem-2',
-              body: new VizPanel({
-                title: 'Panel B',
-                key: 'panel-2',
-                pluginId: 'table',
-              }),
-            }),
-          ],
-        }),
+  describe('When checking dashboard managed by an external system', () => {
+    beforeEach(() => {
+      config.featureToggles.provisioning = true;
+    });
+
+    afterEach(() => {
+      config.featureToggles.provisioning = false;
+    });
+
+    it('should return true if the dashboard is managed', () => {
+      const scene = buildTestScene({
+        meta: {
+          k8s: {
+            annotations: {
+              [AnnoKeyManagerKind]: ManagerKind.Repo,
+            },
+          },
+        },
       });
+      expect(scene.isManaged()).toBe(true);
+    });
 
-      scene.onEnterEditMode(true);
-      expect(scene.state.isEditing).toBe(true);
-      expect((scene.state.body as SceneGridLayout).state.children.length).toBe(2);
+    it('dashboard should be editable if managed by repo', () => {
+      const scene = buildTestScene({
+        meta: {
+          k8s: {
+            annotations: {
+              [AnnoKeyManagerKind]: ManagerKind.Repo,
+            },
+          },
+        },
+      });
+      expect(scene.managedResourceCannotBeEdited()).toBe(false);
+    });
 
-      scene.exitEditMode({ skipConfirm: true });
-      expect(scene.state.isEditing).toBe(false);
-      expect((scene.state.body as SceneGridLayout).state.children.length).toBe(1);
+    it('dashboard should not be editable if managed by systems that do not allow edits: kubectl', () => {
+      const scene = buildTestScene({
+        meta: {
+          k8s: {
+            annotations: {
+              [AnnoKeyManagerKind]: ManagerKind.Kubectl,
+            },
+          },
+        },
+      });
+      expect(scene.managedResourceCannotBeEdited()).toBe(true);
+    });
+
+    it('dashboard should not be editable if managed by systems that do not allow edits: terraform', () => {
+      const scene = buildTestScene({
+        meta: {
+          k8s: {
+            annotations: {
+              [AnnoKeyManagerKind]: ManagerKind.Terraform,
+            },
+          },
+        },
+      });
+      expect(scene.managedResourceCannotBeEdited()).toBe(true);
+    });
+
+    it('dashboard should not be editable if managed by systems that do not allow edits: plugin', () => {
+      const scene = buildTestScene({
+        meta: {
+          k8s: { annotations: { [AnnoKeyManagerKind]: ManagerKind.Plugin } },
+        },
+      });
+      expect(scene.managedResourceCannotBeEdited()).toBe(true);
+    });
+
+    it('dashboard should be editable if not managed', () => {
+      const scene = buildTestScene();
+      expect(scene.managedResourceCannotBeEdited()).toBe(false);
+    });
+  });
+
+  describe('getTransformationCounts', () => {
+    it('should count transformations from V1 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModel = createV1DashboardWithTransformations(['reduce', 'calculateField', 'reduce']);
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toEqual({ calculateField: 1, reduce: 2 });
+    });
+
+    it('should count transformations from V2 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModel = createV2DashboardWithTransformations(['filterByValue', 'organize', 'filterByValue']);
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toEqual({ filterByValue: 2, organize: 1 });
+    });
+
+    it('should return undefined when no transformations exist', () => {
+      const scene = buildTestScene();
+      const saveModelV1 = createV1DashboardWithExpressions([]);
+      const saveModelV2 = createV2DashboardWithExpressions([]);
+
+      const resultV1 = scene.getTransformationCounts(saveModelV1);
+      const resultV2 = scene.getTransformationCounts(saveModelV2);
+
+      expect(resultV1).toBeUndefined();
+      expect(resultV2).toBeUndefined();
+    });
+
+    it('should return undefined for empty V1 dashboard', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Empty Dashboard',
+        schemaVersion: 30,
+        panels: [],
+      } as unknown as Dashboard;
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for empty V2 dashboard', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Empty Dashboard V2',
+        elements: {},
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle multiple panels with transformations in V1', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard',
+        schemaVersion: 30,
+        panels: [
+          {
+            id: 1,
+            type: 'timeseries',
+            transformations: [
+              { id: 'reduce', options: {} },
+              { id: 'calculateField', options: {} },
+            ],
+          },
+          {
+            id: 2,
+            type: 'graph',
+            transformations: [{ id: 'reduce', options: {} }],
+          },
+        ],
+      } as unknown as Dashboard;
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toEqual({ calculateField: 1, reduce: 2 });
+    });
+
+    it('should handle multiple panels with transformations in V2', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard V2',
+        elements: {
+          'panel-1': {
+            kind: 'Panel',
+            spec: {
+              id: 1,
+              title: 'Panel 1',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [],
+                  transformations: [
+                    { kind: 'organize', spec: { id: 'organize', options: {} } },
+                    { kind: 'filterByValue', spec: { id: 'filterByValue', options: {} } },
+                  ],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+          'panel-2': {
+            kind: 'Panel',
+            spec: {
+              id: 2,
+              title: 'Panel 2',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [],
+                  transformations: [{ kind: 'organize', spec: { id: 'organize', options: {} } }],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+        },
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toEqual({ filterByValue: 1, organize: 2 });
+    });
+
+    it('should return object with correct structure', () => {
+      const scene = buildTestScene();
+      const saveModel = createV1DashboardWithTransformations(['organize', 'calculateField', 'filterByValue']);
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toEqual({
+        calculateField: 1,
+        filterByValue: 1,
+        organize: 1,
+      });
+    });
+
+    it('should skip LibraryPanel elements in V2', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard V2',
+        elements: {
+          'panel-1': {
+            kind: 'Panel',
+            spec: {
+              id: 1,
+              title: 'Panel 1',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [],
+                  transformations: [{ kind: 'organize', spec: { id: 'organize', options: {} } }],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+          'library-panel-1': {
+            kind: 'LibraryPanel',
+            spec: {
+              uid: 'library-uid',
+              name: 'Library Panel',
+            },
+          },
+        },
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getTransformationCounts(saveModel);
+
+      expect(result).toEqual({ organize: 1 });
+    });
+  });
+
+  describe('getExpressionCounts', () => {
+    it('should count all expression types from V1 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModel = createV1DashboardWithExpressions(['sql', 'sql', 'reduce']);
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ reduce: 1, sql: 2 });
+    });
+
+    it('should count all expression types from V2 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModel = createV2DashboardWithExpressions(['sql', 'math', 'sql']);
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ math: 1, sql: 2 });
+    });
+
+    it('should return undefined when no expressions exist for V1 and V2 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModelV1 = createV1DashboardWithExpressions([]);
+      const saveModelV2 = createV2DashboardWithExpressions([]);
+
+      const resultV1 = scene.getExpressionCounts(saveModelV1);
+      const resultV2 = scene.getExpressionCounts(saveModelV2);
+
+      expect(resultV1).toBeUndefined();
+      expect(resultV2).toBeUndefined();
+    });
+
+    it('should return undefined for empty V1 dashboard', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Empty Dashboard',
+        schemaVersion: 30,
+        panels: [],
+      } as unknown as Dashboard;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for empty V2 dashboard', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Empty Dashboard V2',
+        elements: {},
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle multiple panels with expressions in V1', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard',
+        schemaVersion: 30,
+        panels: [
+          {
+            id: 1,
+            type: 'timeseries',
+            targets: [
+              {
+                refId: 'A',
+                datasource: { type: '__expr__', uid: '__expr__' },
+                type: 'sql',
+              },
+            ],
+          },
+          {
+            id: 2,
+            type: 'graph',
+            targets: [
+              {
+                refId: 'A',
+                datasource: { type: '__expr__', uid: '__expr__' },
+                type: 'sql',
+              },
+              {
+                refId: 'B',
+                datasource: { type: '__expr__', uid: '__expr__' },
+                type: 'math',
+              },
+            ],
+          },
+        ],
+      } as unknown as Dashboard;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ math: 1, sql: 2 });
+    });
+
+    it('should handle multiple panels with expressions in V2', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard V2',
+        elements: {
+          'panel-1': {
+            kind: 'Panel',
+            spec: {
+              id: 1,
+              title: 'Panel 1',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [
+                    {
+                      kind: 'PanelQuery',
+                      spec: {
+                        query: {
+                          kind: 'DataQuery',
+                          group: '__expr__',
+                          datasource: { name: '__expr__' },
+                          spec: { type: 'sql' },
+                        },
+                        refId: 'A',
+                      },
+                    },
+                  ],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+          'panel-2': {
+            kind: 'Panel',
+            spec: {
+              id: 2,
+              title: 'Panel 2',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [
+                    {
+                      kind: 'PanelQuery',
+                      spec: {
+                        query: {
+                          kind: 'DataQuery',
+                          group: '__expr__',
+                          datasource: { name: '__expr__' },
+                          spec: { type: 'sql' },
+                        },
+                        refId: 'A',
+                      },
+                    },
+                    {
+                      kind: 'PanelQuery',
+                      spec: {
+                        query: {
+                          kind: 'DataQuery',
+                          group: '__expr__',
+                          datasource: { name: '__expr__' },
+                          spec: { type: 'math' },
+                        },
+                        refId: 'B',
+                      },
+                    },
+                  ],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+        },
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ math: 1, sql: 2 });
+    });
+
+    it('should return object with correct structure for multiple expression types', () => {
+      const scene = buildTestScene();
+      const saveModel = createV1DashboardWithExpressions(['reduce', 'math', 'sql']);
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ math: 1, reduce: 1, sql: 1 });
+    });
+
+    it('should skip non-expression datasources in V1 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard',
+        schemaVersion: 30,
+        panels: [
+          {
+            id: 1,
+            type: 'timeseries',
+            targets: [
+              {
+                refId: 'A',
+                datasource: { type: 'prometheus', uid: 'prometheus-uid' },
+                type: 'instant',
+              },
+              {
+                refId: 'B',
+                datasource: { type: '__expr__', uid: '__expr__' },
+                type: 'sql',
+              },
+            ],
+          },
+        ],
+      } as unknown as Dashboard;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ sql: 1 });
+    });
+
+    it('should skip non-expression datasources in V2 dashboards', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard V2',
+        elements: {
+          'panel-1': {
+            kind: 'Panel',
+            spec: {
+              id: 1,
+              title: 'Panel 1',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [
+                    {
+                      kind: 'PanelQuery',
+                      spec: {
+                        query: {
+                          kind: 'DataQuery',
+                          group: 'prometheus',
+                          datasource: { name: 'prometheus-uid' },
+                          spec: { expr: 'up' },
+                        },
+                        refId: 'A',
+                      },
+                    },
+                    {
+                      kind: 'PanelQuery',
+                      spec: {
+                        query: {
+                          kind: 'DataQuery',
+                          group: '__expr__',
+                          datasource: { name: '__expr__' },
+                          spec: { type: 'math' },
+                        },
+                        refId: 'B',
+                      },
+                    },
+                  ],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+        },
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ math: 1 });
+    });
+
+    it('should skip LibraryPanel elements in V2', () => {
+      const scene = buildTestScene();
+      const saveModel = {
+        title: 'Test Dashboard V2',
+        elements: {
+          'panel-1': {
+            kind: 'Panel',
+            spec: {
+              id: 1,
+              title: 'Panel 1',
+              data: {
+                kind: 'QueryGroup',
+                spec: {
+                  queries: [
+                    {
+                      kind: 'PanelQuery',
+                      spec: {
+                        query: {
+                          kind: 'DataQuery',
+                          group: '__expr__',
+                          datasource: { name: '__expr__' },
+                          spec: { type: 'sql' },
+                        },
+                        refId: 'A',
+                      },
+                    },
+                  ],
+                  queryOptions: {},
+                },
+              },
+            },
+          },
+          'library-panel-1': {
+            kind: 'LibraryPanel',
+            spec: {
+              uid: 'library-uid',
+              name: 'Library Panel',
+            },
+          },
+        },
+      } as unknown as DashboardV2Spec;
+
+      const result = scene.getExpressionCounts(saveModel);
+
+      expect(result).toEqual({ sql: 1 });
     });
   });
 });
+
+function createV1DashboardWithExpressions(expressionTypes: string[]): Dashboard {
+  return {
+    title: 'Test Dashboard',
+    schemaVersion: 30,
+    panels: [
+      {
+        id: 1,
+        type: 'timeseries',
+        targets: [
+          {
+            refId: 'A',
+            datasource: { type: 'prometheus', uid: 'prometheus-uid' },
+          },
+          ...expressionTypes.map((type, i) => ({
+            refId: String.fromCharCode(66 + i), // B, C, D...
+            datasource: { type: '__expr__', uid: '__expr__' },
+            type,
+          })),
+        ],
+      },
+    ],
+  };
+}
+
+function createV1DashboardWithTransformations(transformationIds: string[]): Dashboard {
+  return {
+    title: 'Test Dashboard',
+    schemaVersion: 30,
+    panels: [
+      {
+        id: 1,
+        type: 'timeseries',
+        targets: [
+          {
+            refId: 'A',
+            datasource: { type: 'prometheus', uid: 'prometheus-uid' },
+          },
+        ],
+        transformations: transformationIds.map((id) => ({
+          id,
+          options: {},
+        })),
+      },
+    ],
+  };
+}
+
+function createV2DashboardWithExpressions(expressionTypes: string[]): DashboardV2Spec {
+  return {
+    title: 'Test Dashboard V2',
+    annotations: [],
+    cursorSync: 'Off',
+    editable: true,
+    links: [],
+    preload: false,
+    tags: [],
+    timeSettings: {
+      timezone: 'browser',
+      from: 'now-6h',
+      to: 'now',
+      autoRefresh: '',
+      autoRefreshIntervals: ['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'],
+      hideTimepicker: false,
+      fiscalYearStartMonth: 0,
+    },
+    variables: [],
+    layout: {
+      kind: 'GridLayout',
+      spec: {
+        items: [],
+      },
+    },
+    elements: {
+      'panel-1': {
+        kind: 'Panel',
+        spec: {
+          id: 1,
+          title: 'Panel',
+          description: '',
+          links: [],
+          data: {
+            kind: 'QueryGroup',
+            spec: {
+              queries: [
+                {
+                  kind: 'PanelQuery',
+                  spec: {
+                    hidden: false,
+                    query: {
+                      kind: 'DataQuery',
+                      group: 'prometheus',
+                      version: 'v0',
+                      datasource: {
+                        name: 'prometheus-uid',
+                      },
+                      spec: {},
+                    },
+                    refId: 'A',
+                  },
+                },
+                ...expressionTypes.map((type, i) => ({
+                  kind: 'PanelQuery' as const,
+                  spec: {
+                    hidden: false,
+                    query: {
+                      kind: 'DataQuery' as const,
+                      group: '__expr__',
+                      version: 'v0' as const,
+                      datasource: {
+                        name: '__expr__',
+                      },
+                      spec: {
+                        type,
+                      },
+                    },
+                    refId: String.fromCharCode(66 + i), // B, C, D...
+                  },
+                })),
+              ],
+              queryOptions: {},
+              transformations: [],
+            },
+          },
+          vizConfig: {
+            kind: 'VizConfig',
+            version: '1.0.0',
+            group: 'timeseries',
+            spec: {
+              options: {},
+              fieldConfig: {
+                defaults: {},
+                overrides: [],
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+}
+
+function createV2DashboardWithTransformations(transformationIds: string[]): DashboardV2Spec {
+  return {
+    title: 'Test Dashboard V2',
+    annotations: [],
+    cursorSync: 'Off',
+    editable: true,
+    links: [],
+    preload: false,
+    tags: [],
+    timeSettings: {
+      timezone: 'browser',
+      from: 'now-6h',
+      to: 'now',
+      autoRefresh: '',
+      autoRefreshIntervals: ['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'],
+      hideTimepicker: false,
+      fiscalYearStartMonth: 0,
+    },
+    variables: [],
+    layout: {
+      kind: 'GridLayout',
+      spec: {
+        items: [],
+      },
+    },
+    elements: {
+      'panel-1': {
+        kind: 'Panel',
+        spec: {
+          id: 1,
+          title: 'Panel',
+          description: '',
+          links: [],
+          data: {
+            kind: 'QueryGroup',
+            spec: {
+              queries: [
+                {
+                  kind: 'PanelQuery',
+                  spec: {
+                    hidden: false,
+                    query: {
+                      kind: 'DataQuery',
+                      group: 'prometheus',
+                      version: 'v0',
+                      datasource: {
+                        name: 'prometheus-uid',
+                      },
+                      spec: {},
+                    },
+                    refId: 'A',
+                  },
+                },
+              ],
+              queryOptions: {},
+              transformations: transformationIds.map((id) => ({
+                kind: id,
+                spec: {
+                  id,
+                  options: {},
+                },
+              })),
+            },
+          },
+          vizConfig: {
+            kind: 'VizConfig',
+            version: '1.0.0',
+            group: 'timeseries',
+            spec: {
+              options: {},
+              fieldConfig: {
+                defaults: {},
+                overrides: [],
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+}
 
 function buildTestScene(overrides?: Partial<DashboardSceneState>) {
   const scene = new DashboardScene({
@@ -1199,82 +1957,78 @@ function buildTestScene(overrides?: Partial<DashboardSceneState>) {
     }),
     controls: new DashboardControls({}),
     $behaviors: [new behaviors.CursorSync({}), new behaviors.LiveNowTimer({})],
-    body: new SceneGridLayout({
-      children: [
-        new DashboardGridItem({
-          key: 'griditem-1',
-          x: 0,
-          body: new VizPanel({
-            title: 'Panel A',
-            key: 'panel-1',
-            pluginId: 'table',
-            $timeRange: new PanelTimeRange({
-              from: 'now-12h',
-              to: 'now',
-              timeZone: 'browser',
-            }),
-            $data: new SceneDataTransformer({
-              transformations: [],
-              $data: new SceneQueryRunner({ key: 'data-query-runner', queries: [{ refId: 'A' }] }),
-            }),
-          }),
-        }),
-        new DashboardGridItem({
-          key: 'griditem-2',
-          body: new VizPanel({
-            title: 'Panel B',
-            key: 'panel-2',
-            pluginId: 'table',
-          }),
-        }),
-        new SceneGridRow({
-          key: 'panel-3',
-          actions: new RowActions({}),
-          children: [
-            new DashboardGridItem({
-              body: new VizPanel({
-                title: 'Panel C',
-                key: 'panel-4',
-                pluginId: 'table',
+    body: new DefaultGridLayoutManager({
+      grid: new SceneGridLayout({
+        children: [
+          new DashboardGridItem({
+            key: 'griditem-1',
+            x: 0,
+            body: new VizPanel({
+              title: 'Panel A',
+              key: 'panel-1',
+              pluginId: 'table',
+              $timeRange: new PanelTimeRange({
+                from: 'now-12h',
+                to: 'now',
+                timeZone: 'browser',
+              }),
+              $data: new SceneDataTransformer({
+                transformations: [],
+                $data: new SceneQueryRunner({ key: 'data-query-runner', queries: [{ refId: 'A' }] }),
               }),
             }),
-            new DashboardGridItem({
-              body: new LibraryVizPanel({
-                uid: 'uid',
-                name: 'libraryPanel',
-                panelKey: 'panel-5',
-                title: 'Library Panel',
-                panel: new VizPanel({
-                  title: 'Library Panel',
-                  key: 'panel-5',
-                  pluginId: 'table',
-                }),
-              }),
-            }),
-          ],
-        }),
-        new DashboardGridItem({
-          body: new VizPanel({
-            title: 'Panel B',
-            key: 'panel-2-clone-1',
-            pluginId: 'table',
-            $data: new SceneQueryRunner({ key: 'data-query-runner2', queries: [{ refId: 'A' }] }),
           }),
-        }),
-        new DashboardGridItem({
-          body: new LibraryVizPanel({
-            uid: 'uid',
-            name: 'libraryPanel',
-            panelKey: 'panel-6',
-            title: 'Library Panel',
-            panel: new VizPanel({
-              title: 'Library Panel',
-              key: 'panel-6',
+          new DashboardGridItem({
+            key: 'griditem-2',
+            body: new VizPanel({
+              title: 'Panel B',
+              key: 'panel-2',
               pluginId: 'table',
             }),
           }),
-        }),
-      ],
+          new SceneGridRow({
+            key: 'panel-3',
+            actions: new RowActions({}),
+            children: [
+              new DashboardGridItem({
+                body: new VizPanel({
+                  title: 'Panel C',
+                  key: 'panel-4',
+                  pluginId: 'table',
+                }),
+              }),
+              new DashboardGridItem({
+                body: new VizPanel({
+                  title: 'Library Panel',
+                  pluginId: 'table',
+                  key: 'panel-5',
+                  $behaviors: [new LibraryPanelBehavior({ name: 'libraryPanel', uid: 'uid' })],
+                }),
+              }),
+            ],
+          }),
+          new DashboardGridItem({
+            body: new VizPanel({
+              title: 'Panel B',
+              key: getCloneKey('panel-2', 1),
+              repeatSourceKey: 'panel-2',
+              $variables: new SceneVariableSet({
+                variables: [new LocalValueVariable({ name: 'a', value: 'A' })],
+              }),
+              pluginId: 'table',
+              $data: new SceneQueryRunner({ key: 'data-query-runner2', queries: [{ refId: 'A' }] }),
+            }),
+          }),
+          new DashboardGridItem({
+            body: new VizPanel({
+              title: 'Library Panel',
+              pluginId: 'table',
+              key: 'panel-6',
+              $behaviors: [new LibraryPanelBehavior({ name: 'libraryPanel', uid: 'uid' })],
+            }),
+          }),
+        ],
+      }),
     }),
     ...overrides,
   });
@@ -1282,21 +2036,11 @@ function buildTestScene(overrides?: Partial<DashboardSceneState>) {
   return scene;
 }
 
-function mockResultsOfDetectChangesWorker({
-  hasChanges,
-  hasTimeChanges,
-  hasVariableValueChanges,
-}: {
-  hasChanges: boolean;
-  hasTimeChanges: boolean;
-  hasVariableValueChanges: boolean;
-}) {
+function mockResultsOfDetectChangesWorker({ hasChanges = true }) {
   jest.mocked(worker.postMessage).mockImplementationOnce(() => {
     worker.onmessage?.({
       data: {
-        hasChanges: hasChanges ?? true,
-        hasTimeChanges: hasTimeChanges ?? true,
-        hasVariableValueChanges: hasVariableValueChanges ?? true,
+        hasChanges,
       },
     } as unknown as MessageEvent);
   });
@@ -1313,9 +2057,8 @@ function getVersionMock(): DecoratedRevisionModel {
     id: 2,
     checked: false,
     uid: 'uid',
-    parentVersion: 1,
     version: 2,
-    created: new Date(),
+    created: new Date().toISOString(),
     createdBy: 'admin',
     message: '',
     data: dash,

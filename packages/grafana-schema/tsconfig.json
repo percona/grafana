@@ -1,11 +1,15 @@
 {
+  "extends": "../../scripts/tsconfig.base.json",
   "compilerOptions": {
-    "declarationDir": "./dist/esm",
+    "declaration": true,
+    "jsx": "react-jsx",
+    "baseUrl": "./",
+    "declarationDir": "./dist/types",
     "emitDeclarationOnly": true,
     "isolatedModules": true,
-    "rootDirs": ["."]
+    "rootDir": "./src",
+    "moduleResolution": "bundler"
   },
   "exclude": ["dist/**/*"],
-  "extends": "@grafana/tsconfig",
   "include": ["src/**/*.ts*"]
 }

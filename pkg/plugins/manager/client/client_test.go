@@ -8,15 +8,16 @@ import (
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/stretchr/testify/require"
+
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin"
-	"github.com/grafana/grafana/pkg/plugins/manager/fakes"
-	"github.com/stretchr/testify/require"
+	"github.com/grafana/grafana/pkg/plugins/manager/pluginfakes"
 )
 
 func TestQueryData(t *testing.T) {
 	t.Run("Empty registry should return not registered error", func(t *testing.T) {
-		registry := fakes.NewFakePluginRegistry()
+		registry := pluginfakes.NewFakePluginRegistry()
 		client := ProvideService(registry)
 		_, err := client.QueryData(context.Background(), &backend.QueryDataRequest{})
 		require.Error(t, err)
@@ -25,30 +26,45 @@ func TestQueryData(t *testing.T) {
 
 	t.Run("Non-empty registry", func(t *testing.T) {
 		tcs := []struct {
-			err           error
-			expectedError error
+			err               error
+			expectedError     error
+			shouldPassThrough bool
 		}{
 			{
-				err:           plugins.ErrPluginUnavailable,
-				expectedError: plugins.ErrPluginUnavailable,
+				err:               plugins.ErrPluginUnavailable,
+				expectedError:     plugins.ErrPluginUnavailable,
+				shouldPassThrough: true,
 			},
 			{
-				err:           plugins.ErrMethodNotImplemented,
-				expectedError: plugins.ErrMethodNotImplemented,
+				err:               plugins.ErrMethodNotImplemented,
+				expectedError:     plugins.ErrMethodNotImplemented,
+				shouldPassThrough: true,
 			},
 			{
-				err:           errors.New("surprise surprise"),
-				expectedError: plugins.ErrPluginDownstreamErrorBase,
+				err:               errors.New("surprise surprise"),
+				expectedError:     plugins.ErrPluginRequestFailureErrorBase,
+				shouldPassThrough: false,
 			},
 			{
-				err:           context.Canceled,
-				expectedError: plugins.ErrPluginRequestCanceledErrorBase,
+				err:               context.Canceled,
+				expectedError:     plugins.ErrPluginRequestCanceledErrorBase,
+				shouldPassThrough: false,
+			},
+			{
+				err:               plugins.ErrPluginGrpcConnectionUnavailableBaseFn(context.Background()).Errorf("unavailable"),
+				expectedError:     plugins.ErrPluginGrpcConnectionUnavailableBaseFn(context.Background()).Errorf("unavailable"),
+				shouldPassThrough: true,
+			},
+			{
+				err:               plugins.ErrPluginGrpcResourceExhaustedBase.Errorf("exhausted"),
+				expectedError:     plugins.ErrPluginGrpcResourceExhaustedBase.Errorf("exhausted"),
+				shouldPassThrough: true,
 			},
 		}
 
 		for _, tc := range tcs {
 			t.Run(fmt.Sprintf("Plugin client error %q should return expected error", tc.err), func(t *testing.T) {
-				registry := fakes.NewFakePluginRegistry()
+				registry := pluginfakes.NewFakePluginRegistry()
 				p := &plugins.Plugin{
 					JSONData: plugins.JSONData{
 						ID: "grafana",
@@ -69,7 +85,11 @@ func TestQueryData(t *testing.T) {
 					},
 				})
 				require.Error(t, err)
-				require.ErrorIs(t, err, tc.expectedError)
+				if tc.shouldPassThrough {
+					require.Equal(t, tc.err, err)
+				} else {
+					require.ErrorIs(t, err, tc.expectedError)
+				}
 			})
 		}
 	})
@@ -77,7 +97,7 @@ func TestQueryData(t *testing.T) {
 
 func TestCheckHealth(t *testing.T) {
 	t.Run("empty plugin registry should return plugin not registered error", func(t *testing.T) {
-		registry := fakes.NewFakePluginRegistry()
+		registry := pluginfakes.NewFakePluginRegistry()
 		client := ProvideService(registry)
 		_, err := client.CheckHealth(context.Background(), &backend.CheckHealthRequest{})
 		require.Error(t, err)
@@ -110,7 +130,7 @@ func TestCheckHealth(t *testing.T) {
 
 		for _, tc := range tcs {
 			t.Run(fmt.Sprintf("Plugin client error %q should return expected error", tc.err), func(t *testing.T) {
-				registry := fakes.NewFakePluginRegistry()
+				registry := pluginfakes.NewFakePluginRegistry()
 				p := &plugins.Plugin{
 					JSONData: plugins.JSONData{
 						ID: "grafana",
@@ -138,7 +158,7 @@ func TestCheckHealth(t *testing.T) {
 }
 
 func TestCallResource(t *testing.T) {
-	registry := fakes.NewFakePluginRegistry()
+	registry := pluginfakes.NewFakePluginRegistry()
 	p := &plugins.Plugin{
 		JSONData: plugins.JSONData{
 			ID: "pid",
@@ -169,7 +189,7 @@ func TestCallResource(t *testing.T) {
 		}
 
 		responses := []*backend.CallResourceResponse{}
-		sender := callResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
+		sender := backend.CallResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
 			responses = append(responses, res)
 			return nil
 		})
@@ -232,7 +252,7 @@ func TestCallResource(t *testing.T) {
 		}
 
 		responses := []*backend.CallResourceResponse{}
-		sender := callResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
+		sender := backend.CallResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
 			responses = append(responses, res)
 			return nil
 		})
@@ -280,7 +300,7 @@ func TestCallResource(t *testing.T) {
 		}
 
 		responses := []*backend.CallResourceResponse{}
-		sender := callResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
+		sender := backend.CallResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
 			responses = append(responses, res)
 			return nil
 		})
@@ -307,6 +327,48 @@ func TestCallResource(t *testing.T) {
 		require.Equal(t, http.StatusOK, res.Status)
 		require.Equal(t, []byte(backendResponse), res.Body)
 		require.Empty(t, res.Headers[setCookieHeaderName])
+		require.Equal(t, "should not be deleted", res.Headers["X-Custom"][0])
+	})
+
+	t.Run("Should set proxy response headers", func(t *testing.T) {
+		resHeaders := map[string][]string{
+			"X-Custom": {"should not be deleted"},
+		}
+
+		req := &backend.CallResourceRequest{
+			PluginContext: backend.PluginContext{
+				PluginID: "pid",
+			},
+		}
+
+		responses := []*backend.CallResourceResponse{}
+		sender := backend.CallResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
+			responses = append(responses, res)
+			return nil
+		})
+
+		p.RegisterClient(&fakePluginBackend{
+			crr: func(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
+				return sender.Send(&backend.CallResourceResponse{
+					Headers: resHeaders,
+					Status:  http.StatusOK,
+					Body:    []byte(backendResponse),
+				})
+			},
+		})
+		err := registry.Add(context.Background(), p)
+		require.NoError(t, err)
+
+		client := ProvideService(registry)
+
+		err = client.CallResource(context.Background(), req, sender)
+		require.NoError(t, err)
+
+		require.Len(t, responses, 1)
+		res := responses[0]
+		require.Equal(t, http.StatusOK, res.Status)
+		require.Equal(t, []byte(backendResponse), res.Body)
+		require.Equal(t, "sandbox", res.Headers["Content-Security-Policy"][0])
 		require.Equal(t, "should not be deleted", res.Headers["X-Custom"][0])
 	})
 
@@ -348,7 +410,7 @@ func TestCallResource(t *testing.T) {
 				}
 
 				responses := []*backend.CallResourceResponse{}
-				sender := callResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
+				sender := backend.CallResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
 					responses = append(responses, res)
 					return nil
 				})

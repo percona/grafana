@@ -2,12 +2,14 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import path from 'path';
-// @ts-expect-error - there are no types for this package
 import ReplaceInFileWebpackPlugin from 'replace-in-file-webpack-plugin';
-import { Configuration } from 'webpack';
+import TerserPlugin from 'terser-webpack-plugin';
+import webpack, { type Configuration, type Compiler } from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import VirtualModulesPlugin from 'webpack-virtual-modules';
 
-import { DIST_DIR } from './constants';
-import { getPackageJson, getPluginJson, getEntries, hasLicense } from './utils';
+import { DIST_DIR } from './constants.ts';
+import { getPackageJson, getPluginJson, getEntries, hasLicense } from './utils.ts';
 
 function skipFiles(f: string): boolean {
   if (f.includes('/dist/')) {
@@ -22,18 +24,72 @@ function skipFiles(f: string): boolean {
     // avoid copying package.json
     return false;
   }
+  if (f.includes('/project.json')) {
+    // avoid copying project.json
+    return false;
+  }
   return true;
 }
 
-const config = async (env: Record<string, unknown>): Promise<Configuration> => {
+class BuildModeWebpackPlugin {
+  apply(compiler: Compiler) {
+    compiler.hooks.compilation.tap('BuildModeWebpackPlugin', (compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'BuildModeWebpackPlugin',
+          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+        },
+        async () => {
+          const assets = compilation.getAssets();
+          for (const asset of assets) {
+            if (asset.name.endsWith('plugin.json')) {
+              const pluginJsonString = asset.source.source().toString();
+              const pluginJsonWithBuildMode = JSON.stringify(
+                {
+                  ...JSON.parse(pluginJsonString),
+                  buildMode: compilation.options.mode,
+                },
+                null,
+                4
+              );
+              compilation.updateAsset(asset.name, new webpack.sources.RawSource(pluginJsonWithBuildMode));
+            }
+          }
+        }
+      );
+    });
+  }
+}
+
+export type Env = {
+  [key: string]: true | string | Env;
+};
+
+const config = async (env: Env): Promise<Configuration> => {
   const pluginJson = getPluginJson();
+  // Inject module
+  const virtualPublicPath = new VirtualModulesPlugin({
+    'node_modules/grafana-public-path.js': `
+  import amdMetaModule from 'amd-module';
+
+  __webpack_public_path__ =
+    amdMetaModule && amdMetaModule.uri
+      ? amdMetaModule.uri.slice(0, amdMetaModule.uri.lastIndexOf('/') + 1)
+      : 'public/plugins/${pluginJson.id}/';
+  `,
+  });
+
   const baseConfig: Configuration = {
     cache: {
       type: 'filesystem',
       buildDependencies: {
-        config: [__filename],
+        config: [import.meta.filename],
       },
-      cacheDirectory: path.resolve(__dirname, '../../node_modules/.cache/webpack', path.basename(process.cwd())),
+      cacheDirectory: path.resolve(
+        import.meta.dirname,
+        '../../node_modules/.cache/webpack',
+        path.basename(process.cwd())
+      ),
     },
 
     context: process.cwd(),
@@ -43,6 +99,8 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
     entry: await getEntries(),
 
     externals: [
+      // Required for dynamic publicPath resolution
+      { 'amd-module': 'module' },
       'lodash',
       'jquery',
       'moment',
@@ -58,13 +116,12 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
       'react-redux',
       'redux',
       'rxjs',
+      'rxjs/operators',
       'react-router',
-      'react-router-dom',
       'd3',
-      'angular',
-      '@grafana/ui',
-      '@grafana/runtime',
-      '@grafana/data',
+      /^@grafana\/ui/i,
+      /^@grafana\/runtime/i,
+      /^@grafana\/data/i,
 
       // Mark legacy SDK imports as external if their name starts with the "grafana/" prefix
       ({ request }, callback) => {
@@ -84,14 +141,26 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
 
     module: {
       rules: [
+        // This must come first in the rules array otherwise it breaks sourcemaps.
+        {
+          test: /module\.tsx?$/,
+          use: [
+            {
+              loader: 'imports-loader',
+              options: {
+                imports: `side-effects grafana-public-path`,
+              },
+            },
+          ],
+        },
         {
           exclude: /(node_modules)/,
           test: /\.[tj]sx?$/,
           use: {
-            loader: require.resolve('swc-loader'),
+            loader: 'swc-loader',
             options: {
               jsc: {
-                baseUrl: path.resolve(__dirname),
+                baseUrl: path.resolve(import.meta.dirname),
                 target: 'es2015',
                 loose: false,
                 parser: {
@@ -99,6 +168,11 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
                   tsx: true,
                   decorators: false,
                   dynamicImport: true,
+                },
+                transform: {
+                  react: {
+                    runtime: 'automatic',
+                  },
                 },
               },
             },
@@ -148,7 +222,30 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
       uniqueName: pluginJson.id,
     },
 
+    optimization: {
+      minimize: Boolean(env.production),
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            format: {
+              comments: (_, { type, value }) => type === 'comment2' && value.trim().startsWith('[create-plugin]'),
+            },
+            compress: {
+              drop_console: ['log', 'info'],
+            },
+          },
+        }),
+      ],
+    },
+
     plugins: [
+      virtualPublicPath,
+      // Insert create plugin version information into the bundle so Grafana will load from cdn with script tags.
+      new webpack.BannerPlugin({
+        banner: '/* [create-plugin] version: 5.22.0 */',
+        raw: true,
+        entryOnly: true,
+      }),
       new CopyWebpackPlugin({
         patterns: [
           // To `compiler.options.output`
@@ -186,6 +283,8 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
           ],
         },
       ]),
+      // Add buildMode to plugin.json
+      new BuildModeWebpackPlugin(),
       ...(env.development
         ? [
             new ForkTsCheckerWebpackPlugin({
@@ -199,11 +298,13 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
               extensions: ['.ts', '.tsx'],
               lintDirtyModulesOnly: true, // don't lint on start, only lint changed files
               cacheLocation: path.resolve(
-                __dirname,
+                import.meta.dirname,
                 '../../node_modules/.cache/eslint-webpack-plugin',
                 path.basename(process.cwd()),
                 '.eslintcache'
               ),
+              configType: 'flat',
+              failOnError: false,
             }),
           ]
         : []),
@@ -211,6 +312,7 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
 
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      conditionNames: ['@grafana-app/source', '...'],
       unsafeCache: true,
     },
 
@@ -220,6 +322,11 @@ const config = async (env: Record<string, unknown>): Promise<Configuration> => {
       ignored: ['**/node_modules', '**/dist', '**/.yarn'],
     },
   };
+
+  if (env.stats) {
+    baseConfig.stats = 'normal';
+    baseConfig.plugins?.push(new BundleAnalyzerPlugin());
+  }
 
   return baseConfig;
 };

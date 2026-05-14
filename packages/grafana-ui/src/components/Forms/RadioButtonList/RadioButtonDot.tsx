@@ -1,11 +1,12 @@
 import { css } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useStyles2 } from '../../../themes';
+import { useStyles2 } from '../../../themes/ThemeContext';
 
-export interface RadioButtonDotProps<T> {
+export interface RadioButtonDotProps<T>
+  extends Omit<React.HTMLProps<HTMLInputElement>, 'label' | 'value' | 'onChange' | 'type'> {
   id: string;
   name: string;
   checked?: boolean;
@@ -25,12 +26,14 @@ export const RadioButtonDot = <T extends string | number | readonly string[]>({
   disabled,
   description,
   onChange,
+  ...props
 }: RadioButtonDotProps<T>) => {
   const styles = useStyles2(getStyles);
 
   return (
     <label title={description} className={styles.label}>
       <input
+        {...props}
         id={id}
         name={name}
         type="radio"
@@ -58,6 +61,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     height: theme.spacing(2),
     border: `1px solid ${theme.colors.border.medium}`,
     borderRadius: theme.shape.radius.circle,
+    cursor: 'pointer',
     margin: '3px 0' /* Space for box-shadow when focused */,
 
     ':checked': {
@@ -97,6 +101,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: 'grid',
     gridTemplateColumns: `${theme.spacing(2)} auto`,
     gap: theme.spacing(1),
+    cursor: 'pointer',
   }),
   description: css({
     fontSize: theme.typography.size.sm,

@@ -3,27 +3,22 @@ package cloudwatch
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana/pkg/tsdb/cloudwatch/kinds/dataquery"
 	"github.com/grafana/grafana/pkg/tsdb/cloudwatch/models"
-	"github.com/grafana/grafana/pkg/tsdb/cloudwatch/utils"
 )
 
 const initialAlertPollPeriod = time.Second
 
-var executeSyncLogQuery = func(ctx context.Context, e *cloudWatchExecutor, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+var executeSyncLogQuery = func(ctx context.Context, ds *DataSource, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	resp := backend.NewQueryDataResponse()
-
-	instance, err := e.getInstance(ctx, req.PluginContext)
-	if err != nil {
-		return nil, err
-	}
 
 	for _, q := range req.Queries {
 		var logsQuery models.LogsQuery
@@ -37,22 +32,32 @@ var executeSyncLogQuery = func(ctx context.Context, e *cloudWatchExecutor, req *
 			logsQuery.QueryString = *logsQuery.Expression
 		}
 
-		region := utils.Depointerizer(logsQuery.Region)
+		region := logsQuery.Region
 		if region == "" || region == defaultRegion {
-			logsQuery.Region = utils.Pointer(instance.Settings.Region)
+			logsQuery.Region = ds.Settings.Region
 		}
 
-		logsClient, err := e.getCWLogsClient(ctx, req.PluginContext, region)
+		logsClient, err := ds.getCWLogsClient(ctx, region)
 		if err != nil {
 			return nil, err
 		}
 
-		getQueryResultsOutput, err := e.syncQuery(ctx, logsClient, q, logsQuery, instance.Settings.LogsTimeout.Duration)
+		refId := "A"
+		if q.RefID != "" {
+			refId = q.RefID
+		}
+
+		getQueryResultsOutput, err := ds.syncQuery(ctx, logsClient, q, logsQuery, ds.Settings.LogsTimeout.Duration)
+		var sourceError backend.ErrorWithSource
+		if errors.As(err, &sourceError) {
+			resp.Responses[refId] = backend.ErrorResponseWithErrorSource(sourceError)
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
 
-		dataframe, err := logsResultsToDataframes(getQueryResultsOutput)
+		dataframe, err := logsResultsToDataframes(getQueryResultsOutput, logsQuery.StatsGroups)
 		if err != nil {
 			return nil, err
 		}
@@ -67,11 +72,6 @@ var executeSyncLogQuery = func(ctx context.Context, e *cloudWatchExecutor, req *
 			frames = data.Frames{dataframe}
 		}
 
-		refId := "A"
-		if q.RefID != "" {
-			refId = q.RefID
-		}
-
 		respD := resp.Responses[refId]
 		respD.Frames = frames
 		resp.Responses[refId] = respD
@@ -80,9 +80,9 @@ var executeSyncLogQuery = func(ctx context.Context, e *cloudWatchExecutor, req *
 	return resp, nil
 }
 
-func (e *cloudWatchExecutor) syncQuery(ctx context.Context, logsClient cloudwatchlogsiface.CloudWatchLogsAPI,
+func (ds *DataSource) syncQuery(ctx context.Context, logsClient models.CWLogsClient,
 	queryContext backend.DataQuery, logsQuery models.LogsQuery, logsTimeout time.Duration) (*cloudwatchlogs.GetQueryResultsOutput, error) {
-	startQueryOutput, err := e.executeStartQuery(ctx, logsClient, logsQuery, queryContext.TimeRange)
+	startQueryOutput, err := ds.executeStartQuery(ctx, logsClient, logsQuery, queryContext.TimeRange)
 	if err != nil {
 		return nil, err
 	}
@@ -107,11 +107,11 @@ func (e *cloudWatchExecutor) syncQuery(ctx context.Context, logsClient cloudwatc
 
 	attemptCount := 1
 	for range ticker.C {
-		res, err := e.executeGetQueryResults(ctx, logsClient, requestParams)
+		res, err := ds.executeGetQueryResults(ctx, logsClient, requestParams)
 		if err != nil {
-			return nil, fmt.Errorf("CloudWatch Error: %w", err)
+			return nil, err
 		}
-		if isTerminated(*res.Status) {
+		if isTerminated(res.Status) {
 			return res, err
 		}
 		if time.Duration(attemptCount)*time.Second >= logsTimeout {

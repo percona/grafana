@@ -1,24 +1,21 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState, type JSX } from 'react';
+import * as React from 'react';
 
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import { EditorField, EditorRow, InlineSelect } from '@grafana/experimental';
+import { EditorField, EditorRow, InlineSelect } from '@grafana/plugin-ui';
+import { config } from '@grafana/runtime';
 import { ConfirmModal, Input, RadioButtonGroup, Space } from '@grafana/ui';
 
+import { CloudWatchMetricsQuery, MetricEditorMode, MetricQueryType, MetricStat } from '../../../dataquery.gen';
 import { CloudWatchDatasource } from '../../../datasource';
+import { DEFAULT_METRICS_QUERY } from '../../../defaultQueries';
 import useMigratedMetricsQuery from '../../../migrations/useMigratedMetricsQuery';
-import {
-  CloudWatchJsonData,
-  CloudWatchMetricsQuery,
-  CloudWatchQuery,
-  MetricEditorMode,
-  MetricQueryType,
-  MetricStat,
-} from '../../../types';
-import { MetricStatEditor } from '../../shared/MetricStatEditor';
+import { CloudWatchQuery, CloudWatchJsonData } from '../../../types';
+import { MetricStatEditor } from '../../shared/MetricStatEditor/MetricStatEditor';
 
 import { DynamicLabelsField } from './DynamicLabelsField';
 import { MathExpressionQueryField } from './MathExpressionQueryField';
-import { SQLBuilderEditor } from './SQLBuilderEditor';
+import { SQLBuilderEditor } from './SQLBuilderEditor/SQLBuilderEditor';
 import { SQLCodeEditor } from './SQLCodeEditor';
 
 export interface Props extends QueryEditorProps<CloudWatchDatasource, CloudWatchQuery, CloudWatchJsonData> {
@@ -29,7 +26,7 @@ export interface Props extends QueryEditorProps<CloudWatchDatasource, CloudWatch
 
 const metricEditorModes: Array<SelectableValue<MetricQueryType>> = [
   { label: 'Metric Search', value: MetricQueryType.Search },
-  { label: 'Metric Query', value: MetricQueryType.Query },
+  { label: 'Metric Insights', value: MetricQueryType.Insights },
 ];
 const editorModes = [
   { label: 'Builder', value: MetricEditorMode.Builder },
@@ -39,14 +36,14 @@ const editorModes = [
 export const MetricsQueryEditor = (props: Props) => {
   const { query, datasource, extraHeaderElementLeft, extraHeaderElementRight, onChange } = props;
   const [showConfirm, setShowConfirm] = useState(false);
-  const [sqlCodeEditorIsDirty, setSQLCodeEditorIsDirty] = useState(false);
+  const [codeEditorIsDirty, setCodeEditorIsDirty] = useState(false);
   const migratedQuery = useMigratedMetricsQuery(query, props.onChange);
 
   const onEditorModeChange = useCallback(
     (newMetricEditorMode: MetricEditorMode) => {
       if (
-        sqlCodeEditorIsDirty &&
-        query.metricQueryType === MetricQueryType.Query &&
+        codeEditorIsDirty &&
+        query.metricQueryType === MetricQueryType.Insights &&
         query.metricEditorMode === MetricEditorMode.Code
       ) {
         setShowConfirm(true);
@@ -54,8 +51,19 @@ export const MetricsQueryEditor = (props: Props) => {
       }
       onChange({ ...query, metricEditorMode: newMetricEditorMode });
     },
-    [setShowConfirm, onChange, sqlCodeEditorIsDirty, query]
+    [setShowConfirm, onChange, codeEditorIsDirty, query]
   );
+
+  const updateAccounIdOnMount = () => {
+    if (config.featureToggles.cloudWatchCrossAccountQuerying && query.accountId) {
+      datasource.resources.isMonitoringAccount(query.region).then((isMonitoring) => {
+        if (!isMonitoring && query.accountId) {
+          onChange({ ...query, accountId: undefined });
+        }
+      });
+    }
+  };
+  useEffect(updateAccounIdOnMount, [datasource, onChange, query]);
 
   useEffect(() => {
     extraHeaderElementLeft?.(
@@ -64,6 +72,14 @@ export const MetricsQueryEditor = (props: Props) => {
         value={metricEditorModes.find((m) => m.value === query.metricQueryType)}
         options={metricEditorModes}
         onChange={({ value }) => {
+          if (
+            codeEditorIsDirty &&
+            query.metricQueryType === MetricQueryType.Search &&
+            query.metricEditorMode === MetricEditorMode.Builder
+          ) {
+            setShowConfirm(true);
+            return;
+          }
           onChange({ ...query, metricQueryType: value });
         }}
       />
@@ -80,13 +96,19 @@ export const MetricsQueryEditor = (props: Props) => {
         <ConfirmModal
           isOpen={showConfirm}
           title="Are you sure?"
-          body="You will lose manual changes done to the query if you go back to the visual builder."
+          body="You will lose changes made to the query if you change to Metric Insights Builder mode."
           confirmText="Yes, I am sure."
-          dismissText="No, continue editing the query manually."
+          dismissText="No, continue editing the query."
           icon="exclamation-triangle"
           onConfirm={() => {
             setShowConfirm(false);
-            onChange({ ...query, metricEditorMode: MetricEditorMode.Builder });
+            setCodeEditorIsDirty(false);
+            onChange({
+              ...query,
+              ...DEFAULT_METRICS_QUERY,
+              metricQueryType: MetricQueryType.Insights,
+              metricEditorMode: MetricEditorMode.Builder,
+            });
           }}
           onDismiss={() => setShowConfirm(false)}
         />
@@ -99,7 +121,7 @@ export const MetricsQueryEditor = (props: Props) => {
     };
   }, [
     query,
-    sqlCodeEditorIsDirty,
+    codeEditorIsDirty,
     datasource,
     onChange,
     extraHeaderElementLeft,
@@ -111,7 +133,6 @@ export const MetricsQueryEditor = (props: Props) => {
   return (
     <>
       <Space v={0.5} />
-
       {query.metricQueryType === MetricQueryType.Search && (
         <>
           {query.metricEditorMode === MetricEditorMode.Builder && (
@@ -119,7 +140,12 @@ export const MetricsQueryEditor = (props: Props) => {
               {...props}
               refId={query.refId}
               metricStat={query}
-              onChange={(metricStat: MetricStat) => props.onChange({ ...query, ...metricStat })}
+              onChange={(metricStat: MetricStat) => {
+                if (!codeEditorIsDirty) {
+                  setCodeEditorIsDirty(true);
+                }
+                props.onChange({ ...query, ...metricStat });
+              }}
             ></MetricStatEditor>
           )}
           {query.metricEditorMode === MetricEditorMode.Code && (
@@ -131,15 +157,15 @@ export const MetricsQueryEditor = (props: Props) => {
           )}
         </>
       )}
-      {query.metricQueryType === MetricQueryType.Query && (
+      {query.metricQueryType === MetricQueryType.Insights && (
         <>
           {query.metricEditorMode === MetricEditorMode.Code && (
             <SQLCodeEditor
               region={query.region}
               sql={query.sqlExpression ?? ''}
               onChange={(sqlExpression) => {
-                if (!sqlCodeEditorIsDirty) {
-                  setSQLCodeEditorIsDirty(true);
+                if (!codeEditorIsDirty) {
+                  setCodeEditorIsDirty(true);
                 }
                 props.onChange({ ...migratedQuery, sqlExpression });
               }}

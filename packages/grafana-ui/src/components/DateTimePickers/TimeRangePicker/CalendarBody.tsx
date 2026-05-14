@@ -1,19 +1,28 @@
 import { css } from '@emotion/css';
-import React, { useCallback } from 'react';
-import Calendar from 'react-calendar';
+import { useCallback } from 'react';
+import Calendar, { CalendarType } from 'react-calendar';
 
 import { GrafanaTheme2, dateTimeParse, DateTime, TimeZone } from '@grafana/data';
+import { t } from '@grafana/i18n';
 
-import { useStyles2 } from '../../../themes';
+import { useStyles2 } from '../../../themes/ThemeContext';
 import { Icon } from '../../Icon/Icon';
+import { getWeekStart, WeekStart } from '../WeekStartPicker';
 import { adjustDateForReactCalendar } from '../utils/adjustDateForReactCalendar';
 
 import { TimePickerCalendarProps } from './TimePickerCalendar';
 
-export function Body({ onChange, from, to, timeZone }: TimePickerCalendarProps) {
+const weekStartMap: Record<WeekStart, CalendarType> = {
+  saturday: 'islamic',
+  sunday: 'gregory',
+  monday: 'iso8601',
+};
+
+export function Body({ onChange, from, to, timeZone, weekStart }: TimePickerCalendarProps) {
   const value = inputToValue(from, to, new Date(), timeZone);
   const onCalendarChange = useOnCalendarChange(onChange, timeZone);
   const styles = useStyles2(getBodyStyles);
+  const weekStartValue = getWeekStart(weekStart);
 
   return (
     <Calendar
@@ -24,9 +33,12 @@ export function Body({ onChange, from, to, timeZone }: TimePickerCalendarProps) 
       tileClassName={styles.title}
       value={value}
       nextLabel={<Icon name="angle-right" />}
+      nextAriaLabel={t('time-picker.calendar.next-month', 'Next month')}
       prevLabel={<Icon name="angle-left" />}
+      prevAriaLabel={t('time-picker.calendar.previous-month', 'Previous month')}
       onChange={onCalendarChange}
       locale="en"
+      calendarType={weekStartMap[weekStartValue]}
     />
   );
 }
@@ -80,6 +92,7 @@ export const getBodyStyles = (theme: GrafanaTheme2) => {
   // If a time range is part of only 1 day but does not encompass the whole day,
   // the class that react-calendar uses is '--hasActive' by itself (without being part of a '--range')
   const hasActiveSelector = `.react-calendar__tile--hasActive:not(.react-calendar__tile--range)`;
+
   return {
     title: css({
       color: theme.colors.text.primary,
@@ -87,17 +100,18 @@ export const getBodyStyles = (theme: GrafanaTheme2) => {
       fontSize: theme.typography.size.md,
       border: '1px solid transparent',
 
-      '&:hover': {
+      '&:hover, &:focus': {
         position: 'relative',
       },
 
       '&:disabled': {
         color: theme.colors.action.disabledText,
+        cursor: 'not-allowed',
       },
     }),
     body: css({
       zIndex: theme.zIndex.modal,
-      backgroundColor: theme.colors.background.primary,
+      backgroundColor: theme.colors.background.elevated,
       width: '268px',
 
       '.react-calendar__navigation': {
@@ -147,39 +161,51 @@ export const getBodyStyles = (theme: GrafanaTheme2) => {
           outline: 0,
         },
 
-      [`${hasActiveSelector}, .react-calendar__tile--active, .react-calendar__tile--active:hover`]: {
-        color: theme.colors.primary.contrastText,
-        fontWeight: theme.typography.fontWeightMedium,
-        background: theme.colors.primary.main,
-        boxShadow: 'none',
-        border: '0px',
+      // The --hover modifier is active when the user is selecting a range and hovering over a tile - it shows the pending range.
+      // It is applied to all dates between the clicked date and the hovered date.
+      // The *clicked* date should have primary bg, while *pending* range dates should have hover bg.
+      '.react-calendar__tile--hover': {
+        backgroundColor: theme.colors.action.hover,
+        // eslint-disable-next-line @grafana/no-border-radius-literal
+        borderRadius: 0,
       },
 
-      '.react-calendar__tile--rangeEnd, .react-calendar__tile--rangeStart': {
-        padding: 0,
-        border: '0px',
-        color: theme.colors.primary.contrastText,
-        fontWeight: theme.typography.fontWeightMedium,
-        background: theme.colors.primary.main,
+      '.react-calendar__tile--hoverStart': {
+        borderTopLeftRadius: theme.shape.radius.pill,
+        borderBottomLeftRadius: theme.shape.radius.pill,
+      },
 
-        abbr: {
-          backgroundColor: theme.colors.primary.main,
-          borderRadius: '100px',
-          display: 'block',
-          paddingTop: '2px',
-          height: '26px',
+      '.react-calendar__tile--hoverEnd': {
+        borderTopRightRadius: theme.shape.radius.pill,
+        borderBottomRightRadius: theme.shape.radius.pill,
+      },
+
+      // Addiitonally, when hovering a date before clicking any, it should show the hover bg.
+      '.react-calendar__tile:hover:not(.react-calendar__tile--hover):not(.react-calendar__tile--active):not(.react-calendar__tile--hasActive)':
+        {
+          backgroundColor: theme.colors.action.hover,
+          borderRadius: theme.shape.radius.pill,
         },
+
+      // When the user is selecting a range (they've clicked one date, tiles have --hover), both --rangeStart and --rangeEnd are on the tile.
+      // The --hover classes above  handle the rounding of the tiles so they're contigious with the range
+      [`${hasActiveSelector}, .react-calendar__tile--rangeStart:not(.react-calendar__tile--hover)`]: {
+        borderTopLeftRadius: theme.shape.radius.pill,
+        borderBottomLeftRadius: theme.shape.radius.pill,
       },
 
-      [`${hasActiveSelector}, .react-calendar__tile--rangeStart`]: {
-        borderTopLeftRadius: '20px',
-        borderBottomLeftRadius: '20px',
+      [`${hasActiveSelector}, .react-calendar__tile--rangeEnd:not(.react-calendar__tile--hover)`]: {
+        borderTopRightRadius: theme.shape.radius.pill,
+        borderBottomRightRadius: theme.shape.radius.pill,
       },
 
-      [`${hasActiveSelector}, .react-calendar__tile--rangeEnd`]: {
-        borderTopRightRadius: '20px',
-        borderBottomRightRadius: '20px',
-      },
+      [`${hasActiveSelector}, .react-calendar__tile--active, .react-calendar__tile--rangeEnd, .react-calendar__tile--rangeStart`]:
+        {
+          color: theme.colors.primary.contrastText,
+          fontWeight: theme.typography.fontWeightMedium,
+          background: theme.colors.primary.main,
+          border: '0px',
+        },
     }),
   };
 };

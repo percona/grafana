@@ -1,8 +1,7 @@
-import { cloneDeep, extend, isString } from 'lodash';
+import { cloneDeep, extend } from 'lodash';
 
 import {
   dateMath,
-  dateTime,
   getDefaultTimeRange,
   isDateTime,
   rangeUtil,
@@ -11,14 +10,19 @@ import {
   toUtc,
   IntervalValues,
   AppEvents,
+  dateTimeForTimeZone,
 } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
+import { t } from '@grafana/i18n';
+import { config, locationService } from '@grafana/runtime';
 import { sceneGraph } from '@grafana/scenes';
-import { t } from '@grafana/ui/src/utils/i18n';
-import appEvents from 'app/core/app_events';
-import { config } from 'app/core/config';
+import { appEvents } from 'app/core/app_events';
 import { AutoRefreshInterval, contextSrv, ContextSrv } from 'app/core/services/context_srv';
-import { getCopiedTimeRange, getShiftedTimeRange, getZoomedTimeRange } from 'app/core/utils/timePicker';
+import {
+  getCopiedTimeRange,
+  getShiftedTimeRange,
+  getZoomedTimeRange,
+  toUtcDateTimeIfIsoString,
+} from 'app/core/utils/timePicker';
 import { getTimeRange } from 'app/features/dashboard/utils/timeRange';
 
 import {
@@ -98,15 +102,11 @@ export class TimeSrv {
 
   private parseTime() {
     // when absolute time is saved in json it is turned to a string
-    if (isString(this.time.from) && this.time.from.indexOf('Z') >= 0) {
-      this.time.from = dateTime(this.time.from).utc();
-    }
-    if (isString(this.time.to) && this.time.to.indexOf('Z') >= 0) {
-      this.time.to = dateTime(this.time.to).utc();
-    }
+    this.time.from = toUtcDateTimeIfIsoString(this.time.from);
+    this.time.to = toUtcDateTimeIfIsoString(this.time.to);
   }
 
-  private parseUrlParam(value: string) {
+  private parseUrlParam(value: string, timeZone?: string) {
     if (value.indexOf('now') !== -1) {
       return value;
     }
@@ -124,7 +124,7 @@ export class TimeSrv {
 
     if (!isNaN(Number(value))) {
       const epoch = parseInt(value, 10);
-      return toUtc(epoch);
+      return timeZone ? dateTimeForTimeZone(timeZone, epoch) : toUtc(epoch);
     }
 
     return null;
@@ -158,12 +158,13 @@ export class TimeSrv {
       this.time = this.getTimeWindow(params.get('time')!, params.get('time.window')!);
     }
 
+    const timeZone = this.timeModel?.getTimezone();
     if (params.get('from')) {
-      this.time.from = this.parseUrlParam(params.get('from')!) || this.time.from;
+      this.time.from = this.parseUrlParam(params.get('from')!, timeZone) || this.time.from;
     }
 
     if (params.get('to')) {
-      this.time.to = this.parseUrlParam(params.get('to')!) || this.time.to;
+      this.time.to = this.parseUrlParam(params.get('to')!, timeZone) || this.time.to;
     }
 
     // if absolute ignore refresh option saved to timeModel
@@ -376,7 +377,8 @@ export class TimeSrv {
 
   copyTimeRangeToClipboard() {
     const { raw } = this.timeRange();
-    navigator.clipboard.writeText(JSON.stringify({ from: raw.from, to: raw.to }));
+    const clipboardPayload = rangeUtil.formatRawTimeRange(raw);
+    navigator.clipboard.writeText(JSON.stringify(clipboardPayload));
     appEvents.emit(AppEvents.alertSuccess, [
       t('time-picker.copy-paste.copy-success-message', 'Time range copied to clipboard'),
     ]);
@@ -393,7 +395,11 @@ export class TimeSrv {
       return;
     }
 
-    const { from, to } = range;
+    let { from, to } = range;
+
+    // if ISO-8601 UTC string (which include 'Z') is pasted, convert them to DateTime.utc
+    from = toUtcDateTimeIfIsoString(from);
+    to = toUtcDateTimeIfIsoString(to);
 
     this.setTime({ from, to }, updateUrl);
   }

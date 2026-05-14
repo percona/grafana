@@ -5,7 +5,9 @@ import {
   TestDataSourceResponse,
   DataSourceTestSucceeded,
   DataSourceTestFailed,
+  DataSourceApi,
 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import {
   config,
   DataSourceSrv,
@@ -15,14 +17,18 @@ import {
   isFetchError,
   locationService,
 } from '@grafana/runtime';
-import { updateNavIndex } from 'app/core/actions';
-import { appEvents, contextSrv } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
+import { updateNavIndex } from 'app/core/reducers/navModel';
 import { getBackendSrv } from 'app/core/services/backend_srv';
+import { contextSrv } from 'app/core/services/context_srv';
+import { DatasourceAPIVersions } from 'app/features/apiserver/client';
 import { ROUTES as CONNECTIONS_ROUTES } from 'app/features/connections/constants';
 import { getDatasourceSrv } from 'app/features/plugins/datasource_srv';
+import { pluginImporter } from 'app/features/plugins/importer/pluginImporter';
 import { getPluginSettings } from 'app/features/plugins/pluginSettings';
-import { importDataSourcePlugin } from 'app/features/plugins/plugin_loader';
-import { AccessControlAction, DataSourcePluginCategory, ThunkDispatch, ThunkResult } from 'app/types';
+import { AccessControlAction } from 'app/types/accessControl';
+import { DataSourcePluginCategory } from 'app/types/datasources';
+import { ThunkDispatch, ThunkResult } from 'app/types/store';
 
 import * as api from '../api';
 import { DATASOURCES_ROUTES } from '../constants';
@@ -55,7 +61,7 @@ export interface InitDataSourceSettingDependencies {
   loadDataSourceMeta: typeof loadDataSourceMeta;
   getDataSource: typeof getDataSource;
   getDataSourceMeta: typeof getDataSourceMeta;
-  importDataSourcePlugin: typeof importDataSourcePlugin;
+  importDataSourcePlugin: typeof pluginImporter.importDataSource;
 }
 
 export interface TestDataSourceDependencies {
@@ -98,7 +104,7 @@ export const initDataSourceSettings = (
     loadDataSourceMeta,
     getDataSource,
     getDataSourceMeta,
-    importDataSourcePlugin,
+    importDataSourcePlugin: pluginImporter.importDataSource,
   }
 ): ThunkResult<void> => {
   return async (dispatch, getState) => {
@@ -122,6 +128,11 @@ export const initDataSourceSettings = (
       }
     }
   };
+};
+
+const getPluginVersion = (dsApi: DataSourceApi) => {
+  const isCorePlugin = (dsApi?.meta?.module || '').startsWith('core');
+  return isCorePlugin ? config?.buildInfo?.version : dsApi?.meta?.info?.version;
 };
 
 export const testDataSource = (
@@ -152,6 +163,7 @@ export const testDataSource = (
         trackDataSourceTested({
           grafana_version: config.buildInfo.version,
           plugin_id: dsApi.type,
+          plugin_version: getPluginVersion(dsApi),
           datasource_uid: dsApi.uid,
           success: true,
           path: editLink,
@@ -164,6 +176,7 @@ export const testDataSource = (
         trackDataSourceTested({
           grafana_version: config.buildInfo.version,
           plugin_id: dsApi.type,
+          plugin_version: getPluginVersion(dsApi),
           datasource_uid: dsApi.uid,
           success: false,
           path: editLink,
@@ -187,7 +200,7 @@ export function loadDataSources(): ThunkResult<Promise<void>> {
 
 export function loadDataSource(uid: string): ThunkResult<Promise<DataSourceSettings>> {
   return async (dispatch) => {
-    let dataSource = await api.getDataSourceByIdOrUid(uid);
+    let dataSource = await api.getDataSourceByUid(uid);
 
     // Reload route to use UID instead
     // -------------------------------
@@ -213,7 +226,7 @@ export function loadDataSource(uid: string): ThunkResult<Promise<DataSourceSetti
 export function loadDataSourceMeta(dataSource: DataSourceSettings): ThunkResult<void> {
   return async (dispatch) => {
     const pluginInfo: DataSourcePluginMeta = await getPluginSettings(dataSource.type);
-    const plugin = await importDataSourcePlugin(pluginInfo);
+    const plugin = await pluginImporter.importDataSource(pluginInfo);
     const isBackend = plugin.DataSourceClass.prototype instanceof DataSourceWithBackend;
     const meta = {
       ...pluginInfo,
@@ -248,7 +261,7 @@ export function addDataSource(
       plugin_id: plugin.id,
       datasource_uid: result.datasource.uid,
       plugin_version: result.meta?.info?.version,
-      path: editLink,
+      path: window.location.pathname,
     });
 
     locationService.push(editLink);
@@ -264,6 +277,8 @@ export function loadDataSourcePlugins(): ThunkResult<void> {
   };
 }
 
+const dsApiVersions = new DatasourceAPIVersions();
+
 export function updateDataSource(dataSource: DataSourceSettings) {
   return async (
     dispatch: (
@@ -271,13 +286,24 @@ export function updateDataSource(dataSource: DataSourceSettings) {
     ) => DataSourceSettings
   ) => {
     try {
+      if (config.featureToggles.grafanaAPIServerWithExperimentalAPIs) {
+        dataSource.apiVersion = await dsApiVersions.get(dataSource.type);
+      }
       await api.updateDataSource(dataSource);
     } catch (err) {
       const formattedError = parseHealthCheckError(err);
 
       dispatch(testDataSourceFailed(formattedError));
-
-      return Promise.reject(dataSource);
+      const errorInfo = isFetchError(err)
+        ? err.data
+        : {
+            message: t(
+              'datasources.update-data-source.error-info.message.an-unexpected-error-occurred',
+              'An unexpected error occurred.'
+            ),
+            traceID: '',
+          };
+      return Promise.reject(errorInfo);
     }
 
     await getDatasourceSrv().reload();

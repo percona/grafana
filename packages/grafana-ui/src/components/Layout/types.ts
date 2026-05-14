@@ -18,13 +18,14 @@ export type JustifyContent =
   | 'space-between'
   | 'space-around'
   | 'space-evenly'
+  | 'stretch'
   | 'start'
   | 'end'
   | 'left'
   | 'right';
 
 export type Direction = 'row' | 'row-reverse' | 'column' | 'column-reverse';
-export type Wrap = 'nowrap' | 'wrap' | 'wrap-reverse';
+export type Wrap = boolean | 'nowrap' | 'wrap' | 'wrap-reverse';
 
 type FlexGrow = number;
 type FlexShrink = number;

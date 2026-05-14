@@ -1,11 +1,14 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import * as React from 'react';
 
 import { isEmptyObject, SelectableValue, VariableRefresh } from '@grafana/data';
+import { selectors as e2eSelectors } from '@grafana/e2e-selectors';
+import { Trans, t } from '@grafana/i18n';
 import { getBackendSrv } from '@grafana/runtime';
-import { Button, ClipboardButton, Field, Input, LinkButton, Modal, Select, Spinner } from '@grafana/ui';
-import { t, Trans } from 'app/core/internationalization';
+import { Button, ClipboardButton, Field, Input, LinkButton, Modal, Select, Spinner, Stack } from '@grafana/ui';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
-import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
+import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
+import { PanelModel } from 'app/features/dashboard/state/PanelModel';
 import { DashboardInteractions } from 'app/features/dashboard-scene/utils/interactions';
 
 import { getDashboardSnapshotSrv } from '../../services/SnapshotSrv';
@@ -27,6 +30,8 @@ interface State {
   externalEnabled: boolean;
   sharingButtonText: string;
 }
+
+const selectors = e2eSelectors.pages.ShareDashboardModal.SnapshotScene;
 
 export class ShareSnapshot extends PureComponent<Props, State> {
   private dashboard: DashboardModel;
@@ -252,14 +257,14 @@ export class ShareSnapshot extends PureComponent<Props, State> {
     return (
       <>
         <div>
-          <p className="share-modal-info-text">
+          <p>
             <Trans i18nKey="share-modal.snapshot.info-text-1">
               A snapshot is an instant way to share an interactive dashboard publicly. When created, we strip sensitive
               data like queries (metric, template, and annotation) and panel links, leaving only the visible metric data
               and series names embedded in your dashboard.
             </Trans>
           </p>
-          <p className="share-modal-info-text">
+          <p>
             <Trans i18nKey="share-modal.snapshot.info-text-2">
               Keep in mind, your snapshot <em>can be viewed by anyone</em> that has the link and can access the URL.
               Share wisely.
@@ -291,7 +296,12 @@ export class ShareSnapshot extends PureComponent<Props, State> {
               {sharingButtonText}
             </Button>
           )}
-          <Button variant="primary" disabled={isLoading} onClick={this.createSnapshot()}>
+          <Button
+            variant="primary"
+            disabled={isLoading}
+            onClick={this.createSnapshot()}
+            data-testid={selectors.PublishSnapshot}
+          >
             <Trans i18nKey="share-modal.snapshot.local-button">Publish Snapshot</Trans>
           </Button>
         </Modal.ButtonRow>
@@ -303,40 +313,44 @@ export class ShareSnapshot extends PureComponent<Props, State> {
     const { snapshotUrl } = this.state;
 
     return (
-      <>
+      <Stack direction="column" gap={0}>
         <Field label={t('share-modal.snapshot.url-label', 'Snapshot URL')}>
           <Input
             id="snapshot-url-input"
             value={snapshotUrl}
+            data-testid={selectors.CopyUrlInput}
             readOnly
             addonAfter={
-              <ClipboardButton icon="copy" variant="primary" getText={this.getSnapshotUrl}>
+              <ClipboardButton
+                icon="copy"
+                variant="primary"
+                getText={this.getSnapshotUrl}
+                data-testid={selectors.CopyUrlButton}
+              >
                 <Trans i18nKey="share-modal.snapshot.copy-link-button">Copy</Trans>
               </ClipboardButton>
             }
           />
         </Field>
 
-        <div className="pull-right" style={{ padding: '5px' }}>
+        <div style={{ alignSelf: 'flex-end', padding: '5px' }}>
           <Trans i18nKey="share-modal.snapshot.mistake-message">Did you make a mistake? </Trans>&nbsp;
           <LinkButton fill="text" target="_blank" onClick={this.deleteSnapshot}>
             <Trans i18nKey="share-modal.snapshot.delete-button">Delete snapshot.</Trans>
           </LinkButton>
         </div>
-      </>
+      </Stack>
     );
   }
 
   renderStep3() {
     return (
-      <div className="share-modal-header">
-        <p className="share-modal-info-text">
-          <Trans i18nKey="share-modal.snapshot.deleted-message">
-            The snapshot has been deleted. If you have already accessed it once, then it might take up to an hour before
-            before it is removed from browser caches or CDN caches.
-          </Trans>
-        </p>
-      </div>
+      <p>
+        <Trans i18nKey="share-modal.snapshot.deleted-message">
+          The snapshot has been deleted. If you have already accessed it once, then it might take up to an hour before
+          before it is removed from browser caches or CDN caches.
+        </Trans>
+      </p>
     );
   }
 

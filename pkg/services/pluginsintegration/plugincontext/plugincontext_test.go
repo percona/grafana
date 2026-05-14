@@ -10,7 +10,7 @@ import (
 	"github.com/grafana/grafana/pkg/infra/db/dbtest"
 	"github.com/grafana/grafana/pkg/infra/localcache"
 	"github.com/grafana/grafana/pkg/plugins"
-	pluginFakes "github.com/grafana/grafana/pkg/plugins/manager/fakes"
+	"github.com/grafana/grafana/pkg/plugins/manager/pluginfakes"
 	"github.com/grafana/grafana/pkg/plugins/manager/registry"
 	"github.com/grafana/grafana/pkg/services/datasources"
 	fakeDatasources "github.com/grafana/grafana/pkg/services/datasources/fakes"
@@ -26,25 +26,25 @@ import (
 
 func TestGet(t *testing.T) {
 	const (
-		pluginID   = "plugin-id"
-		alias      = "alias"
-		apiVersion = "v0alpha1"
+		pluginID = "plugin-id"
+		alias    = "alias"
 	)
 
 	preg := registry.NewInMemory()
 	require.NoError(t, preg.Add(context.Background(), &plugins.Plugin{
 		JSONData: plugins.JSONData{
-			ID:         pluginID,
-			AliasIDs:   []string{alias},
-			APIVersion: apiVersion,
+			ID:       pluginID,
+			AliasIDs: []string{alias},
 		},
 	}))
 
 	cfg := setting.NewCfg()
 	ds := &fakeDatasources.FakeDataSourceService{}
 	db := &dbtest.FakeDB{ExpectedError: pluginsettings.ErrPluginSettingNotFound}
+	store, err := pluginstore.NewPluginStoreForTest(preg, &pluginfakes.FakeLoader{}, &pluginfakes.FakeSourceRegistry{})
+	require.NoError(t, err)
 	pcp := plugincontext.ProvideService(cfg, localcache.ProvideService(),
-		pluginstore.New(preg, &pluginFakes.FakeLoader{}), &fakeDatasources.FakeCacheService{},
+		store, &fakeDatasources.FakeCacheService{},
 		ds, pluginSettings.ProvideService(db, secretstest.NewFakeSecretsService()), pluginconfig.NewFakePluginRequestConfigProvider(),
 	)
 	identity := &user.SignedInUser{OrgID: int64(1), Login: "admin"}
@@ -61,7 +61,6 @@ func TestGet(t *testing.T) {
 				pCtx, err := pcp.Get(context.Background(), tc.input, identity, identity.OrgID)
 				require.NoError(t, err)
 				require.Equal(t, pluginID, pCtx.PluginID)
-				require.Equal(t, apiVersion, pCtx.APIVersion)
 				require.NotNil(t, pCtx.GrafanaConfig)
 			})
 
@@ -75,7 +74,6 @@ func TestGet(t *testing.T) {
 				})
 				require.NoError(t, err)
 				require.Equal(t, pluginID, pCtx.PluginID)
-				require.Equal(t, apiVersion, pCtx.APIVersion)
 				require.NotNil(t, pCtx.GrafanaConfig)
 			})
 		})

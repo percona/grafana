@@ -5,16 +5,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"regexp"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/benbjohnson/clock"
+	"github.com/grafana/alerting/notify/historian/lokiclient"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"go.opentelemetry.io/otel/trace"
 
+	alertingInstrument "github.com/grafana/alerting/http/instrument"
+
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/services/ngalert/client"
+	"github.com/grafana/grafana/pkg/infra/tracing"
+	"github.com/grafana/grafana/pkg/services/ngalert/accesscontrol"
 	"github.com/grafana/grafana/pkg/services/ngalert/eval"
 	"github.com/grafana/grafana/pkg/services/ngalert/metrics"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
@@ -33,17 +41,101 @@ const (
 	dfLabels = "labels"
 )
 
+// QueryResultBuilder is a builder for a data frame that represents query results from Loki.
+// It contains three fields: time (timestamp), line (JSON data), and labels (JSON labels).
+type QueryResultBuilder struct {
+	frame *data.Frame
+}
+
+// NewQueryResultBuilder creates a new QueryResultBuilder with the specified capacity.
+// The capacity is used to pre-allocate the underlying slices for better performance.
+func NewQueryResultBuilder(capacity int) *QueryResultBuilder {
+	frame := data.NewFrame("states")
+	lbls := data.Labels(map[string]string{})
+
+	// We represent state history as a single merged history, that roughly corresponds to what you get in the Grafana Explore tab when querying Loki directly.
+	// The format is composed of the following vectors:
+	//   1. `time` - timestamp - when the transition happened
+	//   2. `line` - JSON - the full data of the transition
+	//   3. `labels` - JSON - the labels associated with that state transition
+	times := make([]time.Time, 0, capacity)
+	lines := make([]json.RawMessage, 0, capacity)
+	labels := make([]json.RawMessage, 0, capacity)
+
+	frame.Fields = append(frame.Fields, data.NewField(dfTime, lbls, times))
+	frame.Fields = append(frame.Fields, data.NewField(dfLine, lbls, lines))
+	frame.Fields = append(frame.Fields, data.NewField(dfLabels, lbls, labels))
+
+	return &QueryResultBuilder{frame: frame}
+}
+
+func (qr QueryResultBuilder) AddRowRaw(timestamp time.Time, line json.RawMessage, labels json.RawMessage) {
+	frame := qr.frame
+	frame.Fields[0].Append(timestamp)
+	frame.Fields[1].Append(line)
+	frame.Fields[2].Append(labels)
+}
+
+func (qr QueryResultBuilder) AddRow(timestamp time.Time, line LokiEntry, labels json.RawMessage) error {
+	lineBytes, err := json.Marshal(line)
+	if err != nil {
+		return err
+	}
+	qr.AddRowRaw(timestamp, lineBytes, labels)
+	return nil
+}
+
+// ToFrame converts the QueryResultBuilder back to a data.Frame.
+func (qr QueryResultBuilder) ToFrame() *data.Frame {
+	return qr.frame
+}
+
+func (qr QueryResultBuilder) AddWarn(s string) {
+	m := qr.frame.Meta
+	if m == nil {
+		m = &data.FrameMeta{}
+		qr.frame.SetMeta(m)
+	}
+	m.Notices = append(m.Notices, data.Notice{
+		Severity: data.NoticeSeverityWarning,
+		Text:     s,
+		Link:     "",
+		Inspect:  0,
+	})
+}
+
 const (
 	StateHistoryLabelKey   = "from"
 	StateHistoryLabelValue = "state-history"
+	LokiClientSpanName     = "ngalert.historian.client"
 )
 
 const defaultQueryRange = 6 * time.Hour
 
+var (
+	ErrLokiQueryTooLong = errutil.BadRequest("loki.requestTooLong").MustTemplate(
+		"Request to Loki exceeded ({{.Public.QuerySize}} bytes) configured maximum size of {{.Public.MaxLimit}} bytes. Query: {{.Private.Query}}",
+		errutil.WithPublic("Query for Loki exceeded the configured limit of {{.Public.MaxLimit}} bytes. Remove some filters and try again."),
+	)
+)
+
+func NewErrLokiQueryTooLong(query string, maxLimit int) error {
+	return ErrLokiQueryTooLong.Build(errutil.TemplateData{
+		Private: map[string]any{
+			"Query": query,
+		},
+		Public: map[string]any{
+			"MaxLimit":  maxLimit,
+			"QuerySize": len(query),
+		},
+	})
+}
+
 type remoteLokiClient interface {
 	Ping(context.Context) error
-	Push(context.Context, []Stream) error
-	RangeQuery(ctx context.Context, logQL string, start, end, limit int64) (QueryRes, error)
+	Push(context.Context, []lokiclient.Stream) error
+	RangeQuery(ctx context.Context, logQL string, start, end, limit int64) (lokiclient.QueryRes, error)
+	MaxQuerySize() int
 }
 
 // RemoteLokibackend is a state.Historian that records state history to an external Loki instance.
@@ -53,15 +145,19 @@ type RemoteLokiBackend struct {
 	clock          clock.Clock
 	metrics        *metrics.Historian
 	log            log.Logger
+	ac             AccessControl
+	ruleStore      RuleStore
 }
 
-func NewRemoteLokiBackend(logger log.Logger, cfg LokiConfig, req client.Requester, metrics *metrics.Historian) *RemoteLokiBackend {
+func NewRemoteLokiBackend(logger log.Logger, cfg lokiclient.LokiConfig, req alertingInstrument.Requester, metrics *metrics.Historian, tracer tracing.Tracer, ruleStore RuleStore, ac AccessControl) *RemoteLokiBackend {
 	return &RemoteLokiBackend{
-		client:         NewLokiClient(cfg, req, metrics, logger),
+		client:         lokiclient.NewLokiClient(cfg, req, metrics.BytesWritten, metrics.WriteDuration, logger, tracer, LokiClientSpanName),
 		externalLabels: cfg.ExternalLabels,
 		clock:          clock.New(),
 		metrics:        metrics,
 		log:            logger,
+		ac:             ac,
+		ruleStore:      ruleStore,
 	}
 }
 
@@ -94,12 +190,12 @@ func (h *RemoteLokiBackend) Record(ctx context.Context, rule history_model.RuleM
 		defer cancel()
 		defer close(errCh)
 		logger := h.log.FromContext(ctx)
-
+		logger.Debug("Saving state history batch", "samples", len(logStream.Values))
 		org := fmt.Sprint(rule.OrgID)
 		h.metrics.WritesTotal.WithLabelValues(org, "loki").Inc()
 		h.metrics.TransitionsTotal.WithLabelValues(org).Add(float64(len(logStream.Values)))
 
-		if err := h.recordStreams(ctx, []Stream{logStream}, logger); err != nil {
+		if err := h.recordStreams(ctx, logStream, logger); err != nil {
 			logger.Error("Failed to save alert state history batch", "error", err)
 			h.metrics.WritesFailed.WithLabelValues(org, "loki").Inc()
 			h.metrics.TransitionsFailed.WithLabelValues(org).Add(float64(len(logStream.Values)))
@@ -111,9 +207,17 @@ func (h *RemoteLokiBackend) Record(ctx context.Context, rule history_model.RuleM
 
 // Query retrieves state history entries from an external Loki instance and formats the results into a dataframe.
 func (h *RemoteLokiBackend) Query(ctx context.Context, query models.HistoryQuery) (*data.Frame, error) {
-	logQL, err := BuildLogQuery(query)
+	uids, err := h.getFolderUIDsForFilter(ctx, query)
 	if err != nil {
 		return nil, err
+	}
+
+	queries, err := BuildLogQuery(query, uids, h.client.MaxQuerySize())
+	if err != nil {
+		return nil, err
+	}
+	if len(queries) > 1 {
+		h.log.FromContext(ctx).Info("Execute query in multiple batches", "batchSize", len(queries), "folders", len(uids), "maxQueryLimit", h.client.MaxQuerySize())
 	}
 
 	now := time.Now().UTC()
@@ -123,71 +227,59 @@ func (h *RemoteLokiBackend) Query(ctx context.Context, query models.HistoryQuery
 	if query.From.IsZero() {
 		query.From = now.Add(-defaultQueryRange)
 	}
-
-	// Timestamps are expected in RFC3339Nano.
-	res, err := h.client.RangeQuery(ctx, logQL, query.From.UnixNano(), query.To.UnixNano(), int64(query.Limit))
-	if err != nil {
-		return nil, err
+	var res []lokiclient.Stream
+	for _, logQL := range queries {
+		// Timestamps are expected in RFC3339Nano.
+		// Apply user-defined limit to every request. Multiple batches is a very rare case, and therefore we can tolerate getting more data than needed.
+		// The limit can be applied after all results are merged
+		r, err := h.client.RangeQuery(ctx, logQL, query.From.UnixNano(), query.To.UnixNano(), int64(query.Limit))
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, r.Data.Result...)
 	}
-	return merge(res, query.RuleUID)
-}
-
-func buildSelectors(query models.HistoryQuery) ([]Selector, error) {
-	// OrgID and the state history label are static and will be included in all queries.
-	selectors := make([]Selector, 2)
-
-	// Set the predefined selector orgID.
-	selector, err := NewSelector(OrgIDLabel, "=", fmt.Sprintf("%d", query.OrgID))
-	if err != nil {
-		return nil, err
-	}
-	selectors[0] = selector
-
-	// Set the predefined selector for the state history label.
-	selector, err = NewSelector(StateHistoryLabelKey, "=", StateHistoryLabelValue)
-	if err != nil {
-		return nil, err
-	}
-	selectors[1] = selector
-
-	return selectors, nil
+	return h.merge(res, uids)
 }
 
 // merge will put all the results in one array sorted by timestamp.
-func merge(res QueryRes, ruleUID string) (*data.Frame, error) {
+func (h RemoteLokiBackend) merge(res []lokiclient.Stream, folderUIDToFilter []string) (*data.Frame, error) {
+	filterByFolderUIDMap := make(map[string]struct{}, len(folderUIDToFilter))
+	for _, uid := range folderUIDToFilter {
+		filterByFolderUIDMap[uid] = struct{}{}
+	}
+
 	// Find the total number of elements in all arrays.
 	totalLen := 0
-	for _, arr := range res.Data.Result {
+	for _, arr := range res {
 		totalLen += len(arr.Values)
 	}
 
-	// Create a new slice to store the merged elements.
-	frame := data.NewFrame("states")
-
-	// We merge all series into a single linear history.
-	lbls := data.Labels(map[string]string{})
-
-	// We represent state history as a single merged history, that roughly corresponds to what you get in the Grafana Explore tab when querying Loki directly.
-	// The format is composed of the following vectors:
-	//   1. `time` - timestamp - when the transition happened
-	//   2. `line` - JSON - the full data of the transition
-	//   3. `labels` - JSON - the labels associated with that state transition
-	times := make([]time.Time, 0, totalLen)
-	lines := make([]json.RawMessage, 0, totalLen)
-	labels := make([]json.RawMessage, 0, totalLen)
+	queryResult := NewQueryResultBuilder(totalLen)
 
 	// Initialize a slice of pointers to the current position in each array.
-	pointers := make([]int, len(res.Data.Result))
+	pointers := make([]int, len(res))
 	for {
 		minTime := int64(math.MaxInt64)
-		minEl := Sample{}
+		minEl := lokiclient.Sample{}
 		minElStreamIdx := -1
 		// Find the element with the earliest time among all arrays.
-		for i, stream := range res.Data.Result {
+		for i, stream := range res {
 			// Skip if we already reached the end of the current array.
 			if len(stream.Values) == pointers[i] {
 				continue
 			}
+			// check if stream should be in the results
+			if len(filterByFolderUIDMap) > 0 {
+				folderLbl, ok := stream.Stream[FolderUIDLabel]
+				if !ok {
+					continue // skip entries without folder UID, only if needs filtering
+				}
+				_, ok = filterByFolderUIDMap[folderLbl]
+				if !ok {
+					continue
+				}
+			}
+
 			curTime := stream.Values[pointers[i]].T.UnixNano()
 			if pointers[i] < len(stream.Values) && curTime < minTime {
 				minTime = curTime
@@ -199,38 +291,31 @@ func merge(res QueryRes, ruleUID string) (*data.Frame, error) {
 		if minElStreamIdx == -1 {
 			break
 		}
+		entryBytes := []byte(minEl.V)
 		var entry LokiEntry
-		err := json.Unmarshal([]byte(minEl.V), &entry)
+		err := json.Unmarshal(entryBytes, &entry)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal entry: %w", err)
+			h.log.Warn("failed to unmarshal entry, continuing", "err", err, "entry", minEl.V)
+			pointers[minElStreamIdx]++
+			continue
 		}
 		// Append the minimum element to the merged slice and move the pointer.
 		tsNano := minEl.T.UnixNano()
-		// TODO: In general, perhaps we should omit the offending line and log, rather than failing the request entirely.
-		streamLbls := res.Data.Result[minElStreamIdx].Stream
+		streamLbls := res[minElStreamIdx].Stream
 		lblsJson, err := json.Marshal(streamLbls)
 		if err != nil {
-			return nil, fmt.Errorf("failed to serialize stream labels: %w", err)
+			// This should in theory never happen, as we're marshalling a map[string]string.
+			h.log.Warn("failed to serialize stream labels, continuing", "err", err, "labels", streamLbls)
+			pointers[minElStreamIdx]++
+			continue
 		}
-		line, err := jsonifyRow(minEl.V)
-		if err != nil {
-			return nil, fmt.Errorf("a line was in an invalid format: %w", err)
-		}
-
-		times = append(times, time.Unix(0, tsNano))
-		labels = append(labels, lblsJson)
-		lines = append(lines, line)
+		queryResult.AddRowRaw(time.Unix(0, tsNano), entryBytes, lblsJson)
 		pointers[minElStreamIdx]++
 	}
-
-	frame.Fields = append(frame.Fields, data.NewField(dfTime, lbls, times))
-	frame.Fields = append(frame.Fields, data.NewField(dfLine, lbls, lines))
-	frame.Fields = append(frame.Fields, data.NewField(dfLabels, lbls, labels))
-
-	return frame, nil
+	return queryResult.ToFrame(), nil
 }
 
-func StatesToStream(rule history_model.RuleMeta, states []state.StateTransition, externalLabels map[string]string, logger log.Logger) Stream {
+func StatesToStream(rule history_model.RuleMeta, states []state.StateTransition, externalLabels map[string]string, logger log.Logger) lokiclient.Stream {
 	labels := mergeLabels(make(map[string]string), externalLabels)
 	// System-defined labels take precedence over user-defined external labels.
 	labels[StateHistoryLabelKey] = StateHistoryLabelValue
@@ -238,30 +323,13 @@ func StatesToStream(rule history_model.RuleMeta, states []state.StateTransition,
 	labels[GroupLabel] = fmt.Sprint(rule.Group)
 	labels[FolderUIDLabel] = fmt.Sprint(rule.NamespaceUID)
 
-	samples := make([]Sample, 0, len(states))
+	samples := make([]lokiclient.Sample, 0, len(states))
 	for _, state := range states {
-		if !shouldRecord(state) {
+		if !ShouldRecord(state) {
 			continue
 		}
 
-		sanitizedLabels := removePrivateLabels(state.Labels)
-		entry := LokiEntry{
-			SchemaVersion:  1,
-			Previous:       state.PreviousFormatted(),
-			Current:        state.Formatted(),
-			Values:         valuesAsDataBlob(state.State),
-			Condition:      rule.Condition,
-			DashboardUID:   rule.DashboardUID,
-			PanelID:        rule.PanelID,
-			Fingerprint:    labelFingerprint(sanitizedLabels),
-			RuleTitle:      rule.Title,
-			RuleID:         rule.ID,
-			RuleUID:        rule.UID,
-			InstanceLabels: sanitizedLabels,
-		}
-		if state.State.State == eval.Error {
-			entry.Error = state.Error.Error()
-		}
+		entry := StateTransitionToLokiEntry(rule, state)
 
 		jsn, err := json.Marshal(entry)
 		if err != nil {
@@ -270,24 +338,46 @@ func StatesToStream(rule history_model.RuleMeta, states []state.StateTransition,
 		}
 		line := string(jsn)
 
-		samples = append(samples, Sample{
-			T: state.State.LastEvaluationTime,
+		samples = append(samples, lokiclient.Sample{
+			T: state.LastEvaluationTime,
 			V: line,
 		})
 	}
 
-	return Stream{
+	return lokiclient.Stream{
 		Stream: labels,
 		Values: samples,
 	}
 }
 
-func (h *RemoteLokiBackend) recordStreams(ctx context.Context, streams []Stream, logger log.Logger) error {
-	if err := h.client.Push(ctx, streams); err != nil {
+func StateTransitionToLokiEntry(rule history_model.RuleMeta, state state.StateTransition) LokiEntry {
+	sanitizedLabels := removePrivateLabels(state.Labels)
+	entry := LokiEntry{
+		SchemaVersion:  1,
+		Previous:       state.PreviousFormatted(),
+		Current:        state.Formatted(),
+		Values:         valuesAsDataBlob(state.State),
+		Condition:      rule.Condition,
+		DashboardUID:   rule.DashboardUID,
+		PanelID:        rule.PanelID,
+		Fingerprint:    labelFingerprint(sanitizedLabels),
+		RuleTitle:      rule.Title,
+		RuleID:         rule.ID,
+		RuleUID:        rule.UID,
+		InstanceLabels: sanitizedLabels,
+	}
+	if state.State.State == eval.Error && state.Error != nil {
+		entry.Error = state.Error.Error()
+	}
+	return entry
+}
+
+func (h *RemoteLokiBackend) recordStreams(ctx context.Context, stream lokiclient.Stream, logger log.Logger) error {
+	if err := h.client.Push(ctx, []lokiclient.Stream{stream}); err != nil {
 		return err
 	}
 
-	logger.Debug("Done saving alert state history batch")
+	logger.Debug("Done saving alert state history batch", "samples", len(stream.Values))
 	return nil
 }
 
@@ -317,94 +407,250 @@ func valuesAsDataBlob(state *state.State) *simplejson.Json {
 	return jsonifyValues(state.Values)
 }
 
-func jsonifyRow(line string) (json.RawMessage, error) {
-	// Ser/deser to validate the contents of the log line before shipping it forward.
-	// TODO: We may want to remove this in the future, as we already have the value in the form of a []byte, and json.RawMessage is also a []byte.
-	// TODO: Though, if the log line does not contain valid JSON, this can cause problems later on when rendering the dataframe.
-	var entry LokiEntry
-	if err := json.Unmarshal([]byte(line), &entry); err != nil {
+// BuildLogQuery converts models.HistoryQuery and a list of folder UIDs to Loki queries.
+// It can return multiple queries if the list of folder UIDs is too big to fit into single query.
+// If there is a folder UID long enough to exceed a query size it returns ErrQueryTooLong.
+func BuildLogQuery(query models.HistoryQuery, folderUIDs []string, maxQuerySize int) ([]string, error) {
+	// first build tail of the query (if exists) to know what remaining capacity we have for folders
+	tail, err := buildQueryTail(query)
+	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(entry)
+	// build the base selectors. skip the closing bracket because we will append folders below. Closing bracket will be added at the end
+	head := fmt.Sprintf(`{%s="%d",%s=%q`, OrgIDLabel, query.OrgID, StateHistoryLabelKey, StateHistoryLabelValue)
+
+	// check if system-defined + user-defined query parameters do not exceed maximum size
+	baseQuerySize := len(head) + 1 + len(tail) // 1 stands for closing bracket
+	if len(head)+1+len(tail) > maxQuerySize {
+		return nil, NewErrLokiQueryTooLong(head+"}"+tail, maxQuerySize)
+	}
+
+	// nothing to append to the head. Construct the query and return what we have
+	if len(folderUIDs) == 0 {
+		return []string{head + "}" + tail}, nil
+	}
+	remainingFolders := folderUIDs
+	var result []string
+	for len(remainingFolders) > 0 { // iterating until all folders are processed and at least one result
+		// pre-calculate the size of the string to avoid excessive re-allocations
+		requiredLengthEstimate := baseQuerySize + 1 + len(FolderUIDLabel) + 3 // 1 - comma, 3 - operator + opening backtick
+		for _, folder := range remainingFolders {                             // this does not account to escaping characters because it's not expected generally
+			requiredLengthEstimate += len(folder) + 1 // 1 - accounts to pipe-separator and  backtick at the end
+			if requiredLengthEstimate > maxQuerySize {
+				break
+			}
+		}
+		s := strings.Builder{}
+		s.Grow(requiredLengthEstimate)
+		s.WriteString(head)
+		s.WriteString(",")
+		s.WriteString(FolderUIDLabel)
+		s.WriteString("=~`")
+		added := false
+		for len(remainingFolders) > 0 {
+			uid := regexp.QuoteMeta(remainingFolders[0])
+			requiredLength := s.Len() + len(tail) + len(uid) + 2 // 2 - backtick + closing bracket
+			if added {
+				requiredLength++ // account to pipe symbol
+			}
+			if requiredLength > maxQuerySize {
+				if !added {
+					// finish the query for logging
+					s.WriteString(uid)
+					s.WriteString("`}")
+					s.WriteString(tail)
+					return nil, NewErrLokiQueryTooLong(s.String(), maxQuerySize)
+				}
+				break
+			}
+			if added {
+				s.WriteString("|")
+			}
+			s.WriteString(uid)
+			added = true
+			remainingFolders = remainingFolders[1:]
+		}
+		s.WriteString("`")
+		s.WriteString("}")
+		s.WriteString(tail)
+		result = append(result, s.String())
+	}
+	return result, nil
 }
 
-type Selector struct {
-	// Label to Select
-	Label string
-	Op    Operator
-	// Value that is expected
-	Value string
-}
-
-func NewSelector(label, op, value string) (Selector, error) {
-	if !isValidOperator(op) {
-		return Selector{}, fmt.Errorf("'%s' is not a valid query operator", op)
+func buildQueryTail(query models.HistoryQuery) (string, error) {
+	if !queryHasLogFilters(query) {
+		return "", nil
 	}
-	return Selector{Label: label, Op: Operator(op), Value: value}, nil
-}
-
-func selectorString(selectors []Selector) string {
-	if len(selectors) == 0 {
-		return "{}"
-	}
-	// Build the query selector.
-	query := ""
-	for _, s := range selectors {
-		query += fmt.Sprintf("%s%s%q,", s.Label, s.Op, s.Value)
-	}
-	// Remove the last comma, as we append one to every selector.
-	query = query[:len(query)-1]
-	return "{" + query + "}"
-}
-
-func isValidOperator(op string) bool {
-	switch op {
-	case "=", "!=", "=~", "!~":
-		return true
-	}
-	return false
-}
-
-func BuildLogQuery(query models.HistoryQuery) (string, error) {
-	selectors, err := buildSelectors(query)
-	if err != nil {
-		return "", fmt.Errorf("failed to build the provided selectors: %w", err)
-	}
-
-	logQL := selectorString(selectors)
-
-	if queryHasLogFilters(query) {
-		logQL = fmt.Sprintf("%s | json", logQL)
-	}
+	b := strings.Builder{}
+	b.WriteString(" | json")
 
 	if query.RuleUID != "" {
-		logQL = fmt.Sprintf("%s | ruleUID=%q", logQL, query.RuleUID)
+		b.WriteString(" | ruleUID=")
+		_, err := fmt.Fprintf(&b, "%q", query.RuleUID)
+		if err != nil {
+			return "", err
+		}
 	}
 	if query.DashboardUID != "" {
-		logQL = fmt.Sprintf("%s | dashboardUID=%q", logQL, query.DashboardUID)
+		b.WriteString(" | dashboardUID=")
+		_, err := fmt.Fprintf(&b, "%q", query.DashboardUID)
+		if err != nil {
+			return "", err
+		}
 	}
 	if query.PanelID != 0 {
-		logQL = fmt.Sprintf("%s | panelID=%d", logQL, query.PanelID)
+		b.WriteString(" | panelID=")
+		b.WriteString(strconv.FormatInt(query.PanelID, 10))
+	}
+	if query.Previous != "" {
+		b.WriteString(" | previous=~")
+		_, err := fmt.Fprintf(&b, "%q", "^"+regexp.QuoteMeta(query.Previous)+".*")
+		if err != nil {
+			return "", err
+		}
+	}
+	if query.Current != "" {
+		b.WriteString(" | current=~")
+		_, err := fmt.Fprintf(&b, "%q", "^"+regexp.QuoteMeta(query.Current)+".*")
+		if err != nil {
+			return "", err
+		}
 	}
 
-	labelFilters := ""
+	requiredSize := 0
 	labelKeys := make([]string, 0, len(query.Labels))
-	for k := range query.Labels {
+	for k, v := range query.Labels {
+		requiredSize += len(k) + len(v) + 13 // 13 all literals below
 		labelKeys = append(labelKeys, k)
 	}
 	// Ensure that all queries we build are deterministic.
 	sort.Strings(labelKeys)
+	b.Grow(requiredSize)
 	for _, k := range labelKeys {
-		labelFilters += fmt.Sprintf(" | labels_%s=%q", k, query.Labels[k])
+		b.WriteString(" | labels_")
+		b.WriteString(k)
+		b.WriteString("=")
+		_, err := fmt.Fprintf(&b, "%q", query.Labels[k])
+		if err != nil {
+			return "", err
+		}
 	}
-	logQL += labelFilters
-
-	return logQL, nil
+	return b.String(), nil
 }
 
 func queryHasLogFilters(query models.HistoryQuery) bool {
 	return query.RuleUID != "" ||
 		query.DashboardUID != "" ||
 		query.PanelID != 0 ||
+		query.Previous != "" ||
+		query.Current != "" ||
 		len(query.Labels) > 0
+}
+
+func (h *RemoteLokiBackend) getFolderUIDsForFilter(ctx context.Context, query models.HistoryQuery) ([]string, error) {
+	bypass, err := h.ac.CanReadAllRules(ctx, query.SignedInUser)
+	if err != nil {
+		return nil, err
+	}
+
+	if query.RuleUID != "" {
+		return h.getFolderUIDsForRuleFilter(ctx, query, bypass)
+	}
+
+	// If the query has no rule filter, we need to return all folder UIDs the user has access to.
+	// For a user with access to all rules and folders, the full list of folders will likely be too large to be an
+	// effective optimization in Loki, so we skip folderUID filtering entirely in that case.
+	if bypass {
+		return nil, nil
+	}
+
+	// All folders the user has access to.
+	folders, err := h.ruleStore.GetUserVisibleNamespaces(ctx, query.OrgID, query.SignedInUser)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch folders that user can access: %w", err)
+	}
+	uids := make([]string, 0, len(folders))
+	// Keep only UIDs of folder in which user can read rules.
+	for _, f := range folders {
+		hasAccess, err := h.ac.HasAccessInFolder(ctx, query.SignedInUser, models.NewNamespace(f))
+		if err != nil {
+			return nil, err
+		}
+		if !hasAccess {
+			continue
+		}
+		uids = append(uids, f.UID)
+	}
+	if len(uids) == 0 {
+		return nil, accesscontrol.NewAuthorizationErrorGeneric("read rules in any folder")
+	}
+	sort.Strings(uids)
+	return uids, nil
+}
+
+func (h *RemoteLokiBackend) getFolderUIDsForRuleFilter(ctx context.Context, query models.HistoryQuery, canReadAll bool) ([]string, error) {
+	rule, err := h.ruleStore.GetAlertRuleByUID(ctx, &models.GetAlertRuleByUIDQuery{
+		UID:   query.RuleUID,
+		OrgID: query.OrgID,
+	})
+	if err != nil {
+		if canReadAll {
+			// When the user can read all rules, filtering by folder UID is purely an optimization, so we can ignore errors here.
+			h.log.FromContext(ctx).Debug("failed to fetch alert rule by UID", "err", err)
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to fetch alert rule by UID: %w", err)
+	}
+
+	// First, we check if the user has access to the current version of the rule. If not, we can return early.
+	// Whether we should check historical folders they might still have access to is not 100% clear, but it seems more
+	// intuitive to deny access in this case.
+	if !canReadAll {
+		if err := h.ac.AuthorizeAccessInFolder(ctx, query.SignedInUser, rule); err != nil {
+			return nil, err
+		}
+	}
+
+	// We want to return folder UIDs when possible, as it's indexed in Loki and will help with query performance.
+	// However, by just returning the current folder UID the user can lose history when a rule is moved between folders.
+	// So, we attempt to get historical folder UIDs from the rule's history.
+	historicalFolders, err := h.ruleStore.GetAlertRuleVersionFolders(ctx, rule.OrgID, rule.GUID)
+	if err != nil {
+		// Including historical folders is an edge case enhancement, better to just log the error and continue
+		// with the current folder UID.
+		h.log.FromContext(ctx).Debug("failed to include historical folder UIDs for rule", "err", err)
+	}
+
+	accessibleFolders := make([]string, 0, len(historicalFolders)+1)
+	dedup := make(map[string]struct{})
+
+	accessibleFolders = append(accessibleFolders, rule.GetNamespaceUID())
+	dedup[rule.GetNamespaceUID()] = struct{}{}
+
+	for _, folderUID := range historicalFolders {
+		if _, exists := dedup[folderUID]; exists {
+			continue
+		}
+
+		if canReadAll {
+			// If the user can read all rules, no need to check access to each folder.
+			accessibleFolders = append(accessibleFolders, folderUID)
+			continue
+		}
+
+		hasAccess, err := h.ac.HasAccessInFolder(ctx, query.SignedInUser, models.NewNamespaceUID(folderUID))
+		if err != nil {
+			// Including historical folders is an edge case enhancement, better to just log the error and continue
+			// with the current folder UID.
+			h.log.FromContext(ctx).Debug("failed to check access to folder", "err", err, "folderUID", folderUID)
+			continue
+		}
+		if !hasAccess {
+			continue
+		}
+		accessibleFolders = append(accessibleFolders, folderUID)
+	}
+
+	return accessibleFolders, nil
 }

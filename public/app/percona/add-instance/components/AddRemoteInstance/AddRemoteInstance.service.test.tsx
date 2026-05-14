@@ -1,3 +1,4 @@
+import { MetricsMode } from 'app/percona/inventory/Inventory.types';
 import { toExternalServicePayload, toPayload } from './AddRemoteInstance.service';
 
 describe('AddRemoteInstanceService:: ', () => {
@@ -42,7 +43,7 @@ describe('AddRemoteInstanceService:: ', () => {
         node_type: 'NODE_TYPE_REMOTE_NODE',
       },
       listen_port: '80',
-      metrics_mode: 1,
+      metrics_mode: MetricsMode.PULL,
     };
 
     expect(toExternalServicePayload(data)).toStrictEqual(payload);
@@ -94,7 +95,7 @@ describe('AddRemoteInstanceService:: ', () => {
       pmm_agent_id: 'pmm-server',
       port: '80',
       qan_postgresql_pgstatements_agent: true,
-      metrics_mode: 1,
+      metrics_mode: MetricsMode.PULL,
       node_id: 'node1',
     };
     expect(toPayload(data)).toStrictEqual(payload);

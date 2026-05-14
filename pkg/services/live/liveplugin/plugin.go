@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/centrifugal/centrifuge"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
-	"github.com/grafana/grafana/pkg/services/auth/identity"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/services/datasources"
 	"github.com/grafana/grafana/pkg/services/live/orgchannel"
 	"github.com/grafana/grafana/pkg/services/live/pipeline"
@@ -25,11 +26,11 @@ func NewChannelLocalPublisher(node *centrifuge.Node, pipeline *pipeline.Pipeline
 
 func (p *ChannelLocalPublisher) PublishLocal(channel string, data []byte) error {
 	if p.pipeline != nil {
-		orgID, channelID, err := orgchannel.StripOrgID(channel)
+		ns, channelID, err := orgchannel.StripK8sNamespace(channel)
 		if err != nil {
 			return err
 		}
-		ok, err := p.pipeline.ProcessInput(context.Background(), orgID, channelID, data)
+		ok, err := p.pipeline.ProcessInput(context.Background(), ns.Value, channelID, data)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,10 @@
-import React, { FC, HTMLAttributes, RefCallback } from 'react';
+import { FC, HTMLAttributes } from 'react';
+import * as React from 'react';
 
 import { NavModel, NavModelItem, PageLayoutType } from '@grafana/data';
+import { PluginPageBackground } from '@grafana/runtime';
+
+import { ScrollRefElement } from '../NativeScrollbar';
 
 import { PageContents } from './PageContents';
 
@@ -9,6 +13,8 @@ export interface PageProps extends HTMLAttributes<HTMLDivElement> {
   navId?: string;
   navModel?: NavModel;
   pageNav?: NavModelItem;
+  /** Determines the background color of the page. Defaults to primary. */
+  background?: PluginPageBackground;
   /** Can be used to place info inline with the heading */
   info?: PageInfoItem[];
   /** Can be used to place actions inline with the heading */
@@ -20,16 +26,8 @@ export interface PageProps extends HTMLAttributes<HTMLDivElement> {
   subTitle?: React.ReactNode;
   /** Control the page layout. */
   layout?: PageLayoutType;
-  /**
-   * Can be used to get the scroll container element to access scroll position
-   * */
-  // Probably will deprecate this in the future in favor of just scrolling document.body directly
-  scrollRef?: RefCallback<HTMLDivElement>;
-  /**
-   * Can be used to update the current scroll position
-   * */
-  // Probably will deprecate this in the future in favor of just scrolling document.body directly
-  scrollTop?: number;
+  /** Can be used to get the scroll container element to access scroll position */
+  onSetScrollRef?: (ref: ScrollRefElement) => void;
 }
 
 export interface PageInfoItem {

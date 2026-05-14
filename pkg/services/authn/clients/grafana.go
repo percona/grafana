@@ -5,7 +5,11 @@ import (
 	"crypto/subtle"
 	"errors"
 	"net/mail"
+	"strconv"
 
+	"go.opentelemetry.io/otel/trace"
+
+	claims "github.com/grafana/authlib/types"
 	"github.com/grafana/grafana/pkg/services/authn"
 	"github.com/grafana/grafana/pkg/services/login"
 	"github.com/grafana/grafana/pkg/services/org"
@@ -17,13 +21,14 @@ import (
 var _ authn.ProxyClient = new(Grafana)
 var _ authn.PasswordClient = new(Grafana)
 
-func ProvideGrafana(cfg *setting.Cfg, userService user.Service) *Grafana {
-	return &Grafana{cfg, userService}
+func ProvideGrafana(cfg *setting.Cfg, userService user.Service, tracer trace.Tracer) *Grafana {
+	return &Grafana{cfg, userService, tracer}
 }
 
 type Grafana struct {
 	cfg         *setting.Cfg
 	userService user.Service
+	tracer      trace.Tracer
 }
 
 func (c *Grafana) String() string {
@@ -31,6 +36,9 @@ func (c *Grafana) String() string {
 }
 
 func (c *Grafana) AuthenticateProxy(ctx context.Context, r *authn.Request, username string, additional map[string]string) (*authn.Identity, error) {
+	ctx, span := c.tracer.Start(ctx, "authn.grafana.AuthenticateProxy") //nolint:ineffassign,staticcheck
+	defer span.End()
+
 	identity := &authn.Identity{
 		AuthenticatedBy: login.AuthProxyAuthModule,
 		AuthID:          username,
@@ -89,6 +97,9 @@ func (c *Grafana) AuthenticateProxy(ctx context.Context, r *authn.Request, usern
 }
 
 func (c *Grafana) AuthenticatePassword(ctx context.Context, r *authn.Request, username, password string) (*authn.Identity, error) {
+	ctx, span := c.tracer.Start(ctx, "authn.grafana.AuthenticatePassword")
+	defer span.End()
+
 	usr, err := c.userService.GetByLogin(ctx, &user.GetUserByLoginQuery{LoginOrEmail: username})
 	if err != nil {
 		if errors.Is(err, user.ErrUserNotFound) {
@@ -105,7 +116,8 @@ func (c *Grafana) AuthenticatePassword(ctx context.Context, r *authn.Request, us
 	}
 
 	return &authn.Identity{
-		ID:              authn.NewNamespaceID(authn.NamespaceUser, usr.ID),
+		ID:              strconv.FormatInt(usr.ID, 10),
+		Type:            claims.TypeUser,
 		OrgID:           r.OrgID,
 		ClientParams:    authn.ClientParams{FetchSyncedUser: true, SyncPermissions: true},
 		AuthenticatedBy: login.PasswordAuthModule,

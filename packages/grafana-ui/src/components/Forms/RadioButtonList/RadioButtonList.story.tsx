@@ -1,5 +1,6 @@
 import { Meta, StoryFn } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 
 import { SelectableValue } from '@grafana/data';
 
@@ -16,7 +17,7 @@ const defaultOptions: Array<SelectableValue<string>> = [
 ];
 
 const meta: Meta<typeof RadioButtonList> = {
-  title: 'Forms/RadioButtonList',
+  title: 'Inputs/RadioButtonList',
   component: RadioButtonList,
   parameters: {
     controls: {

@@ -2,101 +2,122 @@ package provisioning
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
+	"github.com/grafana/alerting/definition"
 
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
+	"github.com/grafana/grafana/pkg/services/ngalert/notifier/legacy_storage"
+	"github.com/grafana/grafana/pkg/services/ngalert/provisioning/validation"
 	"github.com/grafana/grafana/pkg/setting"
 )
 
 type NotificationPolicyService struct {
-	configStore     *alertmanagerConfigStoreImpl
+	configStore     alertmanagerConfigStore
 	provenanceStore ProvisioningStore
 	xact            TransactionManager
 	log             log.Logger
 	settings        setting.UnifiedAlertingSettings
+	validator       validation.ProvenanceStatusTransitionValidator
 }
 
-func NewNotificationPolicyService(am AMConfigStore, prov ProvisioningStore,
+func NewNotificationPolicyService(am alertmanagerConfigStore, prov ProvisioningStore,
 	xact TransactionManager, settings setting.UnifiedAlertingSettings, log log.Logger) *NotificationPolicyService {
 	return &NotificationPolicyService{
-		configStore:     &alertmanagerConfigStoreImpl{store: am},
+		configStore:     am,
 		provenanceStore: prov,
 		xact:            xact,
 		log:             log,
 		settings:        settings,
+		validator:       validation.ValidateProvenanceRelaxed,
 	}
 }
 
-func (nps *NotificationPolicyService) GetAMConfigStore() AMConfigStore {
-	return nps.configStore.store
-}
-
-func (nps *NotificationPolicyService) GetPolicyTree(ctx context.Context, orgID int64) (definitions.Route, error) {
+func (nps *NotificationPolicyService) GetPolicyTree(ctx context.Context, orgID int64) (definitions.Route, string, error) {
 	rev, err := nps.configStore.Get(ctx, orgID)
 	if err != nil {
-		return definitions.Route{}, err
+		return definitions.Route{}, "", err
 	}
 
-	if rev.cfg.AlertmanagerConfig.Config.Route == nil {
-		return definitions.Route{}, fmt.Errorf("no route present in current alertmanager config")
+	if rev.Config.AlertmanagerConfig.Route == nil {
+		return definitions.Route{}, "", fmt.Errorf("no route present in current alertmanager config")
 	}
 
-	provenance, err := nps.provenanceStore.GetProvenance(ctx, rev.cfg.AlertmanagerConfig.Route, orgID)
+	provenance, err := nps.provenanceStore.GetProvenance(ctx, rev.Config.AlertmanagerConfig.Route, orgID)
 	if err != nil {
-		return definitions.Route{}, err
+		return definitions.Route{}, "", err
 	}
-
-	result := *rev.cfg.AlertmanagerConfig.Route
+	result := *rev.Config.AlertmanagerConfig.Route
 	result.Provenance = definitions.Provenance(provenance)
-
-	return result, nil
+	version := calculateRouteFingerprint(result)
+	return result, version, nil
 }
 
-func (nps *NotificationPolicyService) UpdatePolicyTree(ctx context.Context, orgID int64, tree definitions.Route, p models.Provenance) error {
+func (nps *NotificationPolicyService) UpdatePolicyTree(ctx context.Context, orgID int64, tree definitions.Route, p models.Provenance, version string) (definitions.Route, string, error) {
 	err := tree.Validate()
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrValidation, err.Error())
+		return definitions.Route{}, "", models.MakeErrRouteInvalidFormat(err)
 	}
 
 	revision, err := nps.configStore.Get(ctx, orgID)
 	if err != nil {
-		return err
+		return definitions.Route{}, "", err
 	}
 
-	receivers, err := nps.receiversToMap(revision.cfg.AlertmanagerConfig.Receivers)
+	err = nps.checkOptimisticConcurrency(*revision.Config.AlertmanagerConfig.Route, p, version, "update")
 	if err != nil {
-		return err
+		return definitions.Route{}, "", err
 	}
 
-	receivers[""] = struct{}{} // Allow empty receiver (inheriting from parent)
-	err = tree.ValidateReceivers(receivers)
+	// check that provenance is not changed in an invalid way
+	storedProvenance, err := nps.provenanceStore.GetProvenance(ctx, &tree, orgID)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrValidation, err.Error())
+		return definitions.Route{}, "", err
+	}
+	if err := nps.validator(storedProvenance, p); err != nil {
+		return definitions.Route{}, "", err
 	}
 
-	muteTimes := map[string]struct{}{}
-	for _, mt := range revision.cfg.AlertmanagerConfig.MuteTimeIntervals {
-		muteTimes[mt.Name] = struct{}{}
+	if err := revision.ValidateRoute(tree); err != nil {
+		return definitions.Route{}, "", models.MakeErrRouteInvalidFormat(err)
 	}
-	err = tree.ValidateMuteTimes(muteTimes)
+
+	revision.Config.AlertmanagerConfig.Route = &tree
+
+	_, err = revision.Config.GetMergedAlertmanagerConfig()
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrValidation, err.Error())
+		if errors.Is(err, definition.ErrSubtreeMatchersConflict) {
+			// TODO temporarily get the conflicting matchers
+			return definitions.Route{}, "", models.MakeErrRouteConflictingMatchers(fmt.Sprintf("%s", revision.Config.ExtraConfigs[0].MergeMatchers))
+		}
+		nps.log.Warn("Unable to validate the combined routing tree because of an error during merging. This could be a sign of broken external configuration. Skipping", "error", err)
 	}
 
-	revision.cfg.AlertmanagerConfig.Config.Route = &tree
-
-	return nps.xact.InTransaction(ctx, func(ctx context.Context) error {
+	err = nps.xact.InTransaction(ctx, func(ctx context.Context) error {
 		if err := nps.configStore.Save(ctx, revision, orgID); err != nil {
 			return err
 		}
 		return nps.provenanceStore.SetProvenance(ctx, &tree, orgID, p)
 	})
+	if err != nil {
+		return definitions.Route{}, "", err
+	}
+	return tree, calculateRouteFingerprint(tree), nil
 }
 
-func (nps *NotificationPolicyService) ResetPolicyTree(ctx context.Context, orgID int64) (definitions.Route, error) {
-	defaultCfg, err := deserializeAlertmanagerConfig([]byte(nps.settings.DefaultConfiguration))
+func (nps *NotificationPolicyService) ResetPolicyTree(ctx context.Context, orgID int64, provenance models.Provenance) (definitions.Route, error) {
+	storedProvenance, err := nps.provenanceStore.GetProvenance(ctx, &definitions.Route{}, orgID)
+	if err != nil {
+		return definitions.Route{}, err
+	}
+	if err := nps.validator(storedProvenance, provenance); err != nil {
+		return definitions.Route{}, err
+	}
+
+	defaultCfg, err := legacy_storage.DeserializeAlertmanagerConfig([]byte(nps.settings.DefaultConfiguration))
 	if err != nil {
 		nps.log.Error("Failed to parse default alertmanager config: %w", err)
 		return definitions.Route{}, fmt.Errorf("failed to parse default alertmanager config: %w", err)
@@ -107,9 +128,8 @@ func (nps *NotificationPolicyService) ResetPolicyTree(ctx context.Context, orgID
 	if err != nil {
 		return definitions.Route{}, err
 	}
-	revision.cfg.AlertmanagerConfig.Config.Route = route
-	err = nps.ensureDefaultReceiverExists(revision.cfg, defaultCfg)
-	if err != nil {
+
+	if _, err := revision.ResetUserDefinedRoute(defaultCfg); err != nil {
 		return definitions.Route{}, err
 	}
 
@@ -127,30 +147,21 @@ func (nps *NotificationPolicyService) ResetPolicyTree(ctx context.Context, orgID
 	return *route, nil
 }
 
-func (nps *NotificationPolicyService) receiversToMap(records []*definitions.PostableApiReceiver) (map[string]struct{}, error) {
-	receivers := map[string]struct{}{}
-	for _, receiver := range records {
-		receivers[receiver.Name] = struct{}{}
-	}
-	return receivers, nil
+func calculateRouteFingerprint(route definitions.Route) string {
+	return legacy_storage.CalculateRouteFingerprint(route)
 }
 
-func (nps *NotificationPolicyService) ensureDefaultReceiverExists(cfg *definitions.PostableUserConfig, defaultCfg *definitions.PostableUserConfig) error {
-	defaultRcv := cfg.AlertmanagerConfig.Route.Receiver
-
-	for _, rcv := range cfg.AlertmanagerConfig.Receivers {
-		if rcv.Name == defaultRcv {
-			return nil
+func (nps *NotificationPolicyService) checkOptimisticConcurrency(current definitions.Route, provenance models.Provenance, desiredVersion string, action string) error {
+	if desiredVersion == "" {
+		if provenance != models.ProvenanceFile {
+			// if version is not specified and it's not a file provisioning, emit a log message to reflect that optimistic concurrency is disabled for this request
+			nps.log.Debug("ignoring optimistic concurrency check because version was not provided", "operation", action)
 		}
+		return nil
 	}
-
-	for _, rcv := range defaultCfg.AlertmanagerConfig.Receivers {
-		if rcv.Name == defaultRcv {
-			cfg.AlertmanagerConfig.Receivers = append(cfg.AlertmanagerConfig.Receivers, rcv)
-			return nil
-		}
+	currentVersion := calculateRouteFingerprint(current)
+	if currentVersion != desiredVersion {
+		return ErrVersionConflict.Errorf("provided version %s of routing tree does not match current version %s", desiredVersion, currentVersion)
 	}
-
-	nps.log.Error("Grafana Alerting has been configured with a default configuration that is internally inconsistent! The default configuration's notification policy must have a corresponding receiver.")
-	return fmt.Errorf("inconsistent default configuration")
+	return nil
 }

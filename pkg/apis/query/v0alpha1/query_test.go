@@ -2,11 +2,14 @@ package v0alpha1_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
-	data "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	data "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
 	query "github.com/grafana/grafana/pkg/apis/query/v0alpha1"
 )
 
@@ -75,4 +78,40 @@ func TestParseQueriesIntoQueryDataRequest(t *testing.T) {
 		  "to": "200"
 		}
 	  }`, string(out))
+}
+
+func TestGetResponseCode(t *testing.T) {
+	t.Run("return 200 if no errors in responses", func(t *testing.T) {
+		assert.Equal(t, 200, query.GetResponseCode(&backend.QueryDataResponse{
+			Responses: map[string]backend.DataResponse{
+				"A": {
+					Error: nil,
+				},
+				"B": {
+					Error: nil,
+				},
+			},
+		}))
+	})
+	t.Run("return 400 if there is an error in the responses but no status code", func(t *testing.T) {
+		assert.Equal(t, 400, query.GetResponseCode(&backend.QueryDataResponse{
+			Responses: map[string]backend.DataResponse{
+				"A": {
+					Error: fmt.Errorf("some wild error"),
+				},
+			},
+		}))
+	})
+	t.Run("return 400 if there is a partial error but no status code", func(t *testing.T) {
+		assert.Equal(t, 400, query.GetResponseCode(&backend.QueryDataResponse{
+			Responses: map[string]backend.DataResponse{
+				"A": {
+					Error: nil,
+				},
+				"B": {
+					Error: fmt.Errorf("some partial error"),
+				},
+			},
+		}))
+	})
 }

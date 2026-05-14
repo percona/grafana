@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { TestProvider } from 'test/helpers/TestProvider';
 import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
 
@@ -22,6 +21,7 @@ const setup = (props: Partial<PageProps>) => {
     {
       id: HOME_NAV_ID,
       text: 'Home',
+      url: '/',
     },
     {
       text: 'Section name',

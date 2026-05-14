@@ -2,16 +2,18 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/grafana/grafana/pkg/api/routing"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/metrics"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	"github.com/grafana/grafana/pkg/services/dashboardimport"
 	"github.com/grafana/grafana/pkg/services/dashboardimport/api"
 	"github.com/grafana/grafana/pkg/services/dashboardimport/utils"
 	"github.com/grafana/grafana/pkg/services/dashboards"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/folder"
 	"github.com/grafana/grafana/pkg/services/librarypanels"
 	"github.com/grafana/grafana/pkg/services/plugindashboards"
@@ -23,16 +25,17 @@ func ProvideService(routeRegister routing.RouteRegister,
 	quotaService quota.Service,
 	pluginDashboardService plugindashboards.Service, pluginStore pluginstore.Store,
 	libraryPanelService librarypanels.Service, dashboardService dashboards.DashboardService,
-	ac accesscontrol.AccessControl, folderService folder.Service,
+	ac accesscontrol.AccessControl, folderService folder.Service, features featuremgmt.FeatureToggles,
 ) *ImportDashboardService {
 	s := &ImportDashboardService{
 		pluginDashboardService: pluginDashboardService,
 		dashboardService:       dashboardService,
 		libraryPanelService:    libraryPanelService,
 		folderService:          folderService,
+		features:               features,
 	}
 
-	dashboardImportAPI := api.New(s, quotaService, pluginStore, ac)
+	dashboardImportAPI := api.New(s, quotaService, pluginStore, ac, features)
 	dashboardImportAPI.RegisterAPIEndpoints(routeRegister)
 
 	return s
@@ -43,9 +46,10 @@ type ImportDashboardService struct {
 	dashboardService       dashboards.DashboardService
 	libraryPanelService    librarypanels.Service
 	folderService          folder.Service
+	features               featuremgmt.FeatureToggles
 }
 
-func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashboardimport.ImportDashboardRequest) (*dashboardimport.ImportDashboardResponse, error) {
+func (s *ImportDashboardService) InterpolateDashboard(ctx context.Context, req *dashboardimport.ImportDashboardRequest) (*simplejson.Json, error) {
 	var draftDashboard *dashboards.Dashboard
 	if req.PluginId != "" {
 		loadReq := &plugindashboards.LoadPluginDashboardRequest{
@@ -57,12 +61,23 @@ func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashb
 		} else {
 			draftDashboard = resp.Dashboard
 		}
-	} else {
+	} else if req.Dashboard != nil {
 		draftDashboard = dashboards.NewDashboardFromJson(req.Dashboard)
+	} else {
+		return nil, fmt.Errorf("either PluginId or Dashboard must be provided")
 	}
 
 	evaluator := utils.NewDashTemplateEvaluator(draftDashboard.Data, req.Inputs)
 	generatedDash, err := evaluator.Eval()
+	if err != nil {
+		return nil, err
+	}
+
+	return generatedDash, nil
+}
+
+func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashboardimport.ImportDashboardRequest) (*dashboardimport.ImportDashboardResponse, error) {
+	generatedDash, err := s.InterpolateDashboard(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -109,11 +124,9 @@ func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashb
 		req.FolderUid = folder.UID
 	}
 
-	namespace, identifier := req.User.GetNamespacedID()
-	userID := int64(0)
-
-	if namespace == identity.NamespaceUser || namespace == identity.NamespaceServiceAccount {
-		userID, _ = identity.IntIdentifier(namespace, identifier)
+	var userID int64
+	if id, err := identity.UserIdentifier(req.User.GetID()); err == nil {
+		userID = id
 	}
 
 	saveCmd := dashboards.SaveDashboardCommand{
@@ -133,22 +146,17 @@ func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashb
 		User:      req.User,
 	}
 
-	savedDashboard, err := s.dashboardService.ImportDashboard(ctx, dto)
-	if err != nil {
-		return nil, err
-	}
-
-	metrics.MFolderIDsServiceCount.WithLabelValues(metrics.DashboardImport).Inc()
 	// nolint:staticcheck
 	err = s.libraryPanelService.ImportLibraryPanelsForDashboard(ctx, req.User, libraryElements, generatedDash.Get("panels").MustArray(), req.FolderId, req.FolderUid)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.libraryPanelService.ConnectLibraryPanelsForDashboard(ctx, req.User, savedDashboard)
+	savedDashboard, err := s.dashboardService.ImportDashboard(ctx, dto)
 	if err != nil {
 		return nil, err
 	}
+	metrics.MFolderIDsServiceCount.WithLabelValues(metrics.DashboardImport).Inc()
 
 	revision := savedDashboard.Data.Get("revision").MustInt64(0)
 	metrics.MFolderIDsServiceCount.WithLabelValues(metrics.DashboardImport).Inc()

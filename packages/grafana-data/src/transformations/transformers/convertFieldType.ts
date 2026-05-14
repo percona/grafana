@@ -2,9 +2,9 @@ import { map } from 'rxjs/operators';
 
 import { TimeZone } from '@grafana/schema';
 
-import { DateTimeOptionsWhenParsing, dateTimeParse } from '../../datetime';
-import { SynchronousDataTransformerInfo } from '../../types';
+import { dateTimeParse, DateTimeOptionsWhenParsing } from '../../datetime/parser';
 import { DataFrame, EnumFieldConfig, Field, FieldType } from '../../types/dataFrame';
+import { SynchronousDataTransformerInfo } from '../../types/transformations';
 import { fieldMatchers } from '../matchers';
 import { FieldMatcherID } from '../matchers/ids';
 
@@ -131,13 +131,17 @@ export function fieldToTimeField(field: Field, dateFormat?: string): Field {
   const timeValues = field.values.slice();
 
   let firstDefined = timeValues.find((v) => v != null);
-
-  let isISO8601 = typeof firstDefined === 'string' && iso8601Regex.test(firstDefined);
+  const convertToMS = typeof firstDefined === 'number' && dateFormat === 'X';
+  const isISO8601 = typeof firstDefined === 'string' && iso8601Regex.test(firstDefined);
 
   for (let t = 0; t < timeValues.length; t++) {
     if (timeValues[t]) {
       let parsed = isISO8601 ? Date.parse(timeValues[t]) : dateTimeParse(timeValues[t], opts).valueOf();
-      timeValues[t] = Number.isFinite(parsed) ? parsed : null;
+      if (Number.isFinite(parsed)) {
+        timeValues[t] = convertToMS ? parsed * 1000 : parsed;
+      } else {
+        timeValues[t] = null;
+      }
     } else {
       timeValues[t] = null;
     }
@@ -206,12 +210,15 @@ export function fieldToStringField(
       values = values.map((v) => dateTimeParse(v, parseOptions).format(dateFormat));
       break;
 
+    // Handle both "string" and "other" types to ensure compatibility across Grafana versions (10 & 11)
+    // In some cases fields are classified as 'other' in Grafana 10 but as 'string' in Grafana 11
+    case FieldType.string:
     case FieldType.other:
       values = values.map((v) => {
         if (joinWith?.length && Array.isArray(v)) {
           return v.join(joinWith);
         }
-        return JSON.stringify(v); // will quote strings and avoid "object"
+        return JSON.stringify(v);
       });
       break;
 
@@ -254,10 +261,13 @@ function fieldToComplexField(field: Field): Field {
  */
 export function ensureTimeField(field: Field, dateFormat?: string): Field {
   const firstValueTypeIsNumber = typeof field.values[0] === 'number';
+  // if the format is unix seconds, we don't want to skip formatting
+  const isUnixSecondsFormat = dateFormat === 'X';
+
   if (field.type === FieldType.time && firstValueTypeIsNumber) {
     return field; //already time
   }
-  if (firstValueTypeIsNumber) {
+  if (firstValueTypeIsNumber && !isUnixSecondsFormat) {
     return {
       ...field,
       type: FieldType.time, //assumes it should be time

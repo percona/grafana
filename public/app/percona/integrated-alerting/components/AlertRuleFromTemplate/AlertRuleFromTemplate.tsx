@@ -1,24 +1,29 @@
 import { AxiosError } from 'axios';
-import React, { FC, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
+import { OrgRole } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Button, Stack, Spinner, useStyles2 } from '@grafana/ui';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { Page } from 'app/core/components/Page/Page';
 import { useAppNotification } from 'app/core/copy/appNotification';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { PMM_ALERTING_CREATE_ALERT_TEMPLATE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { PMM_ALERTING_CREATE_ALERT_TEMPLATE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { ApiErrorResponse } from 'app/percona/shared/core';
+import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { AlertRulesService } from 'app/percona/shared/services/AlertRules/AlertRules.service';
 
+import { Messages } from '../../IntegratedAlerting.messages';
 import { TemplatedAlertFormValues } from '../../types';
 import { TemplateForm } from '../TemplateForm/TemplateForm';
 import { formatCreateAPIPayload } from '../TemplateForm/TemplateForm.utils';
 
 import { getStyles } from './AlertRuleFromTemplate.styles';
+import { Trans } from '@grafana/i18n';
 
 export const AlertRuleFromTemplate: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +49,8 @@ export const AlertRuleFromTemplate: FC = () => {
     shouldFocusError: true,
   });
   const styles = useStyles2(getStyles);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('alertingEnabled'), []);
 
   const submit = async (values: TemplatedAlertFormValues) => {
     setIsSubmitting(true);
@@ -53,7 +60,7 @@ export const AlertRuleFromTemplate: FC = () => {
       notifyApp.success(`Rule "${values.ruleName}" saved.`);
 
       locationService.push(returnTo);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error);
       const message = (error as AxiosError<ApiErrorResponse>)?.response?.data?.message;
       notifyApp.error(message || 'Failed to save rule');
@@ -76,11 +83,11 @@ export const AlertRuleFromTemplate: FC = () => {
         disabled={isSubmitting}
       >
         {isSubmitting && <Spinner className={styles.buttonSpinner} inline={true} />}
-        Save rule and exit
+        <Trans i18nKey="alerting.alert-rule-from-template.action-buttons.save">Save rule and exit</Trans>
       </Button>
       <Link to={returnTo}>
         <Button variant="secondary" disabled={isSubmitting} type="button" size="sm">
-          Cancel
+          <Trans i18nKey="alerting.alert-rule-from-template.action-buttons.cancel">Cancel</Trans>
         </Button>
       </Link>
     </Stack>
@@ -90,7 +97,13 @@ export const AlertRuleFromTemplate: FC = () => {
     <FormProvider {...methods}>
       <AppChromeUpdate actions={actionButtons} />
       <Page navId="alert-list" pageNav={PMM_ALERTING_CREATE_ALERT_TEMPLATE}>
-        <TemplateForm />
+        <FeatureLoader
+          featureName={Messages.alerting}
+          featureSelector={featureSelector}
+          allowedRoles={[OrgRole.Admin, OrgRole.Editor]}
+        >
+          <TemplateForm />
+        </FeatureLoader>
       </Page>
     </FormProvider>
   );

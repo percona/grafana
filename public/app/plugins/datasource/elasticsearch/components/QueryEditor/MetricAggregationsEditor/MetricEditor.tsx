@@ -1,13 +1,13 @@
 import { cx } from '@emotion/css';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { satisfies, SemVer } from 'semver';
 
 import { SelectableValue } from '@grafana/data';
 import { InlineSegmentGroup, SegmentAsync, useTheme2 } from '@grafana/ui';
 
+import { MetricAggregation, MetricAggregationType } from '../../../dataquery.gen';
 import { useFields } from '../../../hooks/useFields';
 import { useDispatch } from '../../../hooks/useStatelessReducer';
-import { MetricAggregation, MetricAggregationType } from '../../../types';
 import { MetricPicker } from '../../MetricPicker';
 import { useDatasource, useQuery } from '../ElasticsearchQueryContext';
 import { segmentStyles } from '../styles';

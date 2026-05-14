@@ -1,12 +1,7 @@
 import { isNil, omitBy } from 'lodash';
 
 import { FieldConfigSource, PanelTypeChangedHandler } from '@grafana/data';
-import {
-  LegendDisplayMode,
-  SortOrder,
-  StackingMode,
-  TooltipDisplayMode,
-} from '@grafana/schema/dist/esm/common/common.gen';
+import { LegendDisplayMode, SortOrder, StackingMode, TooltipDisplayMode } from '@grafana/schema';
 
 import { defaultHistogramConfig } from './config';
 import { FieldConfig as HistogramFieldConfig, Options } from './panelcfg.gen';
@@ -38,11 +33,10 @@ export const changeToHistogramPanelMigrationHandler: PanelTypeChangedHandler = (
   return {};
 };
 
-function graphToHistogramOptions(angular: any): {
+function graphToHistogramOptions(graphOptions: GraphOptions): {
   fieldConfig: FieldConfigSource;
   options: Options;
 } {
-  const graphOptions: GraphOptions = angular;
   let histogramFieldConfig: HistogramFieldConfig = {};
   const options: Options = {
     legend: {

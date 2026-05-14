@@ -36,6 +36,9 @@ export const getStyles = ({ v1: { colors, spacing, typography } }: GrafanaTheme2
       grid-template-columns: 1fr 1fr;
       gap: ${spacing.md};
     `,
+    advancedFilter3Columns: css`
+      grid-template-columns: 1fr 1fr 1fr;
+    `,
     searchFields: css`
       display: flex;
       gap: ${spacing.xs};

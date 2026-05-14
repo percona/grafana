@@ -10,6 +10,7 @@ export const instanceList = [
   { type: Databases.mysql, title: Messages.titles.mysql },
   { type: Databases.mongodb, title: Messages.titles.mongodb },
   { type: Databases.proxysql, title: Messages.titles.proxysql },
+  { type: Databases.valkey, title: Messages.titles.valkey },
   { type: InstanceTypesExtra.external, title: Messages.titles.external },
   { type: Databases.haproxy, title: Messages.titles.haproxy },
 ];

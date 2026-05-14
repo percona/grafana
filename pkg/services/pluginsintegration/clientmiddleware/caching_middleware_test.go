@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana/pkg/plugins/manager/client/clienttest"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/handlertest"
 	"github.com/grafana/grafana/pkg/services/caching"
 	"github.com/grafana/grafana/pkg/services/contexthandler"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
@@ -22,9 +22,10 @@ func TestCachingMiddleware(t *testing.T) {
 		require.NoError(t, err)
 
 		cs := caching.NewFakeOSSCachingService()
-		cdt := clienttest.NewClientDecoratorTest(t,
-			clienttest.WithReqContext(req, &user.SignedInUser{}),
-			clienttest.WithMiddlewares(NewCachingMiddleware(cs)),
+		cachingServiceClient := caching.ProvideCachingServiceClient(cs, nil)
+		cdt := handlertest.NewHandlerMiddlewareTest(t,
+			WithReqContext(req, &user.SignedInUser{}),
+			handlertest.WithMiddlewares(NewCachingMiddleware(cachingServiceClient)),
 		)
 
 		jsonDataMap := map[string]any{}
@@ -63,7 +64,7 @@ func TestCachingMiddleware(t *testing.T) {
 			cs.ReturnHit = true
 			cs.ReturnQueryResponse = dataResponse
 
-			resp, err := cdt.Decorator.QueryData(req.Context(), qdr)
+			resp, err := cdt.MiddlewareHandler.QueryData(req.Context(), qdr)
 			assert.NoError(t, err)
 			// Cache service is called once
 			cs.AssertCalls(t, "HandleQueryRequest", 1)
@@ -75,9 +76,9 @@ func TestCachingMiddleware(t *testing.T) {
 		})
 
 		t.Run("If cache returns a miss, queries are issued and the update cache function is called", func(t *testing.T) {
-			origShouldCacheQuery := shouldCacheQuery
+			origShouldCacheQuery := caching.ShouldCacheQuery
 			var shouldCacheQueryCalled bool
-			shouldCacheQuery = func(resp *backend.QueryDataResponse) bool {
+			caching.ShouldCacheQuery = func(resp *backend.QueryDataResponse) bool {
 				shouldCacheQueryCalled = true
 				return true
 			}
@@ -85,14 +86,14 @@ func TestCachingMiddleware(t *testing.T) {
 			t.Cleanup(func() {
 				updateCacheCalled = false
 				shouldCacheQueryCalled = false
-				shouldCacheQuery = origShouldCacheQuery
+				caching.ShouldCacheQuery = origShouldCacheQuery
 				cs.Reset()
 			})
 
 			cs.ReturnHit = false
 			cs.ReturnQueryResponse = dataResponse
 
-			resp, err := cdt.Decorator.QueryData(req.Context(), qdr)
+			resp, err := cdt.MiddlewareHandler.QueryData(req.Context(), qdr)
 			assert.NoError(t, err)
 			// Cache service is called once
 			cs.AssertCalls(t, "HandleQueryRequest", 1)
@@ -105,15 +106,16 @@ func TestCachingMiddleware(t *testing.T) {
 		})
 
 		t.Run("with async queries", func(t *testing.T) {
-			asyncCdt := clienttest.NewClientDecoratorTest(t,
-				clienttest.WithReqContext(req, &user.SignedInUser{}),
-				clienttest.WithMiddlewares(
-					NewCachingMiddlewareWithFeatureManager(cs, featuremgmt.WithFeatures(featuremgmt.FlagAwsAsyncQueryCaching))),
+			cachingServiceClient := caching.ProvideCachingServiceClient(cs, featuremgmt.WithFeatures(featuremgmt.FlagAwsAsyncQueryCaching))
+			asyncCdt := handlertest.NewHandlerMiddlewareTest(t,
+				WithReqContext(req, &user.SignedInUser{}),
+				handlertest.WithMiddlewares(
+					NewCachingMiddleware(cachingServiceClient)),
 			)
 			t.Run("If shoudCacheQuery returns true update cache function is called", func(t *testing.T) {
-				origShouldCacheQuery := shouldCacheQuery
+				origShouldCacheQuery := caching.ShouldCacheQuery
 				var shouldCacheQueryCalled bool
-				shouldCacheQuery = func(resp *backend.QueryDataResponse) bool {
+				caching.ShouldCacheQuery = func(resp *backend.QueryDataResponse) bool {
 					shouldCacheQueryCalled = true
 					return true
 				}
@@ -121,14 +123,14 @@ func TestCachingMiddleware(t *testing.T) {
 				t.Cleanup(func() {
 					updateCacheCalled = false
 					shouldCacheQueryCalled = false
-					shouldCacheQuery = origShouldCacheQuery
+					caching.ShouldCacheQuery = origShouldCacheQuery
 					cs.Reset()
 				})
 
 				cs.ReturnHit = false
 				cs.ReturnQueryResponse = dataResponse
 
-				resp, err := asyncCdt.Decorator.QueryData(req.Context(), qdr)
+				resp, err := asyncCdt.MiddlewareHandler.QueryData(req.Context(), qdr)
 				assert.NoError(t, err)
 				// Cache service is called once
 				cs.AssertCalls(t, "HandleQueryRequest", 1)
@@ -141,9 +143,9 @@ func TestCachingMiddleware(t *testing.T) {
 			})
 
 			t.Run("If shoudCacheQuery returns false update cache function is not called", func(t *testing.T) {
-				origShouldCacheQuery := shouldCacheQuery
+				origShouldCacheQuery := caching.ShouldCacheQuery
 				var shouldCacheQueryCalled bool
-				shouldCacheQuery = func(resp *backend.QueryDataResponse) bool {
+				caching.ShouldCacheQuery = func(resp *backend.QueryDataResponse) bool {
 					shouldCacheQueryCalled = true
 					return false
 				}
@@ -151,14 +153,14 @@ func TestCachingMiddleware(t *testing.T) {
 				t.Cleanup(func() {
 					updateCacheCalled = false
 					shouldCacheQueryCalled = false
-					shouldCacheQuery = origShouldCacheQuery
+					caching.ShouldCacheQuery = origShouldCacheQuery
 					cs.Reset()
 				})
 
 				cs.ReturnHit = false
 				cs.ReturnQueryResponse = dataResponse
 
-				resp, err := asyncCdt.Decorator.QueryData(req.Context(), qdr)
+				resp, err := asyncCdt.MiddlewareHandler.QueryData(req.Context(), qdr)
 				assert.NoError(t, err)
 				// Cache service is called once
 				cs.AssertCalls(t, "HandleQueryRequest", 1)
@@ -196,10 +198,11 @@ func TestCachingMiddleware(t *testing.T) {
 		}
 
 		cs := caching.NewFakeOSSCachingService()
-		cdt := clienttest.NewClientDecoratorTest(t,
-			clienttest.WithReqContext(req, &user.SignedInUser{}),
-			clienttest.WithMiddlewares(NewCachingMiddleware(cs)),
-			clienttest.WithResourceResponses([]*backend.CallResourceResponse{simulatedPluginResponse}),
+		cachingServiceClient := caching.ProvideCachingServiceClient(cs, nil)
+		cdt := handlertest.NewHandlerMiddlewareTest(t,
+			WithReqContext(req, &user.SignedInUser{}),
+			handlertest.WithMiddlewares(NewCachingMiddleware(cachingServiceClient)),
+			handlertest.WithResourceResponses([]*backend.CallResourceResponse{simulatedPluginResponse}),
 		)
 
 		jsonDataMap := map[string]any{}
@@ -221,7 +224,7 @@ func TestCachingMiddleware(t *testing.T) {
 		}
 
 		var sentResponse *backend.CallResourceResponse
-		var storeOneResponseCallResourceSender = callResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
+		var storeOneResponseCallResourceSender = backend.CallResourceResponseSenderFunc(func(res *backend.CallResourceResponse) error {
 			sentResponse = res
 			return nil
 		})
@@ -235,7 +238,7 @@ func TestCachingMiddleware(t *testing.T) {
 			cs.ReturnHit = true
 			cs.ReturnResourceResponse = dataResponse
 
-			err := cdt.Decorator.CallResource(req.Context(), crr, storeOneResponseCallResourceSender)
+			err := cdt.MiddlewareHandler.CallResource(req.Context(), crr, storeOneResponseCallResourceSender)
 			assert.NoError(t, err)
 			// Cache service is called once
 			cs.AssertCalls(t, "HandleResourceRequest", 1)
@@ -255,7 +258,7 @@ func TestCachingMiddleware(t *testing.T) {
 			cs.ReturnHit = false
 			cs.ReturnResourceResponse = dataResponse
 
-			err := cdt.Decorator.CallResource(req.Context(), crr, storeOneResponseCallResourceSender)
+			err := cdt.MiddlewareHandler.CallResource(req.Context(), crr, storeOneResponseCallResourceSender)
 			assert.NoError(t, err)
 			// Cache service is called once
 			cs.AssertCalls(t, "HandleResourceRequest", 1)
@@ -272,9 +275,10 @@ func TestCachingMiddleware(t *testing.T) {
 		require.NoError(t, err)
 
 		cs := caching.NewFakeOSSCachingService()
-		cdt := clienttest.NewClientDecoratorTest(t,
+		cachingServiceClient := caching.ProvideCachingServiceClient(cs, nil)
+		cdt := handlertest.NewHandlerMiddlewareTest(t,
 			// Skip the request context in this case
-			clienttest.WithMiddlewares(NewCachingMiddleware(cs)),
+			handlertest.WithMiddlewares(NewCachingMiddleware(cachingServiceClient)),
 		)
 		reqCtx := contexthandler.FromContext(req.Context())
 		require.Nil(t, reqCtx)
@@ -298,7 +302,7 @@ func TestCachingMiddleware(t *testing.T) {
 				PluginContext: pluginCtx,
 			}
 
-			resp, err := cdt.Decorator.QueryData(context.Background(), qdr)
+			resp, err := cdt.MiddlewareHandler.QueryData(context.Background(), qdr)
 			assert.NoError(t, err)
 			// Cache service is never called
 			cs.AssertCalls(t, "HandleQueryRequest", 0)
@@ -315,7 +319,7 @@ func TestCachingMiddleware(t *testing.T) {
 				PluginContext: pluginCtx,
 			}
 
-			err := cdt.Decorator.CallResource(req.Context(), crr, nopCallResourceSender)
+			err := cdt.MiddlewareHandler.CallResource(req.Context(), crr, nopCallResourceSender)
 			assert.NoError(t, err)
 			// Cache service is never called
 			cs.AssertCalls(t, "HandleResourceRequest", 0)

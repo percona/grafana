@@ -2,14 +2,14 @@
 import { cx } from '@emotion/css';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { AppEvents, PageLayoutType, SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { CollapsableSection, CustomScrollbar, LinkButton, PageToolbar, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { PageSwitcherValue } from 'app/percona/shared/components/Elements/PageSwitcherCard/PageSwitcherCard.types';
@@ -26,7 +26,7 @@ import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api
 import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { PageSwitcherCard } from '../../../shared/components/Elements/PageSwitcherCard/PageSwitcherCard';
 import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
@@ -57,9 +57,10 @@ import {
 import { RetryModeSelector } from './RetryModeSelector';
 import { ScheduleSection } from './ScheduleSection/ScheduleSection';
 
-const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
+const AddBackupPage: FC = () => {
   const [queryParams, setQueryParams] = useQueryParams();
-  const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === BackupType.SCHEDULED;
+  const routeParams = useParams();
+  const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || routeParams.type === BackupType.SCHEDULED;
   const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
   const [pending, setPending] = useState(false);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
@@ -96,7 +97,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
         backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
       }
       for (const value of backups) {
-        if (value.id === match.params.id) {
+        if (value.id === routeParams.id) {
           backup = value;
           break;
         }
@@ -191,7 +192,13 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   );
 
   return (
-    <Page navId="backup-add-edit" layout={PageLayoutType.Custom}>
+    <Page
+      navId="backup-add-edit"
+      pageNav={{
+        text: modalTitle,
+      }}
+      layout={PageLayoutType.Custom}
+    >
       <Overlay isPending={pending}>
         <Form
           initialValues={initialValues}
@@ -351,7 +358,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                             label={Messages.advanceSettings}
                             isOpen={advancedSectionOpen}
                             onToggle={onToggle}
-                            controlled
                             buttonDataTestId="add-backup-advanced-settings"
                           >
                             <RetryModeSelector retryMode={values.retryMode} />

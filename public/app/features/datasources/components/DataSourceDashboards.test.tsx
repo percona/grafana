@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 
 import { configureStore } from 'app/store/configureStore';
 
-import { getMockDashboard } from '../__mocks__';
+import { getMockDashboard } from '../mocks/dataSourcesMocks';
 
 import { DataSourceDashboardsView, ViewProps } from './DataSourceDashboards';
 

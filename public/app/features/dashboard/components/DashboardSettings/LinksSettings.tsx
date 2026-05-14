@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
 import { NEW_LINK } from 'app/features/dashboard-scene/settings/links/utils';
 
-import { LinkSettingsEdit, LinkSettingsList } from '../LinksSettings';
+import { LinkSettingsEdit } from '../LinksSettings/LinkSettingsEdit';
+import { LinkSettingsList } from '../LinksSettings/LinkSettingsList';
 
 import { SettingsPageProps } from './types';
 
@@ -39,12 +40,7 @@ export function LinksSettings({ dashboard, sectionNav, editIndex }: SettingsPage
     pageNav = {
       text: title,
       subTitle: description,
-    };
-
-    const parentUrl = sectionNav.node.url;
-    pageNav.parentItem = sectionNav.node.parentItem && {
-      ...sectionNav.node.parentItem,
-      url: parentUrl,
+      parentItem: sectionNav.node.parentItem,
     };
   }
 

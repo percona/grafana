@@ -2,8 +2,9 @@ import { PayloadAction } from '@reduxjs/toolkit';
 
 import { DashboardViewItem, DashboardViewItemKind } from 'app/features/search/types';
 
-import { isSharedWithMe } from '../components/utils';
+import { GENERAL_FOLDER_UID } from '../../search/constants';
 import { BrowseDashboardsState } from '../types';
+import { isSharedWithMe } from '../utils/dashboards';
 
 import { fetchNextChildrenPage, refetchChildren } from './actions';
 import { findItem } from './utils';
@@ -23,7 +24,7 @@ export function refetchChildrenFulfilled(state: BrowseDashboardsState, action: R
     isFullyLoaded: kind === 'dashboard' && lastPageOfKind,
   };
 
-  if (parentUID) {
+  if (parentUID && parentUID !== GENERAL_FOLDER_UID) {
     state.childrenByParentUID[parentUID] = newCollection;
   } else {
     state.rootItems = newCollection;
@@ -83,7 +84,10 @@ export function setItemSelectionState(
 
   // SearchView doesn't use DashboardViewItemKind (yet), so we pick just the specific properties
   // we're interested in
-  action: PayloadAction<{ item: Pick<DashboardViewItem, 'kind' | 'uid' | 'parentUID'>; isSelected: boolean }>
+  action: PayloadAction<{
+    item: Pick<DashboardViewItem, 'kind' | 'uid' | 'parentUID' | 'managedBy'>;
+    isSelected: boolean;
+  }>
 ) {
   const { item, isSelected } = action.payload;
 
@@ -135,9 +139,9 @@ export function setItemSelectionState(
 
 export function setAllSelection(
   state: BrowseDashboardsState,
-  action: PayloadAction<{ isSelected: boolean; folderUID: string | undefined }>
+  action: PayloadAction<{ isSelected: boolean; folderUID: string | undefined; excludeUIDs?: string[] }>
 ) {
-  const { isSelected, folderUID: folderUIDArg } = action.payload;
+  const { isSelected, folderUID: folderUIDArg, excludeUIDs } = action.payload;
 
   // If we're in the folder view for sharedwith me (currently not supported)
   // bail and don't select anything
@@ -174,6 +178,11 @@ export function setAllSelection(
           continue;
         }
 
+        // Skip items in the exclude list
+        if (excludeUIDs?.includes(child.uid)) {
+          continue;
+        }
+
         state.selectedItems[child.kind][child.uid] = isSelected;
 
         if (child.kind !== 'folder') {
@@ -197,6 +206,21 @@ export function setAllSelection(
       for (const uid in selection) {
         selection[uid] = isSelected;
       }
+    }
+  }
+}
+
+export function clearFolders(state: BrowseDashboardsState, action: PayloadAction<Array<string | undefined>>) {
+  const folderUIDs = Array.isArray(action.payload) ? action.payload : [action.payload];
+
+  for (const folderUID of folderUIDs) {
+    if (!folderUID) {
+      state.rootItems = undefined;
+    } else {
+      state.childrenByParentUID[folderUID] = undefined;
+
+      // close the folder to require it to be refetched next time its opened
+      state.openFolders[folderUID] = false;
     }
   }
 }

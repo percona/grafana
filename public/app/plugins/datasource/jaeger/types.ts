@@ -1,20 +1,5 @@
-import { DataQuery } from '@grafana/data';
-
-export type TraceKeyValuePair = {
-  key: string;
-  type?: string;
-  value: any;
-};
-
-export type TraceLink = {
-  url: string;
-  text: string;
-};
-
-export type TraceLog = {
-  timestamp: number;
-  fields: TraceKeyValuePair[];
-};
+import { TraceKeyValuePair, TraceLog } from '@grafana/data';
+import { DataQuery } from '@grafana/schema';
 
 export type TraceProcess = {
   serviceName: string;

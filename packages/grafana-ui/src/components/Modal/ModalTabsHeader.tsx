@@ -1,8 +1,6 @@
-import React from 'react';
-
 import { NavModelItem } from '@grafana/data';
 
-import { IconName } from '../../types';
+import { IconName } from '../../types/icon';
 import { Tab } from '../Tabs/Tab';
 import { TabsBar } from '../Tabs/TabsBar';
 

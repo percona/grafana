@@ -1,12 +1,12 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import type * as monacoType from 'monaco-editor/esm/vs/editor/editor.api';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 
 import { GrafanaTheme2, monacoLanguageRegistry } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
-import { withTheme2 } from '../../themes';
-import { Themeable2 } from '../../types';
+import { withTheme2 } from '../../themes/ThemeContext';
+import { Themeable2 } from '../../types/theme';
 
 import { ReactMonacoEditorLazy } from './ReactMonacoEditorLazy';
 import { registerSuggestions } from './suggestions';
@@ -129,16 +129,17 @@ class UnthemedCodeEditor extends PureComponent<Props> {
   };
 
   render() {
-    const { theme, language, width, height, showMiniMap, showLineNumbers, readOnly, monacoOptions } = this.props;
+    const { theme, language, width, height, showMiniMap, showLineNumbers, readOnly, wordWrap, monacoOptions } =
+      this.props;
     const { alwaysConsumeMouseWheel, ...restMonacoOptions } = monacoOptions ?? {};
 
     const value = this.props.value ?? '';
     const longText = value.length > 100;
 
-    const containerStyles = this.props.containerStyles ?? getStyles(theme).container;
+    const containerStyles = cx(getStyles(theme).container, this.props.containerStyles);
 
     const options: MonacoOptions = {
-      wordWrap: 'off',
+      wordWrap: wordWrap ? 'on' : 'off',
       tabSize: 2,
       codeLens: false,
       contextmenu: false,
@@ -195,6 +196,11 @@ class UnthemedCodeEditor extends PureComponent<Props> {
   }
 }
 
+/**
+ * Monaco Code editor.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/inputs-codeeditor--docs
+ */
 export const CodeEditor = withTheme2(UnthemedCodeEditor);
 
 const getStyles = (theme: GrafanaTheme2) => {
@@ -202,6 +208,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     container: css({
       borderRadius: theme.shape.radius.default,
       border: `1px solid ${theme.components.input.borderColor}`,
+      overflow: 'hidden',
     }),
   };
 };

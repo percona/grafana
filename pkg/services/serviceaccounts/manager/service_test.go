@@ -4,17 +4,20 @@ import (
 	"context"
 	"testing"
 
-	"github.com/grafana/grafana/pkg/services/accesscontrol/actest"
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/services/accesscontrol/actest"
 	"github.com/grafana/grafana/pkg/services/apikey"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/serviceaccounts"
+	"github.com/grafana/grafana/pkg/tests/testsuite"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 type FakeServiceAccountStore struct {
-	ExpectedServiceAccountID                *serviceaccounts.ServiceAccount
+	ExpectedServiceAccountID                int64
 	ExpectedServiceAccountDTO               *serviceaccounts.ServiceAccountDTO
 	ExpectedServiceAccountProfileDTO        *serviceaccounts.ServiceAccountProfileDTO
 	ExpectedSearchServiceAccountQueryResult *serviceaccounts.SearchOrgServiceAccountsResult
@@ -33,13 +36,13 @@ func newServiceAccountStoreFake() *FakeServiceAccountStore {
 }
 
 // CreateServiceAccount is a fake creating a service account.
-func (f *FakeServiceAccountStore) RetrieveServiceAccount(ctx context.Context, orgID, serviceAccountID int64) (*serviceaccounts.ServiceAccountProfileDTO, error) {
+func (f *FakeServiceAccountStore) RetrieveServiceAccount(ctx context.Context, query *serviceaccounts.GetServiceAccountQuery) (*serviceaccounts.ServiceAccountProfileDTO, error) {
 	return f.ExpectedServiceAccountProfileDTO, f.ExpectedError
 }
 
 // RetrieveServiceAccountIdByName is a fake retrieving a service account id by name.
 func (f *FakeServiceAccountStore) RetrieveServiceAccountIdByName(ctx context.Context, orgID int64, name string) (int64, error) {
-	return f.ExpectedServiceAccountID.Id, f.ExpectedError
+	return f.ExpectedServiceAccountID, f.ExpectedError
 }
 
 // CreateServiceAccount is a fake creating a service account.
@@ -71,11 +74,6 @@ func (f *FakeServiceAccountStore) DeleteServiceAccount(ctx context.Context, orgI
 // MigrateApiKeysToServiceAccounts is a fake migrating api keys to service accounts.
 func (f *FakeServiceAccountStore) MigrateApiKeysToServiceAccounts(ctx context.Context, orgID int64) (*serviceaccounts.MigrationResult, error) {
 	return f.expectedMigratedResults, f.ExpectedError
-}
-
-// MigrateApiKey is a fake migrating an api key to a service account.
-func (f *FakeServiceAccountStore) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) error {
-	return f.ExpectedError
 }
 
 // RevertApiKey is a fake reverting an api key to a service account.
@@ -116,11 +114,24 @@ func (f *SecretsCheckerFake) CheckTokens(ctx context.Context) error {
 	return f.ExpectedError
 }
 
-func TestProvideServiceAccount_DeleteServiceAccount(t *testing.T) {
+func TestMain(m *testing.M) {
+	testsuite.Run(m)
+}
+
+func TestIntegrationProvideServiceAccount_DeleteServiceAccount(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	storeMock := newServiceAccountStoreFake()
 	acSvc := actest.FakeService{}
 	pSvc := &actest.FakePermissionsService{}
-	svc := ServiceAccountsService{acSvc, pSvc, storeMock, log.NewNopLogger(), log.NewNopLogger(), &SecretsCheckerFake{}, false, 0}
+	svc := ServiceAccountsService{
+		acService:         acSvc,
+		permissions:       pSvc,
+		store:             storeMock,
+		db:                db.InitTestDB(t),
+		log:               log.NewNopLogger(),
+		secretScanEnabled: false,
+	}
 	testOrgId := 1
 
 	t.Run("should create service account", func(t *testing.T) {

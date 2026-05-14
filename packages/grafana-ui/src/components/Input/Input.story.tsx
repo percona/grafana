@@ -1,27 +1,28 @@
 import { StoryFn, Meta } from '@storybook/react';
-import React, { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { KeyValue } from '@grafana/data';
-import { Field, Button, Input } from '@grafana/ui';
 
-import { getAvailableIcons } from '../../types';
+import { getAvailableIcons } from '../../types/icon';
+import { Button } from '../Button/Button';
+import { Field } from '../Forms/Field';
 
+import { Input } from './Input';
 import mdx from './Input.mdx';
 import { parseAccessory } from './storyUtils';
 
 const prefixSuffixOpts = {
-  None: null,
-  Text: '$',
+  $: 'Text',
   ...getAvailableIcons().reduce<KeyValue<string>>((prev, c) => {
     return {
       ...prev,
-      [`Icon: ${c}`]: `icon-${c}`,
+      [`icon-${c}`]: `Icon: ${c}`,
     };
   }, {}),
 };
 
 const meta: Meta = {
-  title: 'Forms/Input',
+  title: 'Inputs/Input',
   component: Input,
   parameters: {
     docs: {
@@ -43,20 +44,22 @@ const meta: Meta = {
     prefixVisible: {
       control: {
         type: 'select',
-        options: prefixSuffixOpts,
+        labels: prefixSuffixOpts,
       },
+      options: [null, ...Object.keys(prefixSuffixOpts)],
     },
     suffixVisible: {
       control: {
         type: 'select',
-        options: prefixSuffixOpts,
+        labels: prefixSuffixOpts,
       },
+      options: [null, ...Object.keys(prefixSuffixOpts)],
     },
     type: {
       control: {
         type: 'select',
-        options: ['text', 'number', 'password'],
       },
+      options: ['text', 'number', 'password'],
     },
     // validation: { name: 'Validation regex (will do a partial match if you do not anchor it)' },
     width: { control: { type: 'range', min: 10, max: 200, step: 10 } },
@@ -68,20 +71,24 @@ export const Simple: StoryFn = (args) => {
   const addonBefore = <div style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>Input</div>;
   const prefix = parseAccessory(args.prefixVisible);
   const suffix = parseAccessory(args.suffixVisible);
+  const id = useId();
 
   return (
-    <Input
-      disabled={args.disabled}
-      width={args.width}
-      prefix={prefix}
-      invalid={args.invalid}
-      suffix={suffix}
-      loading={args.loading}
-      addonBefore={args.before && addonBefore}
-      addonAfter={args.after && addonAfter}
-      type={args.type}
-      placeholder={args.placeholder}
-    />
+    <Field label="Simple input">
+      <Input
+        id={id}
+        disabled={args.disabled}
+        width={args.width}
+        prefix={prefix}
+        invalid={args.invalid}
+        suffix={suffix}
+        loading={args.loading}
+        addonBefore={args.before && addonBefore}
+        addonAfter={args.after && addonAfter}
+        type={args.type}
+        placeholder={args.placeholder}
+      />
+    </Field>
   );
 };
 Simple.args = {
@@ -93,11 +100,12 @@ Simple.args = {
 
 export const WithFieldValidation: StoryFn = (args) => {
   const [value, setValue] = useState('');
+  const id = useId();
 
   return (
     <div>
-      <Field invalid={value === ''} error={value === '' ? 'This input is required' : ''}>
-        <Input value={value} onChange={(e) => setValue(e.currentTarget.value)} {...args} />
+      <Field invalid={value === ''} error={value === '' ? 'This input is required' : ''} label="Input with validation">
+        <Input id={id} value={value} onChange={(e) => setValue(e.currentTarget.value)} {...args} />
       </Field>
     </div>
   );

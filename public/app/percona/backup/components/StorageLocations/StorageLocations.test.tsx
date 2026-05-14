@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { StorageLocations } from './StorageLocations';
 import { StorageLocationsService } from './StorageLocations.service';
@@ -12,12 +12,6 @@ import { stubLocations } from './__mocks__/StorageLocations.service';
 
 jest.mock('./StorageLocations.service');
 jest.mock('app/core/app_events');
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: () => ({
-    pathname: '/',
-  }),
-}));
 
 describe('StorageLocations', () => {
   it('should show delete modal when icon is clicked', async () => {
@@ -25,12 +19,14 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true } },
           },
         } as StoreState)}
       >
-        {wrapWithGrafanaContextMock(<StorageLocations />)}
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<StorageLocations />)}
+        </MemoryRouter>
       </Provider>
     );
 
@@ -49,12 +45,14 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true } },
           },
         } as StoreState)}
       >
-        {wrapWithGrafanaContextMock(<StorageLocations />)}
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<StorageLocations />)}
+        </MemoryRouter>
       </Provider>
     );
 
@@ -81,11 +79,13 @@ describe('StorageLocations', () => {
           store={configureStore({
             percona: {
               user: { isAuthorized: true },
-              settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+              settings: { result: { backupEnabled: true } },
             },
           } as StoreState)}
         >
-          {wrapWithGrafanaContextMock(<StorageLocations />)}
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            {wrapWithGrafanaContextMock(<StorageLocations />)}
+          </MemoryRouter>
         </Provider>
       )
     );

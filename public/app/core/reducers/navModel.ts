@@ -93,6 +93,7 @@ export const navIndexReducer = (state: NavIndex = initialState, action: AnyActio
   if (updateNavIndex.match(action)) {
     const newPages: NavIndex = {};
     const payload = action.payload;
+
     function addNewPages(node: NavModelItem) {
       if (node.children) {
         for (const child of node.children) {
@@ -130,7 +131,6 @@ export const navIndexReducer = (state: NavIndex = initialState, action: AnyActio
       teams: getItemWithNewSubTitle(state.teams, subTitle),
       plugins: getItemWithNewSubTitle(state.plugins, subTitle),
       'org-settings': getItemWithNewSubTitle(state['org-settings'], subTitle),
-      apikeys: getItemWithNewSubTitle(state.apikeys, subTitle),
     };
   } else if (removeNavIndex.match(action)) {
     delete state[action.payload];

@@ -1,10 +1,12 @@
 import { css, cx } from '@emotion/css';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
+import * as React from 'react';
 
 import { formattedValueToString, GrafanaTheme2 } from '@grafana/data';
+import { Trans } from '@grafana/i18n';
 
-import { styleMixins } from '../../themes';
 import { useStyles2 } from '../../themes/ThemeContext';
+import { hoverColor } from '../../themes/mixins';
 
 import { VizLegendSeriesIcon } from './VizLegendSeriesIcon';
 import { VizLegendItem } from './types';
@@ -86,7 +88,12 @@ export const LegendTableItem = ({
             onClick={!readonly ? onClick : undefined}
             className={cx(styles.label, item.disabled && styles.labelDisabled)}
           >
-            {item.label} {item.yAxis === 2 && <span className={styles.yAxisLabel}>(right y-axis)</span>}
+            {item.label}{' '}
+            {item.yAxis === 2 && (
+              <span className={styles.yAxisLabel}>
+                <Trans i18nKey="grafana-ui.viz-legend.right-axis-indicator">(right y-axis)</Trans>
+              </span>
+            )}
           </button>
         </span>
       </td>
@@ -105,7 +112,7 @@ export const LegendTableItem = ({
 LegendTableItem.displayName = 'LegendTableItem';
 
 const getStyles = (theme: GrafanaTheme2) => {
-  const rowHoverBg = styleMixins.hoverColor(theme.colors.background.primary, theme);
+  const rowHoverBg = hoverColor(theme.colors.background.primary, theme);
 
   return {
     row: css({

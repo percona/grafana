@@ -1,4 +1,5 @@
-import React, { ReactNode, useCallback } from 'react';
+import { ReactNode, useCallback } from 'react';
+import * as React from 'react';
 
 import { StandardEditorProps, StringFieldConfigSettings } from '@grafana/data';
 import { Input, TextArea } from '@grafana/ui';
@@ -7,7 +8,7 @@ interface Props extends StandardEditorProps<string, StringFieldConfigSettings> {
   suffix?: ReactNode;
 }
 
-export const StringValueEditor = ({ value, onChange, item, suffix }: Props) => {
+export const StringValueEditor = ({ value, onChange, item, suffix, id }: Props) => {
   const Component = item.settings?.useTextarea ? TextArea : Input;
   const onValueChange = useCallback(
     (
@@ -35,6 +36,7 @@ export const StringValueEditor = ({ value, onChange, item, suffix }: Props) => {
 
   return (
     <Component
+      id={id}
       placeholder={item.settings?.placeholder}
       defaultValue={value || ''}
       rows={(item.settings?.useTextarea && item.settings.rows) || 5}

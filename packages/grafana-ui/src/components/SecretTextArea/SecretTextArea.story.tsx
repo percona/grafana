@@ -1,10 +1,10 @@
 import { StoryFn, Meta } from '@storybook/react';
-import React, { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent } from 'react';
 
 import { SecretTextArea } from './SecretTextArea';
 
 const meta: Meta<typeof SecretTextArea> = {
-  title: 'Forms/SecretTextArea',
+  title: 'Inputs/SecretTextArea',
   component: SecretTextArea,
   parameters: {
     controls: {

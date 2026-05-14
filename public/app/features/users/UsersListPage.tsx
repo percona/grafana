@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { renderMarkdown } from '@grafana/data';
+import { OrgRole, renderMarkdown } from '@grafana/data';
+import { Alert } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
-import { contextSrv } from 'app/core/core';
-import { OrgUser, OrgRole, StoreState } from 'app/types';
+import { contextSrv } from 'app/core/services/context_srv';
+import { StoreState } from 'app/types/store';
+import { OrgUser } from 'app/types/user';
 
 import { OrgUsersTable } from '../admin/Users/OrgUsersTable';
 import InviteesTable from '../invites/InviteesTable';
@@ -80,6 +82,10 @@ export const UsersListPageUnconnected = ({
     setShowInvites(!showInvites);
   };
 
+  const onUserRolesChange = () => {
+    loadUsers();
+  };
+
   const renderTable = () => {
     if (showInvites) {
       return <InviteesTable invitees={invitees} />;
@@ -91,6 +97,7 @@ export const UsersListPageUnconnected = ({
           rolesLoading={rolesLoading}
           onRoleChange={onRoleChange}
           onRemoveUser={onRemoveUser}
+          onUserRolesChange={onUserRolesChange}
           fetchData={changeSort}
           changePage={changePage}
           page={page}
@@ -104,7 +111,9 @@ export const UsersListPageUnconnected = ({
     <Page.Contents isLoading={!isLoading}>
       <UsersActionBar onShowInvites={onShowInvites} showInvites={showInvites} />
       {externalUserMngInfoHtml && (
-        <div className="grafana-info-box" dangerouslySetInnerHTML={{ __html: externalUserMngInfoHtml }} />
+        <Alert severity="info" title="">
+          <div dangerouslySetInnerHTML={{ __html: externalUserMngInfoHtml }} />
+        </Alert>
       )}
       {isLoading && renderTable()}
     </Page.Contents>

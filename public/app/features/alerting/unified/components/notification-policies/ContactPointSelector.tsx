@@ -1,55 +1,77 @@
-import React from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { Select, SelectCommonProps, Text, Stack } from '@grafana/ui';
+import { t } from '@grafana/i18n';
+import { Alert, Select, SelectCommonProps, Text } from '@grafana/ui';
+import { ContactPointReceiverSummary } from 'app/features/alerting/unified/components/contact-points/ContactPoint';
+import { useAlertmanager } from 'app/features/alerting/unified/state/AlertmanagerContext';
 
-import {
-  RECEIVER_META_KEY,
-  RECEIVER_PLUGIN_META_KEY,
-  useContactPointsWithStatus,
-} from '../contact-points/useContactPoints';
-import { ReceiverConfigWithMetadata } from '../contact-points/utils';
+import { useContactPointsWithStatus } from '../contact-points/useContactPoints';
+import { ContactPointWithMetadata } from '../contact-points/utils';
 
-export const ContactPointSelector = (props: SelectCommonProps<string>) => {
-  const { contactPoints, isLoading, error } = useContactPointsWithStatus();
+const MAX_CONTACT_POINTS_RENDERED = 500;
 
-  // TODO error handling
-  if (error) {
-    return <span>Failed to load contact points</span>;
-  }
+type ContactPointSelectorProps = {
+  selectProps: SelectCommonProps<ContactPointWithMetadata>;
+  /** Name of a contact point to optionally find and set as the preset value on the dropdown */
+  selectedContactPointName?: string | null;
+  onError?: (error: Error) => void;
+};
 
-  const options: Array<SelectableValue<string>> = contactPoints.map((contactPoint) => {
+export const ExternalAlertmanagerContactPointSelector = ({
+  selectProps,
+  selectedContactPointName,
+  onError = () => {},
+}: ContactPointSelectorProps) => {
+  const { selectedAlertmanager } = useAlertmanager();
+  const { contactPoints, isLoading, error } = useContactPointsWithStatus({
+    alertmanager: selectedAlertmanager!,
+  });
+
+  const options: Array<SelectableValue<ContactPointWithMetadata>> = contactPoints.map((contactPoint) => {
     return {
       label: contactPoint.name,
-      value: contactPoint.name,
-      component: () => <ReceiversSummary receivers={contactPoint.grafana_managed_receiver_configs} />,
+      value: contactPoint,
+      component: () => (
+        <Text variant="bodySmall" color="secondary">
+          <ContactPointReceiverSummary receivers={contactPoint.grafana_managed_receiver_configs} limit={2} />
+        </Text>
+      ),
     };
   });
 
-  return <Select options={options} isLoading={isLoading} {...props} />;
-};
+  const matchedContactPoint: SelectableValue<ContactPointWithMetadata> | null = useMemo(() => {
+    return options.find((option) => option.value?.name === selectedContactPointName) || null;
+  }, [options, selectedContactPointName]);
 
-interface ReceiversProps {
-  receivers: ReceiverConfigWithMetadata[];
-}
+  useEffect(() => {
+    // If the contact points are fetched successfully and the selected contact point is not in the list, show an error
+    if (!isLoading && selectedContactPointName && !matchedContactPoint) {
+      onError(new Error(`Contact point "${selectedContactPointName}" could not be found`));
+    }
+  }, [isLoading, matchedContactPoint, onError, selectedContactPointName]);
 
-const ReceiversSummary = ({ receivers }: ReceiversProps) => {
+  // TODO error handling
+  if (error) {
+    return (
+      <Alert
+        title={t(
+          'alerting.contact-point-selector.title-failed-to-fetch-contact-points',
+          'Failed to fetch contact points'
+        )}
+        severity="error"
+      />
+    );
+  }
+
   return (
-    <Stack direction="row">
-      {receivers.map((receiver, index) => (
-        <Stack key={receiver.uid ?? index} direction="row" gap={0.5}>
-          {receiver[RECEIVER_PLUGIN_META_KEY]?.icon && (
-            <img
-              width="16px"
-              src={receiver[RECEIVER_PLUGIN_META_KEY]?.icon}
-              alt={receiver[RECEIVER_PLUGIN_META_KEY]?.title}
-            />
-          )}
-          <Text key={index} variant="bodySmall" color="secondary">
-            {receiver[RECEIVER_META_KEY].name ?? receiver[RECEIVER_PLUGIN_META_KEY]?.title ?? receiver.type}
-          </Text>
-        </Stack>
-      ))}
-    </Stack>
+    <Select
+      virtualized={options.length > MAX_CONTACT_POINTS_RENDERED}
+      options={options}
+      value={matchedContactPoint}
+      {...selectProps}
+      isLoading={isLoading}
+      disabled={isLoading}
+    />
   );
 };

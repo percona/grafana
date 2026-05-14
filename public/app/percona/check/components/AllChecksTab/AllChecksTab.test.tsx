@@ -1,15 +1,15 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import { FC } from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom-v5-compat';
 
-import { NavIndex } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
-import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
+import { NavIndex, OrgRole } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
+import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { CheckService } from '../../Check.service';
 
@@ -29,7 +29,12 @@ jest.mock('app/percona/check/Check.service');
 jest.mock('app/percona/shared/services/advisors/Advisors.service.ts');
 
 describe('AllChecksTab::', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    config.bootData.user.isGrafanaAdmin = true;
+    config.bootData.user.orgRole = OrgRole.Admin;
+  });
 
   it('should render a table in category', async () => {
     render(<AllChecksTabTesting />);
@@ -55,45 +60,7 @@ describe('AllChecksTab::', () => {
   });
 
   it('should render a table in different category', async () => {
-    const navIndex: NavIndex = {
-      ['advisors-configuration']: {
-        id: 'advisors-configuration',
-        text: 'advisors-configuration',
-        icon: 'list-ul',
-        url: '/advisors/configuration',
-      },
-    };
-
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
-            advisors: {
-              loading: false,
-              result: advisorsArray,
-            },
-          },
-          navIndex: navIndex,
-        } as StoreState)}
-      >
-        {wrapWithGrafanaContextMock(
-          <Router history={locationService.getHistory()}>
-            <AllChecksTab
-              {...getRouteComponentProps({
-                match: {
-                  params: { category: 'configuration' },
-                  isExact: true,
-                  path: '/advisors/:category',
-                  url: '/advisors/configuration',
-                },
-              })}
-            />
-          </Router>
-        )}
-      </Provider>
-    );
+    render(<AllChecksTabTesting category="configuration" />);
 
     const text = screen.queryByText(/Version configuration/i);
 
@@ -126,6 +93,7 @@ describe('AllChecksTab::', () => {
     expect(collabseDiv).toBeInTheDocument();
 
     await waitFor(() => fireEvent.click(collabseDiv));
+    await waitFor(() => screen.getByTestId('check-table-loader-button'));
 
     const button = screen.getAllByTestId('check-table-loader-button')[0];
     expect(button).toBeInTheDocument();
@@ -133,7 +101,7 @@ describe('AllChecksTab::', () => {
     await waitFor(() => fireEvent.click(button));
 
     expect(runChecksSpy).toBeCalledTimes(1);
-    expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'mongodb_cve_version', disable: true }] });
+    expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'mongodb_cve_version', enable: false }] });
   });
 
   it('should log an error if the run checks API call fails', async () => {
@@ -185,40 +153,63 @@ describe('AllChecksTab::', () => {
       expect(runChecksSpy).toBeCalledTimes(1);
     });
   });
+
+  it("editors shouldn't be able to run advisor checks", async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(<AllChecksTabTesting />);
+
+    const runChecksButton = screen.queryByRole('button', { name: Messages.runDbChecks });
+
+    expect(runChecksButton).toBeNull();
+  });
+
+  it('editors should be able to run checks', () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(<AllChecksTabTesting />);
+
+    expect(screen.queryByTestId('db-check-panel-actions')).not.toBeInTheDocument();
+  });
+
+  it("viewers shouldn't be able to to access advisors", async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(<AllChecksTabTesting />);
+
+    expect(screen.queryByText('Insufficient access permissions.'));
+  });
 });
 
-const AllChecksTabTesting = () => {
-  return (
-    <Provider
-      store={configureStore({
-        percona: {
-          user: { isAuthorized: true, isPlatformUser: false },
-          settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
-          advisors: {
-            loading: false,
-            result: advisorsArray,
-          },
+const AllChecksTabTesting: FC<{ category?: string }> = ({ category = 'security' }) => (
+  <Provider
+    store={configureStore({
+      percona: {
+        user: { isAuthorized: true },
+        settings: { result: { advisorEnabled: true } },
+        advisors: {
+          loading: false,
+          result: advisorsArray,
         },
-        navIndex: navIndex,
-      } as StoreState)}
-    >
-      {wrapWithGrafanaContextMock(
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab
-            {...getRouteComponentProps({
-              match: {
-                params: { category: 'security' },
-                isExact: true,
-                path: '/advisors/:category',
-                url: '/advisors/security',
-              },
-            })}
-          />
-        </Router>
-      )}
-    </Provider>
-  );
-};
+      },
+      navIndex: navIndex,
+    } as StoreState)}
+  >
+    {wrapWithGrafanaContextMock(
+      <MemoryRouter
+        initialEntries={['/advisors/' + category]}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Routes>
+          <Route path="/advisors/:category" element={<AllChecksTab />} />
+        </Routes>
+      </MemoryRouter>
+    )}
+  </Provider>
+);
 
 const navIndex: NavIndex = {
   ['advisors-security']: {
@@ -229,7 +220,7 @@ const navIndex: NavIndex = {
   },
 };
 
-const advisorsArray = [
+const advisorsArray: Advisor[] = [
   {
     name: 'cve_security',
     description: 'Informing users about versions of DBs  affected by CVE.',
@@ -242,8 +233,10 @@ const advisorsArray = [
           'This check returns errors if MongoDB or Percona Server for MongoDB version is less than the latest one with CVE fixes.',
         summary: 'MongoDB CVE Version',
         interval: 'RARE',
+        enabled: true,
       },
     ],
+    comment: '',
   },
   {
     name: 'version_configuration',
@@ -254,7 +247,7 @@ const advisorsArray = [
     checks: [
       {
         name: 'mongodb_version',
-        disabled: true,
+        enabled: false,
         description:
           'This check returns warnings if MongoDB or Percona Server for MongoDB version is not the latest one.',
         summary: 'MongoDB Version',
@@ -262,7 +255,7 @@ const advisorsArray = [
       },
       {
         name: 'mysql_version',
-        disabled: true,
+        enabled: false,
         description:
           'This check returns warnings if MySQL, Percona Server for MySQL, or MariaDB version is not the latest one.',
         summary: 'MySQL Version',
@@ -274,7 +267,9 @@ const advisorsArray = [
           'This check returns warnings if PostgreSQL minor version is not the latest one.\nAdditionally notice is returned if PostgreSQL major version is not the latest one.\nError is returned if the major version of PostgreSQL is 9.4 or older.\n',
         summary: 'PostgreSQL Version',
         interval: 'STANDARD',
+        enabled: true,
       },
     ],
+    comment: '',
   },
 ];

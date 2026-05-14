@@ -1,10 +1,7 @@
-import React from 'react';
-
 import { TransformerRegistryItem } from '@grafana/data';
 import { Drawer } from '@grafana/ui';
 import { OperationRowHelp } from 'app/core/components/QueryOperationRow/OperationRowHelp';
-
-import { getLinkToDocs } from '../../../transformers/docs/content';
+import { FALLBACK_DOCS_LINK } from 'app/features/transformers/docs/constants';
 
 interface TransformationEditorHelpDisplayProps {
   isOpen: boolean;
@@ -22,7 +19,8 @@ export const TransformationEditorHelpDisplay = ({
     help,
   } = transformer;
 
-  const helpContent = help ? help : getLinkToDocs();
+  const helpContent = help ? help : FALLBACK_DOCS_LINK;
+
   const helpElement = (
     <Drawer title={name} subtitle="Transformation help" onClose={() => onCloseClick(false)}>
       <OperationRowHelp markdown={helpContent} styleOverrides={{ borderTop: '2px solid' }} />

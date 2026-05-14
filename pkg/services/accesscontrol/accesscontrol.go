@@ -2,17 +2,22 @@ package accesscontrol
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/registry"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	"github.com/grafana/grafana/pkg/services/authn"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/user"
 )
+
+var tracer = otel.Tracer("github.com/grafana/grafana/pkg/services/accesscontrol")
 
 type AccessControl interface {
 	// Evaluate evaluates access to the given resources.
@@ -20,6 +25,12 @@ type AccessControl interface {
 	// RegisterScopeAttributeResolver allows the caller to register a scope resolver for a
 	// specific scope prefix (ex: datasources:name:)
 	RegisterScopeAttributeResolver(prefix string, resolver ScopeAttributeResolver)
+	// WithoutResolvers copies AccessControl without any configured resolvers.
+	// This is useful when we don't want to reuse any pre-configured resolvers
+	// for a authorization call.
+	WithoutResolvers() AccessControl
+	// InvalidateResolverCache removes a scope resolution from the cache
+	InvalidateResolverCache(orgID int64, scope string)
 }
 
 type Service interface {
@@ -49,6 +60,8 @@ type Service interface {
 	DeleteExternalServiceRole(ctx context.Context, externalServiceID string) error
 	// SyncUserRoles adds provided roles to user
 	SyncUserRoles(ctx context.Context, orgID int64, cmd SyncUserRolesCommand) error
+	// GetStaicRoles returns a map where key organization role and value is a static rbac role.
+	GetStaticRoles(ctx context.Context) map[string]*RoleDTO
 }
 
 //go:generate  mockery --name Store --structname MockStore --outpkg actest --filename store_mock.go --output ./actest/
@@ -76,8 +89,9 @@ type Options struct {
 type SearchOptions struct {
 	ActionPrefix string // Needed for the PoC v1, it's probably going to be removed.
 	Action       string
+	ActionSets   []string
 	Scope        string
-	NamespacedID string    // ID of the identity (ex: user:3, service-account:4)
+	UserID       int64
 	wildcards    Wildcards // private field computed based on the Scope
 	RolePrefixes []string
 }
@@ -95,24 +109,6 @@ func (s *SearchOptions) Wildcards() []string {
 
 	s.wildcards = WildcardsFromPrefix(ScopePrefix(s.Scope))
 	return s.wildcards
-}
-
-func (s *SearchOptions) ComputeUserID() (int64, error) {
-	if s.NamespacedID == "" {
-		return 0, errors.New("namespacedID must be set")
-	}
-
-	id, err := identity.ParseNamespaceID(s.NamespacedID)
-	if err != nil {
-		return 0, err
-	}
-
-	// Validate namespace type is user or service account
-	if id.Namespace() != identity.NamespaceUser && id.Namespace() != identity.NamespaceServiceAccount {
-		return 0, fmt.Errorf("invalid namespace: %s", id.Namespace())
-	}
-
-	return id.ParseInt()
 }
 
 type SyncUserRolesCommand struct {
@@ -145,6 +141,12 @@ type ServiceAccountPermissionsService interface {
 	PermissionsService
 }
 
+type ReceiverPermissionsService interface {
+	PermissionsService
+	SetDefaultPermissions(ctx context.Context, orgID int64, user identity.Requester, uid string)
+	CopyPermissions(ctx context.Context, orgID int64, user identity.Requester, oldUID, newUID string) (int, error)
+}
+
 type PermissionsService interface {
 	// GetPermissions returns all permissions for given resourceID
 	GetPermissions(ctx context.Context, user identity.Requester, resourceID string) ([]ResourcePermission, error)
@@ -171,7 +173,7 @@ type User struct {
 func HasGlobalAccess(ac AccessControl, authnService authn.Service, c *contextmodel.ReqContext) func(evaluator Evaluator) bool {
 	return func(evaluator Evaluator) bool {
 		var targetOrgID int64 = GlobalOrgID
-		orgUser, err := authnService.ResolveIdentity(c.Req.Context(), targetOrgID, c.SignedInUser.GetID())
+		orgUser, err := authnService.ResolveIdentity(c.Req.Context(), targetOrgID, c.GetID())
 		if err != nil {
 			// This will be an common error for entities that can't authenticate in global scope
 			c.Logger.Debug("Failed to authenticate user in global scope", "error", err)
@@ -185,11 +187,11 @@ func HasGlobalAccess(ac AccessControl, authnService authn.Service, c *contextmod
 		}
 
 		// guard against nil map
-		if c.SignedInUser.Permissions == nil {
-			c.SignedInUser.Permissions = make(map[int64]map[string][]string)
+		if c.Permissions == nil {
+			c.Permissions = make(map[int64]map[string][]string)
 		}
 		// set on user so we don't fetch global permissions every time this is called
-		c.SignedInUser.Permissions[orgUser.GetOrgID()] = orgUser.GetPermissions()
+		c.Permissions[orgUser.GetOrgID()] = orgUser.GetPermissions()
 
 		return hasAccess
 	}
@@ -212,13 +214,13 @@ var ReqSignedIn = func(c *contextmodel.ReqContext) bool {
 }
 
 var ReqGrafanaAdmin = func(c *contextmodel.ReqContext) bool {
-	return c.SignedInUser.GetIsGrafanaAdmin()
+	return c.GetIsGrafanaAdmin()
 }
 
 // ReqHasRole generates a fallback to check whether the user has a role
 // ReqHasRole(org.RoleAdmin) will always return true for Grafana server admins, eg, a Grafana Admin / Viewer role combination
 func ReqHasRole(role org.RoleType) func(c *contextmodel.ReqContext) bool {
-	return func(c *contextmodel.ReqContext) bool { return c.SignedInUser.HasRole(role) }
+	return func(c *contextmodel.ReqContext) bool { return c.HasRole(role) }
 }
 
 func BuildPermissionsMap(permissions []Permission) map[string]bool {
@@ -231,30 +233,81 @@ func BuildPermissionsMap(permissions []Permission) map[string]bool {
 }
 
 // GroupScopesByAction will group scopes on action
+//
+// Deprecated: use GroupScopesByActionContext instead
 func GroupScopesByAction(permissions []Permission) map[string][]string {
-	// Use a map to deduplicate scopes.
-	// User can have the same permission from multiple sources (e.g. team, basic role, directly assigned etc).
-	// User will also have duplicate permissions if action sets are used, as we will be double writing permissions for a while.
-	m := make(map[string]map[string]struct{})
+	return GroupScopesByActionContext(context.Background(), permissions)
+}
+
+// GroupScopesByAction will group scopes on action
+func GroupScopesByActionContext(ctx context.Context, permissions []Permission) map[string][]string {
+	_, span := tracer.Start(ctx, "accesscontrol.GroupScopesByActionContext", trace.WithAttributes(
+		attribute.Int("permissions_count", len(permissions)),
+	))
+	defer span.End()
+
+	// Optimized for both memory efficiency and speed.
+	// Uses index caching to avoid map lookups in hot path, plus a single
+	// contiguous backing array to reduce allocations and GC pressure.
+	// Pre-sized for ~256 actions (typical max is ~500, uint16 supports up to 65535).
+
+	if len(permissions) == 0 {
+		return make(map[string][]string)
+	}
+
+	// First pass: assign indices and cache them to avoid repeated map lookups
+	// Using uint16 for indices (2 bytes vs 8) - supports up to 65535 unique actions
+	actionIndex := make(map[string]uint16, 256)
+	indices := make([]uint16, len(permissions))
+
 	for i := range permissions {
-		if _, ok := m[permissions[i].Action]; !ok {
-			m[permissions[i].Action] = make(map[string]struct{})
+		action := permissions[i].Action
+		if idx, ok := actionIndex[action]; ok {
+			indices[i] = idx
+		} else {
+			idx := uint16(len(actionIndex))
+			actionIndex[action] = idx
+			indices[i] = idx
 		}
-		m[permissions[i].Action][permissions[i].Scope] = struct{}{}
 	}
 
-	res := make(map[string][]string, len(m))
-	for action, scopes := range m {
-		scopeList := make([]string, len(scopes))
-		i := 0
-		for scope := range scopes {
-			scopeList[i] = scope
-			i++
-		}
-		res[action] = scopeList
+	numActions := len(actionIndex)
+
+	// Count scopes per action using cached indices (fast slice access, no map lookups)
+	actionCounts := make([]int, numActions)
+	for _, idx := range indices {
+		actionCounts[idx]++
 	}
 
-	return res
+	// Single contiguous backing array - much more memory-efficient than many small allocations
+	backingArray := make([]string, len(permissions))
+
+	// Create slices pointing into the backing array with exact capacities
+	scopes := make([][]string, numActions)
+	offset := 0
+	for i, count := range actionCounts {
+		scopes[i] = backingArray[offset : offset : offset+count]
+		offset += count
+	}
+
+	// Second pass: append scopes using cached indices (no map lookups in hot path!)
+	for i := range permissions {
+		idx := indices[i]
+		scopes[idx] = append(scopes[idx], permissions[i].Scope)
+	}
+
+	// Build result map
+	m := make(map[string][]string, numActions)
+	for action, idx := range actionIndex {
+		m[action] = scopes[idx]
+	}
+
+	span.SetAttributes(
+		attribute.Int("unique_actions", numActions),
+		attribute.Float64("avg_scopes_per_action", float64(len(permissions))/float64(numActions)),
+	)
+
+	return m
 }
 
 // Reduce will reduce a list of permissions to its minimal form, grouping scopes by action
@@ -359,6 +412,20 @@ func GetOrgRoles(user identity.Requester) []string {
 	}
 
 	return roles
+}
+
+// PermissionsForActions generate Permissions for all actions provided scoped to provided scope.
+func PermissionsForActions(actions []string, scope string) []Permission {
+	permissions := make([]Permission, len(actions))
+
+	for i, action := range actions {
+		permissions[i] = Permission{
+			Action: action,
+			Scope:  scope,
+		}
+	}
+
+	return permissions
 }
 
 func BackgroundUser(name string, orgID int64, role org.RoleType, permissions []Permission) identity.Requester {

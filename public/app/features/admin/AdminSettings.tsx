@@ -1,7 +1,8 @@
-import React from 'react';
 import { useAsync } from 'react-use';
 
+import { Trans } from '@grafana/i18n';
 import { getBackendSrv } from '@grafana/runtime';
+import { Alert } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 
 import { AdminSettingsTable } from './AdminSettingsTable';
@@ -14,10 +15,12 @@ function AdminSettings() {
   return (
     <Page navId="server-settings">
       <Page.Contents>
-        <div className="grafana-info-box span8" style={{ margin: '20px 0 25px 0' }}>
-          These system settings are defined in grafana.ini or custom.ini (or overridden in ENV variables). To change
-          these you currently need to restart Grafana.
-        </div>
+        <Alert severity="info" title="">
+          <Trans i18nKey="admin.settings.info-description">
+            These system settings are defined in grafana.ini or custom.ini (or overridden in ENV variables). To change
+            these you currently need to restart Grafana.
+          </Trans>
+        </Alert>
 
         {loading && <AdminSettingsTable.Skeleton />}
 

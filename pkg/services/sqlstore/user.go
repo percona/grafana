@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/grafana/grafana/pkg/events"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/util"
@@ -64,6 +63,7 @@ func (ss *SQLStore) createUser(ctx context.Context, sess *DBSession, args user.C
 
 	// create user
 	usr = user.User{
+		UID:        util.GenerateShortUID(),
 		Email:      args.Email,
 		Login:      args.Login,
 		IsAdmin:    args.IsAdmin,
@@ -97,14 +97,6 @@ func (ss *SQLStore) createUser(ctx context.Context, sess *DBSession, args user.C
 	if _, err := sess.Insert(&usr); err != nil {
 		return usr, err
 	}
-
-	sess.publishAfterCommit(&events.UserCreated{
-		Timestamp: usr.Created,
-		Id:        usr.ID,
-		Name:      usr.Name,
-		Login:     usr.Login,
-		Email:     usr.Email,
-	})
 
 	orgUser := org.OrgUser{
 		OrgID:   orgID,
@@ -181,12 +173,6 @@ func (ss *SQLStore) getOrCreateOrg(sess *DBSession, orgName string) (int64, erro
 			return 0, err
 		}
 	}
-
-	sess.publishAfterCommit(&events.OrgCreated{
-		Timestamp: org.Created,
-		Id:        org.ID,
-		Name:      org.Name,
-	})
 
 	return org.ID, nil
 }

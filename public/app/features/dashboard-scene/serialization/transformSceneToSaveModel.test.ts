@@ -13,28 +13,23 @@ import {
   toDataFrame,
   VariableSupportType,
 } from '@grafana/data';
-import { getPanelPlugin } from '@grafana/data/test/__mocks__/pluginMocks';
-import { getPluginLinkExtensions, setPluginImportUtils } from '@grafana/runtime';
-import {
-  MultiValueVariable,
-  sceneGraph,
-  SceneGridLayout,
-  SceneGridRow,
-  SceneTimeRange,
-  VizPanel,
-} from '@grafana/scenes';
+import { getPanelPlugin } from '@grafana/data/test';
+import { setPluginImportUtils } from '@grafana/runtime';
+import { MultiValueVariable, sceneGraph, SceneGridLayout, SceneGridRow, VizPanel } from '@grafana/scenes';
 import { Dashboard, LoadingState, Panel, RowPanel, VariableRefresh } from '@grafana/schema';
-import { PanelModel } from 'app/features/dashboard/state';
+import { PanelModel } from 'app/features/dashboard/state/PanelModel';
 import { getTimeRange } from 'app/features/dashboard/utils/timeRange';
-import { reduceTransformRegistryItem } from 'app/features/transformers/editors/ReduceTransformerEditor';
-import { SHARED_DASHBOARD_QUERY } from 'app/plugins/datasource/dashboard';
+import { getReduceTransformRegistryItem } from 'app/features/transformers/editors/ReduceTransformerEditor';
+import { SHARED_DASHBOARD_QUERY } from 'app/plugins/datasource/dashboard/constants';
+import { DashboardDataDTO } from 'app/types/dashboard';
 
-import { buildPanelEditScene } from '../panel-edit/PanelEditor';
 import { DashboardDataLayerSet } from '../scene/DashboardDataLayerSet';
-import { DashboardGridItem } from '../scene/DashboardGridItem';
-import { DashboardScene } from '../scene/DashboardScene';
-import { LibraryVizPanel } from '../scene/LibraryVizPanel';
-import { RowRepeaterBehavior } from '../scene/RowRepeaterBehavior';
+import { LibraryPanelBehavior } from '../scene/LibraryPanelBehavior';
+import { DashboardGridItem } from '../scene/layout-default/DashboardGridItem';
+import { DefaultGridLayoutManager } from '../scene/layout-default/DefaultGridLayoutManager';
+import { RowRepeaterBehavior } from '../scene/layout-default/RowRepeaterBehavior';
+import { RowItem } from '../scene/layout-rows/RowItem';
+import { RowsLayoutManager } from '../scene/layout-rows/RowsLayoutManager';
 import { NEW_LINK } from '../settings/links/utils';
 import { activateFullSceneTree, buildPanelRepeaterScene } from '../utils/test-utils';
 import { getVizPanelKeyForPanelId } from '../utils/utils';
@@ -44,20 +39,17 @@ import dashboard_to_load1 from './testfiles/dashboard_to_load1.json';
 import repeatingRowsAndPanelsDashboardJson from './testfiles/repeating_rows_and_panels.json';
 import snapshotableDashboardJson from './testfiles/snapshotable_dashboard.json';
 import snapshotableWithRowsDashboardJson from './testfiles/snapshotable_with_rows.json';
-import {
-  buildGridItemForLibPanel,
-  buildGridItemForPanel,
-  transformSaveModelToScene,
-} from './transformSaveModelToScene';
+import { buildGridItemForPanel, transformSaveModelToScene } from './transformSaveModelToScene';
 import {
   gridItemToPanel,
   gridRowToSaveModel,
   panelRepeaterToPanels,
+  rowItemToSaveModel,
   transformSceneToSaveModel,
   trimDashboardForSnapshot,
 } from './transformSceneToSaveModel';
 
-standardTransformersRegistry.setInit(() => [reduceTransformRegistryItem]);
+standardTransformersRegistry.setInit(() => [getReduceTransformRegistryItem()]);
 setPluginImportUtils({
   importPanelPlugin: (id: string) => Promise.resolve(getPanelPlugin({})),
   getPanelPluginFromCache: (id: string) => undefined,
@@ -136,11 +128,14 @@ jest.mock('@grafana/runtime', () => ({
         toDataQuery: (q: StandardVariableQuery) => q,
       },
     }),
+    // mock getInstanceSettings()
+    getInstanceSettings: jest.fn(),
   }),
   getRunRequest: () => (ds: DataSourceApi, request: DataQueryRequest) => {
     return runRequestMock(ds, request);
   },
   config: {
+    ...jest.requireActual('@grafana/runtime').config,
     panels: {
       text: { skipDataQuery: true },
     },
@@ -157,7 +152,10 @@ jest.mock('@grafana/runtime', () => ({
   getPluginLinkExtensions: jest.fn(),
 }));
 
-const getPluginLinkExtensionsMock = jest.mocked(getPluginLinkExtensions);
+jest.mock('@grafana/data', () => ({
+  ...jest.requireActual('@grafana/data'),
+  setWeekStart: jest.fn(),
+}));
 
 jest.mock('@grafana/scenes', () => ({
   ...jest.requireActual('@grafana/scenes'),
@@ -168,11 +166,6 @@ jest.mock('@grafana/scenes', () => ({
 }));
 
 describe('transformSceneToSaveModel', () => {
-  beforeEach(() => {
-    getPluginLinkExtensionsMock.mockRestore();
-    getPluginLinkExtensionsMock.mockReturnValue({ extensions: [] });
-  });
-
   describe('Given a simple scene with custom settings', () => {
     it('Should transform back to persisted model', () => {
       const dashboardWithCustomSettings = {
@@ -188,12 +181,11 @@ describe('transformSceneToSaveModel', () => {
         timepicker: {
           ...dashboard_to_load1.timepicker,
           refresh_intervals: ['5m', '15m', '30m', '1h'],
-          time_options: ['5m', '15m', '30m'],
           hidden: true,
         },
         links: [{ ...NEW_LINK, title: 'Link 1' }],
       };
-      const scene = transformSaveModelToScene({ dashboard: dashboardWithCustomSettings as any, meta: {} });
+      const scene = transformSaveModelToScene({ dashboard: dashboardWithCustomSettings as DashboardDataDTO, meta: {} });
       const saveModel = transformSceneToSaveModel(scene);
 
       expect(saveModel).toMatchSnapshot();
@@ -202,7 +194,7 @@ describe('transformSceneToSaveModel', () => {
 
   describe('Given a simple scene with variables', () => {
     it('Should transform back to persisted model', () => {
-      const scene = transformSaveModelToScene({ dashboard: dashboard_to_load1 as any, meta: {} });
+      const scene = transformSaveModelToScene({ dashboard: dashboard_to_load1 as DashboardDataDTO, meta: {} });
       const saveModel = transformSceneToSaveModel(scene);
 
       expect(saveModel).toMatchSnapshot();
@@ -211,7 +203,10 @@ describe('transformSceneToSaveModel', () => {
 
   describe('Given a scene with rows', () => {
     it('Should transform back to persisted model', () => {
-      const scene = transformSaveModelToScene({ dashboard: repeatingRowsAndPanelsDashboardJson as any, meta: {} });
+      const scene = transformSaveModelToScene({
+        dashboard: repeatingRowsAndPanelsDashboardJson as DashboardDataDTO,
+        meta: {},
+      });
 
       const saveModel = transformSceneToSaveModel(scene);
 
@@ -223,12 +218,16 @@ describe('transformSceneToSaveModel', () => {
     });
 
     it('Should remove repeated rows in save model', () => {
-      const scene = transformSaveModelToScene({ dashboard: repeatingRowsAndPanelsDashboardJson as any, meta: {} });
+      const scene = transformSaveModelToScene({
+        dashboard: repeatingRowsAndPanelsDashboardJson as DashboardDataDTO,
+        meta: {},
+      });
 
       const variable = scene.state.$variables?.state.variables[0] as MultiValueVariable;
       variable.changeValueTo(['a', 'b', 'c']);
 
-      const grid = scene.state.body as SceneGridLayout;
+      const layout = scene.state.body as DefaultGridLayoutManager;
+      const grid = layout.state.grid;
       const rowWithRepeat = grid.state.children[1] as SceneGridRow;
       const rowRepeater = rowWithRepeat.state.$behaviors![0] as RowRepeaterBehavior;
 
@@ -345,33 +344,32 @@ describe('transformSceneToSaveModel', () => {
 
   describe('Library panels', () => {
     it('given a library panel', () => {
-      // Not using buildGridItemFromPanelSchema since it strips options/fieldConfig
-      const libVizPanel = new LibraryVizPanel({
-        name: 'Some lib panel panel',
-        title: 'A panel',
-        uid: 'lib-panel-uid',
-        panelKey: 'lib-panel',
-        panel: new VizPanel({
-          key: 'panel-4',
-          title: 'Panel blahh blah',
-          fieldConfig: {
-            defaults: {},
-            overrides: [],
+      const libVizPanel = new VizPanel({
+        key: 'panel-4',
+        title: 'Panel blahh blah',
+        $behaviors: [
+          new LibraryPanelBehavior({
+            name: 'Some lib panel panel',
+            uid: 'lib-panel-uid',
+          }),
+        ],
+        fieldConfig: {
+          defaults: {},
+          overrides: [],
+        },
+        options: {
+          legend: {
+            calcs: [],
+            displayMode: 'list',
+            placement: 'bottom',
+            showLegend: true,
           },
-          options: {
-            legend: {
-              calcs: [],
-              displayMode: 'list',
-              placement: 'bottom',
-              showLegend: true,
-            },
-            tooltip: {
-              maxHeight: 600,
-              mode: 'single',
-              sort: 'none',
-            },
+          tooltip: {
+            maxHeight: 600,
+            mode: 'single',
+            sort: 'none',
           },
-        }),
+        },
       });
 
       const panel = new DashboardGridItem({
@@ -395,7 +393,7 @@ describe('transformSceneToSaveModel', () => {
         x: 0,
         y: 0,
       });
-      expect(result.title).toBe('A panel');
+      expect(result.title).toBe('Panel blahh blah');
       expect(result.transformations).toBeUndefined();
       expect(result.fieldConfig).toBeUndefined();
       expect(result.options).toBeUndefined();
@@ -428,7 +426,7 @@ describe('transformSceneToSaveModel', () => {
 
   describe('Annotations', () => {
     it('should transform annotations to save model', () => {
-      const scene = transformSaveModelToScene({ dashboard: dashboard_to_load1 as any, meta: {} });
+      const scene = transformSaveModelToScene({ dashboard: dashboard_to_load1 as DashboardDataDTO, meta: {} });
       const saveModel = transformSceneToSaveModel(scene);
 
       expect(saveModel.annotations?.list?.length).toBe(4);
@@ -436,7 +434,7 @@ describe('transformSceneToSaveModel', () => {
     });
 
     it('should transform annotations to save model after state changes', () => {
-      const scene = transformSaveModelToScene({ dashboard: dashboard_to_load1 as any, meta: {} });
+      const scene = transformSaveModelToScene({ dashboard: dashboard_to_load1 as DashboardDataDTO, meta: {} });
 
       const layers = (scene.state.$data as DashboardDataLayerSet)?.state.annotationLayers;
       const enabledLayer = layers[1];
@@ -679,7 +677,7 @@ describe('transformSceneToSaveModel', () => {
     });
 
     it('attaches snapshot data to panels using Grafana snapshot query', async () => {
-      const scene = transformSaveModelToScene({ dashboard: snapshotableDashboardJson as any, meta: {} });
+      const scene = transformSaveModelToScene({ dashboard: snapshotableDashboardJson as DashboardDataDTO, meta: {} });
 
       activateFullSceneTree(scene);
 
@@ -734,7 +732,10 @@ describe('transformSceneToSaveModel', () => {
     });
 
     it('handles basic rows', async () => {
-      const scene = transformSaveModelToScene({ dashboard: snapshotableWithRowsDashboardJson as any, meta: {} });
+      const scene = transformSaveModelToScene({
+        dashboard: snapshotableWithRowsDashboardJson as DashboardDataDTO,
+        meta: {},
+      });
 
       activateFullSceneTree(scene);
 
@@ -794,8 +795,8 @@ describe('transformSceneToSaveModel', () => {
 
         activateFullSceneTree(scene);
 
-        expect(repeater.state.repeatedPanels?.length).toBe(2);
-        const result = panelRepeaterToPanels(repeater, undefined, true);
+        expect(repeater.state.repeatedPanels?.length).toBe(1);
+        const result = panelRepeaterToPanels(repeater, true);
 
         expect(result).toHaveLength(2);
 
@@ -821,43 +822,43 @@ describe('transformSceneToSaveModel', () => {
       it('handles repeated library panels', () => {
         const { scene, repeater } = buildPanelRepeaterScene(
           { variableQueryTime: 0, numberOfOptions: 2 },
-          new LibraryVizPanel({
-            name: 'Some lib panel panel',
-            title: 'A panel',
-            uid: 'lib-panel-uid',
-            panelKey: 'lib-panel',
-            panel: new VizPanel({
-              key: 'panel-4',
-              title: 'Panel blahh blah',
-              fieldConfig: {
-                defaults: {},
-                overrides: [],
+          new VizPanel({
+            key: 'panel-4',
+            title: 'Panel blahh blah',
+            fieldConfig: {
+              defaults: {},
+              overrides: [],
+            },
+            options: {
+              legend: {
+                calcs: [],
+                displayMode: 'list',
+                placement: 'bottom',
+                showLegend: true,
               },
-              options: {
-                legend: {
-                  calcs: [],
-                  displayMode: 'list',
-                  placement: 'bottom',
-                  showLegend: true,
-                },
-                tooltip: {
-                  maxHeight: 600,
-                  mode: 'single',
-                  sort: 'none',
-                },
+              tooltip: {
+                maxHeight: 600,
+                mode: 'single',
+                sort: 'none',
               },
-            }),
+            },
+            $behaviors: [
+              new LibraryPanelBehavior({
+                name: 'Some lib panel panel',
+                uid: 'lib-panel-uid',
+              }),
+            ],
           })
         );
 
         activateFullSceneTree(scene);
-        const result = panelRepeaterToPanels(repeater, undefined, true);
+        const result = panelRepeaterToPanels(repeater, true);
 
         expect(result).toHaveLength(1);
 
         expect(result[0]).toMatchObject({
           id: 4,
-          title: 'A panel',
+          title: 'Panel blahh blah',
           libraryPanel: {
             name: 'Some lib panel panel',
             uid: 'lib-panel-uid',
@@ -876,7 +877,7 @@ describe('transformSceneToSaveModel', () => {
         activateFullSceneTree(scene);
 
         let panels: Panel[] = [];
-        gridRowToSaveModel(row, panels, undefined, true);
+        gridRowToSaveModel(row, panels, true);
 
         expect(panels).toHaveLength(2);
         expect(panels[0].repeat).toBe('handler');
@@ -904,7 +905,7 @@ describe('transformSceneToSaveModel', () => {
         activateFullSceneTree(scene);
 
         let panels: Panel[] = [];
-        gridRowToSaveModel(row, panels, undefined, true);
+        gridRowToSaveModel(row, panels, true);
 
         expect(panels[0].repeat).toBe('handler');
 
@@ -940,7 +941,7 @@ describe('transformSceneToSaveModel', () => {
       let snapshot: Dashboard = {} as Dashboard;
 
       beforeEach(() => {
-        const scene = transformSaveModelToScene({ dashboard: snapshotableDashboardJson as any, meta: {} });
+        const scene = transformSaveModelToScene({ dashboard: snapshotableDashboardJson as DashboardDataDTO, meta: {} });
         activateFullSceneTree(scene);
         snapshot = transformSceneToSaveModel(scene, true);
       });
@@ -1004,7 +1005,7 @@ describe('transformSceneToSaveModel', () => {
       });
 
       it('should remove links', async () => {
-        const scene = transformSaveModelToScene({ dashboard: snapshotableDashboardJson as any, meta: {} });
+        const scene = transformSaveModelToScene({ dashboard: snapshotableDashboardJson as DashboardDataDTO, meta: {} });
         activateFullSceneTree(scene);
         const snapshot = transformSceneToSaveModel(scene, true);
         expect(snapshot.links?.length).toBe(1);
@@ -1014,97 +1015,12 @@ describe('transformSceneToSaveModel', () => {
     });
   });
 
-  describe('Given a scene with an open panel editor', () => {
-    it('should persist changes to panel model', async () => {
-      const panel = new VizPanel({
-        key: 'panel-1',
-        pluginId: 'text',
-      });
-
-      const gridItem = new DashboardGridItem({ body: panel });
-
-      const editScene = buildPanelEditScene(panel);
-      const scene = new DashboardScene({
-        editPanel: editScene,
-        isEditing: true,
-        body: new SceneGridLayout({
-          children: [gridItem],
-        }),
-        $timeRange: new SceneTimeRange({
-          from: 'now-6h',
-          to: 'now',
-          timeZone: '',
-        }),
-      });
-
-      editScene!.state.vizManager.state.panel.setState({
-        options: {
-          mode: 'markdown',
-          code: {
-            language: 'plaintext',
-            showLineNumbers: false,
-            showMiniMap: false,
-          },
-          content: 'new content',
-        },
-      });
-      activateFullSceneTree(scene);
-      const saveModel = transformSceneToSaveModel(scene);
-      expect((saveModel.panels![0] as any).options.content).toBe('new content');
-    });
-
-    it('should persist changes to panel model in row', async () => {
-      const panel = new VizPanel({
-        key: 'panel-1',
-        pluginId: 'text',
-        options: {
-          content: 'old content',
-        },
-      });
-
-      const gridItem = new DashboardGridItem({ body: panel });
-
-      const editScene = buildPanelEditScene(panel);
-      const scene = new DashboardScene({
-        editPanel: editScene,
-        isEditing: true,
-        body: new SceneGridLayout({
-          children: [
-            new SceneGridRow({
-              key: '23',
-              isCollapsed: false,
-              children: [gridItem],
-            }),
-          ],
-        }),
-        $timeRange: new SceneTimeRange({
-          from: 'now-6h',
-          to: 'now',
-          timeZone: '',
-        }),
-      });
-      activateFullSceneTree(scene);
-
-      editScene!.state.vizManager.state.panel.setState({
-        options: {
-          mode: 'markdown',
-          code: {
-            language: 'plaintext',
-            showLineNumbers: false,
-            showMiniMap: false,
-          },
-          content: 'new content',
-        },
-      });
-
-      const saveModel = transformSceneToSaveModel(scene);
-      expect((saveModel.panels![1] as any).options.content).toBe('new content');
-    });
-  });
-
   describe('Given a scene with repeated panels and non-repeated panels', () => {
     it('should save repeated panels itemHeight as height', () => {
-      const scene = transformSaveModelToScene({ dashboard: repeatingRowsAndPanelsDashboardJson as any, meta: {} });
+      const scene = transformSaveModelToScene({
+        dashboard: repeatingRowsAndPanelsDashboardJson as DashboardDataDTO,
+        meta: {},
+      });
       const gridItem = sceneGraph.findByKey(scene, 'grid-item-2') as DashboardGridItem;
       expect(gridItem).toBeInstanceOf(DashboardGridItem);
       expect(gridItem.state.height).toBe(10);
@@ -1117,7 +1033,10 @@ describe('transformSceneToSaveModel', () => {
     });
 
     it('should not save non-repeated panels itemHeight as height', () => {
-      const scene = transformSaveModelToScene({ dashboard: repeatingRowsAndPanelsDashboardJson as any, meta: {} });
+      const scene = transformSaveModelToScene({
+        dashboard: repeatingRowsAndPanelsDashboardJson as DashboardDataDTO,
+        meta: {},
+      });
       const gridItem = sceneGraph.findByKey(scene, 'grid-item-15') as DashboardGridItem;
       expect(gridItem).toBeInstanceOf(DashboardGridItem);
       expect(gridItem.state.height).toBe(2);
@@ -1134,10 +1053,550 @@ describe('transformSceneToSaveModel', () => {
   });
 });
 
-export function buildGridItemFromPanelSchema(panel: Partial<Panel>) {
-  if (panel.libraryPanel) {
-    return buildGridItemForLibPanel(new PanelModel(panel))!;
-  }
+describe('Given a scene with custom quick ranges', () => {
+  it('should save quick ranges to save model', () => {
+    const dashboardWithCustomSettings = {
+      ...dashboard_to_load1,
+      timepicker: {
+        ...dashboard_to_load1.timepicker,
+        quick_ranges: [
+          {
+            display: 'Last 6 hours',
+            from: 'now-6h',
+            to: 'now',
+          },
+          {
+            display: 'Last 3 days',
+            from: 'now-3d',
+            to: 'now',
+          },
+        ],
+      },
+    };
+    const scene = transformSaveModelToScene({ dashboard: dashboardWithCustomSettings as DashboardDataDTO, meta: {} });
+    const saveModel = transformSceneToSaveModel(scene);
 
+    expect(saveModel).toMatchSnapshot();
+  });
+});
+
+export function buildGridItemFromPanelSchema(panel: Partial<Panel>) {
   return buildGridItemForPanel(new PanelModel(panel));
 }
+
+describe('rowItemToSaveModel', () => {
+  it('should convert an expanded row with panels to v1beta1 format with correct Y positions', () => {
+    // Create a row with a panel at relative Y=0
+    const gridItem = new DashboardGridItem({
+      key: 'griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 8,
+      body: new VizPanel({
+        key: 'panel-1',
+        title: 'Test Panel',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const rowItem = new RowItem({
+      title: 'Test Row',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem],
+        }),
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    const nextY = rowItemToSaveModel(rowItem, panelsArray, false, 5);
+
+    // Should have 2 items: row panel + content panel
+    expect(panelsArray).toHaveLength(2);
+
+    // Row panel should be at Y=5 (the starting currentY)
+    const rowPanel = panelsArray[0] as RowPanel;
+    expect(rowPanel.type).toBe('row');
+    expect(rowPanel.title).toBe('Test Row');
+    expect(rowPanel.gridPos?.y).toBe(5);
+    expect(rowPanel.gridPos?.h).toBe(1);
+    expect(rowPanel.collapsed).toBe(false);
+
+    // Content panel should be at Y=6 (panelStartY = currentY + 1)
+    // Panel at relative Y=0 gets absolute Y = 0 + 6 = 6
+    const contentPanel = panelsArray[1] as Panel;
+    expect(contentPanel.title).toBe('Test Panel');
+    expect(contentPanel.gridPos?.y).toBe(6);
+    expect(contentPanel.gridPos?.h).toBe(8);
+
+    // Next Y should be panelStartY + maxRelativeY = 6 + 8 = 14
+    expect(nextY).toBe(14);
+  });
+
+  it('should convert a collapsed row with panels stored inside the row panel', () => {
+    const gridItem = new DashboardGridItem({
+      key: 'griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 8,
+      body: new VizPanel({
+        key: 'panel-1',
+        title: 'Collapsed Panel',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const rowItem = new RowItem({
+      title: 'Collapsed Row',
+      collapse: true,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem],
+        }),
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    const nextY = rowItemToSaveModel(rowItem, panelsArray, false, 10);
+
+    // Should have only 1 item: the row panel (panels are stored inside)
+    expect(panelsArray).toHaveLength(1);
+
+    const rowPanel = panelsArray[0] as RowPanel;
+    expect(rowPanel.type).toBe('row');
+    expect(rowPanel.title).toBe('Collapsed Row');
+    expect(rowPanel.gridPos?.y).toBe(10);
+    expect(rowPanel.collapsed).toBe(true);
+
+    // Collapsed panels should be stored inside the row with absolute Y
+    // panelStartY = 10 + 1 = 11, panel Y = 0 + 11 = 11
+    expect(rowPanel.panels).toHaveLength(1);
+    expect(rowPanel.panels![0].title).toBe('Collapsed Panel');
+    expect(rowPanel.panels![0].gridPos?.y).toBe(11);
+
+    // Next Y should be panelStartY + maxRelativeY = 11 + 8 = 19
+    expect(nextY).toBe(19);
+  });
+
+  it('should handle hidden header rows without creating a row panel', () => {
+    const gridItem = new DashboardGridItem({
+      key: 'griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 8,
+      body: new VizPanel({
+        key: 'panel-1',
+        title: 'Panel in Hidden Header Row',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const rowItem = new RowItem({
+      title: 'Hidden Header Row',
+      collapse: false,
+      hideHeader: true,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem],
+        }),
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    const nextY = rowItemToSaveModel(rowItem, panelsArray, false, 3);
+
+    // Should have only 1 item: the content panel (no row panel for hidden header)
+    expect(panelsArray).toHaveLength(1);
+
+    const contentPanel = panelsArray[0] as Panel;
+    expect(contentPanel.title).toBe('Panel in Hidden Header Row');
+    // Hidden header rows keep relative Y positions (no adjustment)
+    expect(contentPanel.gridPos?.y).toBe(0);
+
+    // For hidden header rows with DefaultGridLayoutManager, currentY IS updated
+    // based on panel heights so next row starts after this content
+    // Panel at y=0 with h=8 means max extent = 8
+    expect(nextY).toBe(8);
+  });
+
+  it('should handle row with repeat variable', () => {
+    const gridItem = new DashboardGridItem({
+      key: 'griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 8,
+      body: new VizPanel({
+        key: 'panel-1',
+        title: 'Repeated Panel',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const rowItem = new RowItem({
+      title: 'Repeated Row $var',
+      collapse: false,
+      repeatByVariable: 'var',
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem],
+        }),
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    rowItemToSaveModel(rowItem, panelsArray, false, 0);
+
+    const rowPanel = panelsArray[0] as RowPanel;
+    expect(rowPanel.type).toBe('row');
+    expect(rowPanel.repeat).toBe('var');
+  });
+
+  it('should handle multiple rows with correct Y progression', () => {
+    // First row with a panel at relative Y=0, H=8
+    const gridItem1 = new DashboardGridItem({
+      key: 'griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 8,
+      body: new VizPanel({
+        key: 'panel-1',
+        title: 'Panel 1',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const rowItem1 = new RowItem({
+      title: 'Row 1',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem1],
+        }),
+      }),
+    });
+
+    // Second row with a panel at relative Y=0, H=4
+    const gridItem2 = new DashboardGridItem({
+      key: 'griditem-2',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 4,
+      body: new VizPanel({
+        key: 'panel-2',
+        title: 'Panel 2',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const rowItem2 = new RowItem({
+      title: 'Row 2',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem2],
+        }),
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+
+    // Process first row starting at Y=0
+    // Row 1 at Y=0, panel at panelStartY=1, nextY = 1 + 8 = 9
+    let nextY = rowItemToSaveModel(rowItem1, panelsArray, false, 0);
+    expect(nextY).toBe(9);
+
+    // Process second row starting at the returned Y=9
+    // Row 2 at Y=9, panel at panelStartY=10, nextY = 10 + 4 = 14
+    nextY = rowItemToSaveModel(rowItem2, panelsArray, false, nextY);
+    expect(nextY).toBe(14);
+
+    // Should have 4 items total: 2 row panels + 2 content panels
+    expect(panelsArray).toHaveLength(4);
+
+    // First row at Y=0
+    expect((panelsArray[0] as RowPanel).gridPos?.y).toBe(0);
+    // First panel at panelStartY = 0 + 1 = 1
+    expect((panelsArray[1] as Panel).gridPos?.y).toBe(1);
+    // Second row at Y=9
+    expect((panelsArray[2] as RowPanel).gridPos?.y).toBe(9);
+    // Second panel at panelStartY = 9 + 1 = 10
+    expect((panelsArray[3] as Panel).gridPos?.y).toBe(10);
+  });
+
+  it('should handle expanded parent row with nested rows (flattening to top level)', () => {
+    // Create a nested row with a panel
+    const nestedGridItem = new DashboardGridItem({
+      key: 'nested-griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 6,
+      body: new VizPanel({
+        key: 'nested-panel-1',
+        title: 'Nested Panel',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const nestedRow = new RowItem({
+      title: 'Nested Row',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [nestedGridItem],
+        }),
+      }),
+    });
+
+    // Create parent row that contains nested rows via RowsLayoutManager
+    const parentRow = new RowItem({
+      title: 'Parent Row',
+      collapse: false,
+      layout: new RowsLayoutManager({
+        rows: [nestedRow],
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    const nextY = rowItemToSaveModel(parentRow, panelsArray, false, 0);
+
+    // For expanded parent with nested rows, content is flattened to top level
+    // Should have: parent row panel + nested row panel + nested panel
+    expect(panelsArray).toHaveLength(3);
+
+    // Parent row at Y=0
+    const parentRowPanel = panelsArray[0] as RowPanel;
+    expect(parentRowPanel.type).toBe('row');
+    expect(parentRowPanel.title).toBe('Parent Row');
+    expect(parentRowPanel.gridPos?.y).toBe(0);
+
+    // Nested row at Y=1 (currentY + 1 after parent row)
+    const nestedRowPanel = panelsArray[1] as RowPanel;
+    expect(nestedRowPanel.type).toBe('row');
+    expect(nestedRowPanel.title).toBe('Nested Row');
+    expect(nestedRowPanel.gridPos?.y).toBe(1);
+
+    // Nested panel at Y=2 (panelStartY = 1 + 1 = 2)
+    const nestedPanel = panelsArray[2] as Panel;
+    expect(nestedPanel.title).toBe('Nested Panel');
+    expect(nestedPanel.gridPos?.y).toBe(2);
+
+    // Next Y should be after all nested content
+    // Nested row: panelStartY=2, maxRelativeY=6, nextY = 2 + 6 = 8
+    expect(nextY).toBe(8);
+  });
+
+  it('should handle collapsed parent row with nested rows (storing inside parent)', () => {
+    // Create a nested row with a panel
+    const nestedGridItem = new DashboardGridItem({
+      key: 'nested-griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 6,
+      body: new VizPanel({
+        key: 'nested-panel-1',
+        title: 'Nested Panel in Collapsed Parent',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const nestedRow = new RowItem({
+      title: 'Nested Row',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [nestedGridItem],
+        }),
+      }),
+    });
+
+    // Create COLLAPSED parent row that contains nested rows
+    const parentRow = new RowItem({
+      title: 'Collapsed Parent Row',
+      collapse: true,
+      layout: new RowsLayoutManager({
+        rows: [nestedRow],
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    rowItemToSaveModel(parentRow, panelsArray, false, 5);
+
+    // For collapsed parent with nested rows, only the parent row panel is added
+    // Nested content is flattened and stored inside parent's panels array
+    expect(panelsArray).toHaveLength(1);
+
+    const parentRowPanel = panelsArray[0] as RowPanel;
+    expect(parentRowPanel.type).toBe('row');
+    expect(parentRowPanel.title).toBe('Collapsed Parent Row');
+    expect(parentRowPanel.gridPos?.y).toBe(5);
+    expect(parentRowPanel.collapsed).toBe(true);
+
+    // Nested panels should be stored inside the parent row
+    expect(parentRowPanel.panels).toHaveLength(1);
+    expect(parentRowPanel.panels![0].title).toBe('Nested Panel in Collapsed Parent');
+  });
+
+  it('should handle multiple levels of nested rows when expanded', () => {
+    // Create innermost panel
+    const innerGridItem = new DashboardGridItem({
+      key: 'inner-griditem',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 4,
+      body: new VizPanel({
+        key: 'inner-panel',
+        title: 'Inner Panel',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    // Create inner row
+    const innerRow = new RowItem({
+      title: 'Inner Row',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [innerGridItem],
+        }),
+      }),
+    });
+
+    // Create middle row containing inner row
+    const middleRow = new RowItem({
+      title: 'Middle Row',
+      collapse: false,
+      layout: new RowsLayoutManager({
+        rows: [innerRow],
+      }),
+    });
+
+    // Create outer row containing middle row
+    const outerRow = new RowItem({
+      title: 'Outer Row',
+      collapse: false,
+      layout: new RowsLayoutManager({
+        rows: [middleRow],
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+    const nextY = rowItemToSaveModel(outerRow, panelsArray, false, 0);
+
+    // All rows should be flattened to top level
+    // Should have: outer row + middle row + inner row + inner panel
+    expect(panelsArray).toHaveLength(4);
+
+    // Outer Row at Y=0
+    expect((panelsArray[0] as RowPanel).title).toBe('Outer Row');
+    expect((panelsArray[0] as RowPanel).gridPos?.y).toBe(0);
+    // Middle Row at Y=1 (after outer)
+    expect((panelsArray[1] as RowPanel).title).toBe('Middle Row');
+    expect((panelsArray[1] as RowPanel).gridPos?.y).toBe(1);
+    // Inner Row at Y=2 (after middle)
+    expect((panelsArray[2] as RowPanel).title).toBe('Inner Row');
+    expect((panelsArray[2] as RowPanel).gridPos?.y).toBe(2);
+    // Inner Panel at Y=3 (panelStartY = 2 + 1)
+    expect((panelsArray[3] as Panel).title).toBe('Inner Panel');
+    expect((panelsArray[3] as Panel).gridPos?.y).toBe(3);
+
+    // Next Y should be after all content
+    // Inner row: panelStartY=3, maxRelativeY=4, nextY = 3 + 4 = 7
+    expect(nextY).toBe(7);
+  });
+
+  it('should handle hidden header row with multiple panels and update currentY correctly', () => {
+    // Create two panels at different Y positions
+    const gridItem1 = new DashboardGridItem({
+      key: 'griditem-1',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 8,
+      body: new VizPanel({
+        key: 'panel-1',
+        title: 'Panel 1',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const gridItem2 = new DashboardGridItem({
+      key: 'griditem-2',
+      x: 0,
+      y: 8,
+      width: 12,
+      height: 6,
+      body: new VizPanel({
+        key: 'panel-2',
+        title: 'Panel 2',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const hiddenHeaderRow = new RowItem({
+      title: '',
+      collapse: false,
+      hideHeader: true,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem1, gridItem2],
+        }),
+      }),
+    });
+
+    // Following row to verify Y progression
+    const gridItem3 = new DashboardGridItem({
+      key: 'griditem-3',
+      x: 0,
+      y: 0,
+      width: 12,
+      height: 4,
+      body: new VizPanel({
+        key: 'panel-3',
+        title: 'Panel 3',
+        pluginId: 'timeseries',
+      }),
+    });
+
+    const followingRow = new RowItem({
+      title: 'Following Row',
+      collapse: false,
+      layout: new DefaultGridLayoutManager({
+        grid: new SceneGridLayout({
+          children: [gridItem3],
+        }),
+      }),
+    });
+
+    const panelsArray: Array<Panel | RowPanel> = [];
+
+    // Process hidden header row starting at Y=0
+    let nextY = rowItemToSaveModel(hiddenHeaderRow, panelsArray, false, 0);
+
+    // Hidden header row panels keep relative Y, but currentY advances
+    // Panel 1: y=0, h=8
+    // Panel 2: y=8, h=6 -> max extent = 14
+    expect(nextY).toBe(14);
+    expect(panelsArray).toHaveLength(2);
+    expect((panelsArray[0] as Panel).gridPos?.y).toBe(0);
+    expect((panelsArray[1] as Panel).gridPos?.y).toBe(8);
+
+    // Process following row - should start at Y=14
+    nextY = rowItemToSaveModel(followingRow, panelsArray, false, nextY);
+
+    expect(panelsArray).toHaveLength(4); // 2 from hidden header + row panel + panel
+    const followingRowPanel = panelsArray[2] as RowPanel;
+    expect(followingRowPanel.type).toBe('row');
+    expect(followingRowPanel.title).toBe('Following Row');
+    expect(followingRowPanel.gridPos?.y).toBe(14); // Starts after hidden header content
+  });
+});

@@ -10,7 +10,7 @@ import (
 	"github.com/grafana/grafana/pkg/web"
 )
 
-// swagger:route GET /org/quotas getCurrentOrg getCurrentOrgQuota
+// swagger:route GET /org/quotas quota org getCurrentOrgQuota
 //
 // Fetch Organization quota.
 //
@@ -23,10 +23,10 @@ import (
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) GetCurrentOrgQuotas(c *contextmodel.ReqContext) response.Response {
-	return hs.getOrgQuotasHelper(c, c.SignedInUser.GetOrgID())
+	return hs.getOrgQuotasHelper(c, c.GetOrgID())
 }
 
-// swagger:route GET /orgs/{org_id}/quotas orgs getOrgQuota
+// swagger:route GET /orgs/{org_id}/quotas quota orgs getOrgQuota
 //
 // Fetch Organization quota.
 //
@@ -47,14 +47,16 @@ func (hs *HTTPServer) GetOrgQuotas(c *contextmodel.ReqContext) response.Response
 }
 
 func (hs *HTTPServer) getOrgQuotasHelper(c *contextmodel.ReqContext, orgID int64) response.Response {
-	q, err := hs.QuotaService.GetQuotasByScope(c.Req.Context(), quota.OrgScope, orgID)
+	ctx, span := hs.tracer.Start(c.Req.Context(), "api.getOrgQuotasHelper")
+	defer span.End()
+	q, err := hs.QuotaService.GetQuotasByScope(ctx, quota.OrgScope, orgID)
 	if err != nil {
 		return response.ErrOrFallback(http.StatusInternalServerError, "failed to get quota", err)
 	}
 	return response.JSON(http.StatusOK, q)
 }
 
-// swagger:route PUT /orgs/{org_id}/quotas/{quota_target} orgs updateOrgQuota
+// swagger:route PUT /orgs/{org_id}/quotas/{quota_target} quota orgs updateOrgQuota
 //
 // Update user quota.
 //
@@ -70,6 +72,8 @@ func (hs *HTTPServer) getOrgQuotasHelper(c *contextmodel.ReqContext, orgID int64
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) UpdateOrgQuota(c *contextmodel.ReqContext) response.Response {
+	ctx, span := hs.tracer.Start(c.Req.Context(), "api.UpdateOrgQuota")
+	defer span.End()
 	cmd := quota.UpdateQuotaCmd{}
 	var err error
 	if err := web.Bind(c.Req, &cmd); err != nil {
@@ -81,13 +85,13 @@ func (hs *HTTPServer) UpdateOrgQuota(c *contextmodel.ReqContext) response.Respon
 	}
 	cmd.Target = web.Params(c.Req)[":target"]
 
-	if err := hs.QuotaService.Update(c.Req.Context(), &cmd); err != nil {
+	if err := hs.QuotaService.Update(ctx, &cmd); err != nil {
 		return response.ErrOrFallback(http.StatusInternalServerError, "Failed to update org quotas", err)
 	}
 	return response.Success("Organization quota updated")
 }
 
-// swagger:route GET /admin/users/{user_id}/quotas admin_users getUserQuota
+// swagger:route GET /admin/users/{user_id}/quotas quota admin_users getUserQuota
 //
 // Fetch user quota.
 //
@@ -103,7 +107,7 @@ func (hs *HTTPServer) UpdateOrgQuota(c *contextmodel.ReqContext) response.Respon
 // 404: notFoundError
 // 500: internalServerError
 
-// swagger:route GET /user/quotas signed_in_user getUserQuotas
+// swagger:route GET /user/quotas quota signed_in_user getUserQuotas
 //
 // Fetch user quota.
 //
@@ -114,12 +118,14 @@ func (hs *HTTPServer) UpdateOrgQuota(c *contextmodel.ReqContext) response.Respon
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) GetUserQuotas(c *contextmodel.ReqContext) response.Response {
+	ctx, span := hs.tracer.Start(c.Req.Context(), "api.GetUserQuotas")
+	defer span.End()
 	id, err := strconv.ParseInt(web.Params(c.Req)[":id"], 10, 64)
 	if err != nil {
 		return response.Err(quota.ErrBadRequest.Errorf("id is invalid: %w", err))
 	}
 
-	q, err := hs.QuotaService.GetQuotasByScope(c.Req.Context(), quota.UserScope, id)
+	q, err := hs.QuotaService.GetQuotasByScope(ctx, quota.UserScope, id)
 	if err != nil {
 		return response.ErrOrFallback(http.StatusInternalServerError, "Failed to get org quotas", err)
 	}
@@ -127,7 +133,7 @@ func (hs *HTTPServer) GetUserQuotas(c *contextmodel.ReqContext) response.Respons
 	return response.JSON(http.StatusOK, q)
 }
 
-// swagger:route PUT /admin/users/{user_id}/quotas/{quota_target} admin_users updateUserQuota
+// swagger:route PUT /admin/users/{user_id}/quotas/{quota_target} quota admin_users updateUserQuota
 //
 // Update user quota.
 //
@@ -143,6 +149,8 @@ func (hs *HTTPServer) GetUserQuotas(c *contextmodel.ReqContext) response.Respons
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) UpdateUserQuota(c *contextmodel.ReqContext) response.Response {
+	ctx, span := hs.tracer.Start(c.Req.Context(), "api.UpdateUserQuota")
+	defer span.End()
 	cmd := quota.UpdateQuotaCmd{}
 	var err error
 	if err := web.Bind(c.Req, &cmd); err != nil {
@@ -154,7 +162,7 @@ func (hs *HTTPServer) UpdateUserQuota(c *contextmodel.ReqContext) response.Respo
 	}
 	cmd.Target = web.Params(c.Req)[":target"]
 
-	if err := hs.QuotaService.Update(c.Req.Context(), &cmd); err != nil {
+	if err := hs.QuotaService.Update(ctx, &cmd); err != nil {
 		return response.ErrOrFallback(http.StatusInternalServerError, "Failed to update org quotas", err)
 	}
 	return response.Success("Organization quota updated")

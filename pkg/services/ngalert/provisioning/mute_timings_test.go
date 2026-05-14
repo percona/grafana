@@ -8,19 +8,23 @@ import (
 	"testing"
 
 	"github.com/prometheus/alertmanager/config"
+	"github.com/prometheus/alertmanager/pkg/labels"
 	"github.com/prometheus/alertmanager/timeinterval"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
+	"github.com/grafana/grafana/pkg/services/ngalert/notifier/legacy_storage"
+	"github.com/grafana/grafana/pkg/services/ngalert/notifier/routes"
 )
 
 func TestGetMuteTimings(t *testing.T) {
 	orgID := int64(1)
-	revision := &cfgRevision{
-		cfg: &definitions.PostableUserConfig{
+	revision := &legacy_storage.ConfigRevision{
+		Config: &definitions.PostableUserConfig{
 			AlertmanagerConfig: definitions.PostableApiAlertingConfig{
 				Config: definitions.Config{
 					MuteTimeIntervals: []config.MuteTimeInterval{
@@ -32,6 +36,8 @@ func TestGetMuteTimings(t *testing.T) {
 							Name:          "Test2",
 							TimeIntervals: nil,
 						},
+					},
+					TimeIntervals: []config.TimeInterval{
 						{
 							Name:          "Test3",
 							TimeIntervals: nil,
@@ -49,7 +55,7 @@ func TestGetMuteTimings(t *testing.T) {
 
 	t.Run("service returns timings from config file", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 			return revision, nil
 		}
 
@@ -58,16 +64,21 @@ func TestGetMuteTimings(t *testing.T) {
 		result, err := sut.GetMuteTimings(context.Background(), 1)
 
 		require.NoError(t, err)
-		require.Len(t, result, len(revision.cfg.AlertmanagerConfig.MuteTimeIntervals))
+		require.Len(t, result, len(revision.Config.AlertmanagerConfig.MuteTimeIntervals)+len(revision.Config.AlertmanagerConfig.TimeIntervals))
 		require.Equal(t, "Test1", result[0].Name)
 		require.EqualValues(t, provenances["Test1"], result[0].Provenance)
 		require.NotEmpty(t, result[0].Version)
+		require.Equal(t, legacy_storage.NameToUid(result[0].Name), result[0].UID)
+
 		require.Equal(t, "Test2", result[1].Name)
 		require.EqualValues(t, provenances["Test2"], result[1].Provenance)
 		require.NotEmpty(t, result[1].Version)
+		require.Equal(t, legacy_storage.NameToUid(result[1].Name), result[1].UID)
+
 		require.Equal(t, "Test3", result[2].Name)
 		require.EqualValues(t, "", result[2].Provenance)
 		require.NotEmpty(t, result[2].Version)
+		require.Equal(t, legacy_storage.NameToUid(result[2].Name), result[2].UID)
 
 		require.Len(t, store.Calls, 1)
 		require.Equal(t, "Get", store.Calls[0].Method)
@@ -78,8 +89,8 @@ func TestGetMuteTimings(t *testing.T) {
 
 	t.Run("service returns empty list when config file contains no mute timings", func(t *testing.T) {
 		sut, store, _ := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: &definitions.PostableUserConfig{}}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: &definitions.PostableUserConfig{}}, nil
 		}
 
 		result, err := sut.GetMuteTimings(context.Background(), 1)
@@ -92,7 +103,7 @@ func TestGetMuteTimings(t *testing.T) {
 		t.Run("when unable to read config", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
 			expected := fmt.Errorf("failed")
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return nil, expected
 			}
 
@@ -103,7 +114,7 @@ func TestGetMuteTimings(t *testing.T) {
 
 		t.Run("when unable to read provenance", func(t *testing.T) {
 			sut, store, prov := createMuteTimingSvcSut()
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return revision, nil
 			}
 			expected := fmt.Errorf("failed")
@@ -114,17 +125,109 @@ func TestGetMuteTimings(t *testing.T) {
 			require.ErrorIs(t, err, expected)
 		})
 	})
+
+	t.Run("with imported intervals", func(t *testing.T) {
+		grafanaIntervals := []config.MuteTimeInterval{
+			{Name: "grafana-interval"},
+		}
+		importedIntervals := []config.MuteTimeInterval{
+			{Name: "imported-interval"},
+		}
+		revision := createConfigWithImportedIntervals(grafanaIntervals, importedIntervals)
+
+		provenances := map[string]models.Provenance{
+			"grafana-interval": models.ProvenanceAPI,
+		}
+
+		t.Run("returns only Grafana intervals without WithIncludeImported", func(t *testing.T) {
+			sut, store, prov := createMuteTimingSvcSut()
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return revision, nil
+			}
+			prov.EXPECT().GetProvenances(mock.Anything, mock.Anything, mock.Anything).Return(provenances, nil)
+
+			result, err := sut.GetMuteTimings(context.Background(), orgID)
+
+			require.NoError(t, err)
+			require.Len(t, result, 1)
+			require.Equal(t, "grafana-interval", result[0].Name)
+			require.EqualValues(t, models.ProvenanceAPI, result[0].Provenance)
+		})
+
+		t.Run("returns both Grafana and imported intervals with WithIncludeImported", func(t *testing.T) {
+			sut, store, prov := createMuteTimingSvcSut()
+			sut = sut.WithIncludeImported()
+
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return revision, nil
+			}
+			prov.EXPECT().GetProvenances(mock.Anything, mock.Anything, mock.Anything).Return(provenances, nil)
+
+			result, err := sut.GetMuteTimings(context.Background(), orgID)
+
+			require.NoError(t, err)
+			require.Len(t, result, 2)
+
+			// Find Grafana interval
+			var grafanaInterval *definitions.MuteTimeInterval
+			var importedInterval *definitions.MuteTimeInterval
+			for i := range result {
+				switch name := result[i].Name; name {
+				case "grafana-interval":
+					grafanaInterval = &result[i]
+				case "imported-interval":
+					importedInterval = &result[i]
+				}
+			}
+
+			require.NotNil(t, grafanaInterval, "Grafana interval not found")
+			require.NotNil(t, importedInterval, "Imported interval not found")
+
+			// Verify Grafana interval
+			require.Equal(t, "grafana-interval", grafanaInterval.Name)
+			require.EqualValues(t, models.ProvenanceAPI, grafanaInterval.Provenance)
+			require.Equal(t, legacy_storage.NameToUid(grafanaInterval.Name), grafanaInterval.UID)
+
+			// Verify imported interval
+			require.Equal(t, "imported-interval", importedInterval.Name)
+			require.EqualValues(t, models.ProvenanceConvertedPrometheus, importedInterval.Provenance)
+			require.Equal(t, legacy_storage.NameToUid(importedInterval.Name), importedInterval.UID)
+		})
+
+		t.Run("handles empty ExtraConfigs", func(t *testing.T) {
+			sut, store, prov := createMuteTimingSvcSut()
+			sut = sut.WithIncludeImported()
+
+			emptyRevision := createConfigWithImportedIntervals(grafanaIntervals, nil)
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return emptyRevision, nil
+			}
+			prov.EXPECT().GetProvenances(mock.Anything, mock.Anything, mock.Anything).Return(provenances, nil)
+
+			result, err := sut.GetMuteTimings(context.Background(), orgID)
+
+			require.NoError(t, err)
+			require.Len(t, result, 1)
+			require.Equal(t, "grafana-interval", result[0].Name)
+		})
+	})
 }
 
-func TestGetMuteTiming(t *testing.T) {
+func TestGetMuteTimingByName(t *testing.T) {
 	orgID := int64(1)
-	revision := &cfgRevision{
-		cfg: &definitions.PostableUserConfig{
+	revision := &legacy_storage.ConfigRevision{
+		Config: &definitions.PostableUserConfig{
 			AlertmanagerConfig: definitions.PostableApiAlertingConfig{
 				Config: definitions.Config{
 					MuteTimeIntervals: []config.MuteTimeInterval{
 						{
 							Name:          "Test1",
+							TimeIntervals: nil,
+						},
+					},
+					TimeIntervals: []config.TimeInterval{
+						{
+							Name:          "Test2",
 							TimeIntervals: nil,
 						},
 					},
@@ -135,44 +238,111 @@ func TestGetMuteTiming(t *testing.T) {
 
 	t.Run("service returns timing by name", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 			return revision, nil
 		}
 		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
 
-		result, err := sut.GetMuteTiming(context.Background(), "Test1", orgID)
+		result, err := sut.GetMuteTimingByName(context.Background(), "Test1", orgID)
 
 		require.NoError(t, err)
 
 		require.Equal(t, "Test1", result.Name)
 		require.EqualValues(t, models.ProvenanceAPI, result.Provenance)
+		require.Equal(t, legacy_storage.NameToUid(result.Name), result.UID)
 		require.NotEmpty(t, result.Version)
 
 		require.Len(t, store.Calls, 1)
 		require.Equal(t, "Get", store.Calls[0].Method)
 		require.Equal(t, orgID, store.Calls[0].Args[1])
 
-		prov.AssertCalled(t, "GetProvenance", mock.Anything, &result, orgID)
+		prov.AssertCalled(t, "GetProvenance", mock.Anything, mock.MatchedBy(func(mt *definitions.MuteTimeInterval) bool {
+			return mt.Name == result.Name
+		}), orgID)
+
+		t.Run("service returns ErrTimeIntervalNotFound if no mute timing by name", func(t *testing.T) {
+			sut, store, _ := createMuteTimingSvcSut()
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return revision, nil
+			}
+
+			_, err := sut.GetMuteTimingByName(context.Background(), "Test123", orgID)
+
+			require.Truef(t, ErrTimeIntervalNotFound.Is(err), "expected ErrTimeIntervalNotFound but got %s", err)
+		})
+
+		t.Run("service propagates errors", func(t *testing.T) {
+			t.Run("when unable to read config", func(t *testing.T) {
+				sut, store, _ := createMuteTimingSvcSut()
+				expected := fmt.Errorf("failed")
+				store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+					return nil, expected
+				}
+
+				_, err := sut.GetMuteTimingByName(context.Background(), "Test1", orgID)
+
+				require.ErrorIs(t, err, expected)
+			})
+
+			t.Run("when unable to read provenance", func(t *testing.T) {
+				sut, store, prov := createMuteTimingSvcSut()
+				store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+					return revision, nil
+				}
+				expected := fmt.Errorf("failed")
+				prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return("", expected)
+
+				_, err := sut.GetMuteTimingByName(context.Background(), "Test1", orgID)
+
+				require.ErrorIs(t, err, expected)
+			})
+		})
+	})
+}
+
+func TestGetMuteTimingByUID(t *testing.T) {
+	orgID := int64(1)
+	revision := &legacy_storage.ConfigRevision{
+		Config: &definitions.PostableUserConfig{
+			AlertmanagerConfig: definitions.PostableApiAlertingConfig{
+				Config: definitions.Config{
+					MuteTimeIntervals: []config.MuteTimeInterval{
+						{
+							Name:          "Test1",
+							TimeIntervals: nil,
+						},
+					},
+					TimeIntervals: []config.TimeInterval{
+						{
+							Name:          "Test2",
+							TimeIntervals: nil,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	t.Run("service returns timing by UID", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return revision, nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
+		result, err := sut.GetMuteTimingByUID(context.Background(), legacy_storage.NameToUid("Test1"), orgID)
+
+		require.NoError(t, err)
+
+		require.Equal(t, result, result)
 	})
 
 	t.Run("service returns ErrTimeIntervalNotFound if no mute timings", func(t *testing.T) {
 		sut, store, _ := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: &definitions.PostableUserConfig{}}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: &definitions.PostableUserConfig{}}, nil
 		}
 
-		_, err := sut.GetMuteTiming(context.Background(), "Test1", orgID)
-
-		require.Truef(t, ErrTimeIntervalNotFound.Is(err), "expected ErrTimeIntervalNotFound but got %s", err)
-	})
-
-	t.Run("service returns ErrTimeIntervalNotFound if no mute timing by name", func(t *testing.T) {
-		sut, store, _ := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return revision, nil
-		}
-
-		_, err := sut.GetMuteTiming(context.Background(), "Test123", orgID)
+		_, err := sut.GetMuteTimingByUID(context.Background(), "Test1", orgID)
 
 		require.Truef(t, ErrTimeIntervalNotFound.Is(err), "expected ErrTimeIntervalNotFound but got %s", err)
 	})
@@ -181,24 +351,24 @@ func TestGetMuteTiming(t *testing.T) {
 		t.Run("when unable to read config", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
 			expected := fmt.Errorf("failed")
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return nil, expected
 			}
 
-			_, err := sut.GetMuteTiming(context.Background(), "Test1", orgID)
+			_, err := sut.GetMuteTimingByUID(context.Background(), legacy_storage.NameToUid("Test1"), orgID)
 
 			require.ErrorIs(t, err, expected)
 		})
 
 		t.Run("when unable to read provenance", func(t *testing.T) {
 			sut, store, prov := createMuteTimingSvcSut()
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return revision, nil
 			}
 			expected := fmt.Errorf("failed")
 			prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return("", expected)
 
-			_, err := sut.GetMuteTiming(context.Background(), "Test1", orgID)
+			_, err := sut.GetMuteTimingByUID(context.Background(), legacy_storage.NameToUid("Test1"), orgID)
 
 			require.ErrorIs(t, err, expected)
 		})
@@ -216,6 +386,11 @@ func TestCreateMuteTimings(t *testing.T) {
 					MuteTimeIntervals: []config.MuteTimeInterval{
 						{
 							Name: "TEST",
+						},
+					},
+					TimeIntervals: []config.TimeInterval{
+						{
+							Name: "TEST2",
 						},
 					},
 				},
@@ -257,10 +432,11 @@ func TestCreateMuteTimings(t *testing.T) {
 	})
 
 	t.Run("returns ErrTimeIntervalExists if mute timing with the name exists", func(t *testing.T) {
-		sut, store, _ := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceNone, nil)
 
 		existing := initialConfig().AlertmanagerConfig.MuteTimeIntervals[0]
 		timing := definitions.MuteTimeInterval{
@@ -271,14 +447,24 @@ func TestCreateMuteTimings(t *testing.T) {
 		_, err := sut.CreateMuteTiming(context.Background(), timing, orgID)
 
 		require.Truef(t, ErrTimeIntervalExists.Is(err), "expected ErrTimeIntervalExists but got %s", err)
+
+		existing = config.MuteTimeInterval(initialConfig().AlertmanagerConfig.TimeIntervals[0])
+		timing = definitions.MuteTimeInterval{
+			MuteTimeInterval: existing,
+			Provenance:       definitions.Provenance(models.ProvenanceFile),
+		}
+
+		_, err = sut.CreateMuteTiming(context.Background(), timing, orgID)
+
+		require.Truef(t, ErrTimeIntervalExists.Is(err), "expected ErrTimeIntervalExists but got %s", err)
 	})
 
 	t.Run("saves mute timing and provenance in a transaction", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
-		store.SaveFn = func(ctx context.Context, revision *cfgRevision) error {
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
 			assertInTransaction(t, ctx)
 			return nil
 		}
@@ -293,6 +479,7 @@ func TestCreateMuteTimings(t *testing.T) {
 
 		require.EqualValues(t, expected, result.MuteTimeInterval)
 		require.EqualValues(t, expectedProvenance, result.Provenance)
+		require.Equal(t, legacy_storage.NameToUid(expected.Name), result.UID)
 		require.NotEmpty(t, result.Version)
 
 		require.Len(t, store.Calls, 2)
@@ -301,10 +488,10 @@ func TestCreateMuteTimings(t *testing.T) {
 
 		require.Equal(t, "Save", store.Calls[1].Method)
 		require.Equal(t, orgID, store.Calls[1].Args[2])
-		revision := store.Calls[1].Args[1].(*cfgRevision)
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
 
-		expectedTimings := append(initialConfig().AlertmanagerConfig.MuteTimeIntervals, expected)
-		require.EqualValues(t, expectedTimings, revision.cfg.AlertmanagerConfig.MuteTimeIntervals)
+		expectedTimings := append(initialConfig().AlertmanagerConfig.TimeIntervals, config.TimeInterval(expected))
+		require.EqualValues(t, expectedTimings, revision.Config.AlertmanagerConfig.TimeIntervals)
 
 		prov.AssertCalled(t, "SetProvenance", mock.Anything, &timing, orgID, expectedProvenance)
 	})
@@ -313,7 +500,7 @@ func TestCreateMuteTimings(t *testing.T) {
 		t.Run("when unable to read config", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
 			expectedErr := errors.New("test-err")
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return nil, expectedErr
 			}
 			_, err := sut.CreateMuteTiming(context.Background(), timing, orgID)
@@ -322,8 +509,8 @@ func TestCreateMuteTimings(t *testing.T) {
 
 		t.Run("when provenance fails to save", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-				return &cfgRevision{cfg: initialConfig()}, nil
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 			}
 			expectedErr := fmt.Errorf("failed to save provenance")
 			sut.provenanceStore.(*MockProvisioningStore).EXPECT().
@@ -343,11 +530,11 @@ func TestCreateMuteTimings(t *testing.T) {
 
 		t.Run("when AM config fails to save", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-				return &cfgRevision{cfg: initialConfig()}, nil
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 			}
 			expectedErr := errors.New("test-err")
-			store.SaveFn = func(ctx context.Context, revision *cfgRevision) error {
+			store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
 				return expectedErr
 			}
 
@@ -377,8 +564,18 @@ func TestUpdateMuteTimings(t *testing.T) {
 			AlertmanagerConfig: definitions.PostableApiAlertingConfig{
 				Config: definitions.Config{
 					MuteTimeIntervals: []config.MuteTimeInterval{
+						original,
+					},
+					TimeIntervals: []config.TimeInterval{
 						{
-							Name: "Test",
+							Name: "Test2",
+						},
+					},
+					Route: &definitions.Route{
+						Routes: []*definitions.Route{
+							{
+								MuteTimeIntervals: []string{original.Name},
+							},
 						},
 					},
 				},
@@ -401,6 +598,7 @@ func TestUpdateMuteTimings(t *testing.T) {
 	}
 	expectedProvenance := models.ProvenanceAPI
 	expectedVersion := calculateMuteTimeIntervalFingerprint(expected)
+	expectedUID := legacy_storage.NameToUid(expected.Name)
 	timing := definitions.MuteTimeInterval{
 		MuteTimeInterval: expected,
 		Version:          originalVersion,
@@ -422,7 +620,10 @@ func TestUpdateMuteTimings(t *testing.T) {
 	})
 
 	t.Run("rejects mute timings if provenance is not right", func(t *testing.T) {
-		sut, _, prov := createMuteTimingSvcSut()
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
 		expectedErr := errors.New("test")
 		sut.validator = func(from, to models.Provenance) error {
 			return expectedErr
@@ -439,10 +640,41 @@ func TestUpdateMuteTimings(t *testing.T) {
 		require.ErrorIs(t, err, expectedErr)
 	})
 
+	t.Run("rejects mute timings if new name already exists", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		sut.validator = func(from, to models.Provenance) error {
+			return nil
+		}
+		timing := definitions.MuteTimeInterval{
+			UID: legacy_storage.NameToUid("Test2"),
+			MuteTimeInterval: config.MuteTimeInterval{
+				Name: "Test",
+				TimeIntervals: []timeinterval.TimeInterval{
+					{
+						Times: []timeinterval.TimeRange{
+							{
+								StartMinute: 10, EndMinute: 60,
+							},
+						},
+					},
+				},
+			},
+			Provenance: definitions.Provenance(expectedProvenance),
+		}
+
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
+
+		_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+		require.ErrorIs(t, err, ErrTimeIntervalExists)
+	})
+
 	t.Run("returns ErrVersionConflict if storage version does not match", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
 
 		timing := definitions.MuteTimeInterval{
@@ -460,28 +692,43 @@ func TestUpdateMuteTimings(t *testing.T) {
 
 	t.Run("returns ErrMuteTimingsNotFound if mute timing does not exist", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
 		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
-		timing := definitions.MuteTimeInterval{
-			MuteTimeInterval: config.MuteTimeInterval{
-				Name: "No-timing",
-			},
-			Provenance: definitions.Provenance(expectedProvenance),
-		}
 
-		_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+		t.Run("when UID is specified", func(t *testing.T) {
+			timing := definitions.MuteTimeInterval{
+				UID:              "not-found",
+				MuteTimeInterval: expected,
+				Provenance:       definitions.Provenance(expectedProvenance),
+			}
 
-		require.Truef(t, ErrTimeIntervalNotFound.Is(err), "expected ErrTimeIntervalNotFound but got %s", err)
+			_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+
+			require.ErrorIs(t, err, ErrTimeIntervalNotFound)
+		})
+
+		t.Run("when only Name is specified", func(t *testing.T) {
+			timing := definitions.MuteTimeInterval{
+				MuteTimeInterval: config.MuteTimeInterval{
+					Name: "not-found",
+				},
+				Provenance: definitions.Provenance(expectedProvenance),
+			}
+
+			_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+
+			require.ErrorIs(t, err, ErrTimeIntervalNotFound)
+		})
 	})
 
 	t.Run("saves mute timing and provenance in a transaction if optimistic concurrency passes", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
-		store.SaveFn = func(ctx context.Context, revision *cfgRevision) error {
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
 			assertInTransaction(t, ctx)
 			return nil
 		}
@@ -498,6 +745,7 @@ func TestUpdateMuteTimings(t *testing.T) {
 		require.EqualValues(t, expected, result.MuteTimeInterval)
 		require.EqualValues(t, expectedProvenance, result.Provenance)
 		require.EqualValues(t, expectedVersion, result.Version)
+		require.Equal(t, legacy_storage.NameToUid(result.Name), result.UID)
 
 		require.Len(t, store.Calls, 2)
 		require.Equal(t, "Get", store.Calls[0].Method)
@@ -505,9 +753,9 @@ func TestUpdateMuteTimings(t *testing.T) {
 
 		require.Equal(t, "Save", store.Calls[1].Method)
 		require.Equal(t, orgID, store.Calls[1].Args[2])
-		revision := store.Calls[1].Args[1].(*cfgRevision)
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
 
-		require.EqualValues(t, []config.MuteTimeInterval{expected}, revision.cfg.AlertmanagerConfig.MuteTimeIntervals)
+		require.EqualValues(t, []config.MuteTimeInterval{expected}, revision.Config.AlertmanagerConfig.MuteTimeIntervals)
 
 		prov.AssertCalled(t, "SetProvenance", mock.Anything, &timing, orgID, expectedProvenance)
 
@@ -541,10 +789,207 @@ func TestUpdateMuteTimings(t *testing.T) {
 
 			require.Equal(t, "Save", store.Calls[1].Method)
 			require.Equal(t, orgID, store.Calls[1].Args[2])
-			revision := store.Calls[1].Args[1].(*cfgRevision)
+			revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
 
-			require.EqualValues(t, []config.MuteTimeInterval{timing.MuteTimeInterval}, revision.cfg.AlertmanagerConfig.MuteTimeIntervals)
+			require.EqualValues(t, []config.MuteTimeInterval{timing.MuteTimeInterval}, revision.Config.AlertmanagerConfig.MuteTimeIntervals)
 		})
+	})
+
+	t.Run("updates time interval where it is", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
+			assertInTransaction(t, ctx)
+			return nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
+		prov.EXPECT().SetProvenance(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+			func(ctx context.Context, _ models.Provisionable, _ int64, _ models.Provenance) error {
+				assertInTransaction(t, ctx)
+				return nil
+			})
+
+		original := config.MuteTimeInterval(initialConfig().AlertmanagerConfig.TimeIntervals[0])
+
+		expected := expected
+		expected.Name = original.Name
+		timing := timing
+		timing.MuteTimeInterval = expected
+		timing.Version = calculateMuteTimeIntervalFingerprint(original)
+		expectedVersion := calculateMuteTimeIntervalFingerprint(expected)
+
+		result, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+		require.NoError(t, err)
+
+		require.EqualValues(t, expected, result.MuteTimeInterval)
+		require.EqualValues(t, expectedProvenance, result.Provenance)
+		require.EqualValues(t, expectedVersion, result.Version)
+		require.Equal(t, legacy_storage.NameToUid(result.Name), result.UID)
+
+		require.Len(t, store.Calls, 2)
+		require.Equal(t, "Get", store.Calls[0].Method)
+		require.Equal(t, orgID, store.Calls[0].Args[1])
+
+		require.Equal(t, "Save", store.Calls[1].Method)
+		require.Equal(t, orgID, store.Calls[1].Args[2])
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
+
+		require.EqualValues(t, []config.TimeInterval{config.TimeInterval(expected)}, revision.Config.AlertmanagerConfig.TimeIntervals)
+
+		prov.AssertCalled(t, "SetProvenance", mock.Anything, &timing, orgID, expectedProvenance)
+	})
+
+	t.Run("renames interval and all its dependencies", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
+			assertInTransaction(t, ctx)
+			return nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
+		prov.EXPECT().DeleteProvenance(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, provisionable models.Provisionable, i int64) error {
+			assertInTransaction(t, ctx)
+			return nil
+		})
+		prov.EXPECT().SetProvenance(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+			func(ctx context.Context, _ models.Provisionable, _ int64, _ models.Provenance) error {
+				assertInTransaction(t, ctx)
+				return nil
+			})
+
+		ruleStore := &fakeAlertRuleNotificationStore{
+			RenameTimeIntervalInNotificationSettingsFn: func(ctx context.Context, orgID int64, old, new string, validate func(models.Provenance) bool, dryRun bool) ([]models.AlertRuleKey, []models.AlertRuleKey, error) {
+				assertInTransaction(t, ctx)
+				return nil, nil, nil
+			},
+		}
+		sut.ruleNotificationsStore = ruleStore
+
+		interval := expected
+		interval.Name = "another-time-interval"
+		timing := definitions.MuteTimeInterval{
+			UID:              expectedUID,
+			MuteTimeInterval: interval,
+			Version:          originalVersion,
+			Provenance:       definitions.Provenance(expectedProvenance),
+		}
+
+		result, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+		require.NoError(t, err)
+
+		require.EqualValues(t, interval, result.MuteTimeInterval)
+		require.EqualValues(t, expectedProvenance, result.Provenance)
+		require.EqualValues(t, calculateMuteTimeIntervalFingerprint(interval), result.Version)
+		require.Equal(t, legacy_storage.NameToUid(result.Name), result.UID)
+
+		require.Len(t, ruleStore.Calls, 1)
+		assert.Equal(t, "RenameTimeIntervalInNotificationSettings", ruleStore.Calls[0].Method)
+		assert.Equal(t, orgID, ruleStore.Calls[0].Args[1])
+		assert.Equal(t, original.Name, ruleStore.Calls[0].Args[2])
+		assert.Equal(t, interval.Name, ruleStore.Calls[0].Args[3])
+		assert.NotNil(t, ruleStore.Calls[0].Args[4])
+		assert.False(t, ruleStore.Calls[0].Args[5].(bool))
+
+		prov.AssertCalled(t, "SetProvenance", mock.Anything, mock.MatchedBy(func(m *definitions.MuteTimeInterval) bool {
+			return m.Name == interval.Name
+		}), orgID, expectedProvenance)
+		prov.AssertCalled(t, "DeleteProvenance", mock.Anything, mock.MatchedBy(func(m *definitions.MuteTimeInterval) bool {
+			return m.Name == original.Name
+		}), orgID)
+		prov.AssertExpectations(t)
+
+		require.Len(t, store.Calls, 2)
+		require.Equal(t, "Get", store.Calls[0].Method)
+		assert.Equal(t, orgID, store.Calls[0].Args[1])
+
+		require.Equal(t, "Save", store.Calls[1].Method)
+		assert.Equal(t, orgID, store.Calls[1].Args[2])
+
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
+		assert.EqualValues(t, append(initialConfig().AlertmanagerConfig.TimeIntervals, config.TimeInterval(interval)), revision.Config.AlertmanagerConfig.TimeIntervals)
+		assert.Falsef(t, isTimeIntervalInUseInRoutes(expected.Name, revision.Config.AlertmanagerConfig.Route), "There are still references to the old time interval")
+		assert.Truef(t, isTimeIntervalInUseInRoutes(interval.Name, revision.Config.AlertmanagerConfig.Route), "There are no references to the new time interval")
+	})
+
+	t.Run("returns ErrTimeIntervalDependentResourcesProvenance if route has different provenance status", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.MatchedBy(func(*definitions.Route) bool { return true }), mock.Anything).Return(models.ProvenanceFile, nil)
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
+
+		ruleStore := &fakeAlertRuleNotificationStore{
+			RenameTimeIntervalInNotificationSettingsFn: func(ctx context.Context, orgID int64, old, new string, validate func(models.Provenance) bool, dryRun bool) ([]models.AlertRuleKey, []models.AlertRuleKey, error) {
+				assertInTransaction(t, ctx)
+				return nil, nil, nil
+			},
+		}
+		sut.ruleNotificationsStore = ruleStore
+
+		interval := expected
+		interval.Name = "another-time-interval"
+		timing := definitions.MuteTimeInterval{
+			UID:              expectedUID,
+			MuteTimeInterval: interval,
+			Version:          originalVersion,
+			Provenance:       definitions.Provenance(expectedProvenance),
+		}
+
+		_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+		require.ErrorIs(t, err, ErrTimeIntervalDependentResourcesProvenance)
+
+		require.Len(t, ruleStore.Calls, 1)
+		assert.Equal(t, "RenameTimeIntervalInNotificationSettings", ruleStore.Calls[0].Method)
+		assert.Equal(t, orgID, ruleStore.Calls[0].Args[1])
+		assert.Equal(t, original.Name, ruleStore.Calls[0].Args[2])
+		assert.Equal(t, interval.Name, ruleStore.Calls[0].Args[3])
+		assert.NotNil(t, ruleStore.Calls[0].Args[4])
+		assert.True(t, ruleStore.Calls[0].Args[5].(bool)) // still check if there are rules that have incompatible provenance
+	})
+
+	t.Run("returns ErrTimeIntervalDependentResourcesProvenance if rules have different provenance status", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.MatchedBy(func(*definitions.Route) bool { return true }), mock.Anything).Return(models.ProvenanceNone, nil)
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
+
+		ruleStore := &fakeAlertRuleNotificationStore{
+			RenameTimeIntervalInNotificationSettingsFn: func(ctx context.Context, orgID int64, old, new string, validate func(models.Provenance) bool, dryRun bool) ([]models.AlertRuleKey, []models.AlertRuleKey, error) {
+				assertInTransaction(t, ctx)
+				return nil, []models.AlertRuleKey{models.GenerateRuleKey(orgID)}, nil
+			},
+		}
+		sut.ruleNotificationsStore = ruleStore
+
+		interval := expected
+		interval.Name = "another-time-interval"
+		timing := definitions.MuteTimeInterval{
+			UID:              expectedUID,
+			MuteTimeInterval: interval,
+			Version:          originalVersion,
+			Provenance:       definitions.Provenance(expectedProvenance),
+		}
+
+		_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+		require.ErrorIs(t, err, ErrTimeIntervalDependentResourcesProvenance)
+
+		require.Len(t, ruleStore.Calls, 1)
+		assert.Equal(t, "RenameTimeIntervalInNotificationSettings", ruleStore.Calls[0].Method)
+		assert.Equal(t, orgID, ruleStore.Calls[0].Args[1])
+		assert.Equal(t, original.Name, ruleStore.Calls[0].Args[2])
+		assert.Equal(t, interval.Name, ruleStore.Calls[0].Args[3])
+		assert.NotNil(t, ruleStore.Calls[0].Args[4])
+		assert.False(t, ruleStore.Calls[0].Args[5].(bool))
 	})
 
 	t.Run("propagates errors", func(t *testing.T) {
@@ -552,7 +997,7 @@ func TestUpdateMuteTimings(t *testing.T) {
 			sut, store, prov := createMuteTimingSvcSut()
 			expectedErr := errors.New("test-err")
 			prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return nil, expectedErr
 			}
 			_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
@@ -561,8 +1006,8 @@ func TestUpdateMuteTimings(t *testing.T) {
 
 		t.Run("when provenance fails to save", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-				return &cfgRevision{cfg: initialConfig()}, nil
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 			}
 			expectedErr := fmt.Errorf("failed to save provenance")
 			sut.provenanceStore.(*MockProvisioningStore).EXPECT().
@@ -585,14 +1030,14 @@ func TestUpdateMuteTimings(t *testing.T) {
 
 		t.Run("when AM config fails to save", func(t *testing.T) {
 			sut, store, _ := createMuteTimingSvcSut()
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-				return &cfgRevision{cfg: initialConfig()}, nil
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 			}
 			sut.provenanceStore.(*MockProvisioningStore).EXPECT().
 				GetProvenance(mock.Anything, mock.Anything, mock.Anything).
 				Return(expectedProvenance, nil)
 			expectedErr := errors.New("test-err")
-			store.SaveFn = func(ctx context.Context, revision *cfgRevision) error {
+			store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
 				return expectedErr
 			}
 
@@ -606,6 +1051,36 @@ func TestUpdateMuteTimings(t *testing.T) {
 
 			require.Equal(t, "Save", store.Calls[1].Method)
 		})
+
+		t.Run("when RenameTimeIntervalInNotificationSettings fails", func(t *testing.T) {
+			sut, store, prov := createMuteTimingSvcSut()
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+			}
+			prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(expectedProvenance, nil)
+			prov.EXPECT().DeleteProvenance(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			prov.EXPECT().SetProvenance(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			expectedErr := errors.New("test-err")
+
+			ruleStore := &fakeAlertRuleNotificationStore{
+				RenameTimeIntervalInNotificationSettingsFn: func(ctx context.Context, orgID int64, old, new string, validate func(models.Provenance) bool, dryRun bool) ([]models.AlertRuleKey, []models.AlertRuleKey, error) {
+					return nil, nil, expectedErr
+				},
+			}
+			sut.ruleNotificationsStore = ruleStore
+
+			interval := expected
+			interval.Name = "another-time-interval"
+			timing := definitions.MuteTimeInterval{
+				UID:              expectedUID,
+				MuteTimeInterval: interval,
+				Version:          originalVersion,
+				Provenance:       definitions.Provenance(expectedProvenance),
+			}
+
+			_, err := sut.UpdateMuteTiming(context.Background(), timing, orgID)
+			require.ErrorIs(t, err, expectedErr)
+		})
 	})
 }
 
@@ -614,20 +1089,30 @@ func TestDeleteMuteTimings(t *testing.T) {
 
 	timingToDelete := config.MuteTimeInterval{Name: "unused-timing"}
 	correctVersion := calculateMuteTimeIntervalFingerprint(timingToDelete)
-	usedTiming := "used-timing"
+	usedMuteTiming := "used-timing"
+	usedActiveTiming := "used-active-timing"
 	initialConfig := func() *definitions.PostableUserConfig {
 		return &definitions.PostableUserConfig{
 			TemplateFiles: nil,
 			AlertmanagerConfig: definitions.PostableApiAlertingConfig{
 				Config: definitions.Config{
 					Route: &definitions.Route{
-						MuteTimeIntervals: []string{usedTiming},
+						MuteTimeIntervals:   []string{usedMuteTiming},
+						ActiveTimeIntervals: []string{usedActiveTiming},
 					},
 					MuteTimeIntervals: []config.MuteTimeInterval{
 						{
-							Name: usedTiming,
+							Name: usedMuteTiming,
 						},
 						timingToDelete,
+					},
+					TimeIntervals: []config.TimeInterval{
+						{
+							Name: usedActiveTiming,
+						},
+						{
+							Name: "timing-to-delete2",
+						},
 					},
 				},
 				Receivers: nil,
@@ -635,67 +1120,84 @@ func TestDeleteMuteTimings(t *testing.T) {
 		}
 	}
 
-	t.Run("re-saves config and deletes provenance if mute timing does not exist", func(t *testing.T) {
-		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
-		}
-		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
-		prov.EXPECT().DeleteProvenance(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
-		err := sut.DeleteMuteTiming(context.Background(), "no-timing", orgID, definitions.Provenance(models.ProvenanceAPI), "")
-		require.NoError(t, err)
-
-		require.Len(t, store.Calls, 2)
-		require.Equal(t, "Get", store.Calls[0].Method)
-		require.Equal(t, orgID, store.Calls[0].Args[1])
-
-		require.Equal(t, "Save", store.Calls[1].Method)
-		require.Equal(t, orgID, store.Calls[1].Args[2])
-		revision := store.Calls[1].Args[1].(*cfgRevision)
-
-		require.EqualValues(t, initialConfig().AlertmanagerConfig.MuteTimeIntervals, revision.cfg.AlertmanagerConfig.MuteTimeIntervals)
-
-		prov.AssertCalled(t, "DeleteProvenance", mock.Anything, &definitions.MuteTimeInterval{MuteTimeInterval: config.MuteTimeInterval{Name: "no-timing"}, Provenance: definitions.Provenance(models.ProvenanceAPI)}, orgID)
-	})
-
-	t.Run("fails if it was created with different provenance", func(t *testing.T) {
+	t.Run("fails if provenance check fails", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
 		expectedErr := errors.New("test")
 		sut.validator = func(from, to models.Provenance) error {
 			return expectedErr
 		}
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
 		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
-		prov.EXPECT().DeleteProvenance(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-		err := sut.DeleteMuteTiming(context.Background(), "no-timing", orgID, definitions.Provenance(models.ProvenanceNone), correctVersion)
+		err := sut.DeleteMuteTiming(context.Background(), timingToDelete.Name, orgID, definitions.Provenance(models.ProvenanceNone), correctVersion)
 		require.ErrorIs(t, err, expectedErr)
-
-		require.Len(t, store.Calls, 0)
 	})
 
-	t.Run("returns ErrTimeIntervalInUse if mute timing is used", func(t *testing.T) {
+	t.Run("returns ErrTimeIntervalInUse if mute timing is used by a route", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
 		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
 
-		err := sut.DeleteMuteTiming(context.Background(), usedTiming, orgID, definitions.Provenance(models.ProvenanceAPI), correctVersion)
+		err := sut.DeleteMuteTiming(context.Background(), usedMuteTiming, orgID, definitions.Provenance(models.ProvenanceAPI), correctVersion)
 
 		require.Len(t, store.Calls, 1)
 		require.Equal(t, "Get", store.Calls[0].Method)
 		require.Equal(t, orgID, store.Calls[0].Args[1])
-		require.Truef(t, ErrTimeIntervalInUse.Is(err), "expected ErrTimeIntervalInUse but got %s", err)
+		require.ErrorIs(t, err, ErrTimeIntervalInUse)
+	})
+
+	t.Run("returns ErrTimeIntervalInUse if active timing is used by a route", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
+
+		err := sut.DeleteMuteTiming(context.Background(), usedActiveTiming, orgID, definitions.Provenance(models.ProvenanceAPI), correctVersion)
+
+		require.Len(t, store.Calls, 1)
+		require.Equal(t, "Get", store.Calls[0].Method)
+		require.Equal(t, orgID, store.Calls[0].Args[1])
+		require.ErrorIs(t, err, ErrTimeIntervalInUse)
+	})
+
+	t.Run("returns ErrTimeIntervalInUse if mute timing is used by rules", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		ruleNsStore := fakeAlertRuleNotificationStore{
+			ListContactPointRoutingsFn: func(ctx context.Context, q models.ListContactPointRoutingsQuery) (map[models.AlertRuleKey]models.ContactPointRouting, error) {
+				assertInTransaction(t, ctx)
+				assert.Equal(t, orgID, q.OrgID)
+				assert.Equal(t, timingToDelete.Name, q.TimeIntervalName)
+				assert.Empty(t, q.ReceiverName)
+				return map[models.AlertRuleKey]models.ContactPointRouting{
+					models.GenerateRuleKey(orgID): {},
+				}, nil
+			},
+		}
+		sut.ruleNotificationsStore = &ruleNsStore
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
+
+		err := sut.DeleteMuteTiming(context.Background(), timingToDelete.Name, orgID, definitions.Provenance(models.ProvenanceAPI), correctVersion)
+
+		require.Len(t, store.Calls, 1)
+		require.Equal(t, "Get", store.Calls[0].Method)
+		require.Equal(t, orgID, store.Calls[0].Args[1])
+		require.ErrorIs(t, err, ErrTimeIntervalInUse)
+		require.Len(t, ruleNsStore.Calls, 1)
+		require.Equal(t, "ListContactPointRoutings", ruleNsStore.Calls[0].Method)
 	})
 
 	t.Run("returns ErrVersionConflict if provided version does not match", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
 		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceAPI, nil)
 
@@ -709,10 +1211,10 @@ func TestDeleteMuteTimings(t *testing.T) {
 
 	t.Run("deletes mute timing and provenance in transaction if passes optimistic concurrency check", func(t *testing.T) {
 		sut, store, prov := createMuteTimingSvcSut()
-		store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-			return &cfgRevision{cfg: initialConfig()}, nil
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 		}
-		store.SaveFn = func(ctx context.Context, revision *cfgRevision) error {
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
 			assertInTransaction(t, ctx)
 			return nil
 		}
@@ -732,12 +1234,12 @@ func TestDeleteMuteTimings(t *testing.T) {
 
 		require.Equal(t, "Save", store.Calls[1].Method)
 		require.Equal(t, orgID, store.Calls[1].Args[2])
-		revision := store.Calls[1].Args[1].(*cfgRevision)
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
 
 		expectedMuteTimings := slices.DeleteFunc(initialConfig().AlertmanagerConfig.MuteTimeIntervals, func(interval config.MuteTimeInterval) bool {
 			return interval.Name == timingToDelete.Name
 		})
-		require.EqualValues(t, expectedMuteTimings, revision.cfg.AlertmanagerConfig.MuteTimeIntervals)
+		require.EqualValues(t, expectedMuteTimings, revision.Config.AlertmanagerConfig.MuteTimeIntervals)
 
 		prov.AssertCalled(t, "DeleteProvenance", mock.Anything, &definitions.MuteTimeInterval{MuteTimeInterval: timingToDelete}, orgID)
 
@@ -748,15 +1250,91 @@ func TestDeleteMuteTimings(t *testing.T) {
 
 			require.Equal(t, "Save", store.Calls[1].Method)
 			require.Equal(t, orgID, store.Calls[1].Args[2])
-			revision := store.Calls[1].Args[1].(*cfgRevision)
+			revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
 
 			expectedMuteTimings := slices.DeleteFunc(initialConfig().AlertmanagerConfig.MuteTimeIntervals, func(interval config.MuteTimeInterval) bool {
 				return interval.Name == timingToDelete.Name
 			})
-			require.EqualValues(t, expectedMuteTimings, revision.cfg.AlertmanagerConfig.MuteTimeIntervals)
+			require.EqualValues(t, expectedMuteTimings, revision.Config.AlertmanagerConfig.MuteTimeIntervals)
 
 			prov.AssertCalled(t, "DeleteProvenance", mock.Anything, &definitions.MuteTimeInterval{MuteTimeInterval: timingToDelete}, orgID)
 		})
+	})
+
+	t.Run("deletes time interval and provenance", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
+			assertInTransaction(t, ctx)
+			return nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceNone, nil)
+		prov.EXPECT().DeleteProvenance(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+			func(ctx context.Context, _ models.Provisionable, _ int64) error {
+				assertInTransaction(t, ctx)
+				return nil
+			})
+
+		timingToDelete := initialConfig().AlertmanagerConfig.TimeIntervals[1]
+		correctVersion := calculateMuteTimeIntervalFingerprint(config.MuteTimeInterval(timingToDelete))
+
+		err := sut.DeleteMuteTiming(context.Background(), timingToDelete.Name, orgID, "", correctVersion)
+		require.NoError(t, err)
+
+		require.Len(t, store.Calls, 2)
+		require.Equal(t, "Get", store.Calls[0].Method)
+		require.Equal(t, orgID, store.Calls[0].Args[1])
+
+		require.Equal(t, "Save", store.Calls[1].Method)
+		require.Equal(t, orgID, store.Calls[1].Args[2])
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
+
+		expectedMuteTimings := slices.DeleteFunc(initialConfig().AlertmanagerConfig.TimeIntervals, func(interval config.TimeInterval) bool {
+			return interval.Name == timingToDelete.Name
+		})
+		require.EqualValues(t, expectedMuteTimings, revision.Config.AlertmanagerConfig.TimeIntervals)
+		require.EqualValues(t, initialConfig().AlertmanagerConfig.MuteTimeIntervals, revision.Config.AlertmanagerConfig.MuteTimeIntervals)
+
+		prov.AssertCalled(t, "DeleteProvenance", mock.Anything, &definitions.MuteTimeInterval{MuteTimeInterval: config.MuteTimeInterval(timingToDelete)}, orgID)
+	})
+
+	t.Run("deletes mute timing and provenance by UID", func(t *testing.T) {
+		sut, store, prov := createMuteTimingSvcSut()
+		store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+			return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
+		}
+		store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
+			assertInTransaction(t, ctx)
+			return nil
+		}
+		prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceNone, nil)
+		prov.EXPECT().DeleteProvenance(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+			func(ctx context.Context, _ models.Provisionable, _ int64) error {
+				assertInTransaction(t, ctx)
+				return nil
+			})
+
+		uid := legacy_storage.NameToUid(timingToDelete.Name)
+
+		err := sut.DeleteMuteTiming(context.Background(), uid, orgID, "", correctVersion)
+		require.NoError(t, err)
+
+		require.Len(t, store.Calls, 2)
+		require.Equal(t, "Get", store.Calls[0].Method)
+		require.Equal(t, orgID, store.Calls[0].Args[1])
+
+		require.Equal(t, "Save", store.Calls[1].Method)
+		require.Equal(t, orgID, store.Calls[1].Args[2])
+		revision := store.Calls[1].Args[1].(*legacy_storage.ConfigRevision)
+
+		expectedMuteTimings := slices.DeleteFunc(initialConfig().AlertmanagerConfig.MuteTimeIntervals, func(interval config.MuteTimeInterval) bool {
+			return interval.Name == timingToDelete.Name
+		})
+		require.EqualValues(t, expectedMuteTimings, revision.Config.AlertmanagerConfig.MuteTimeIntervals)
+
+		prov.AssertCalled(t, "DeleteProvenance", mock.Anything, &definitions.MuteTimeInterval{MuteTimeInterval: timingToDelete}, orgID)
 	})
 
 	t.Run("propagates errors", func(t *testing.T) {
@@ -764,7 +1342,7 @@ func TestDeleteMuteTimings(t *testing.T) {
 			sut, store, prov := createMuteTimingSvcSut()
 			expectedErr := errors.New("test-err")
 			prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceNone, nil)
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
 				return nil, expectedErr
 			}
 			err := sut.DeleteMuteTiming(context.Background(), timingToDelete.Name, orgID, "", "")
@@ -774,8 +1352,8 @@ func TestDeleteMuteTimings(t *testing.T) {
 		t.Run("when provenance fails to save", func(t *testing.T) {
 			sut, store, prov := createMuteTimingSvcSut()
 			prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceNone, nil)
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-				return &cfgRevision{cfg: initialConfig()}, nil
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 			}
 			expectedErr := fmt.Errorf("failed to save provenance")
 			sut.provenanceStore.(*MockProvisioningStore).EXPECT().
@@ -796,11 +1374,11 @@ func TestDeleteMuteTimings(t *testing.T) {
 		t.Run("when AM config fails to save", func(t *testing.T) {
 			sut, store, prov := createMuteTimingSvcSut()
 			prov.EXPECT().GetProvenance(mock.Anything, mock.Anything, mock.Anything).Return(models.ProvenanceNone, nil)
-			store.GetFn = func(ctx context.Context, orgID int64) (*cfgRevision, error) {
-				return &cfgRevision{cfg: initialConfig()}, nil
+			store.GetFn = func(ctx context.Context, orgID int64) (*legacy_storage.ConfigRevision, error) {
+				return &legacy_storage.ConfigRevision{Config: initialConfig()}, nil
 			}
 			expectedErr := errors.New("test-err")
-			store.SaveFn = func(ctx context.Context, revision *cfgRevision) error {
+			store.SaveFn = func(ctx context.Context, revision *legacy_storage.ConfigRevision) error {
 				return expectedErr
 			}
 
@@ -817,8 +1395,8 @@ func TestDeleteMuteTimings(t *testing.T) {
 	})
 }
 
-func createMuteTimingSvcSut() (*MuteTimingService, *alertmanagerConfigStoreFake, *MockProvisioningStore) {
-	store := &alertmanagerConfigStoreFake{}
+func createMuteTimingSvcSut() (*MuteTimingService, *legacy_storage.AlertmanagerConfigStoreFake, *MockProvisioningStore) {
+	store := &legacy_storage.AlertmanagerConfigStoreFake{}
 	prov := &MockProvisioningStore{}
 	return &MuteTimingService{
 		configStore:     store,
@@ -828,5 +1406,78 @@ func createMuteTimingSvcSut() (*MuteTimingService, *alertmanagerConfigStoreFake,
 		validator: func(from, to models.Provenance) error {
 			return nil
 		},
+		ruleNotificationsStore: &fakeAlertRuleNotificationStore{},
+		routeService:           routes.NewFakeService(legacy_storage.ConfigRevision{}),
 	}, store, prov
+}
+
+// buildMimirAMConfigWithTimeIntervals creates a Mimir alertmanager config YAML string
+// containing the provided time intervals for use in ExtraConfigs.
+// This generates a minimal but valid Prometheus alertmanager config with a route and receiver.
+func buildMimirAMConfigWithTimeIntervals(intervals []config.MuteTimeInterval) string {
+	if len(intervals) == 0 {
+		return ""
+	}
+
+	// Start with required route and receivers
+	yaml := "route:\n"
+	yaml += "  receiver: test-receiver\n"
+	yaml += "receivers:\n"
+	yaml += "  - name: test-receiver\n"
+
+	// Add time intervals
+	yaml += "time_intervals:\n"
+	for _, interval := range intervals {
+		yaml += fmt.Sprintf("  - name: %s\n", interval.Name)
+		if len(interval.TimeIntervals) > 0 {
+			yaml += "    time_intervals:\n"
+			for _, ti := range interval.TimeIntervals {
+				yaml += "      -\n"
+				if len(ti.Times) > 0 {
+					yaml += "        times:\n"
+					for _, tr := range ti.Times {
+						yaml += fmt.Sprintf("          - start_time: '%02d:%02d'\n", tr.StartMinute/60, tr.StartMinute%60)
+						yaml += fmt.Sprintf("            end_time: '%02d:%02d'\n", tr.EndMinute/60, tr.EndMinute%60)
+					}
+				}
+				if len(ti.Weekdays) > 0 {
+					yaml += "        weekdays:\n"
+					for _, wd := range ti.Weekdays {
+						// WeekdayRange uses InclusiveRange with Begin/End
+						if wd.Begin == wd.End {
+							yaml += fmt.Sprintf("          - %d\n", wd.Begin)
+						} else {
+							yaml += fmt.Sprintf("          - %d:%d\n", wd.Begin, wd.End)
+						}
+					}
+				}
+			}
+		}
+	}
+	return yaml
+}
+
+// createConfigWithImportedIntervals creates a ConfigRevision with both Grafana and imported
+// Mimir time intervals for testing.
+func createConfigWithImportedIntervals(grafanaIntervals []config.MuteTimeInterval, importedIntervals []config.MuteTimeInterval) *legacy_storage.ConfigRevision {
+	cfg := &definitions.PostableUserConfig{
+		AlertmanagerConfig: definitions.PostableApiAlertingConfig{
+			Config: definitions.Config{
+				MuteTimeIntervals: grafanaIntervals,
+			},
+		},
+	}
+
+	if len(importedIntervals) > 0 {
+		mimirConfig := buildMimirAMConfigWithTimeIntervals(importedIntervals)
+		cfg.ExtraConfigs = []definitions.ExtraConfiguration{
+			{
+				Identifier:         "test-mimir",
+				MergeMatchers:      config.Matchers{&labels.Matcher{Type: labels.MatchEqual, Name: "__imported", Value: "test"}},
+				AlertmanagerConfig: mimirConfig,
+			},
+		}
+	}
+
+	return &legacy_storage.ConfigRevision{Config: cfg}
 }

@@ -14,22 +14,27 @@ For more information on the differences between Grafana-managed and data source-
 
 ## Grafana-managed endpoints
 
-Note that the JSON format from most of the following endpoints is not fully compatible with [provisioning via configuration JSON files](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/set-up/provision-alerting-resources/file-provisioning/).
+{{< admonition type="note" >}}
+In the Alerting provisioning HTTP API, the endpoints use a JSON format that differs from the format returned by the `export` endpoints.
+
+The `export` endpoints allow you to export alerting resources in a JSON format suitable for [provisioning via files](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/set-up/provision-alerting-resources/file-provisioning/). However, this format cannot be used to update resources via the HTTP API.
+
+{{< /admonition >}}
 
 ### Alert rules
 
-| Method | URI                                                              | Name                                                                    | Summary                                                               |
-| ------ | ---------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| DELETE | /api/v1/provisioning/alert-rules/:uid                            | [route delete alert rule](#route-delete-alert-rule)                     | Delete a specific alert rule by UID.                                  |
-| GET    | /api/v1/provisioning/alert-rules/:uid                            | [route get alert rule](#route-get-alert-rule)                           | Get a specific alert rule by UID.                                     |
-| POST   | /api/v1/provisioning/alert-rules                                 | [route post alert rule](#route-post-alert-rule)                         | Create a new alert rule.                                              |
-| PUT    | /api/v1/provisioning/alert-rules/:uid                            | [route put alert rule](#route-put-alert-rule)                           | Update an existing alert rule.                                        |
-| GET    | /api/v1/provisioning/alert-rules/:uid/export                     | [route get alert rule export](#route-get-alert-rule-export)             | Export an alert rule in provisioning file format.                     |
-| GET    | /api/v1/provisioning/folder/:folderUid/rule-groups/:group        | [route get alert rule group](#route-get-alert-rule-group)               | Get a rule group.                                                     |
-| PUT    | /api/v1/provisioning/folder/:folderUid/rule-groups/:group        | [route put alert rule group](#route-put-alert-rule-group)               | Update the interval of a rule group or modify the rules of the group. |
-| GET    | /api/v1/provisioning/folder/:folderUid/rule-groups/:group/export | [route get alert rule group export](#route-get-alert-rule-group-export) | Export an alert rule group in provisioning file format.               |
-| GET    | /api/v1/provisioning/alert-rules                                 | [route get alert rules](#route-get-alert-rules)                         | Get all the alert rules.                                              |
-| GET    | /api/v1/provisioning/alert-rules/export                          | [route get alert rules export](#route-get-alert-rules-export)           | Export all alert rules in provisioning file format.                   |
+| Method | URI                                                              | Name                                                                    | Summary                                                 |
+| ------ | ---------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------- |
+| DELETE | /api/v1/provisioning/alert-rules/:uid                            | [route delete alert rule](#route-delete-alert-rule)                     | Delete a specific alert rule by UID.                    |
+| GET    | /api/v1/provisioning/alert-rules/:uid                            | [route get alert rule](#route-get-alert-rule)                           | Get a specific alert rule by UID.                       |
+| POST   | /api/v1/provisioning/alert-rules                                 | [route post alert rule](#route-post-alert-rule)                         | Create a new alert rule.                                |
+| PUT    | /api/v1/provisioning/alert-rules/:uid                            | [route put alert rule](#route-put-alert-rule)                           | Update an existing alert rule.                          |
+| GET    | /api/v1/provisioning/alert-rules/:uid/export                     | [route get alert rule export](#route-get-alert-rule-export)             | Export an alert rule in provisioning file format.       |
+| GET    | /api/v1/provisioning/folder/:folderUid/rule-groups/:group        | [route get alert rule group](#route-get-alert-rule-group)               | Get a rule group.                                       |
+| PUT    | /api/v1/provisioning/folder/:folderUid/rule-groups/:group        | [route put alert rule group](#route-put-alert-rule-group)               | Create or update a rule group.                          |
+| GET    | /api/v1/provisioning/folder/:folderUid/rule-groups/:group/export | [route get alert rule group export](#route-get-alert-rule-group-export) | Export an alert rule group in provisioning file format. |
+| GET    | /api/v1/provisioning/alert-rules                                 | [route get alert rules](#route-get-alert-rules)                         | Get all the alert rules.                                |
+| GET    | /api/v1/provisioning/alert-rules/export                          | [route get alert rules export](#route-get-alert-rules-export)           | Export all alert rules in provisioning file format.     |
 
 **Example request for new alert rule:**
 
@@ -287,6 +292,46 @@ policies:
             - weekends
 ```
 
+### Notification template groups
+
+Template groups enable you to define multiple notification templates (`{{ define "" }}`) within a single group. They can be managed from the Grafana Alerting UI.
+
+| Method | URI                                  | Name                                            | Summary                                         |
+| ------ | ------------------------------------ | ----------------------------------------------- | ----------------------------------------------- |
+| DELETE | /api/v1/provisioning/templates/:name | [route delete template](#route-delete-template) | Delete a notification template group.           |
+| GET    | /api/v1/provisioning/templates/:name | [route get template](#route-get-template)       | Get a notification template group.              |
+| GET    | /api/v1/provisioning/templates       | [route get template](#route-get-templates)      | Get all notification template groups.           |
+| PUT    | /api/v1/provisioning/templates/:name | [route put template](#route-put-template)       | Create or update a notification template group. |
+
+**Example Request for all notification template groups:**
+
+```http
+GET /api/v1/provisioning/templates
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJrIjoiT0tTcG1pUlY2RnVKZTFVaDFsNFZXdE9ZWmNrMkZYbk
+```
+
+**Example Response:**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+  {
+    "name": "custom_email.message",
+    "template": "{{ define \"custom_email.message\" }}\n  Custom alert!\n{{ end }}",
+    "provenance": "file"
+  },
+  {
+    "name": "custom_email.subject",
+    "template": "{{ define \"custom_email.subject\" }}\n{{ len .Alerts.Firing }} firing alert(s), {{ len .Alerts.Resolved }} resolved alert(s)\n{{ end }}",
+    "provenance": "file"
+  }
+]
+```
+
 ### Mute timings
 
 | Method | URI                                            | Name                                                            | Summary                                              |
@@ -331,64 +376,30 @@ Content-Type: application/json
 ]
 ```
 
-### Templates
-
-| Method | URI                                  | Name                                            | Summary                                   |
-| ------ | ------------------------------------ | ----------------------------------------------- | ----------------------------------------- |
-| DELETE | /api/v1/provisioning/templates/:name | [route delete template](#route-delete-template) | Delete a template.                        |
-| GET    | /api/v1/provisioning/templates/:name | [route get template](#route-get-template)       | Get a notification template.              |
-| GET    | /api/v1/provisioning/templates       | [route get templates](#route-get-templates)     | Get all notification templates.           |
-| PUT    | /api/v1/provisioning/templates/:name | [route put template](#route-put-template)       | Create or update a notification template. |
-
-**Example Request for all notification templates:**
-
-```http
-GET /api/v1/provisioning/templates
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer eyJrIjoiT0tTcG1pUlY2RnVKZTFVaDFsNFZXdE9ZWmNrMkZYbk
-```
-
-**Example Response:**
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-[
-  {
-    "name": "custom_email.message",
-    "template": "{{ define \"custom_email.message\" }}\n  Custom alert!\n{{ end }}",
-    "provenance": "file"
-  },
-  {
-    "name": "custom_email.subject",
-    "template": "{{ define \"custom_email.subject\" }}\n{{ len .Alerts.Firing }} firing alert(s), {{ len .Alerts.Resolved }} resolved alert(s)\n{{ end }}",
-    "provenance": "file"
-  }
-]
-```
-
 ### Edit resources in the Grafana UI
 
-By default, you cannot edit API-provisioned alerting resources in Grafana. To enable editing these resources in the Grafana UI, add the `X-Disable-Provenance` header to the following requests in the API:
+By default, you cannot edit API-provisioned alerting resources in Grafana.
 
-- `POST /api/v1/provisioning/alert-rules`
-- `PUT /api/v1/provisioning/folder/{FolderUID}/rule-groups/{Group}` (calling this endpoint will change provenance for all alert rules within the alert group)
-- `POST /api/v1/provisioning/contact-points`
-- `POST /api/v1/provisioning/mute-timings`
-- `PUT /api/v1/provisioning/policies`
-- `PUT /api/v1/provisioning/templates/{name}`
+To enable editing these resources in the Grafana UI, add the **`X-Disable-Provenance: true`** header to the following API requests:
 
-To reset the notification policy tree to the default and unlock it for editing in the Grafana UI, use the `DELETE /api/v1/provisioning/policies` endpoint.
+- [`PUT /api/v1/provisioning/folder/{FolderUID}/rule-groups/{Group}`](#route-put-alert-rule-group): This action also sets the provenance for the rule group and all its alert rules.
+- [`POST /api/v1/provisioning/alert-rules`](#route-post-alert-rule): The provenance of the new alert rule must match the provenance value configured for its rule group.
+- [`POST /api/v1/provisioning/contact-points`](##route-post-contactpoints)
+- [`POST /api/v1/provisioning/mute-timings`](#route-post-mute-timing)
+- [`PUT /api/v1/provisioning/templates/{name}`](#route-put-template)
+- [`PUT /api/v1/provisioning/policies`](#route-put-policy-tree)
+
+To reset the notification policy tree to the default and unlock it for editing in the Grafana UI, use:
+
+- [`DELETE /api/v1/provisioning/policies`](#route-reset-policy-tree)
 
 ## Data source-managed resources
 
-The Alerting Provisioning HTTP API can only be used to manage Grafana-managed alert resources. To manage resources related to [data source-managed alerts](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/alerting-rules/create-mimir-loki-managed-rule/), consider the following tools:
+The Alerting Provisioning HTTP API can only be used to manage Grafana-managed alert resources. To manage resources related to [data source-managed alerts](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/alerting-rules/create-data-source-managed-rule/), consider the following tools:
 
-- [mimirtool](https://grafana.com/docs/mimir/<GRAFANA_VERSION>/manage/tools/mimirtool/): to interact with the Mimir alertmanager and ruler configuration.
+- [mimirtool](https://grafana.com/docs/mimir/<MIMIR_VERSION>/manage/tools/mimirtool/): to interact with the Mimir alertmanager and ruler configuration.
 - [cortex-tools](https://github.com/grafana/cortex-tools#cortextool): to interact with the Cortex alertmanager and ruler configuration.
-- [lokitool](https://grafana.com/docs/loki/<GRAFANA_VERSION>/alert/#lokitool): to configure the Loki Ruler.
+- [lokitool](https://grafana.com/docs/loki/<LOKI_VERSION>/alert/#lokitool): to configure the Loki Ruler.
 
 Alternatively, the [Grafana Alerting API](https://editor.swagger.io/?url=https://raw.githubusercontent.com/grafana/grafana/main/pkg/services/ngalert/api/tooling/post.json) can be used to access data from data source-managed alerts. This API is primarily intended for internal usage, with the exception of the `/api/v1/provisioning/` endpoints. It's important to note that internal APIs may undergo changes without prior notice and are not officially supported for user consumption.
 
@@ -406,10 +417,10 @@ DELETE /api/v1/provisioning/alert-rules/:uid
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type   | Go type  | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | ------ | -------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| UID                        | `path`   | string | `string` |           |    ✓     |         | Alert rule UID                                            |
-| X-Disable-Provenance: true | `header` | string | `string` |           |          |         | Allows editing of provisioned resources in the Grafana UI |
+| Name                         | Source | Type   | Go type | Required | Default | Description                                               |
+| ---------------------------- | ------ | ------ | ------- | :------: | ------- | --------------------------------------------------------- |
+| `UID`                        | path   | string | string  |    ✓     |         | Alert rule UID                                            |
+| `X-Disable-Provenance: true` | header | string | string  |          |         | Allows editing of provisioned resources in the Grafana UI |
 
 {{% /responsive-table %}}
 
@@ -435,9 +446,9 @@ DELETE /api/v1/provisioning/contact-points/:uid
 
 #### Parameters
 
-| Name | Source | Type   | Go type  | Separator | Required | Default | Description                                |
-| ---- | ------ | ------ | -------- | --------- | :------: | ------- | ------------------------------------------ |
-| UID  | `path` | string | `string` |           |    ✓     |         | UID is the contact point unique identifier |
+| Name  | Source | Type   | Go type | Required | Default | Description                                |
+| ----- | ------ | ------ | ------- | :------: | ------- | ------------------------------------------ |
+| `UID` | path   | string | string  |    ✓     |         | UID is the contact point unique identifier |
 
 #### All responses
 
@@ -461,15 +472,17 @@ DELETE /api/v1/provisioning/mute-timings/:name
 
 #### Parameters
 
-| Name | Source | Type   | Go type  | Separator | Required | Default | Description      |
-| ---- | ------ | ------ | -------- | --------- | :------: | ------- | ---------------- |
-| name | `path` | string | `string` |           |    ✓     |         | Mute timing name |
+| Name      | Source | Type   | Go type | Required | Default | Description                                                                                                   |
+| --------- | ------ | ------ | ------- | :------: | ------- | ------------------------------------------------------------------------------------------------------------- |
+| `name`    | path   | string | string  |    ✓     |         | Mute timing name                                                                                              |
+| `version` | query  | string | string  |          |         | Current version of the resource. Used for optimistic concurrency validation. Keep empty to bypass validation. |
 
 #### All responses
 
 | Code                                 | Status     | Description                               | Has headers | Schema                                         |
 | ------------------------------------ | ---------- | ----------------------------------------- | :---------: | ---------------------------------------------- |
 | [204](#route-delete-mute-timing-204) | No Content | The mute timing was deleted successfully. |             | [schema](#route-delete-mute-timing-204-schema) |
+| [409](#route-delete-mute-timing-409) | Conflict   | GenericPublicError                        |             | [schema](#route-delete-mute-timing-409-schema) |
 
 #### Responses
 
@@ -479,7 +492,15 @@ Status: No Content
 
 ###### <span id="route-delete-mute-timing-204-schema"></span> Schema
 
-### <span id="route-delete-template"></span> Delete a template. (_RouteDeleteTemplate_)
+##### <span id="route-delete-mute-timing-409"></span> 409 - Conflict
+
+Status: Conflict
+
+###### <span id="route-delete-mute-timing-409-schema"></span> Schema
+
+[GenericPublicError](#generic-public-error)
+
+### <span id="route-delete-template"></span> Delete a notification template group. (_RouteDeleteTemplate_)
 
 ```
 DELETE /api/v1/provisioning/templates/:name
@@ -487,15 +508,17 @@ DELETE /api/v1/provisioning/templates/:name
 
 #### Parameters
 
-| Name | Source | Type   | Go type  | Separator | Required | Default | Description   |
-| ---- | ------ | ------ | -------- | --------- | :------: | ------- | ------------- |
-| name | `path` | string | `string` |           |    ✓     |         | Template Name |
+| Name      | Source | Type   | Go type | Required | Default | Description                                                                                                   |
+| --------- | ------ | ------ | ------- | :------: | ------- | ------------------------------------------------------------------------------------------------------------- |
+| `name`    | path   | string | string  |    ✓     |         | Name of the template group                                                                                    |
+| `version` | query  | string | string  |          |         | Current version of the resource. Used for optimistic concurrency validation. Keep empty to bypass validation. |
 
 #### All responses
 
 | Code                              | Status     | Description                            | Has headers | Schema                                      |
 | --------------------------------- | ---------- | -------------------------------------- | :---------: | ------------------------------------------- |
 | [204](#route-delete-template-204) | No Content | The template was deleted successfully. |             | [schema](#route-delete-template-204-schema) |
+| [409](#route-delete-template-409) | Conflict   | GenericPublicError                     |             | [schema](#route-delete-template-409-schema) |
 
 #### Responses
 
@@ -505,6 +528,14 @@ Status: No Content
 
 ###### <span id="route-delete-template-204-schema"></span> Schema
 
+##### <span id="route-delete-template-409"></span> 409 - Conflict
+
+Status: Conflict
+
+###### <span id="route-delete-template-409-schema"></span> Schema
+
+[GenericPublicError](#generic-public-error)
+
 ### <span id="route-get-alert-rule"></span> Get a specific alert rule by UID. (_RouteGetAlertRule_)
 
 ```
@@ -513,9 +544,9 @@ GET /api/v1/provisioning/alert-rules/:uid
 
 #### Parameters
 
-| Name | Source | Type   | Go type  | Separator | Required | Default | Description    |
-| ---- | ------ | ------ | -------- | --------- | :------: | ------- | -------------- |
-| UID  | `path` | string | `string` |           |    ✓     |         | Alert rule UID |
+| Name  | Source | Type   | Go type | Required | Default | Description    |
+| ----- | ------ | ------ | ------- | :------: | ------- | -------------- |
+| `UID` | path   | string | string  |    ✓     |         | Alert rule UID |
 
 #### All responses
 
@@ -546,21 +577,15 @@ Status: Not Found
 GET /api/v1/provisioning/alert-rules/:uid/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name     | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                            |
-| -------- | ------- | ------- | -------- | --------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| UID      | `path`  | string  | `string` |           |    ✓     |          | Alert rule UID                                                                                                                         |
-| download | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                     |
-| format   | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence. |
+| Name       | Source | Type    | Go type | Required | Default | Description                                                                                                                                  |
+| ---------- | ------ | ------- | ------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `UID`      | path   | string  | string  |    ✓     |         | Alert rule UID                                                                                                                               |
+| `download` | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                           |
+| `format`   | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence. |
 
 #### All responses
 
@@ -593,10 +618,10 @@ GET /api/v1/provisioning/folder/:folderUid/rule-groups/:group
 
 #### Parameters
 
-| Name      | Source | Type   | Go type  | Separator | Required | Default | Description |
-| --------- | ------ | ------ | -------- | --------- | :------: | ------- | ----------- |
-| FolderUID | `path` | string | `string` |           |    ✓     |         |             |
-| Group     | `path` | string | `string` |           |    ✓     |         |             |
+| Name        | Source | Type   | Go type | Required | Default | Description |
+| ----------- | ------ | ------ | ------- | :------: | ------- | ----------- |
+| `FolderUID` | path   | string | string  |    ✓     |         |             |
+| `Group`     | path   | string | string  |    ✓     |         |             |
 
 #### All responses
 
@@ -627,22 +652,16 @@ Status: Not Found
 GET /api/v1/provisioning/folder/:folderUid/rule-groups/:group/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name      | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                            |
-| --------- | ------- | ------- | -------- | --------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| FolderUID | `path`  | string  | `string` |           |    ✓     |          |                                                                                                                                        |
-| Group     | `path`  | string  | `string` |           |    ✓     |          |                                                                                                                                        |
-| download  | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                     |
-| format    | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence. |
+| Name        | Source | Type    | Go type | Required | Default | Description                                                                                                                                  |
+| ----------- | ------ | ------- | ------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FolderUID` | path   | string  | string  |    ✓     |         |                                                                                                                                              |
+| `Group`     | path   | string  | string  |    ✓     |         |                                                                                                                                              |
+| `download`  | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                           |
+| `format`    | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence. |
 
 #### All responses
 
@@ -695,20 +714,14 @@ Status: OK
 GET /api/v1/provisioning/alert-rules/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name     | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                            |
-| -------- | ------- | ------- | -------- | --------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| download | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                     |
-| format   | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence. |
+| Name       | Source | Type    | Go type | Required | Default | Description                                                                                                                                  |
+| ---------- | ------ | ------- | ------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `download` | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                           |
+| `format`   | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence. |
 
 #### All responses
 
@@ -741,9 +754,9 @@ GET /api/v1/provisioning/contact-points
 
 #### Parameters
 
-| Name | Source  | Type   | Go type  | Separator | Required | Default | Description    |
-| ---- | ------- | ------ | -------- | --------- | :------: | ------- | -------------- |
-| name | `query` | string | `string` |           |          |         | Filter by name |
+| Name   | Source | Type   | Go type | Required | Default | Description    |
+| ------ | ------ | ------ | ------- | :------: | ------- | -------------- |
+| `name` | query  | string | string  |          |         | Filter by name |
 
 #### All responses
 
@@ -767,22 +780,16 @@ Status: OK
 GET /api/v1/provisioning/contact-points/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name     | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                                                                                     |
-| -------- | ------- | ------- | -------- | --------- | :------: | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| decrypt  | `query` | boolean | `bool`   |           |          |          | Whether any contained secure settings should be decrypted or left redacted. Redacted settings will contain RedactedValue instead. Currently, only org admin can view decrypted secure settings. |
-| download | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                                                                              |
-| format   | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence.                                                          |
-| name     | `query` | string  | `string` |           |          |          | Filter by name                                                                                                                                                                                  |
+| Name       | Source | Type    | Go type | Required | Default | Description                                                                                                                                                                                     |
+| ---------- | ------ | ------- | ------- | :------: | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `decrypt`  | query  | boolean | `bool`  |          |         | Whether any contained secure settings should be decrypted or left redacted. Redacted settings will contain RedactedValue instead. Currently, only org admin can view decrypted secure settings. |
+| `download` | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                                                                              |
+| `format`   | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence.                                                    |
+| `name`     | query  | string  | string  |          |         | Filter by name                                                                                                                                                                                  |
 
 #### All responses
 
@@ -817,9 +824,9 @@ GET /api/v1/provisioning/mute-timings/:name
 
 #### Parameters
 
-| Name | Source | Type   | Go type  | Separator | Required | Default | Description      |
-| ---- | ------ | ------ | -------- | --------- | :------: | ------- | ---------------- |
-| name | `path` | string | `string` |           |    ✓     |         | Mute timing name |
+| Name   | Source | Type   | Go type | Required | Default | Description      |
+| ------ | ------ | ------ | ------- | :------: | ------- | ---------------- |
+| `name` | path   | string | string  |    ✓     |         | Mute timing name |
 
 #### All responses
 
@@ -872,20 +879,14 @@ Status: OK
 GET /api/v1/provisioning/mute-timings/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name     | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                            |
-| -------- | ------- | ------- | -------- | --------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| download | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                     |
-| format   | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence. |
+| Name       | Source | Type    | Go type | Required | Default | Description                                                                                                                                  |
+| ---------- | ------ | ------- | ------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `download` | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                           |
+| `format`   | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence. |
 
 #### All responses
 
@@ -918,21 +919,15 @@ Status: Forbidden
 GET /api/v1/provisioning/mute-timings/:name/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name     | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                            |
-| -------- | ------- | ------- | -------- | --------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| name     | `path`  | string  | `string` |           |    ✓     |          | Mute timing name.                                                                                                                      |
-| download | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                     |
-| format   | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence. |
+| Name       | Source | Type    | Go type | Required | Default | Description                                                                                                                                  |
+| ---------- | ------ | ------- | ------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`     | path   | string  | string  |    ✓     |         | Mute timing name.                                                                                                                            |
+| `download` | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                           |
+| `format`   | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence. |
 
 #### All responses
 
@@ -987,20 +982,14 @@ Status: OK
 GET /api/v1/provisioning/policies/export
 ```
 
-#### Produces
-
-- application/json
-- application/yaml
-- application/terraform+hcl
-- text/yaml
-- text/hcl
+{{< docs/shared lookup="alerts/alerting-provisioning-export-produces.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 #### Parameters
 
-| Name     | Source  | Type    | Go type  | Separator | Required | Default  | Description                                                                                                                            |
-| -------- | ------- | ------- | -------- | --------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| download | `query` | boolean | `bool`   |           |          |          | Whether to initiate a download of the file or not.                                                                                     |
-| format   | `query` | string  | `string` |           |          | `"yaml"` | Format of the downloaded file, either yaml, json or hcl. Accept header can also be used, but the query parameter will take precedence. |
+| Name       | Source | Type    | Go type | Required | Default | Description                                                                                                                                  |
+| ---------- | ------ | ------- | ------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `download` | query  | boolean | `bool`  |          |         | Whether to initiate a download of the file or not.                                                                                           |
+| `format`   | query  | string  | string  |          | `yaml`  | Format of the downloaded file, either `yaml`, `json` or `hcl`. Accept header can also be used, but the query parameter will take precedence. |
 
 #### All responses
 
@@ -1027,7 +1016,7 @@ Status: Not Found
 
 [NotFound](#not-found)
 
-### <span id="route-get-template"></span> Get a notification template. (_RouteGetTemplate_)
+### <span id="route-get-template"></span> Get a notification template group. (_RouteGetTemplate_)
 
 ```
 GET /api/v1/provisioning/templates/:name
@@ -1035,16 +1024,16 @@ GET /api/v1/provisioning/templates/:name
 
 #### Parameters
 
-| Name | Source | Type   | Go type  | Separator | Required | Default | Description   |
-| ---- | ------ | ------ | -------- | --------- | :------: | ------- | ------------- |
-| name | `path` | string | `string` |           |    ✓     |         | Template Name |
+| Name   | Source | Type   | Go type | Required | Default | Description                |
+| ------ | ------ | ------ | ------- | :------: | ------- | -------------------------- |
+| `name` | path   | string | string  |    ✓     |         | Name of the template group |
 
 #### All responses
 
 | Code                           | Status    | Description          | Has headers | Schema                                   |
 | ------------------------------ | --------- | -------------------- | :---------: | ---------------------------------------- |
 | [200](#route-get-template-200) | OK        | NotificationTemplate |             | [schema](#route-get-template-200-schema) |
-| [404](#route-get-template-404) | Not Found | Not found.           |             | [schema](#route-get-template-404-schema) |
+| [404](#route-get-template-404) | Not Found | GenericPublicError   |             | [schema](#route-get-template-404-schema) |
 
 #### Responses
 
@@ -1058,11 +1047,11 @@ Status: OK
 
 ##### <span id="route-get-template-404"></span> 404 - Not found.
 
-Status: Not Found
+[GenericPublicError](#generic-public-error)
 
 ###### <span id="route-get-template-404-schema"></span> Schema
 
-### <span id="route-get-templates"></span> Get all notification templates. (_RouteGetTemplates_)
+### <span id="route-get-templates"></span> Get all notification template groups. (_RouteGetTemplates_)
 
 ```
 GET /api/v1/provisioning/templates
@@ -1070,10 +1059,9 @@ GET /api/v1/provisioning/templates
 
 #### All responses
 
-| Code                            | Status    | Description           | Has headers | Schema                                    |
-| ------------------------------- | --------- | --------------------- | :---------: | ----------------------------------------- |
-| [200](#route-get-templates-200) | OK        | NotificationTemplates |             | [schema](#route-get-templates-200-schema) |
-| [404](#route-get-templates-404) | Not Found | Not found.            |             | [schema](#route-get-templates-404-schema) |
+| Code                            | Status | Description           | Has headers | Schema                                    |
+| ------------------------------- | ------ | --------------------- | :---------: | ----------------------------------------- |
+| [200](#route-get-templates-200) | OK     | NotificationTemplates |             | [schema](#route-get-templates-200-schema) |
 
 #### Responses
 
@@ -1085,26 +1073,24 @@ Status: OK
 
 [NotificationTemplates](#notification-templates)
 
-##### <span id="route-get-templates-404"></span> 404 - Not found.
-
-Status: Not Found
-
-###### <span id="route-get-templates-404-schema"></span> Schema
-
 ### <span id="route-post-alert-rule"></span> Create a new alert rule. (_RoutePostAlertRule_)
 
 ```
 POST /api/v1/provisioning/alert-rules
 ```
 
+This action creates a new alert rule.
+
+The provenance (`X-Disable-Provenance`) of the new rule must match the provenance configured for its rule group. Mixing provisioned and unprovisioned alert rules within the same rule group is not allowed.
+
 #### Parameters
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                            | Go type                       | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | ----------------------------------------------- | ----------------------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| X-Disable-Provenance: true | `header` | string                                          | `string`                      |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [ProvisionedAlertRule](#provisioned-alert-rule) | `models.ProvisionedAlertRule` |           |          |         |                                                           |
+| Name                         | Source | Type                                            | Go type                       | Required | Default | Description                                               |
+| ---------------------------- | ------ | ----------------------------------------------- | ----------------------------- | :------: | ------- | --------------------------------------------------------- |
+| `X-Disable-Provenance: true` | header | string                                          | string                        |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [ProvisionedAlertRule](#provisioned-alert-rule) | `models.ProvisionedAlertRule` |          |         |                                                           |
 
 {{% /responsive-table %}}
 
@@ -1139,14 +1125,16 @@ Status: Bad Request
 POST /api/v1/provisioning/contact-points
 ```
 
+When creating a contact point, the `EmbeddedContactPoint.name` property determines if the new contact point is added to an existing one. In the UI, contact points with the same name are grouped together under a single contact point.
+
 #### Parameters
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                            | Go type                       | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | ----------------------------------------------- | ----------------------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| X-Disable-Provenance: true | `header` | string                                          | `string`                      |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [EmbeddedContactPoint](#embedded-contact-point) | `models.EmbeddedContactPoint` |           |          |         |                                                           |
+| Name                         | Source | Type                                            | Go type                       | Required | Default | Description                                               |
+| ---------------------------- | ------ | ----------------------------------------------- | ----------------------------- | :------: | ------- | --------------------------------------------------------- |
+| `X-Disable-Provenance: true` | header | string                                          | string                        |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [EmbeddedContactPoint](#embedded-contact-point) | `models.EmbeddedContactPoint` |          |         |                                                           |
 
 {{% /responsive-table %}}
 
@@ -1185,10 +1173,10 @@ POST /api/v1/provisioning/mute-timings
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                    | Go type                   | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | --------------------------------------- | ------------------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| X-Disable-Provenance: true | `header` | string                                  | `string`                  |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [MuteTimeInterval](#mute-time-interval) | `models.MuteTimeInterval` |           |          |         |                                                           |
+| Name                         | Source | Type                                    | Go type                   | Required | Default | Description                                               |
+| ---------------------------- | ------ | --------------------------------------- | ------------------------- | :------: | ------- | --------------------------------------------------------- |
+| `X-Disable-Provenance: true` | header | string                                  | string                    |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [MuteTimeInterval](#mute-time-interval) | `models.MuteTimeInterval` |          |         |                                                           |
 
 {{% /responsive-table %}}
 
@@ -1227,11 +1215,11 @@ PUT /api/v1/provisioning/alert-rules/:uid
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                            | Go type                       | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | ----------------------------------------------- | ----------------------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| UID                        | `path`   | string                                          | `string`                      |           |    ✓     |         | Alert rule UID                                            |
-| X-Disable-Provenance: true | `header` | string                                          | `string`                      |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [ProvisionedAlertRule](#provisioned-alert-rule) | `models.ProvisionedAlertRule` |           |          |         |                                                           |
+| Name                         | Source | Type                                            | Go type                       | Required | Default | Description                                               |
+| ---------------------------- | ------ | ----------------------------------------------- | ----------------------------- | :------: | ------- | --------------------------------------------------------- | --- |
+| `UID`                        | path   | string                                          | string                        |    ✓     |         | Alert rule UID                                            |
+| `X-Disable-Provenance: true` | header | string                                          | string                        |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [ProvisionedAlertRule](#provisioned-alert-rule) | `models.ProvisionedAlertRule` |          |         |                                                           |     |
 
 {{% /responsive-table %}}
 
@@ -1260,22 +1248,24 @@ Status: Bad Request
 
 [ValidationError](#validation-error)
 
-### <span id="route-put-alert-rule-group"></span> Update the interval or alert rules of a rule group. (_RoutePutAlertRuleGroup_)
+### <span id="route-put-alert-rule-group"></span> Create or update a rule group. (_RoutePutAlertRuleGroup_)
 
 ```
 PUT /api/v1/provisioning/folder/:folderUid/rule-groups/:group
 ```
 
+This action also changes the provenance setting (`X-Disable-Provenance`) for all alert rules in the alert group.
+
 #### Parameters
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                | Go type                 | Separator | Required | Default | Description                                                                                             |
-| -------------------------- | -------- | ----------------------------------- | ----------------------- | --------- | :------: | ------- | ------------------------------------------------------------------------------------------------------- |
-| FolderUID                  | `path`   | string                              | `string`                |           |    ✓     |         |                                                                                                         |
-| Group                      | `path`   | string                              | `string`                |           |    ✓     |         |                                                                                                         |
-| X-Disable-Provenance: true | `header` | string                              | `string`                |           |          |         | Allows editing of provisioned resources in the Grafana UI                                               |
-| Body                       | `body`   | [AlertRuleGroup](#alert-rule-group) | `models.AlertRuleGroup` |           |          |         | This action is idempotent and rules included in this body will overwrite configured rules for the group |
+| Name                         | Source | Type                                | Go type                 | Required | Default | Description                                                                                                             |
+| ---------------------------- | ------ | ----------------------------------- | ----------------------- | :------: | ------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `FolderUID`                  | path   | string                              | string                  |    ✓     |         |                                                                                                                         |
+| `Group`                      | path   | string                              | string                  |    ✓     |         |                                                                                                                         |
+| `X-Disable-Provenance: true` | header | string                              | string                  |          |         | Allows editing of provisioned resources in the Grafana UI. This also applies to all alert rules within the alert group. |
+| `Body`                       | body   | [AlertRuleGroup](#alert-rule-group) | `models.AlertRuleGroup` |          |         | This action is idempotent and rules included in this body will overwrite configured rules for the group                 |
 
 {{% /responsive-table %}}
 
@@ -1314,11 +1304,11 @@ PUT /api/v1/provisioning/contact-points/:uid
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                            | Go type                       | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | ----------------------------------------------- | ----------------------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| UID                        | `path`   | string                                          | `string`                      |           |    ✓     |         | UID is the contact point unique identifier                |
-| X-Disable-Provenance: true | `header` | string                                          | `string`                      |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [EmbeddedContactPoint](#embedded-contact-point) | `models.EmbeddedContactPoint` |           |          |         |                                                           |
+| Name                         | Source | Type                                            | Go type                       | Required | Default | Description                                               |
+| ---------------------------- | ------ | ----------------------------------------------- | ----------------------------- | :------: | ------- | --------------------------------------------------------- |
+| `UID`                        | path   | string                                          | string                        |    ✓     |         | UID is the contact point unique identifier                |
+| `X-Disable-Provenance: true` | header | string                                          | string                        |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [EmbeddedContactPoint](#embedded-contact-point) | `models.EmbeddedContactPoint` |          |         |                                                           |
 
 {{% /responsive-table %}}
 
@@ -1357,20 +1347,21 @@ PUT /api/v1/provisioning/mute-timings/:name
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type                                    | Go type                   | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | --------------------------------------- | ------------------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| name                       | `path`   | string                                  | `string`                  |           |    ✓     |         | Mute timing name                                          |
-| X-Disable-Provenance: true | `header` | string                                  | `string`                  |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [MuteTimeInterval](#mute-time-interval) | `models.MuteTimeInterval` |           |          |         |                                                           |
+| Name                         | Source | Type                                    | Go type                   | Required | Default | Description                                               |
+| ---------------------------- | ------ | --------------------------------------- | ------------------------- | -------- | :-----: | --------------------------------------------------------- |
+| `name`                       | path   | string                                  | string                    | ✓        |         | Mute timing name                                          |
+| `X-Disable-Provenance: true` | header | string                                  | string                    |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [MuteTimeInterval](#mute-time-interval) | `models.MuteTimeInterval` |          |         |                                                           |
 
 {{% /responsive-table %}}
 
 #### All responses
 
-| Code                              | Status      | Description      | Has headers | Schema                                      |
-| --------------------------------- | ----------- | ---------------- | :---------: | ------------------------------------------- |
-| [200](#route-put-mute-timing-200) | OK          | MuteTimeInterval |             | [schema](#route-put-mute-timing-200-schema) |
-| [400](#route-put-mute-timing-400) | Bad Request | ValidationError  |             | [schema](#route-put-mute-timing-400-schema) |
+| Code                              | Status      | Description        | Has headers | Schema                                      |
+| --------------------------------- | ----------- | ------------------ | :---------: | ------------------------------------------- |
+| [200](#route-put-mute-timing-200) | OK          | MuteTimeInterval   |             | [schema](#route-put-mute-timing-200-schema) |
+| [400](#route-put-mute-timing-400) | Bad Request | ValidationError    |             | [schema](#route-put-mute-timing-400-schema) |
+| [409](#route-put-mute-timing-409) | Conflict    | GenericPublicError |             | [schema](#route-put-mute-timing-409-schema) |
 
 #### Responses
 
@@ -1390,7 +1381,17 @@ Status: Bad Request
 
 [ValidationError](#validation-error)
 
+##### <span id="route-put-mute-timing-409"></span> 409 - Conflict
+
+Status: Conflict
+
+###### <span id="route-put-mute-timing-409-schema"></span> Schema
+
+[GenericPublicError](#generic-public-error)
+
 ### <span id="route-put-policy-tree"></span> Sets the notification policy tree. (_RoutePutPolicyTree_)
+
+{{< docs/shared lookup="alerts/warning-provisioning-tree.md" source="grafana" version="<GRAFANA_VERSION>" >}}
 
 ```
 PUT /api/v1/provisioning/policies
@@ -1400,10 +1401,10 @@ PUT /api/v1/provisioning/policies
 
 {{% responsive-table %}}
 
-| Name                       | Source   | Type            | Go type        | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | --------------- | -------------- | --------- | :------: | ------- | --------------------------------------------------------- |
-| X-Disable-Provenance: true | `header` | string          | `string`       |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [Route](#route) | `models.Route` |           |          |         | The new notification routing tree to use                  |
+| Name                         | Source | Type            | Go type        | Required | Default | Description                                               |
+| ---------------------------- | ------ | --------------- | -------------- | :------: | ------- | --------------------------------------------------------- |
+| `X-Disable-Provenance: true` | header | string          | string         |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [Route](#route) | `models.Route` |          |         | The new notification routing tree to use                  |
 
 {{% /responsive-table %}}
 
@@ -1432,7 +1433,7 @@ Status: Bad Request
 
 [ValidationError](#validation-error)
 
-### <span id="route-put-template"></span> Create or update a notification template. (_RoutePutTemplate_)
+### <span id="route-put-template"></span> Create or update a notification template group. (_RoutePutTemplate_)
 
 ```
 PUT /api/v1/provisioning/templates/:name
@@ -1442,11 +1443,11 @@ PUT /api/v1/provisioning/templates/:name
 
 #### Parameters
 
-| Name                       | Source   | Type                                                          | Go type                              | Separator | Required | Default | Description                                               |
-| -------------------------- | -------- | ------------------------------------------------------------- | ------------------------------------ | --------- | :------: | ------- | --------------------------------------------------------- |
-| name                       | `path`   | string                                                        | `string`                             |           |    ✓     |         | Template Name                                             |
-| X-Disable-Provenance: true | `header` | string                                                        | `string`                             |           |          |         | Allows editing of provisioned resources in the Grafana UI |
-| Body                       | `body`   | [NotificationTemplateContent](#notification-template-content) | `models.NotificationTemplateContent` |           |          |         |                                                           |
+| Name                         | Source | Type                                                          | Go type                              | Required | Default | Description                                               |
+| ---------------------------- | ------ | ------------------------------------------------------------- | ------------------------------------ | -------- | :-----: | --------------------------------------------------------- | --- |
+| `name`                       | path   | string                                                        | string                               | ✓        |         | Name of the template group                                |
+| `X-Disable-Provenance: true` | header | string                                                        | string                               |          |         | Allows editing of provisioned resources in the Grafana UI |
+| `Body`                       | body   | [NotificationTemplateContent](#notification-template-content) | `models.NotificationTemplateContent` |          |         |                                                           |     |
 
 {{% /responsive-table %}}
 
@@ -1455,7 +1456,8 @@ PUT /api/v1/provisioning/templates/:name
 | Code                           | Status      | Description          | Has headers | Schema                                   |
 | ------------------------------ | ----------- | -------------------- | :---------: | ---------------------------------------- |
 | [202](#route-put-template-202) | Accepted    | NotificationTemplate |             | [schema](#route-put-template-202-schema) |
-| [400](#route-put-template-400) | Bad Request | ValidationError      |             | [schema](#route-put-template-400-schema) |
+| [400](#route-put-template-400) | Bad Request | GenericPublicError   |             | [schema](#route-put-template-400-schema) |
+| [409](#route-put-template-409) | Conflict    | GenericPublicError   |             | [schema](#route-put-template-409-schema) |
 
 #### Responses
 
@@ -1473,7 +1475,15 @@ Status: Bad Request
 
 ###### <span id="route-put-template-400-schema"></span> Schema
 
-[ValidationError](#validation-error)
+[GenericPublicError](#generic-public-error)
+
+##### <span id="route-put-template-409"></span> 409 - Conflict
+
+Status: Conflict
+
+###### <span id="route-put-template-409-schema"></span> Schema
+
+[GenericPublicError](#generic-public-error)
 
 ### <span id="route-reset-policy-tree"></span> Clears the notification policy tree. (_RouteResetPolicyTree_)
 
@@ -1509,14 +1519,13 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name                                                      | Type                                      | Go type             | Required | Default | Description                                                                                            | Example |
-| --------------------------------------------------------- | ----------------------------------------- | ------------------- | :------: | ------- | ------------------------------------------------------------------------------------------------------ | ------- |
-| datasourceUid                                             | string                                    | `string`            |          |         | Grafana data source unique identifier; it should be '**expr**' for a Server Side Expression operation. |         |
-| model                                                     | [interface{}](#interface)                 | `interface{}`       |          |         | JSON is the raw JSON query and includes the above properties as well as custom properties.             |         |
-| queryType                                                 | string                                    | `string`            |          |         | QueryType is an optional identifier for the type of query.                                             |
-| It can be used to distinguish different types of queries. |                                           |
-| refId                                                     | string                                    | `string`            |          |         | RefID is the unique identifier of the query, set by the frontend call.                                 |         |
-| relativeTimeRange                                         | [RelativeTimeRange](#relative-time-range) | `RelativeTimeRange` |          |         |                                                                                                        |         |
+| Name                | Type                                      | Go type             | Required | Default | Description                                                                                                          | Example |
+| ------------------- | ----------------------------------------- | ------------------- | :------: | ------- | -------------------------------------------------------------------------------------------------------------------- | ------- |
+| `datasourceUid`     | string                                    | string              |          |         | Grafana data source unique identifier; it should be '**expr**' for a Server Side Expression operation.               |         |
+| `model`             | [interface{}](#interface)                 | `interface{}`       |          |         | JSON is the raw JSON query and includes the above properties as well as custom properties.                           |         |
+| `queryType`         | string                                    | string              |          |         | QueryType is an optional identifier for the type of query. It can be used to distinguish different types of queries. |         |
+| `refId`             | string                                    | string              |          |         | RefID is the unique identifier of the query, set by the frontend call.                                               |         |
+| `relativeTimeRange` | [RelativeTimeRange](#relative-time-range) | `RelativeTimeRange` |          |         |                                                                                                                      |         |
 
 {{% /responsive-table %}}
 
@@ -1526,13 +1535,13 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name              | Type                                      | Go type             | Required | Default | Description | Example |
-| ----------------- | ----------------------------------------- | ------------------- | :------: | ------- | ----------- | ------- |
-| datasourceUid     | string                                    | `string`            |          |         |             |         |
-| model             | [interface{}](#interface)                 | `interface{}`       |          |         |             |         |
-| queryType         | string                                    | `string`            |          |         |             |         |
-| refId             | string                                    | `string`            |          |         |             |         |
-| relativeTimeRange | [RelativeTimeRange](#relative-time-range) | `RelativeTimeRange` |          |         |             |         |
+| Name                | Type                                      | Go type             | Required | Default | Description | Example |
+| ------------------- | ----------------------------------------- | ------------------- | :------: | ------- | ----------- | ------- |
+| `datasourceUid`     | string                                    | string              |          |         |             |         |
+| `model`             | [interface{}](#interface)                 | `interface{}`       |          |         |             |         |
+| `queryType`         | string                                    | string              |          |         |             |         |
+| `refId`             | string                                    | string              |          |         |             |         |
+| `relativeTimeRange` | [RelativeTimeRange](#relative-time-range) | `RelativeTimeRange` |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1542,20 +1551,20 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name         | Type                                      | Go type               | Required | Default | Description | Example |
-| ------------ | ----------------------------------------- | --------------------- | :------: | ------- | ----------- | ------- |
-| annotations  | map of string                             | `map[string]string`   |          |         |             |         |
-| condition    | string                                    | `string`              |          |         |             |         |
-| dashboardUid | string                                    | `string`              |          |         |             |         |
-| data         | [][AlertQueryExport](#alert-query-export) | `[]*AlertQueryExport` |          |         |             |         |
-| execErrState | string                                    | `string`              |          |         |             |         |
-| for          | [Duration](#duration)                     | `Duration`            |          |         |             |         |
-| isPaused     | boolean                                   | `bool`                |          |         |             |         |
-| labels       | map of string                             | `map[string]string`   |          |         |             |         |
-| noDataState  | string                                    | `string`              |          |         |             |         |
-| panelId      | int64 (formatted integer)                 | `int64`               |          |         |             |         |
-| title        | string                                    | `string`              |          |         |             |         |
-| uid          | string                                    | `string`              |          |         |             |         |
+| Name           | Type                                      | Go type               | Required | Default | Description | Example |
+| -------------- | ----------------------------------------- | --------------------- | :------: | ------- | ----------- | ------- |
+| `annotations`  | map of string                             | `map[string]string`   |          |         |             |         |
+| `condition`    | string                                    | string                |          |         |             |         |
+| `dashboardUid` | string                                    | string                |          |         |             |         |
+| `data`         | [][AlertQueryExport](#alert-query-export) | `[]*AlertQueryExport` |          |         |             |         |
+| `execErrState` | string                                    | string                |          |         |             |         |
+| `for`          | [Duration](#duration)                     | Duration              |          |         |             |         |
+| `isPaused`     | boolean                                   | `bool`                |          |         |             |         |
+| `labels`       | map of string                             | `map[string]string`   |          |         |             |         |
+| `noDataState`  | string                                    | string                |          |         |             |         |
+| `panelId`      | int64 (formatted integer)                 | int64                 |          |         |             |         |
+| `title`        | string                                    | string                |          |         |             |         |
+| `uid`          | string                                    | string                |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1565,12 +1574,12 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name      | Type                                              | Go type                   | Required | Default | Description | Example |
-| --------- | ------------------------------------------------- | ------------------------- | :------: | ------- | ----------- | ------- |
-| folderUid | string                                            | `string`                  |          |         |             |         |
-| interval  | int64 (formatted integer)                         | `int64`                   |          |         |             |         |
-| rules     | [][ProvisionedAlertRule](#provisioned-alert-rule) | `[]*ProvisionedAlertRule` |          |         |             |         |
-| title     | string                                            | `string`                  |          |         |             |         |
+| Name        | Type                                              | Go type                   | Required | Default | Description | Example |
+| ----------- | ------------------------------------------------- | ------------------------- | :------: | ------- | ----------- | ------- |
+| `folderUid` | string                                            | string                    |          |         |             |         |
+| `interval`  | int64 (formatted integer)                         | int64                     |          |         |             |         |
+| `rules`     | [][ProvisionedAlertRule](#provisioned-alert-rule) | `[]*ProvisionedAlertRule` |          |         |             |         |
+| `title`     | string                                            | string                    |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1580,13 +1589,13 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name     | Type                                    | Go type              | Required | Default | Description | Example |
-| -------- | --------------------------------------- | -------------------- | :------: | ------- | ----------- | ------- |
-| folder   | string                                  | `string`             |          |         |             |         |
-| interval | [Duration](#duration)                   | `Duration`           |          |         |             |         |
-| name     | string                                  | `string`             |          |         |             |         |
-| orgId    | int64 (formatted integer)               | `int64`              |          |         |             |         |
-| rules    | [][AlertRuleExport](#alert-rule-export) | `[]*AlertRuleExport` |          |         |             |         |
+| Name       | Type                                    | Go type              | Required | Default | Description | Example |
+| ---------- | --------------------------------------- | -------------------- | :------: | ------- | ----------- | ------- |
+| `folder`   | string                                  | string               |          |         |             |         |
+| `interval` | [Duration](#duration)                   | Duration             |          |         |             |         |
+| `name`     | string                                  | string               |          |         |             |         |
+| `orgId`    | int64 (formatted integer)               | int64                |          |         |             |         |
+| `rules`    | [][AlertRuleExport](#alert-rule-export) | `[]*AlertRuleExport` |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1596,12 +1605,12 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name          | Type                                                      | Go type                       | Required | Default | Description | Example |
-| ------------- | --------------------------------------------------------- | ----------------------------- | :------: | ------- | ----------- | ------- |
-| apiVersion    | int64 (formatted integer)                                 | `int64`                       |          |         |             |         |
-| contactPoints | [][ContactPointExport](#contact-point-export)             | `[]*ContactPointExport`       |          |         |             |         |
-| groups        | [][AlertRuleGroupExport](#alert-rule-group-export)        | `[]*AlertRuleGroupExport`     |          |         |             |         |
-| policies      | [][NotificationPolicyExport](#notification-policy-export) | `[]*NotificationPolicyExport` |          |         |             |         |
+| Name            | Type                                                      | Go type                       | Required | Default | Description | Example |
+| --------------- | --------------------------------------------------------- | ----------------------------- | :------: | ------- | ----------- | ------- |
+| `apiVersion`    | int64 (formatted integer)                                 | int64                         |          |         |             |         |
+| `contactPoints` | [][ContactPointExport](#contact-point-export)             | `[]*ContactPointExport`       |          |         |             |         |
+| `groups`        | [][AlertRuleGroupExport](#alert-rule-group-export)        | `[]*AlertRuleGroupExport`     |          |         |             |         |
+| `policies`      | [][NotificationPolicyExport](#notification-policy-export) | `[]*NotificationPolicyExport` |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1609,11 +1618,11 @@ Status: Accepted
 
 **Properties**
 
-| Name      | Type                                 | Go type             | Required | Default | Description | Example |
-| --------- | ------------------------------------ | ------------------- | :------: | ------- | ----------- | ------- |
-| name      | string                               | `string`            |          |         |             |         |
-| orgId     | int64 (formatted integer)            | `int64`             |          |         |             |         |
-| receivers | [][ReceiverExport](#receiver-export) | `[]*ReceiverExport` |          |         |             |         |
+| Name        | Type                                 | Go type             | Required | Default | Description | Example |
+| ----------- | ------------------------------------ | ------------------- | :------: | ------- | ----------- | ------- |
+| `name`      | string                               | string              |          |         |             |         |
+| `orgId`     | int64 (formatted integer)            | int64               |          |         |             |         |
+| `receivers` | [][ReceiverExport](#receiver-export) | `[]*ReceiverExport` |          |         |             |         |
 
 ### <span id="contact-points"></span> ContactPoints
 
@@ -1621,29 +1630,28 @@ Status: Accepted
 
 ### <span id="duration"></span> Duration
 
-| Name     | Type   | Go type | Default | Description | Example |
-| -------- | ------ | ------- | ------- | ----------- | ------- |
-| Duration | string | int64   |         |             |         |
+| Name       | Type   | Go type | Default | Description | Example |
+| ---------- | ------ | ------- | ------- | ----------- | ------- |
+| `Duration` | string | int64   |         |             |         |
 
 ### <span id="embedded-contact-point"></span> EmbeddedContactPoint
 
-> EmbeddedContactPoint is the contact point type that is used
-> by grafanas embedded alertmanager implementation.
+EmbeddedContactPoint is the contact point type used by Grafana-managed alerts.
+
+When creating a contact point, the `EmbeddedContactPoint.name` property determines if the new contact point is added to an existing one. In the UI, contact points with the same name are grouped together under a single contact point.
 
 **Properties**
 
 {{% responsive-table %}}
 
-| Name                                 | Type                    | Go type  | Required | Default | Description                                                       | Example   |
-| ------------------------------------ | ----------------------- | -------- | :------: | ------- | ----------------------------------------------------------------- | --------- |
-| disableResolveMessage                | boolean                 | `bool`   |          |         |                                                                   | `false`   |
-| name                                 | string                  | `string` |          |         | Name is used as grouping key in the UI. Contact points with the   |
-| same name will be grouped in the UI. | `webhook_1`             |
-| provenance                           | string                  | `string` |          |         |                                                                   |           |
-| settings                             | [JSON](#json)           | `JSON`   |    ✓     |         |                                                                   |           |
-| type                                 | string                  | `string` |    ✓     |         |                                                                   | `webhook` |
-| uid                                  | string                  | `string` |          |         | UID is the unique identifier of the contact point. The UID can be |
-| set by the user.                     | `my_external_reference` |
+| Name                    | Type          | Go type | Required | Default | Description                                                                        | Example                 |
+| ----------------------- | ------------- | ------- | :------: | ------- | ---------------------------------------------------------------------------------- | ----------------------- |
+| `disableResolveMessage` | boolean       | `bool`  |          |         |                                                                                    | false                   |
+| `name`                  | string        | string  |          |         | `name` groups multiple contact points with the same name in the UI.                | `webhook_1`             |
+| `provenance`            | string        | string  |          |         |                                                                                    |                         |
+| `settings`              | [JSON](#json) | JSON    |    ✓     |         |                                                                                    |                         |
+| `type`                  | string        | string  |    ✓     |         |                                                                                    | `webhook`               |
+| `uid`                   | string        | string  |          |         | UID is the unique identifier of the contact point. The UID can be set by the user. | `my_external_reference` |
 
 {{% /responsive-table %}}
 
@@ -1657,9 +1665,9 @@ Status: Accepted
 
 ### <span id="match-type"></span> MatchType
 
-| Name      | Type                      | Go type | Default | Description | Example |
-| --------- | ------------------------- | ------- | ------- | ----------- | ------- |
-| MatchType | int64 (formatted integer) | int64   |         |             |         |
+| Name        | Type                      | Go type | Default | Description | Example |
+| ----------- | ------------------------- | ------- | ------- | ----------- | ------- |
+| `MatchType` | int64 (formatted integer) | int64   |         |             |         |
 
 ### <span id="matcher"></span> Matcher
 
@@ -1667,11 +1675,11 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name  | Type                     | Go type     | Required | Default | Description | Example |
-| ----- | ------------------------ | ----------- | :------: | ------- | ----------- | ------- |
-| Name  | string                   | `string`    |          |         |             |         |
-| Type  | [MatchType](#match-type) | `MatchType` |          |         |             |         |
-| Value | string                   | `string`    |          |         |             |         |
+| Name    | Type                     | Go type   | Required | Default | Description | Example |
+| ------- | ------------------------ | --------- | :------: | ------- | ----------- | ------- |
+| `Name`  | string                   | string    |          |         |             |         |
+| `Type`  | [MatchType](#match-type) | MatchType |          |         |             |         |
+| `Value` | string                   | string    |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1689,10 +1697,11 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name           | Type                             | Go type           | Required | Default | Description | Example |
-| -------------- | -------------------------------- | ----------------- | :------: | ------- | ----------- | ------- |
-| name           | string                           | `string`          |          |         |             |         |
-| time_intervals | [][TimeInterval](#time-interval) | `[]*TimeInterval` |          |         |             |         |
+| Name             | Type                             | Go type           | Required | Default | Description         | Example |
+| ---------------- | -------------------------------- | ----------------- | :------: | ------- | ------------------- | ------- |
+| `name`           | string                           | string            |          |         |                     |         |
+| `time_intervals` | [][TimeInterval](#time-interval) | `[]*TimeInterval` |          |         |                     |         |
+| `version`        | string                           | string            |          |         | Version of resource |         |
 
 {{% /responsive-table %}}
 
@@ -1716,10 +1725,10 @@ Status: Accepted
 
 **Properties**
 
-| Name   | Type                         | Go type       | Required | Default | Description | Example |
-| ------ | ---------------------------- | ------------- | :------: | ------- | ----------- | ------- |
-| Policy | [RouteExport](#route-export) | `RouteExport` |          |         | inline      |         |
-| orgId  | int64 (formatted integer)    | `int64`       |          |         |             |         |
+| Name     | Type                         | Go type                      | Required | Default | Description | Example |
+| -------- | ---------------------------- | ---------------------------- | :------: | ------- | ----------- | ------- |
+| `Policy` | [RouteExport](#route-export) | [RouteExport](#route-export) |          |         | inline      |         |
+| `orgId`  | int64 (formatted integer)    | int64                        |          |         |             |         |
 
 ### <span id="notification-template"></span> NotificationTemplate
 
@@ -1727,11 +1736,12 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name       | Type                      | Go type      | Required | Default | Description | Example |
-| ---------- | ------------------------- | ------------ | :------: | ------- | ----------- | ------- |
-| name       | string                    | `string`     |          |         |             |         |
-| provenance | [Provenance](#provenance) | `Provenance` |          |         |             |         |
-| template   | string                    | `string`     |          |         |             |         |
+| Name         | Type                      | Go type                   | Required | Default | Description         | Example |
+| ------------ | ------------------------- | ------------------------- | :------: | ------- | ------------------- | ------- |
+| `name`       | string                    | string                    |          |         |                     |         |
+| `provenance` | [Provenance](#provenance) | [Provenance](#provenance) |          |         |                     |         |
+| `template`   | string                    | string                    |          |         |                     |         |
+| `version`    | string                    | string                    |          |         | Version of resource |         |
 
 {{% /responsive-table %}}
 
@@ -1741,9 +1751,10 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name     | Type   | Go type  | Required | Default | Description | Example |
-| -------- | ------ | -------- | :------: | ------- | ----------- | ------- |
-| template | string | `string` |          |         |             |         |
+| Name       | Type   | Go type | Required | Default | Description                                             | Example |
+| ---------- | ------ | ------- | :------: | ------- | ------------------------------------------------------- | ------- |
+| `template` | string | string  |          |         |                                                         |         |
+| `version`  | string | string  |          |         | Version of resource. Should be empty for new templates. |         |
 
 {{% /responsive-table %}}
 
@@ -1763,9 +1774,9 @@ Status: Accepted
 
 ### <span id="provenance"></span> Provenance
 
-| Name       | Type   | Go type | Default | Description | Example |
-| ---------- | ------ | ------- | ------- | ----------- | ------- |
-| Provenance | string | string  |         |             |         |
+| Name         | Type   | Go type | Default | Description | Example |
+| ------------ | ------ | ------- | ------- | ----------- | ------- |
+| `Provenance` | string | string  |         |             |         |
 
 ### <span id="provisioned-alert-rule"></span> ProvisionedAlertRule
 
@@ -1773,24 +1784,24 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name         | Type                         | Go type             | Required | Default | Description | Example                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------ | ---------------------------- | ------------------- | :------: | ------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| annotations  | map of string                | `map[string]string` |          |         |             | `{"runbook_url":"https://supercoolrunbook.com/page/13"}`                                                                                                                                                                                                                                                                                                                                                                         |
-| condition    | string                       | `string`            |    ✓     |         |             | `A`                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| data         | [][AlertQuery](#alert-query) | `[]*AlertQuery`     |    ✓     |         |             | `[{"datasourceUid":"__expr__","model":{"conditions":[{"evaluator":{"params":[0,0],"type":"gt"},"operator":{"type":"and"},"query":{"params":[]},"reducer":{"params":[],"type":"avg"},"type":"query"}],"datasource":{"type":"__expr__","uid":"__expr__"},"expression":"1 == 1","hide":false,"intervalMs":1000,"maxDataPoints":43200,"refId":"A","type":"math"},"queryType":"","refId":"A","relativeTimeRange":{"from":0,"to":0}}]` |
-| execErrState | string                       | `string`            |    ✓     |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| folderUID    | string                       | `string`            |    ✓     |         |             | `project_x`                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| for          | [Duration](#duration)        | `Duration`          |    ✓     |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| id           | int64 (formatted integer)    | `int64`             |          |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| isPaused     | boolean                      | `bool`              |          |         |             | `false`                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| labels       | map of string                | `map[string]string` |          |         |             | `{"team":"sre-team-1"}`                                                                                                                                                                                                                                                                                                                                                                                                          |
-| noDataState  | string                       | `string`            |    ✓     |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| orgID        | int64 (formatted integer)    | `int64`             |    ✓     |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| provenance   | [Provenance](#provenance)    | `Provenance`        |          |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ruleGroup    | string                       | `string`            |    ✓     |         |             | `eval_group_1`                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| title        | string                       | `string`            |    ✓     |         |             | `Always firing`                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| uid          | string                       | `string`            |          |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| updated      | date-time (formatted string) | `strfmt.DateTime`   |          |         |             |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Name          | Type                         | Go type                   | Required | Default | Description                                                                                                               | Example                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------- | ---------------------------- | ------------------------- | :------: | ------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `annotations` | map of string                | `map[string]string`       |          |         | Optional key-value pairs. `__dashboardUid__` and `__panelId__` must be set together; one cannot be set without the other. | `{"runbook_url":"https://supercoolrunbook.com/page/13"}`                                                                                                                                                                                                                                                                                                                                                                         |
+| `condition`   | string                       | string                    |    ✓     |         |                                                                                                                           | `A`                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `data`        | [][AlertQuery](#alert-query) | `[]*AlertQuery`           |    ✓     |         |                                                                                                                           | `[{"datasourceUid":"__expr__","model":{"conditions":[{"evaluator":{"params":[0,0],"type":"gt"},"operator":{"type":"and"},"query":{"params":[]},"reducer":{"params":[],"type":"avg"},"type":"query"}],"datasource":{"type":"__expr__","uid":"__expr__"},"expression":"1 == 1","hide":false,"intervalMs":1000,"maxDataPoints":43200,"refId":"A","type":"math"},"queryType":"","refId":"A","relativeTimeRange":{"from":0,"to":0}}]` |
+| execErrState  | string                       | string                    |    ✓     |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `folderUID`   | string                       | string                    |    ✓     |         |                                                                                                                           | `project_x`                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `for`         | [Duration](#duration)        | [Duration](#duration)     |    ✓     |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `id`          | int64 (formatted integer)    | int64                     |          |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `isPaused`    | boolean                      | `bool`                    |          |         |                                                                                                                           | `false`                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `labels`      | map of string                | `map[string]string`       |          |         |                                                                                                                           | `{"team":"sre-team-1"}`                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `noDataState` | string                       | string                    |    ✓     |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `orgID`       | int64 (formatted integer)    | `int64                    |    ✓     |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `provenance`  | [Provenance](#provenance)    | [Provenance](#provenance) |          |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `ruleGroup`   | string                       | string                    |    ✓     |         |                                                                                                                           | `eval_group_1`                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `title`       | string                       | string                    |    ✓     |         |                                                                                                                           | `Always firing`                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `uid`         | string                       | string                    |          |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `updated`     | date-time (formatted string) | `strfmt.DateTime`         |          |         |                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 {{% /responsive-table %}}
 
@@ -1806,12 +1817,12 @@ Status: Accepted
 
 **Properties**
 
-| Name                  | Type                       | Go type      | Required | Default | Description | Example |
-| --------------------- | -------------------------- | ------------ | :------: | ------- | ----------- | ------- |
-| disableResolveMessage | boolean                    | `bool`       |          |         |             |         |
-| settings              | [RawMessage](#raw-message) | `RawMessage` |          |         |             |         |
-| type                  | string                     | `string`     |          |         |             |         |
-| uid                   | string                     | `string`     |          |         |             |         |
+| Name                    | Type                       | Go type    | Required | Default | Description | Example |
+| ----------------------- | -------------------------- | ---------- | :------: | ------- | ----------- | ------- |
+| `disableResolveMessage` | boolean                    | `bool`     |          |         |             |         |
+| `settings`              | [RawMessage](#raw-message) | RawMessage |          |         |             |         |
+| `type`                  | string                     | string     |          |         |             |         |
+| `uid`                   | string                     | string     |          |         |             |         |
 
 ### <span id="regexp"></span> Regexp
 
@@ -1829,10 +1840,10 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name | Type                  | Go type    | Required | Default | Description | Example |
-| ---- | --------------------- | ---------- | :------: | ------- | ----------- | ------- |
-| from | [Duration](#duration) | `Duration` |          |         |             |         |
-| to   | [Duration](#duration) | `Duration` |          |         |             |         |
+| Name   | Type                  | Go type  | Required | Default | Description | Example |
+| ------ | --------------------- | -------- | :------: | ------- | ----------- | ------- |
+| `from` | [Duration](#duration) | Duration |          |         |             |         |
+| `to`   | [Duration](#duration) | Duration |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1845,21 +1856,21 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name                | Type                               | Go type             | Required | Default | Description                             | Example |
-| ------------------- | ---------------------------------- | ------------------- | :------: | ------- | --------------------------------------- | ------- |
-| continue            | boolean                            | `bool`              |          |         |                                         |         |
-| group_by            | []string                           | `[]string`          |          |         |                                         |         |
-| group_interval      | string                             | `string`            |          |         |                                         |         |
-| group_wait          | string                             | `string`            |          |         |                                         |         |
-| match               | map of string                      | `map[string]string` |          |         | Deprecated. Remove before v1.0 release. |         |
-| match_re            | [MatchRegexps](#match-regexps)     | `MatchRegexps`      |          |         |                                         |         |
-| matchers            | [Matchers](#matchers)              | `Matchers`          |          |         |                                         |         |
-| mute_time_intervals | []string                           | `[]string`          |          |         |                                         |         |
-| object_matchers     | [ObjectMatchers](#object-matchers) | `ObjectMatchers`    |          |         |                                         |         |
-| provenance          | [Provenance](#provenance)          | `Provenance`        |          |         |                                         |         |
-| receiver            | string                             | `string`            |          |         |                                         |         |
-| repeat_interval     | string                             | `string`            |          |         |                                         |         |
-| routes              | [][Route](#route)                  | `[]*Route`          |          |         |                                         |         |
+| Name                  | Type                               | Go type             | Required | Default | Description                             | Example |
+| --------------------- | ---------------------------------- | ------------------- | :------: | ------- | --------------------------------------- | ------- |
+| `continue`            | boolean                            | `bool`              |          |         |                                         |         |
+| `group_by`            | []string                           | `[]string`          |          |         |                                         |         |
+| `group_interval`      | string                             | string              |          |         |                                         |         |
+| `group_wait`          | string                             | string              |          |         |                                         |         |
+| `match`               | map of string                      | `map[string]string` |          |         | Deprecated. Remove before v1.0 release. |         |
+| `match_re`            | [MatchRegexps](#match-regexps)     | `MatchRegexps`      |          |         |                                         |         |
+| `matchers`            | [Matchers](#matchers)              | `Matchers`          |          |         |                                         |         |
+| `mute_time_intervals` | []string                           | `[]string`          |          |         |                                         |         |
+| `object_matchers`     | [ObjectMatchers](#object-matchers) | `ObjectMatchers`    |          |         |                                         |         |
+| `provenance`          | [Provenance](#provenance)          | Provenance          |          |         |                                         |         |
+| `receiver`            | string                             | string              |          |         |                                         |         |
+| `repeat_interval`     | string                             | string              |          |         |                                         |         |
+| `routes`              | [][Route](#route)                  | `[]*Route`          |          |         |                                         |         |
 
 {{% /responsive-table %}}
 
@@ -1870,20 +1881,20 @@ Status: Accepted
 
 **Properties**
 
-| Name                | Type                               | Go type             | Required | Default | Description                             | Example |
-| ------------------- | ---------------------------------- | ------------------- | :------: | ------- | --------------------------------------- | ------- |
-| continue            | boolean                            | `bool`              |          |         |                                         |         |
-| group_by            | []string                           | `[]string`          |          |         |                                         |         |
-| group_interval      | string                             | `string`            |          |         |                                         |         |
-| group_wait          | string                             | `string`            |          |         |                                         |         |
-| match               | map of string                      | `map[string]string` |          |         | Deprecated. Remove before v1.0 release. |         |
-| match_re            | [MatchRegexps](#match-regexps)     | `MatchRegexps`      |          |         |                                         |         |
-| matchers            | [Matchers](#matchers)              | `Matchers`          |          |         |                                         |         |
-| mute_time_intervals | []string                           | `[]string`          |          |         |                                         |         |
-| object_matchers     | [ObjectMatchers](#object-matchers) | `ObjectMatchers`    |          |         |                                         |         |
-| receiver            | string                             | `string`            |          |         |                                         |         |
-| repeat_interval     | string                             | `string`            |          |         |                                         |         |
-| routes              | [][RouteExport](#route-export)     | `[]*RouteExport`    |          |         |                                         |         |
+| Name                  | Type                               | Go type             | Required | Default | Description                             | Example |
+| --------------------- | ---------------------------------- | ------------------- | :------: | ------- | --------------------------------------- | ------- |
+| `continue`            | boolean                            | `bool`              |          |         |                                         |         |
+| `group_by`            | []string                           | `[]string`          |          |         |                                         |         |
+| `group_interval`      | string                             | string              |          |         |                                         |         |
+| `group_wait`          | string                             | string              |          |         |                                         |         |
+| `match`               | map of string                      | `map[string]string` |          |         | Deprecated. Remove before v1.0 release. |         |
+| `match_re`            | [MatchRegexps](#match-regexps)     | `MatchRegexps`      |          |         |                                         |         |
+| `matchers`            | [Matchers](#matchers)              | `Matchers`          |          |         |                                         |         |
+| `mute_time_intervals` | []string                           | `[]string`          |          |         |                                         |         |
+| `object_matchers`     | [ObjectMatchers](#object-matchers) | `ObjectMatchers`    |          |         |                                         |         |
+| `receiver`            | string                             | string              |          |         |                                         |         |
+| `repeat_interval`     | string                             | string              |          |         |                                         |         |
+| `routes`              | [][RouteExport](#route-export)     | `[]*RouteExport`    |          |         |                                         |         |
 
 ### <span id="time-interval"></span> TimeInterval
 
@@ -1894,14 +1905,14 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name          | Type                       | Go type        | Required | Default | Description | Example |
-| ------------- | -------------------------- | -------------- | :------: | ------- | ----------- | ------- |
-| days_of_month | []string                   | `[]string`     |          |         |             |         |
-| location      | string                     | `string`       |          |         |             |         |
-| months        | []string                   | `[]string`     |          |         |             |         |
-| times         | [][TimeRange](#time-range) | `[]*TimeRange` |          |         |             |         |
-| weekdays      | []string                   | `[]string`     |          |         |             |         |
-| years         | []string                   | `[]string`     |          |         |             |         |
+| Name            | Type                       | Go type        | Required | Default | Description | Example |
+| --------------- | -------------------------- | -------------- | :------: | ------- | ----------- | ------- |
+| `days_of_month` | []string                   | []string       |          |         |             |         |
+| `location`      | string                     | string         |          |         |             |         |
+| `months`        | []string                   | []string       |          |         |             |         |
+| `times`         | [][TimeRange](#time-range) | `[]*TimeRange` |          |         |             |         |
+| `weekdays`      | []string                   | []string       |          |         |             |         |
+| `years`         | []string                   | []string       |          |         |             |         |
 
 {{% /responsive-table %}}
 
@@ -1913,10 +1924,10 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name       | Type   | Go type  | Required | Default | Description | Example                 |
-| ---------- | ------ | -------- | :------: | ------- | ----------- | ----------------------- |
-| end_time   | string | `string` |          |         |             | `"end_time": "24:00"`   |
-| start_time | string | `string` |          |         |             | `"start_time": "18:00"` |
+| Name         | Type   | Go type | Required | Default | Description | Example                 |
+| ------------ | ------ | ------- | :------: | ------- | ----------- | ----------------------- |
+| `end_time`   | string | string  |          |         |             | `"end_time": "24:00"`   |
+| `start_time` | string | string  |          |         |             | `"start_time": "18:00"` |
 
 {{% /responsive-table %}}
 
@@ -1926,8 +1937,23 @@ Status: Accepted
 
 {{% responsive-table %}}
 
-| Name | Type   | Go type  | Required | Default | Description | Example         |
-| ---- | ------ | -------- | :------: | ------- | ----------- | --------------- |
-| msg  | string | `string` |          |         |             | `error message` |
+| Name  | Type   | Go type | Required | Default | Description | Example         |
+| ----- | ------ | ------- | :------: | ------- | ----------- | --------------- |
+| `msg` | string | string  |          |         |             | `error message` |
+
+{{% /responsive-table %}}
+
+### <span id="generic-public-error"></span> GenericPublicError
+
+**Properties**
+
+{{% responsive-table %}}
+
+| Name         | Type       | Go type          | Required | Default | Description                                                              | Example |
+| ------------ | ---------- | ---------------- | :------: | ------- | ------------------------------------------------------------------------ | ------- |
+| `statusCode` | string     | string           |    ✓     |         | HTTP Status Code                                                         |         |
+| `messageId`  | string     | string           |    ✓     |         | Unique code of the error                                                 |         |
+| `message`    | string     | string           |          |         | Error message                                                            |         |
+| `extra`      | map of any | `map[string]any` |          |         | Extra information about the error. Format is specific to the error code. |         |
 
 {{% /responsive-table %}}

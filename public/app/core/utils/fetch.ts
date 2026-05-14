@@ -1,12 +1,13 @@
 import { omitBy } from 'lodash';
+import { Observable, of, throwError } from 'rxjs';
 
-import { deprecationWarning } from '@grafana/data';
+import { deprecationWarning, validatePath } from '@grafana/data';
 import { BackendSrvRequest } from '@grafana/runtime';
 
 export const parseInitFromOptions = (options: BackendSrvRequest): RequestInit => {
   const method = options.method;
   const headers = parseHeaders(options);
-  const isAppJson = isContentTypeApplicationJson(headers);
+  const isAppJson = isContentTypeJson(headers);
   const body = parseBody(options, isAppJson);
   const credentials = parseCredentials(options);
 
@@ -15,6 +16,7 @@ export const parseInitFromOptions = (options: BackendSrvRequest): RequestInit =>
     headers,
     body,
     credentials,
+    signal: options.abortSignal,
   };
 };
 
@@ -57,9 +59,22 @@ const putHeaderParser: HeaderParser = parseHeaderByMethodFactory('put');
 const patchHeaderParser: HeaderParser = parseHeaderByMethodFactory('patch');
 
 const headerParsers = [postHeaderParser, putHeaderParser, patchHeaderParser, defaultHeaderParser];
+const unsafeCharacters = /[^\u0000-\u00ff]/g;
+
+/**
+ * Header values can only contain ISO-8859-1 characters. If a header key or value contains characters outside of this, we will encode the whole value.
+ * Since `encodeURI` also encodes spaces, we won't encode if the value doesn't contain any unsafe characters.
+ */
+function sanitizeHeader(v: string) {
+  return unsafeCharacters.test(v) ? encodeURI(v) : v;
+}
 
 export const parseHeaders = (options: BackendSrvRequest) => {
-  const headers = options?.headers ? new Headers(options.headers) : new Headers();
+  const safeHeaders: Record<string, string> = {};
+  for (let [key, value] of Object.entries(options.headers ?? {})) {
+    safeHeaders[sanitizeHeader(key)] = sanitizeHeader(value);
+  }
+  const headers = new Headers(safeHeaders);
   const parsers = headerParsers.filter((parser) => parser.canParse(options));
   const combinedHeaders = parsers.reduce((prev, parser) => {
     return parser.parse(prev);
@@ -68,13 +83,21 @@ export const parseHeaders = (options: BackendSrvRequest) => {
   return combinedHeaders;
 };
 
-export const isContentTypeApplicationJson = (headers: Headers) => {
+export const isContentTypeJson = (headers: Headers) => {
   if (!headers) {
     return false;
   }
 
   const contentType = headers.get('content-type');
-  if (contentType && contentType.toLowerCase() === 'application/json') {
+  if (
+    contentType &&
+    [
+      'application/json',
+      'application/json-patch+json',
+      'application/merge-patch+json',
+      'application/strategic-merge-patch+json',
+    ].includes(contentType.toLowerCase())
+  ) {
     return true;
   }
 
@@ -119,7 +142,6 @@ export async function parseResponseBody<T>(
           console.warn(`${response.url} returned an invalid JSON`);
           return {} as T;
         }
-
         return await response.json();
 
       case 'text':
@@ -136,7 +158,7 @@ export async function parseResponseBody<T>(
   return textData as T;
 }
 
-function serializeParams(data: Record<string, any>): string {
+function serializeParams(data: Record<string, string | number | boolean | Array<string | number | boolean>>): string {
   return Object.keys(data)
     .map((key) => {
       const value = data[key];
@@ -148,10 +170,25 @@ function serializeParams(data: Record<string, any>): string {
     .join('&');
 }
 
-export const parseUrlFromOptions = (options: BackendSrvRequest): string => {
-  const cleanParams = omitBy(options.params, (v) => v === undefined || (v && v.length === 0));
-  const serializedParams = serializeParams(cleanParams);
-  return options.params && serializedParams.length ? `${options.url}?${serializedParams}` : options.url;
+/**
+ * Formats and validates the URL.
+ * If options.validatePath is true, this will throw an exception if the URL fails validation.
+ * @param options - The options to parse.
+ * @returns An observable that emits the parsed URL or an error if the URL fails validation.
+ */
+export const parseUrlFromOptions = (options: BackendSrvRequest): Observable<string> => {
+  try {
+    const cleanParams = omitBy(options.params, (v) => v === undefined || (v && v.length === 0));
+    const serializedParams = serializeParams(cleanParams);
+
+    const url = options.validatePath //
+      ? validatePath(options.url)
+      : options.url;
+
+    return options.params && serializedParams.length ? of(`${url}?${serializedParams}`) : of(url);
+  } catch (error) {
+    return throwError(() => error);
+  }
 };
 
 export const parseCredentials = (options: BackendSrvRequest): RequestCredentials => {

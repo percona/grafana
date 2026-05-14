@@ -1,5 +1,4 @@
 import { css } from '@emotion/css';
-import React from 'react';
 
 import {
   FlotDataPoint,
@@ -17,7 +16,7 @@ import { HorizontalGroup } from '../../components/Layout/Layout';
 import { MenuGroup, MenuGroupProps } from '../../components/Menu/MenuGroup';
 import { MenuItem } from '../../components/Menu/MenuItem';
 import { SeriesIcon } from '../../components/VizLegend/SeriesIcon';
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 
 import { GraphDimensions } from './GraphTooltip/types';
 

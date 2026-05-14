@@ -1,11 +1,11 @@
 import { css, cx } from '@emotion/css';
-import React, { useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import { GrafanaTheme2, PageLayoutType } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
 
-import FlaggedScrollbar from '../FlaggedScroller';
+import NativeScrollbar from '../NativeScrollbar';
 
 import { PageContents } from './PageContents';
 import { PageHeader } from './PageHeader';
@@ -26,8 +26,8 @@ export const Page: PageType = ({
   className,
   info,
   layout = PageLayoutType.Standard,
-  scrollTop,
-  scrollRef,
+  onSetScrollRef,
+  background,
   ...otherProps
 }) => {
   const styles = useStyles2(getStyles);
@@ -50,15 +50,15 @@ export const Page: PageType = ({
     }
   }, [navModel, pageNav, chrome, layout]);
 
+  const isPrimaryBg = (background ?? getDefaultBackgroundForLayout(layout)) === 'primary';
+
   return (
-    <div className={cx(styles.wrapper, className)} {...otherProps}>
+    <div className={cx(styles.wrapper, isPrimaryBg && styles.wrapperPrimary, className)} {...otherProps}>
       {layout === PageLayoutType.Standard && (
-        <FlaggedScrollbar
+        <NativeScrollbar
           // This id is used by the image renderer to scroll through the dashboard
           divId="page-scrollbar"
-          autoHeightMin={'100%'}
-          scrollTop={scrollTop}
-          scrollRefCallback={scrollRef}
+          onSetScrollRef={onSetScrollRef}
         >
           <div className={styles.pageInner}>
             {pageHeaderNav && (
@@ -74,19 +74,17 @@ export const Page: PageType = ({
             {pageNav && pageNav.children && <PageTabs navItem={pageNav} />}
             <div className={styles.pageContent}>{children}</div>
           </div>
-        </FlaggedScrollbar>
+        </NativeScrollbar>
       )}
 
       {layout === PageLayoutType.Canvas && (
-        <FlaggedScrollbar
+        <NativeScrollbar
           // This id is used by the image renderer to scroll through the dashboard
           divId="page-scrollbar"
-          autoHeightMin={'100%'}
-          scrollTop={scrollTop}
-          scrollRefCallback={scrollRef}
+          onSetScrollRef={onSetScrollRef}
         >
           <div className={styles.canvasContent}>{children}</div>
-        </FlaggedScrollbar>
+        </NativeScrollbar>
       )}
 
       {layout === PageLayoutType.Custom && children}
@@ -100,24 +98,24 @@ const getStyles = (theme: GrafanaTheme2) => {
   return {
     wrapper: css({
       label: 'page-wrapper',
-      height: '100%',
       display: 'flex',
       flex: '1 1 0',
       flexDirection: 'column',
-      minHeight: 0,
+      position: 'relative',
+      container: 'page / inline-size',
+    }),
+    wrapperPrimary: css({
+      label: 'page-wrapper-primary',
+      background: theme.colors.background.primary,
     }),
     pageContent: css({
       label: 'page-content',
       flexGrow: 1,
     }),
-    primaryBg: css({
-      background: theme.colors.background.primary,
-    }),
     pageInner: css({
       label: 'page-inner',
       padding: theme.spacing(2),
       borderBottom: 'none',
-      background: theme.colors.background.primary,
       display: 'flex',
       flexDirection: 'column',
       flexGrow: 1,
@@ -137,3 +135,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     }),
   };
 };
+
+function getDefaultBackgroundForLayout(layout: PageLayoutType) {
+  return layout === PageLayoutType.Standard ? 'primary' : 'canvas';
+}

@@ -1,13 +1,12 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import selectEvent from 'react-select-event';
 
 import { config } from '@grafana/runtime';
 
-import { setupMockedDataSource, statisticVariable } from '../../../__mocks__/CloudWatchDataSource';
-import { validMetricSearchBuilderQuery } from '../../../__mocks__/queries';
-import { MetricStat } from '../../../types';
+import { MetricStat } from '../../../dataquery.gen';
+import { setupMockedDataSource, statisticVariable } from '../../../mocks/CloudWatchDataSource';
+import { validMetricSearchBuilderQuery } from '../../../mocks/queries';
 
 import { MetricStatEditor } from './MetricStatEditor';
 

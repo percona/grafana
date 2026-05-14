@@ -1,13 +1,10 @@
 import { css, cx } from '@emotion/css';
-import React, { Component } from 'react';
+import { useCallback, type JSX } from 'react';
 
-import { renderMarkdown, LinkModelSupplier, ScopedVars, IconName } from '@grafana/data';
-import { GrafanaTheme2 } from '@grafana/data/';
+import { GrafanaTheme2, renderMarkdown, LinkModelSupplier, ScopedVars, IconName } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { locationService, getTemplateSrv } from '@grafana/runtime';
-import { Tooltip, PopoverContent, Icon } from '@grafana/ui';
-import { useStyles2 } from '@grafana/ui/';
-import { getTimeSrv, TimeSrv } from 'app/features/dashboard/services/TimeSrv';
+import { Tooltip, PopoverContent, Icon, useStyles2 } from '@grafana/ui';
 import { PanelModel } from 'app/features/dashboard/state/PanelModel';
 import { InspectTab } from 'app/features/inspector/types';
 
@@ -26,11 +23,10 @@ export interface Props {
   error?: string;
 }
 
-export class PanelHeaderCorner extends Component<Props> {
-  timeSrv: TimeSrv = getTimeSrv();
+export function PanelHeaderCorner({ panel, links, error }: Props) {
+  const styles = useStyles2(getContentStyles);
 
-  getInfoMode = () => {
-    const { panel, error } = this.props;
+  const getInfoMode = useCallback(() => {
     if (error) {
       return InfoMode.Error;
     }
@@ -42,25 +38,24 @@ export class PanelHeaderCorner extends Component<Props> {
     }
 
     return undefined;
-  };
+  }, [panel, error]);
 
-  getInfoContent = (): JSX.Element => {
-    const { panel } = this.props;
+  const getInfoContent = useCallback((): JSX.Element => {
     const markdown = panel.description || '';
     const interpolatedMarkdown = getTemplateSrv().replace(markdown, panel.scopedVars);
     const markedInterpolatedMarkdown = renderMarkdown(interpolatedMarkdown);
-    const links = this.props.links && this.props.links.getLinks(panel.replaceVariables);
+    const linksList = links && links.getLinks(panel.replaceVariables);
 
     return (
-      <div className="panel-info-content markdown-html">
+      <div className={styles.content}>
         <div dangerouslySetInnerHTML={{ __html: markedInterpolatedMarkdown }} />
 
-        {links && links.length > 0 && (
-          <ul className="panel-info-corner-links">
-            {links.map((link, idx) => {
+        {linksList && linksList.length > 0 && (
+          <ul className={styles.cornerLinks}>
+            {linksList.map((link, idx) => {
               return (
                 <li key={idx}>
-                  <a className="panel-info-corner-links__item" href={link.href} target={link.target}>
+                  <a href={link.href} target={link.target}>
                     {link.title}
                   </a>
                 </li>
@@ -70,36 +65,33 @@ export class PanelHeaderCorner extends Component<Props> {
         )}
       </div>
     );
-  };
+  }, [panel, links, styles]);
 
   /**
    * Open the Panel Inspector when we click on an error
    */
-  onClickError = () => {
+  const onClickError = useCallback(() => {
     locationService.partial({
-      inspect: this.props.panel.id,
+      inspect: panel.id,
       inspectTab: InspectTab.Error,
     });
-  };
+  }, [panel.id]);
 
-  render() {
-    const { error } = this.props;
-    const infoMode: InfoMode | undefined = this.getInfoMode();
+  const infoMode: InfoMode | undefined = getInfoMode();
 
-    if (!infoMode) {
-      return null;
-    }
-
-    if (infoMode === InfoMode.Error && error) {
-      return <PanelInfoCorner infoMode={infoMode} content={error} onClick={this.onClickError} />;
-    }
-
-    if (infoMode === InfoMode.Info || infoMode === InfoMode.Links) {
-      return <PanelInfoCorner infoMode={infoMode} content={this.getInfoContent} />;
-    }
-
+  if (!infoMode) {
     return null;
   }
+
+  if (infoMode === InfoMode.Error && error) {
+    return <PanelInfoCorner infoMode={infoMode} content={error} onClick={onClickError} />;
+  }
+
+  if (infoMode === InfoMode.Info || infoMode === InfoMode.Links) {
+    return <PanelInfoCorner infoMode={infoMode} content={getInfoContent} />;
+  }
+
+  return null;
 }
 
 export default PanelHeaderCorner;
@@ -134,6 +126,25 @@ const iconMap: Record<InfoMode, IconName> = {
   [InfoMode.Info]: 'info',
   [InfoMode.Links]: 'external-link-alt',
 };
+
+const getContentStyles = (theme: GrafanaTheme2) => ({
+  content: css({
+    overflow: 'auto',
+
+    code: {
+      whiteSpace: 'normal',
+      wordWrap: 'break-word',
+    },
+
+    'pre > code': {
+      display: 'block',
+    },
+  }),
+  cornerLinks: css({
+    listStyle: 'none',
+    paddingLeft: 0,
+  }),
+});
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {

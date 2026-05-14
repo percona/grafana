@@ -1,13 +1,25 @@
+import { OpenFeatureProvider } from '@openfeature/react-sdk';
 import { Store } from '@reduxjs/toolkit';
 import { render, RenderOptions } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory, MemoryHistoryBuildOptions } from 'history';
-import React, { Fragment, PropsWithChildren } from 'react';
+import { Fragment, PropsWithChildren } from 'react';
+import * as React from 'react';
 import { Provider } from 'react-redux';
+// eslint-disable-next-line no-restricted-imports
 import { Router } from 'react-router-dom';
+import { CompatRouter } from 'react-router-dom-v5-compat';
 import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
 
-import { HistoryWrapper, setLocationService } from '@grafana/runtime';
+import { FeatureToggles } from '@grafana/data';
+import {
+  config,
+  HistoryWrapper,
+  LocationServiceProvider,
+  setChromeHeaderHeightHook,
+  setLocationService,
+} from '@grafana/runtime';
+import { getTestFeatureFlagClient } from '@grafana/test-utils/unstable';
 import { GrafanaContext, GrafanaContextType } from 'app/core/context/GrafanaContext';
 import { ModalsContextProvider } from 'app/core/context/ModalsContextProvider';
 import { configureStore } from 'app/store/configureStore';
@@ -45,19 +57,24 @@ const getWrapper = ({
   historyOptions,
   grafanaContext,
 }: ExtendedRenderOptions & {
-  grafanaContext?: GrafanaContextType;
+  grafanaContext?: Partial<GrafanaContextType>;
 }) => {
   const reduxStore = store || configureStore();
-  /**
-   * Conditional router - either a MemoryRouter or just a Fragment
-   */
-  const PotentialRouter = renderWithRouter ? Router : Fragment;
 
   // Create a fresh location service for each test - otherwise we run the risk
   // of it being stateful in between runs
   const history = createMemoryHistory(historyOptions);
   const locationService = new HistoryWrapper(history);
   setLocationService(locationService);
+
+  /**
+   * Conditional router - either a MemoryRouter or just a Fragment
+   */
+  const PotentialRouter = renderWithRouter
+    ? ({ children }: PropsWithChildren) => <Router history={history}>{children}</Router>
+    : ({ children }: PropsWithChildren) => <Fragment>{children}</Fragment>;
+
+  const PotentialCompatRouter = renderWithRouter ? CompatRouter : Fragment;
 
   const context = {
     ...getGrafanaContextMock(),
@@ -71,11 +88,17 @@ const getWrapper = ({
   return function Wrapper({ children }: PropsWithChildren) {
     return (
       <Provider store={reduxStore}>
-        <GrafanaContext.Provider value={context}>
-          <PotentialRouter history={history}>
-            <ModalsContextProvider>{children}</ModalsContextProvider>
-          </PotentialRouter>
-        </GrafanaContext.Provider>
+        <OpenFeatureProvider client={getTestFeatureFlagClient()}>
+          <GrafanaContext.Provider value={context}>
+            <PotentialRouter>
+              <LocationServiceProvider service={locationService}>
+                <PotentialCompatRouter>
+                  <ModalsContextProvider>{children}</ModalsContextProvider>
+                </PotentialCompatRouter>
+              </LocationServiceProvider>
+            </PotentialRouter>
+          </GrafanaContext.Provider>
+        </OpenFeatureProvider>
       </Provider>
     );
   };
@@ -90,13 +113,62 @@ const customRender = (
   ui: React.ReactElement,
   { renderWithRouter = true, ...renderOptions }: ExtendedRenderOptions = {}
 ) => {
+  const user = userEvent.setup();
   const store = renderOptions.preloadedState ? configureStore(renderOptions?.preloadedState) : undefined;
   const AllTheProviders = renderOptions.wrapper || getWrapper({ store, renderWithRouter, ...renderOptions });
 
+  setChromeHeaderHeightHook(() => 40);
+
   return {
     ...render(ui, { wrapper: AllTheProviders, ...renderOptions }),
+    /** Instance of `userEvent.setup()` ready for use to interact with rendered component */
+    user,
     store,
   };
+};
+
+/**
+ * Enables and disables feature toggles `beforeEach` test, and sets back to empty object `afterEach` test
+ */
+export const testWithFeatureToggles = ({
+  enable,
+  disable,
+}: {
+  enable?: Array<keyof FeatureToggles>;
+  disable?: Array<keyof FeatureToggles>;
+}) => {
+  beforeEach(() => {
+    for (const featureToggle of enable || []) {
+      config.featureToggles[featureToggle] = true;
+    }
+    for (const featureToggle of disable || []) {
+      config.featureToggles[featureToggle] = false;
+    }
+  });
+
+  afterEach(() => {
+    config.featureToggles = {};
+  });
+};
+
+/**
+ * Enables license features `beforeEach` test, and sets back to empty object `afterEach` test
+ */
+export const testWithLicenseFeatures = ({ enable, disable }: { enable?: string[]; disable?: string[] }) => {
+  beforeEach(() => {
+    config.licenseInfo.enabledFeatures = config.licenseInfo.enabledFeatures || {};
+
+    for (const feature of enable || []) {
+      config.licenseInfo.enabledFeatures[feature] = true;
+    }
+    for (const feature of disable || []) {
+      config.licenseInfo.enabledFeatures[feature] = false;
+    }
+  });
+
+  afterEach(() => {
+    config.licenseInfo.enabledFeatures = {};
+  });
 };
 
 export * from '@testing-library/react';

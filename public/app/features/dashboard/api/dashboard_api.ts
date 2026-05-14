@@ -1,84 +1,56 @@
-import { config, getBackendSrv } from '@grafana/runtime';
-import { ScopedResourceClient } from 'app/features/apiserver/client';
-import { ResourceClient } from 'app/features/apiserver/types';
-import { SaveDashboardCommand } from 'app/features/dashboard/components/SaveDashboard/types';
-import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
-import { DeleteDashboardResponse } from 'app/features/manage-dashboards/types';
-import { DashboardDTO, DashboardDataDTO } from 'app/types';
+import { Dashboard } from '@grafana/schema';
+import { Spec as DashboardV2Spec } from '@grafana/schema/apis/dashboard.grafana.app/v2';
+import { DashboardDTO } from 'app/types/dashboard';
 
-export interface DashboardAPI {
-  /** Get a dashboard with the access control metadata */
-  getDashboardDTO(uid: string): Promise<DashboardDTO>;
-  /** Save dashboard */
-  saveDashboard(options: SaveDashboardCommand): Promise<unknown>;
-  /** Delete a dashboard */
-  deleteDashboard(uid: string, showSuccessAlert: boolean): Promise<DeleteDashboardResponse>;
+import { UnifiedDashboardAPI } from './UnifiedDashboardAPI';
+import { LegacyDashboardAPI } from './legacy';
+import { DashboardAPI, DashboardWithAccessInfo } from './types';
+import { getDashboardsApiVersion } from './utils';
+import { K8sDashboardAPI } from './v1';
+import { K8sDashboardV2API } from './v2';
+
+type DashboardAPIClients = {
+  legacy: DashboardAPI<DashboardDTO, Dashboard>;
+  v1: DashboardAPI<DashboardDTO, Dashboard>;
+  v2: DashboardAPI<DashboardDTO | DashboardWithAccessInfo<DashboardV2Spec>, DashboardV2Spec>;
+  unified: DashboardAPI<DashboardDTO | DashboardWithAccessInfo<DashboardV2Spec>, Dashboard | DashboardV2Spec>;
+};
+
+let clients: Partial<DashboardAPIClients> | undefined;
+
+export function setDashboardAPI(override: Partial<DashboardAPIClients> | undefined) {
+  if (process.env.NODE_ENV !== 'test') {
+    throw new Error('dashboardAPI can be only overridden in test environment');
+  }
+  clients = override;
 }
 
-// Implemented using /api/dashboards/*
-class LegacyDashboardAPI implements DashboardAPI {
-  constructor() {}
+// Overloads
+export function getDashboardAPI(): DashboardAPI<
+  DashboardDTO | DashboardWithAccessInfo<DashboardV2Spec>,
+  Dashboard | DashboardV2Spec
+>;
+export function getDashboardAPI(responseFormat: 'v1'): DashboardAPI<DashboardDTO, Dashboard>;
+export function getDashboardAPI(
+  responseFormat: 'v2'
+): DashboardAPI<DashboardWithAccessInfo<DashboardV2Spec>, DashboardV2Spec>;
+export function getDashboardAPI(
+  responseFormat?: 'v1' | 'v2'
+): DashboardAPI<DashboardDTO | DashboardWithAccessInfo<DashboardV2Spec>, Dashboard | DashboardV2Spec> {
+  const v = getDashboardsApiVersion(responseFormat);
 
-  saveDashboard(options: SaveDashboardCommand): Promise<unknown> {
-    dashboardWatcher.ignoreNextSave();
-
-    return getBackendSrv().post('/api/dashboards/db/', {
-      dashboard: options.dashboard,
-      message: options.message ?? '',
-      overwrite: options.overwrite ?? false,
-      folderUid: options.folderUid,
-    });
-  }
-
-  deleteDashboard(uid: string, showSuccessAlert: boolean): Promise<DeleteDashboardResponse> {
-    return getBackendSrv().delete<DeleteDashboardResponse>(`/api/dashboards/uid/${uid}`, { showSuccessAlert });
-  }
-
-  getDashboardDTO(uid: string): Promise<DashboardDTO> {
-    return getBackendSrv().get<DashboardDTO>(`/api/dashboards/uid/${uid}`);
-  }
-}
-
-// Implemented using /apis/dashboards.grafana.app/*
-class K8sDashboardAPI implements DashboardAPI {
-  private client: ResourceClient<DashboardDataDTO>;
-  constructor(private legacy: DashboardAPI) {
-    this.client = new ScopedResourceClient<DashboardDataDTO>({
-      group: 'dashboard.grafana.app',
-      version: 'v0alpha1',
-      resource: 'dashboards',
-    });
-  }
-
-  saveDashboard(options: SaveDashboardCommand): Promise<unknown> {
-    return this.legacy.saveDashboard(options);
-  }
-
-  deleteDashboard(uid: string, showSuccessAlert: boolean): Promise<DeleteDashboardResponse> {
-    return this.legacy.deleteDashboard(uid, showSuccessAlert);
-  }
-
-  async getDashboardDTO(uid: string): Promise<DashboardDTO> {
-    const d = await this.client.get(uid);
-    const m = await this.client.subresource<object>(uid, 'access');
-    return {
-      meta: {
-        ...m,
-        isNew: false,
-        isFolder: false,
-        uid: d.metadata.name,
-      },
-      dashboard: d.spec,
+  if (!clients) {
+    clients = {
+      legacy: new LegacyDashboardAPI(),
+      v1: new K8sDashboardAPI(),
+      v2: new K8sDashboardV2API(),
+      unified: new UnifiedDashboardAPI(),
     };
   }
-}
 
-let instance: DashboardAPI | undefined = undefined;
-
-export function getDashboardAPI() {
-  if (!instance) {
-    const legacy = new LegacyDashboardAPI();
-    instance = config.featureToggles.kubernetesDashboards ? new K8sDashboardAPI(legacy) : legacy;
+  if (!clients[v]) {
+    throw new Error(`Unknown Dashboard API version: ${v}`);
   }
-  return instance;
+
+  return clients[v];
 }

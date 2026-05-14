@@ -1,13 +1,13 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 import { AppEvents, PageLayoutType } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import {
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ACCESS_ROLES_PAGE,
-} from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+} from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { createRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';

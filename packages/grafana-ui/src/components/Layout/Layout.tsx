@@ -1,9 +1,10 @@
 import { css, cx } from '@emotion/css';
-import React, { HTMLProps } from 'react';
+import { HTMLProps } from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 
 enum Orientation {
   Horizontal,
@@ -32,6 +33,8 @@ export interface ContainerProps {
 
 /**
  * @deprecated use Stack component instead
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/layout-deprecated-groups--docs
  */
 export const Layout = ({
   children,

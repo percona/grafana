@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { of } from 'rxjs';
 
 import { DataQueryRequest, DataSourceInstanceSettings, dateTime, PluginMetaInfo, PluginType } from '@grafana/data';
@@ -35,7 +34,7 @@ describe('SearchForm', () => {
     };
     const ds = {
       async metadataRequest(url) {
-        if (url === '/api/services') {
+        if (url === 'services') {
           return Promise.resolve(['jaeger-query', 'service2', 'service3']);
         }
         return undefined;
@@ -172,7 +171,6 @@ function setupFetchMock(response: unknown, mock?: ReturnType<typeof backendSrv.f
 }
 
 const defaultSettings: DataSourceInstanceSettings<JaegerJsonData> = {
-  id: 0,
   uid: '0',
   type: 'tracing',
   name: 'jaeger',

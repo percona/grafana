@@ -1,18 +1,13 @@
-import React from 'react';
+import { PluginSignatureBadge, Stack } from '@grafana/ui';
 
-import { PluginType } from '@grafana/data';
-import { HorizontalGroup, PluginSignatureBadge } from '@grafana/ui';
-
+import { isPluginUpdatable } from '../helpers';
 import { CatalogPlugin } from '../types';
 
-import {
-  PluginEnterpriseBadge,
-  PluginDisabledBadge,
-  PluginInstalledBadge,
-  PluginUpdateAvailableBadge,
-  PluginAngularBadge,
-  PluginDeprecatedBadge,
-} from './Badges';
+import { PluginDeprecatedBadge } from './Badges/PluginDeprecatedBadge';
+import { PluginDisabledBadge } from './Badges/PluginDisabledBadge';
+import { PluginEnterpriseBadge } from './Badges/PluginEnterpriseBadge';
+import { PluginInstalledBadge } from './Badges/PluginInstallBadge';
+import { PluginUpdateAvailableBadge } from './Badges/PluginUpdateAvailableBadge';
 
 type PluginBadgeType = {
   plugin: CatalogPlugin;
@@ -20,26 +15,24 @@ type PluginBadgeType = {
 
 export function PluginListItemBadges({ plugin }: PluginBadgeType) {
   // Currently renderer plugins are not supported by the catalog due to complications related to installation / update / uninstall.
-  const hasUpdate = plugin.hasUpdate && !plugin.isCore && plugin.type !== PluginType.renderer;
+  const canUpdate = isPluginUpdatable(plugin);
   if (plugin.isEnterprise) {
     return (
-      <HorizontalGroup height="auto" wrap>
+      <Stack height="auto" wrap="wrap">
         <PluginEnterpriseBadge plugin={plugin} />
         {plugin.isDisabled && <PluginDisabledBadge error={plugin.error} />}
-        {hasUpdate && <PluginUpdateAvailableBadge plugin={plugin} />}
-        {plugin.angularDetected && <PluginAngularBadge />}
-      </HorizontalGroup>
+        {canUpdate && <PluginUpdateAvailableBadge plugin={plugin} />}
+      </Stack>
     );
   }
 
   return (
-    <HorizontalGroup height="auto" wrap>
+    <Stack height="auto" wrap="wrap">
       <PluginSignatureBadge status={plugin.signature} />
       {plugin.isDisabled && <PluginDisabledBadge error={plugin.error} />}
       {plugin.isDeprecated && <PluginDeprecatedBadge />}
       {plugin.isInstalled && <PluginInstalledBadge />}
-      {hasUpdate && <PluginUpdateAvailableBadge plugin={plugin} />}
-      {plugin.angularDetected && <PluginAngularBadge />}
-    </HorizontalGroup>
+      {canUpdate && <PluginUpdateAvailableBadge plugin={plugin} />}
+    </Stack>
   );
 }

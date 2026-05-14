@@ -1,9 +1,8 @@
 import { css } from '@emotion/css';
-import React from 'react';
 
 import { PanelData, QueryResultMetaStat, TimeZone } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { t } from 'app/core/internationalization';
+import { t } from '@grafana/i18n';
 
 import { InspectStatsTable } from './InspectStatsTable';
 import { InspectStatsTraceIdsTable } from './InspectStatsTraceIdsTable';
@@ -71,7 +70,7 @@ export const InspectStatsTab = ({ data, timeZone }: InspectStatsTabProps) => {
   );
 };
 
-const containerStyles = css`
-  height: 100%;
-  overflow-y: scroll;
-`;
+const containerStyles = css({
+  height: '100%',
+  overflowY: 'scroll',
+});

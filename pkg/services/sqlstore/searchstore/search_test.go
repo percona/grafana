@@ -20,6 +20,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/tests/testsuite"
 	"github.com/grafana/grafana/pkg/util"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 const (
@@ -31,7 +32,9 @@ func TestMain(m *testing.M) {
 	testsuite.Run(m)
 }
 
-func TestBuilder_EqualResults_Basic(t *testing.T) {
+func TestIntegrationBuilder_EqualResults_Basic(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	user := &user.SignedInUser{
 		UserID:  1,
 		OrgID:   1,
@@ -68,13 +71,16 @@ func TestBuilder_EqualResults_Basic(t *testing.T) {
 		{
 			ID:    dashIds[0],
 			Title: "A",
+			OrgID: 1,
 			Slug:  "a",
 			Term:  "templated",
 		},
 	}, res)
 }
 
-func TestBuilder_Pagination(t *testing.T) {
+func TestIntegrationBuilder_Pagination(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	user := &user.SignedInUser{
 		UserID:  1,
 		OrgID:   1,
@@ -121,10 +127,13 @@ func TestBuilder_Pagination(t *testing.T) {
 	assert.Equal(t, "P", resPg2[0].Title, "page 2 should start with the 16th dashboard")
 }
 
-func TestBuilder_RBAC(t *testing.T) {
+func TestIntegrationBuilder_RBAC(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	testsCases := []struct {
 		desc            string
 		userPermissions []accesscontrol.Permission
+		level           dashboardaccess.PermissionType
 		features        featuremgmt.FeatureToggles
 		expectedParams  []any
 	}{
@@ -136,10 +145,52 @@ func TestBuilder_RBAC(t *testing.T) {
 			},
 		},
 		{
+			desc: "user with write permission",
+			userPermissions: []accesscontrol.Permission{
+				{Action: dashboards.ActionDashboardsWrite, Scope: "dashboards:uid:1"},
+			},
+			level:    dashboardaccess.PERMISSION_EDIT,
+			features: featuremgmt.WithFeatures(),
+			expectedParams: []any{
+				int64(1),
+				int64(1),
+				int64(1),
+				0,
+				"Viewer",
+				int64(1),
+				0,
+				"dashboards:write",
+				"folders:edit",
+				"folders:admin",
+				int64(1),
+				int64(1),
+				int64(1),
+				0,
+				"Viewer",
+				int64(1),
+				0,
+				"dashboards:create",
+				"folders:edit",
+				"folders:admin",
+				int64(1),
+				int64(1),
+				int64(1),
+				0,
+				"Viewer",
+				int64(1),
+				0,
+				"dashboards:write",
+				"dashboards:edit",
+				"dashboards:admin",
+				int64(1),
+			},
+		},
+		{
 			desc: "user with view permission",
 			userPermissions: []accesscontrol.Permission{
 				{Action: dashboards.ActionDashboardsRead, Scope: "dashboards:uid:1"},
 			},
+			level:    dashboardaccess.PERMISSION_VIEW,
 			features: featuremgmt.WithFeatures(),
 			expectedParams: []any{
 				int64(1),
@@ -150,46 +201,9 @@ func TestBuilder_RBAC(t *testing.T) {
 				int64(1),
 				0,
 				"dashboards:read",
-				"dashboards:write",
-				2,
-				int64(1),
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"dashboards:read",
-				"dashboards:write",
-				2,
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"folders:read",
-				"dashboards:create",
-				2,
-			},
-		},
-		{
-			desc: "user with view permission with nesting",
-			userPermissions: []accesscontrol.Permission{
-				{Action: dashboards.ActionDashboardsRead, Scope: "dashboards:uid:1"},
-			},
-			features: featuremgmt.WithFeatures(featuremgmt.FlagNestedFolders),
-			expectedParams: []any{
-				int64(1),
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"dashboards:read",
-				"dashboards:write",
-				2,
+				"folders:view",
+				"folders:edit",
+				"folders:admin",
 				int64(1),
 				int64(1),
 				int64(1),
@@ -198,8 +212,9 @@ func TestBuilder_RBAC(t *testing.T) {
 				int64(1),
 				0,
 				"folders:read",
-				"dashboards:create",
-				2,
+				"folders:view",
+				"folders:edit",
+				"folders:admin",
 				int64(1),
 				int64(1),
 				int64(1),
@@ -208,85 +223,10 @@ func TestBuilder_RBAC(t *testing.T) {
 				int64(1),
 				0,
 				"dashboards:read",
-				"dashboards:write",
-				2,
+				"dashboards:view",
+				"dashboards:edit",
+				"dashboards:admin",
 				int64(1),
-			},
-		},
-		{
-			desc: "user with view permission with remove subquery",
-			userPermissions: []accesscontrol.Permission{
-				{Action: dashboards.ActionDashboardsRead, Scope: "dashboards:uid:1"},
-			},
-			features: featuremgmt.WithFeatures(featuremgmt.FlagPermissionsFilterRemoveSubquery),
-			expectedParams: []any{
-				int64(1),
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"dashboards:read",
-				"dashboards:write",
-				2,
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"dashboards:read",
-				"dashboards:write",
-				2,
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"folders:read",
-				"dashboards:create",
-				2,
-			},
-		},
-		{
-			desc: "user with view permission with nesting and remove subquery",
-			userPermissions: []accesscontrol.Permission{
-				{Action: dashboards.ActionDashboardsRead, Scope: "dashboards:uid:1"},
-			},
-			features: featuremgmt.WithFeatures(featuremgmt.FlagNestedFolders, featuremgmt.FlagPermissionsFilterRemoveSubquery),
-			expectedParams: []any{
-				int64(1),
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"dashboards:read",
-				"dashboards:write",
-				2,
-				int64(1),
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"folders:read",
-				"dashboards:create",
-				2,
-				int64(1),
-				int64(1),
-				int64(1),
-				0,
-				"Viewer",
-				int64(1),
-				0,
-				"dashboards:read",
-				"dashboards:write",
-				2,
 			},
 		},
 	}
@@ -306,10 +246,8 @@ func TestBuilder_RBAC(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			if len(tc.userPermissions) > 0 {
-				user.Permissions = map[int64]map[string][]string{1: accesscontrol.GroupScopesByAction(tc.userPermissions)}
+				user.Permissions = map[int64]map[string][]string{1: accesscontrol.GroupScopesByActionContext(context.Background(), tc.userPermissions)}
 			}
-
-			level := dashboardaccess.PERMISSION_EDIT
 
 			builder := &searchstore.Builder{
 				Filters: []any{
@@ -317,10 +255,11 @@ func TestBuilder_RBAC(t *testing.T) {
 					searchstore.TitleSorter{},
 					permissions.NewAccessControlDashboardPermissionFilter(
 						user,
-						level,
+						tc.level,
 						"",
 						tc.features,
 						recursiveQueriesAreSupported,
+						store.GetDialect(),
 					),
 				},
 				Dialect:  store.GetDialect(),

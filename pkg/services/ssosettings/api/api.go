@@ -9,9 +9,9 @@ import (
 
 	"github.com/grafana/grafana/pkg/api/response"
 	"github.com/grafana/grafana/pkg/api/routing"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/infra/log"
 	ac "github.com/grafana/grafana/pkg/services/accesscontrol"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/ssosettings"
@@ -71,6 +71,7 @@ func (api *Api) RegisterAPIEndpoints() {
 		router.Get("/", auth(ac.EvalPermission(ac.ActionSettingsRead)), routing.Wrap(api.listAllProvidersSettings))
 		router.Get("/:key", auth(ac.EvalPermission(ac.ActionSettingsRead, settingsScope)), routing.Wrap(api.getProviderSettings))
 		router.Put("/:key", reqWriteAccess, routing.Wrap(api.updateProviderSettings))
+		router.Patch("/:key", reqWriteAccess, routing.Wrap(api.patchProviderSettings))
 		router.Delete("/:key", reqWriteAccess, routing.Wrap(api.removeProviderSettings))
 	})
 }
@@ -101,7 +102,7 @@ func (api *Api) getAuthorizedList(ctx context.Context, identity identity.Request
 		return nil, err
 	}
 
-	var authorizedProviders []*models.SSOSettings
+	authorizedProviders := make([]*models.SSOSettings, 0, len(allProviders))
 	for _, provider := range allProviders {
 		ev := ac.EvalPermission(ac.ActionSettingsRead, ac.Scope("settings", "auth."+provider.Provider, "*"))
 		hasAccess, err := api.AccessControl.Evaluate(ctx, identity, ev)
@@ -186,6 +187,45 @@ func (api *Api) updateProviderSettings(c *contextmodel.ReqContext) response.Resp
 	return response.Empty(http.StatusNoContent)
 }
 
+// swagger:route PATCH /v1/sso-settings/{key} sso_settings patchProviderSettings
+//
+// # Patch SSO Settings
+//
+// Partially updates the SSO Settings for a provider. Only provided fields are updated.
+//
+// You need to have a permission with action `settings:write` and scope `settings:auth.<provider>:*`.
+//
+// Responses:
+// 204: okResponse
+// 400: badRequestError
+// 401: unauthorisedError
+// 403: forbiddenError
+// 500: internalServerError
+func (api *Api) patchProviderSettings(c *contextmodel.ReqContext) response.Response {
+	key, ok := web.Params(c.Req)[":key"]
+	if !ok {
+		return response.Error(http.StatusBadRequest, "Missing key", nil)
+	}
+
+	var body struct {
+		Settings map[string]any `json:"settings"`
+	}
+	if err := web.Bind(c.Req, &body); err != nil {
+		return response.Error(http.StatusBadRequest, "Failed to parse request body", err)
+	}
+
+	if len(body.Settings) == 0 {
+		return response.Error(http.StatusBadRequest, "At least one setting must be provided", nil)
+	}
+
+	err := api.SSOSettingsService.Patch(c.Req.Context(), key, body.Settings, c.SignedInUser)
+	if err != nil {
+		return response.ErrOrFallback(http.StatusInternalServerError, "Failed to patch provider settings", err)
+	}
+
+	return response.Empty(http.StatusNoContent)
+}
+
 // swagger:route DELETE /v1/sso-settings/{key} sso_settings removeProviderSettings
 //
 // # Remove SSO Settings
@@ -236,6 +276,18 @@ type UpdateProviderSettingsParams struct {
 	Body struct {
 		ID       string         `json:"id"`
 		Provider string         `json:"provider"`
+		Settings map[string]any `json:"settings"`
+	} `json:"body"`
+}
+
+// swagger:parameters patchProviderSettings
+type PatchProviderSettingsParams struct {
+	// in:path
+	// required:true
+	Provider string `json:"key"`
+	// in:body
+	// required:true
+	Body struct {
 		Settings map[string]any `json:"settings"`
 	} `json:"body"`
 }

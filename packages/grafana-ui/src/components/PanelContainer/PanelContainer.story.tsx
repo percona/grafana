@@ -1,11 +1,10 @@
 import { Meta, StoryFn } from '@storybook/react';
-import React from 'react';
 
 import { PanelContainer } from './PanelContainer';
 import mdx from './PanelContainer.mdx';
 
 const meta: Meta<typeof PanelContainer> = {
-  title: 'General/PanelContainer',
+  title: 'Layout/Deprecated/PanelContainer',
   component: PanelContainer,
   parameters: {
     docs: {

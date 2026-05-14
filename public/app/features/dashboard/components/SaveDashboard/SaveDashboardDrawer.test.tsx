@@ -1,21 +1,15 @@
 import { render, waitFor, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { Provider } from 'react-redux';
 
 import { configureStore } from 'app/store/configureStore';
 
-import { DashboardModel } from '../../state';
+import { DashboardModel } from '../../state/DashboardModel';
 import { createDashboardModelFixture } from '../../state/__fixtures__/dashboardFixtures';
 
 import { SaveDashboardDrawer } from './SaveDashboardDrawer';
 
 const saveDashboardMutationMock = jest.fn();
-
-jest.mock('app/core/core', () => ({
-  ...jest.requireActual('app/core/core'),
-  contextSrv: {},
-}));
 
 jest.mock('app/features/browse-dashboards/api/browseDashboardsAPI', () => ({
   ...jest.requireActual('app/features/browse-dashboards/api/browseDashboardsAPI'),

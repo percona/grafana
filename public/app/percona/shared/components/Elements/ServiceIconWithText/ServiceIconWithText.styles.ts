@@ -4,6 +4,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   wrapper: css`
+    gap: 5px;
     display: flex;
     align-items: center;
 

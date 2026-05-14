@@ -158,6 +158,16 @@ ReduceDataOptions: {
 // TODO docs
 VizOrientation: "auto" | "vertical" | "horizontal" @cuetsy(kind="enum")
 
+// Breaks out each annotation frame into multiple lanes on the x-axis
+VizAnnotations: {
+	multiLane?: bool
+} @cuetsy(kind="interface")
+
+// TODO docs
+OptionsWithAnnotations: {
+	annotations?: VizAnnotations
+} @cuetsy(kind="interface")
+
 // TODO docs
 OptionsWithTooltip: {
 	tooltip: VizTooltipOptions
@@ -206,6 +216,8 @@ VizTextDisplayOptions: {
 	titleSize?: number
 	// Explicit value text size
 	valueSize?: number
+	// Explicit percent text size
+	percentSize?: number
 } @cuetsy(kind="interface")
 
 // TODO docs
@@ -227,6 +239,7 @@ GraphFieldConfig: {
 	gradientMode?:    GraphGradientMode
 	thresholdsStyle?: GraphThresholdsStyleConfig
 	transform?:       GraphTransform
+	showValues?:      bool
 	insertNulls?:     bool | number
 } @cuetsy(kind="interface")
 
@@ -251,7 +264,7 @@ BarGaugeDisplayMode: "basic" | "lcd" | "gradient" @cuetsy(kind="enum")
 BarGaugeValueMode: "color" | "text" | "hidden" @cuetsy(kind="enum")
 
 // Allows for the bar gauge name to be placed explicitly
-BarGaugeNamePlacement: "auto" | "top" | "left" @cuetsy(kind="enum")
+BarGaugeNamePlacement: "auto" | "top" | "left" | "hidden" @cuetsy(kind="enum")
 
 // Allows for the bar gauge size to be set explicitly
 BarGaugeSizing: "auto" | "manual" @cuetsy(kind="enum")
@@ -262,6 +275,7 @@ VizTooltipOptions: {
 	sort: SortOrder
 	maxWidth?: number
 	maxHeight?: number
+	hideZeros?: bool
 } @cuetsy(kind="interface")
 
 Labels: {

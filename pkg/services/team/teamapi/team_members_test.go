@@ -15,7 +15,6 @@ import (
 	"github.com/grafana/grafana/pkg/services/accesscontrol/acimpl"
 	"github.com/grafana/grafana/pkg/services/accesscontrol/actest"
 	"github.com/grafana/grafana/pkg/services/dashboards"
-	"github.com/grafana/grafana/pkg/services/dashboards/dashboardaccess"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/licensing"
 	"github.com/grafana/grafana/pkg/services/org"
@@ -28,14 +27,18 @@ import (
 	"github.com/grafana/grafana/pkg/web/webtest"
 )
 
-func SetupAPITestServer(t *testing.T, opts ...func(a *TeamAPI)) *webtest.Server {
+func SetupAPITestServer(t *testing.T, teamService team.Service, opts ...func(a *TeamAPI)) *webtest.Server {
 	t.Helper()
 	router := routing.NewRouteRegister()
 	cfg := setting.NewCfg()
 	cfg.LDAPAuthEnabled = true
 
+	if teamService == nil {
+		teamService = teamtest.NewFakeService()
+	}
+
 	a := ProvideTeamAPI(router,
-		teamtest.NewFakeService(),
+		teamService,
 		actest.FakeService{},
 		acimpl.ProvideAccessControl(featuremgmt.WithFeatures()),
 		&actest.FakePermissionsService{},
@@ -44,6 +47,7 @@ func SetupAPITestServer(t *testing.T, opts ...func(a *TeamAPI)) *webtest.Server 
 		cfg,
 		preftest.NewPreferenceServiceFake(),
 		dashboards.NewFakeDashboardService(t),
+		featuremgmt.WithFeatures(),
 	)
 	for _, o := range opts {
 		o(a)
@@ -55,11 +59,22 @@ func SetupAPITestServer(t *testing.T, opts ...func(a *TeamAPI)) *webtest.Server 
 }
 
 func TestAddTeamMembersAPIEndpoint(t *testing.T) {
-	server := SetupAPITestServer(t)
+	server := SetupAPITestServer(t, &teamtest.FakeService{ExpectedTeamDTO: &team.TeamDTO{ID: 1, UID: "a00001"}})
 
 	t.Run("should be able to add team member with correct permission", func(t *testing.T) {
 		req := webtest.RequestWithSignedInUser(
 			server.NewRequest(http.MethodPost, "/api/teams/1/members", strings.NewReader("{\"userId\": 1}")),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+
+	t.Run("should be able to add team member with correct permission by UID", func(t *testing.T) {
+		req := webtest.RequestWithSignedInUser(
+			server.NewRequest(http.MethodPost, "/api/teams/a00001/members", strings.NewReader("{\"userId\": 1}")),
 			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
 		)
 		res, err := server.SendJSON(req)
@@ -81,7 +96,7 @@ func TestAddTeamMembersAPIEndpoint(t *testing.T) {
 }
 
 func TestGetTeamMembersAPIEndpoint(t *testing.T) {
-	server := SetupAPITestServer(t)
+	server := SetupAPITestServer(t, &teamtest.FakeService{ExpectedIsMember: true, ExpectedTeamDTO: &team.TeamDTO{ID: 1, UID: "a00001"}})
 
 	t.Run("should be able to get team members with correct permission", func(t *testing.T) {
 		req := webtest.RequestWithSignedInUser(
@@ -93,6 +108,18 @@ func TestGetTeamMembersAPIEndpoint(t *testing.T) {
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		require.NoError(t, res.Body.Close())
 	})
+
+	t.Run("should be able to get team members with correct permission by UID", func(t *testing.T) {
+		req := webtest.RequestWithSignedInUser(
+			server.NewGetRequest("/api/teams/a00001/members"),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsRead, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+
 	t.Run("should not be able to get team members without correct permission", func(t *testing.T) {
 		req := webtest.RequestWithSignedInUser(
 			server.NewGetRequest("/api/teams/1/members"),
@@ -106,9 +133,7 @@ func TestGetTeamMembersAPIEndpoint(t *testing.T) {
 }
 
 func TestUpdateTeamMembersAPIEndpoint(t *testing.T) {
-	server := SetupAPITestServer(t, func(hs *TeamAPI) {
-		hs.teamService = &teamtest.FakeService{ExpectedIsMember: true}
-	})
+	server := SetupAPITestServer(t, &teamtest.FakeService{ExpectedIsMember: true, ExpectedTeamDTO: &team.TeamDTO{ID: 1, UID: "a00001"}})
 
 	t.Run("should be able to update team member with correct permission", func(t *testing.T) {
 		req := webtest.RequestWithSignedInUser(
@@ -120,6 +145,18 @@ func TestUpdateTeamMembersAPIEndpoint(t *testing.T) {
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		require.NoError(t, res.Body.Close())
 	})
+
+	t.Run("should be able to update team member with correct permission by team UID", func(t *testing.T) {
+		req := webtest.RequestWithSignedInUser(
+			server.NewRequest(http.MethodPut, "/api/teams/a00001/members/1", strings.NewReader("{\"permission\": 1}")),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+
 	t.Run("should not be able to update team member without correct permission", func(t *testing.T) {
 		req := webtest.RequestWithSignedInUser(
 			server.NewRequest(http.MethodPut, "/api/teams/1/members/1", strings.NewReader("{\"permission\": 1}")),
@@ -132,9 +169,64 @@ func TestUpdateTeamMembersAPIEndpoint(t *testing.T) {
 	})
 }
 
+func TestUpdateTeamMembersFromProvisionedTeamWhenGroupSyncIsEnabled(t *testing.T) {
+	server := SetupAPITestServer(t, &teamtest.FakeService{
+		ExpectedIsMember: true,
+		ExpectedTeamDTO:  &team.TeamDTO{ID: 1, UID: "a00001", IsProvisioned: true},
+	}, func(tapi *TeamAPI) {
+		tapi.cfg.Raw.Section("auth.scim").Key("group_sync_enabled").SetValue("true")
+	})
+
+	t.Run("should not be able to update team member from a provisioned team if team sync is enabled", func(t *testing.T) {
+		req := webtest.RequestWithSignedInUser(
+			server.NewRequest(http.MethodPut, "/api/teams/1/members/1", strings.NewReader("{\"permission\": 1}")),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+
+	t.Run("should not be able to update team member from a provisioned team by team UID if team sync is enabled", func(t *testing.T) {
+		req := webtest.RequestWithSignedInUser(
+			server.NewRequest(http.MethodPut, "/api/teams/a00001/members/1", strings.NewReader("{\"permission\": 1}")),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+}
+
+func TestUpdateTeamMembersFromProvisionedTeamWhenGroupSyncIsDisabled(t *testing.T) {
+	t.Run("should be able to delete team member from a provisioned team when SCIM group sync is disabled", func(t *testing.T) {
+		server := SetupAPITestServer(t, nil, func(hs *TeamAPI) {
+			hs.teamService = &teamtest.FakeService{
+				ExpectedIsMember: true,
+				ExpectedTeamDTO:  &team.TeamDTO{ID: 1, UID: "a00001", IsProvisioned: true},
+			}
+			hs.teamPermissionsService = &actest.FakePermissionsService{}
+		})
+
+		req := webtest.RequestWithSignedInUser(
+			server.NewRequest(http.MethodDelete, "/api/teams/1/members/1", nil),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+}
+
 func TestDeleteTeamMembersAPIEndpoint(t *testing.T) {
-	server := SetupAPITestServer(t, func(hs *TeamAPI) {
-		hs.teamService = &teamtest.FakeService{ExpectedIsMember: true}
+	server := SetupAPITestServer(t, nil, func(hs *TeamAPI) {
+		hs.teamService = &teamtest.FakeService{
+			ExpectedIsMember: true,
+			ExpectedTeamDTO:  &team.TeamDTO{ID: 1, UID: "a00001"},
+		}
 		hs.teamPermissionsService = &actest.FakePermissionsService{}
 	})
 
@@ -160,6 +252,29 @@ func TestDeleteTeamMembersAPIEndpoint(t *testing.T) {
 	})
 }
 
+func TestDeleteTeamMembersFromProvisionedTeam(t *testing.T) {
+	server := SetupAPITestServer(t, nil, func(hs *TeamAPI) {
+		hs.teamService = &teamtest.FakeService{
+			ExpectedIsMember: true,
+			ExpectedTeamDTO:  &team.TeamDTO{ID: 1, UID: "a00001", IsProvisioned: true},
+		}
+		hs.teamPermissionsService = &actest.FakePermissionsService{}
+	}, func(hs *TeamAPI) {
+		hs.cfg.Raw.Section("auth.scim").Key("group_sync_enabled").SetValue("true")
+	})
+
+	t.Run("should not be able to delete team member from a provisioned team", func(t *testing.T) {
+		req := webtest.RequestWithSignedInUser(
+			server.NewRequest(http.MethodDelete, "/api/teams/1/members/1", nil),
+			authedUserWithPermissions(1, 1, []accesscontrol.Permission{{Action: accesscontrol.ActionTeamsPermissionsWrite, Scope: "teams:id:1"}}),
+		)
+		res, err := server.SendJSON(req)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+		require.NoError(t, res.Body.Close())
+	})
+}
+
 func Test_getTeamMembershipUpdates(t *testing.T) {
 	type testCase struct {
 		description     string
@@ -177,9 +292,9 @@ func Test_getTeamMembershipUpdates(t *testing.T) {
 				Admins:  []string{"user3"},
 			},
 			expectedUpdates: []accesscontrol.SetResourcePermissionCommand{
-				{UserID: 1, Permission: team.MemberPermissionName},
-				{UserID: 2, Permission: team.MemberPermissionName},
-				{UserID: 3, Permission: team.AdminPermissionName},
+				{UserID: 1, Permission: team.PermissionTypeMember.String()},
+				{UserID: 2, Permission: team.PermissionTypeMember.String()},
+				{UserID: 3, Permission: team.PermissionTypeAdmin.String()},
 			},
 		},
 		{
@@ -189,11 +304,11 @@ func Test_getTeamMembershipUpdates(t *testing.T) {
 				Admins:  []string{"user3"},
 			},
 			currentMembers: []*team.TeamMemberDTO{
-				{Email: "user1", Permission: 0},
-				{Email: "user3", Permission: dashboardaccess.PERMISSION_ADMIN},
+				{Email: "user1", Permission: team.PermissionTypeMember},
+				{Email: "user3", Permission: team.PermissionTypeAdmin},
 			},
 			expectedUpdates: []accesscontrol.SetResourcePermissionCommand{
-				{UserID: 2, Permission: team.MemberPermissionName},
+				{UserID: 2, Permission: team.PermissionTypeMember.String()},
 			},
 		},
 		{
@@ -203,13 +318,13 @@ func Test_getTeamMembershipUpdates(t *testing.T) {
 				Admins:  []string{"user3"},
 			},
 			currentMembers: []*team.TeamMemberDTO{
-				{Email: "user1", Permission: 0},
-				{Email: "user2", Permission: dashboardaccess.PERMISSION_ADMIN},
-				{Email: "user3", Permission: 0},
+				{Email: "user1", Permission: team.PermissionTypeMember},
+				{Email: "user2", Permission: team.PermissionTypeAdmin},
+				{Email: "user3", Permission: team.PermissionTypeMember},
 			},
 			expectedUpdates: []accesscontrol.SetResourcePermissionCommand{
-				{UserID: 2, Permission: team.MemberPermissionName},
-				{UserID: 3, Permission: team.AdminPermissionName},
+				{UserID: 2, Permission: team.PermissionTypeMember.String()},
+				{UserID: 3, Permission: team.PermissionTypeAdmin.String()},
 			},
 		},
 		{
@@ -219,10 +334,10 @@ func Test_getTeamMembershipUpdates(t *testing.T) {
 				Admins:  []string{"user3"},
 			},
 			currentMembers: []*team.TeamMemberDTO{
-				{Email: "user1", UserID: 1, Permission: 0},
-				{Email: "user2", UserID: 2, Permission: 0},
-				{Email: "user3", UserID: 3, Permission: dashboardaccess.PERMISSION_ADMIN},
-				{Email: "user4", UserID: 4, Permission: dashboardaccess.PERMISSION_ADMIN},
+				{Email: "user1", UserID: 1, Permission: team.PermissionTypeMember},
+				{Email: "user2", UserID: 2, Permission: team.PermissionTypeMember},
+				{Email: "user3", UserID: 3, Permission: team.PermissionTypeAdmin},
+				{Email: "user4", UserID: 4, Permission: team.PermissionTypeAdmin},
 			},
 			expectedUpdates: []accesscontrol.SetResourcePermissionCommand{
 				{UserID: 2, Permission: ""},
@@ -266,6 +381,7 @@ func Test_getTeamMembershipUpdates(t *testing.T) {
 				cfg,
 				preftest.NewPreferenceServiceFake(),
 				dashboards.NewFakeDashboardService(t),
+				featuremgmt.WithFeatures(),
 			)
 
 			user := &user.SignedInUser{UserID: 1, OrgID: 1, OrgRole: org.RoleAdmin, Permissions: map[int64]map[string][]string{1: {accesscontrol.ActionOrgUsersRead: {"users:id:*"}}}}
@@ -281,5 +397,5 @@ func Test_getTeamMembershipUpdates(t *testing.T) {
 }
 
 func authedUserWithPermissions(userID, orgID int64, permissions []accesscontrol.Permission) *user.SignedInUser {
-	return &user.SignedInUser{UserID: userID, OrgID: orgID, OrgRole: org.RoleViewer, Permissions: map[int64]map[string][]string{orgID: accesscontrol.GroupScopesByAction(permissions)}}
+	return &user.SignedInUser{UserID: userID, OrgID: orgID, OrgRole: org.RoleViewer, Permissions: map[int64]map[string][]string{orgID: accesscontrol.GroupScopesByActionContext(context.Background(), permissions)}}
 }

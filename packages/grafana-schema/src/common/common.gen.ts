@@ -111,6 +111,26 @@ export enum ResourceDimensionMode {
   Mapping = 'mapping',
 }
 
+/**
+ * Links to a resource (image/svg path)
+ */
+export interface ResourceDimensionConfig extends BaseDimensionConfig {
+  fixed?: string;
+  mode: ResourceDimensionMode;
+}
+
+export enum ConnectionDirection {
+  Both = 'both',
+  Forward = 'forward',
+  None = 'none',
+  Reverse = 'reverse',
+}
+
+export enum DirectionDimensionMode {
+  Field = 'field',
+  Fixed = 'fixed',
+}
+
 export interface MapLayerOptions {
   /**
    * Custom options depending on the type
@@ -483,6 +503,20 @@ export enum VizOrientation {
 }
 
 /**
+ * Breaks out each annotation frame into multiple lanes on the x-axis
+ */
+export interface VizAnnotations {
+  multiLane?: boolean;
+}
+
+/**
+ * TODO docs
+ */
+export interface OptionsWithAnnotations {
+  annotations?: VizAnnotations;
+}
+
+/**
  * TODO docs
  */
 export interface OptionsWithTooltip {
@@ -577,6 +611,10 @@ export type TimelineValueAlignment = ('center' | 'left' | 'right');
  */
 export interface VizTextDisplayOptions {
   /**
+   * Explicit percent text size
+   */
+  percentSize?: number;
+  /**
    * Explicit title text size
    */
   titleSize?: number;
@@ -611,6 +649,7 @@ export interface GraphFieldConfig extends LineConfig, FillConfig, PointsConfig, 
   drawStyle?: GraphDrawStyle;
   gradientMode?: GraphGradientMode;
   insertNulls?: (boolean | number);
+  showValues?: boolean;
   thresholdsStyle?: GraphThresholdsStyleConfig;
   transform?: GraphTransform;
 }
@@ -658,6 +697,7 @@ export enum BarGaugeValueMode {
  */
 export enum BarGaugeNamePlacement {
   Auto = 'auto',
+  Hidden = 'hidden',
   Left = 'left',
   Top = 'top',
 }
@@ -674,6 +714,7 @@ export enum BarGaugeSizing {
  * TODO docs
  */
 export interface VizTooltipOptions {
+  hideZeros?: boolean;
   maxHeight?: number;
   maxWidth?: number;
   mode: TooltipDisplayMode;
@@ -689,6 +730,7 @@ export interface Labels {}
  * modes are deprecated in favor of new cell subOptions
  */
 export enum TableCellDisplayMode {
+  Actions = 'actions',
   Auto = 'auto',
   BasicGauge = 'basic',
   ColorBackground = 'color-background',
@@ -697,10 +739,13 @@ export enum TableCellDisplayMode {
   Custom = 'custom',
   DataLinks = 'data-links',
   Gauge = 'gauge',
+  Geo = 'geo',
   GradientGauge = 'gradient-gauge',
   Image = 'image',
   JSONView = 'json-view',
   LcdGauge = 'lcd-gauge',
+  Markdown = 'markdown',
+  Pill = 'pill',
   Sparkline = 'sparkline',
 }
 
@@ -729,27 +774,10 @@ export interface TableSortByFieldState {
 }
 
 /**
- * Footer options
- */
-export interface TableFooterOptions {
-  countRows?: boolean;
-  enablePagination?: boolean;
-  fields?: Array<string>;
-  reducer: Array<string>; // actually 1 value
-  show: boolean;
-}
-
-export const defaultTableFooterOptions: Partial<TableFooterOptions> = {
-  fields: [],
-  reducer: [],
-};
-
-/**
  * Auto mode table cell options
  */
 export interface TableAutoCellOptions {
   type: TableCellDisplayMode.Auto;
-  wrapText?: boolean;
 }
 
 /**
@@ -757,7 +785,6 @@ export interface TableAutoCellOptions {
  */
 export interface TableColorTextCellOptions {
   type: TableCellDisplayMode.ColorText;
-  wrapText?: boolean;
 }
 
 /**
@@ -771,6 +798,8 @@ export interface TableJsonViewCellOptions {
  * Json view cell options
  */
 export interface TableImageCellOptions {
+  alt?: string;
+  title?: string;
   type: TableCellDisplayMode.Image;
 }
 
@@ -779,6 +808,13 @@ export interface TableImageCellOptions {
  */
 export interface TableDataLinksCellOptions {
   type: TableCellDisplayMode.DataLinks;
+}
+
+/**
+ * Show actions in the cell
+ */
+export interface TableActionsCellOptions {
+  type: TableCellDisplayMode.Actions;
 }
 
 /**
@@ -805,24 +841,11 @@ export interface TableColoredBackgroundCellOptions {
   applyToRow?: boolean;
   mode?: TableCellBackgroundDisplayMode;
   type: TableCellDisplayMode.ColorBackground;
-  wrapText?: boolean;
 }
 
-/**
- * Height of a table cell
- */
-export enum TableCellHeight {
-  Auto = 'auto',
-  Lg = 'lg',
-  Md = 'md',
-  Sm = 'sm',
+export interface TablePillCellOptions {
+  type: TableCellDisplayMode.Pill;
 }
-
-/**
- * Table cell options. Each cell has a display mode
- * and other potential options for that display.
- */
-export type TableCellOptions = (TableAutoCellOptions | TableSparklineCellOptions | TableBarGaugeCellOptions | TableColoredBackgroundCellOptions | TableColorTextCellOptions | TableImageCellOptions | TableDataLinksCellOptions | TableJsonViewCellOptions);
 
 /**
  * Use UTC/GMT timezone
@@ -835,17 +858,29 @@ export type TimeZoneUtc = 'utc';
 export type TimeZoneBrowser = 'browser';
 
 /**
+ * Options for time comparison
+ */
+export interface TimeCompareOptions {
+  /**
+   * Enable time comparison control
+   */
+  timeCompare?: boolean;
+}
+
+/**
  * Optional formats for the template variable replace functions
  * See also https://grafana.com/docs/grafana/latest/dashboards/variables/variable-syntax/#advanced-variable-format-options
  */
 export enum VariableFormatID {
   CSV = 'csv',
+  CustomQueryParam = 'customqueryparam',
   Date = 'date',
   Distributed = 'distributed',
   DoubleQuote = 'doublequote',
   Glob = 'glob',
   HTML = 'html',
   JSON = 'json',
+  Join = 'join',
   Lucene = 'lucene',
   PercentEncode = 'percentencode',
   Pipe = 'pipe',
@@ -860,6 +895,10 @@ export enum VariableFormatID {
 
 export interface DataSourceRef {
   /**
+   *  Datasource API version
+   */
+  apiVersion?: string;
+  /**
    * The plugin type-id
    */
   type?: string;
@@ -869,12 +908,9 @@ export interface DataSourceRef {
   uid?: string;
 }
 
-/**
- * Links to a resource (image/svg path)
- */
-export interface ResourceDimensionConfig extends BaseDimensionConfig {
-  fixed?: string;
-  mode: ResourceDimensionMode;
+export interface DirectionDimensionConfig extends BaseDimensionConfig {
+  fixed?: ConnectionDirection;
+  mode: DirectionDimensionMode;
 }
 
 export interface FrameGeometrySource {
@@ -923,11 +959,102 @@ export enum ComparisonOperation {
   NEQ = 'neq',
 }
 
+export interface TableMarkdownCellOptions {
+  dynamicHeight?: boolean;
+  type: TableCellDisplayMode.Markdown;
+}
+
+/**
+ * Height of a table cell
+ */
+export enum TableCellHeight {
+  Auto = 'auto',
+  Lg = 'lg',
+  Md = 'md',
+  Sm = 'sm',
+}
+
+/**
+ * Table cell options. Each cell has a display mode
+ * and other potential options for that display.
+ */
+export type TableCellOptions = (TableAutoCellOptions | TableSparklineCellOptions | TableBarGaugeCellOptions | TableColoredBackgroundCellOptions | TableColorTextCellOptions | TableImageCellOptions | TablePillCellOptions | TableDataLinksCellOptions | TableActionsCellOptions | TableJsonViewCellOptions | TableMarkdownCellOptions | {
+    type: TableCellDisplayMode.Geo
+  });
+
+export enum TableCellTooltipPlacement {
+  Auto = 'auto',
+  Bottom = 'bottom',
+  Left = 'left',
+  Right = 'right',
+  Top = 'top',
+}
+
+export interface TableFooterOptions {
+  /**
+   * footer reducers to apply to this field
+   */
+  reducers?: Array<string>;
+}
+
+export const defaultTableFooterOptions: Partial<TableFooterOptions> = {
+  reducers: [],
+};
+
+export interface TableOptions {
+  /**
+   * Controls the height of the rows
+   */
+  cellHeight?: TableCellHeight;
+  /**
+   * If true, disables all keyboard events in the table. this is used when previewing a table (i.e. suggestions)
+   */
+  disableKeyboardEvents?: boolean;
+  /**
+   * Enable pagination on the table
+   */
+  enablePagination?: boolean;
+  /**
+   * Represents the index of the selected frame
+   */
+  frameIndex: number;
+  /**
+   * Defines the number of columns to freeze on the left side of the table
+   */
+  frozenColumns?: {
+    left?: number;
+  };
+  /**
+   * limits the maximum height of a row, if text wrapping or dynamic height is enabled
+   */
+  maxRowHeight?: number;
+  /**
+   * Controls whether the panel should show the header
+   */
+  showHeader: boolean;
+  /**
+   * Controls whether the header should show icons for the column types
+   */
+  showTypeIcons?: boolean;
+  /**
+   * Used to control row sorting
+   */
+  sortBy?: Array<TableSortByFieldState>;
+}
+
+export const defaultTableOptions: Partial<TableOptions> = {
+  cellHeight: TableCellHeight.Sm,
+  frameIndex: 0,
+  showHeader: true,
+  showTypeIcons: false,
+  sortBy: [],
+};
+
 /**
  * Field options for each field within a table (e.g 10, "The String", 64.20, etc.)
  * Generally defines alignment, filtering capabilties, display options, etc.
  */
-export interface TableFieldOptions {
+export interface TableFieldOptions extends HideableFieldConfig {
   align: FieldTextAlignment;
   cellOptions: TableCellOptions;
   /**
@@ -935,14 +1062,42 @@ export interface TableFieldOptions {
    */
   displayMode?: TableCellDisplayMode;
   filterable?: boolean;
-  hidden?: boolean; // ?? default is missing or false ??
+  /**
+   * options for the footer for this field
+   */
+  footer?: TableFooterOptions;
   /**
    * Hides any header for a column, useful for columns that show some static content or buttons.
    */
   hideHeader?: boolean;
   inspect: boolean;
   minWidth?: number;
+  /**
+   * The name of the field which contains styling overrides for this cell
+   */
+  styleField?: string;
+  /**
+   * Selecting or hovering this field will show a tooltip containing the content within the target field
+   */
+  tooltip?: {
+    /**
+     * The name of the field to get the tooltip content from
+     */
+    field: string;
+    /**
+     * placement of the tooltip
+     */
+    placement?: TableCellTooltipPlacement;
+  };
   width?: number;
+  /**
+   * Enables text wrapping for column headers
+   */
+  wrapHeaderText?: boolean;
+  /**
+   * if true, wrap the text content of the cell
+   */
+  wrapText?: boolean;
 }
 
 export const defaultTableFieldOptions: Partial<TableFieldOptions> = {

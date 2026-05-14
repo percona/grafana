@@ -1,7 +1,7 @@
 import { css, cx } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 
 export interface Props {
   className?: string;

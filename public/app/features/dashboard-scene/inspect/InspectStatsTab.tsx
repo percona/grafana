@@ -1,5 +1,4 @@
-import React from 'react';
-
+import { t } from '@grafana/i18n';
 import {
   SceneComponentProps,
   sceneGraph,
@@ -8,7 +7,6 @@ import {
   SceneObjectRef,
   VizPanel,
 } from '@grafana/scenes';
-import { t } from 'app/core/internationalization';
 import { InspectTab } from 'app/features/inspector/types';
 
 import { InspectStatsTab as OldInspectStatsTab } from '../../inspector/InspectStatsTab';

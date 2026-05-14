@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { DataSourceApi } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import {
   SceneComponentProps,
   sceneGraph,
@@ -9,7 +8,6 @@ import {
   SceneObjectRef,
   VizPanel,
 } from '@grafana/scenes';
-import { t } from 'app/core/internationalization';
 import { InspectTab } from 'app/features/inspector/types';
 
 export interface InspectMetaDataTabState extends SceneObjectState {

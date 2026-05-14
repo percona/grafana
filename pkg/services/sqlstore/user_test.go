@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/grafana/grafana/pkg/util/testutil"
 	"github.com/stretchr/testify/require"
 )
 
@@ -11,12 +12,11 @@ import (
 // admin user: getOrCreateOrg was unable to find the existing org.
 // https://github.com/grafana/grafana/issues/71781
 func TestIntegrationGetOrCreateOrg(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	ss, _ := InitTestDB(t)
 
-	err := ss.WithNewDbSession(context.Background(), func(sess *DBSession) error {
+	err := ss.WithDbSession(context.Background(), func(sess *DBSession) error {
 		// Create the org only:
 		ss.cfg.AutoAssignOrg = true
 		ss.cfg.DisableInitAdminCreation = true
@@ -28,7 +28,7 @@ func TestIntegrationGetOrCreateOrg(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = ss.WithNewDbSession(context.Background(), func(sess *DBSession) error {
+	err = ss.WithDbSession(context.Background(), func(sess *DBSession) error {
 		// Run it a second time and verify that it finds the org that was
 		// created above.
 		gotOrgId, err := ss.getOrCreateOrg(sess, mainOrgName)

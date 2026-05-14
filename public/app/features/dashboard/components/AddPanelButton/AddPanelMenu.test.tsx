@@ -1,10 +1,8 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 
 import { PluginType } from '@grafana/data';
 import { locationService, reportInteraction } from '@grafana/runtime';
 import { defaultDashboard } from '@grafana/schema';
-import config from 'app/core/config';
 import { createDashboardModelFixture } from 'app/features/dashboard/state/__fixtures__/dashboardFixtures';
 import {
   onCreateNewPanel,
@@ -15,8 +13,8 @@ import {
 
 import AddPanelMenu from './AddPanelMenu';
 
-jest.mock('app/types', () => ({
-  ...jest.requireActual('app/types'),
+jest.mock('app/types/store', () => ({
+  ...jest.requireActual('app/types/store'),
   useDispatch: () => jest.fn(),
   useSelector: () => jest.fn(),
 }));
@@ -46,7 +44,6 @@ function setup() {
 }
 
 beforeEach(() => {
-  config.featureToggles = { vizAndWidgetSplit: false };
   jest.clearAllMocks();
 });
 
@@ -109,7 +106,10 @@ it('creates new visualization when clicked on menu item Visualization', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'Visualization' }));
   });
 
-  expect(reportInteraction).toHaveBeenCalledWith('dashboards_toolbar_add_clicked', { item: 'add_visualization' });
+  expect(reportInteraction).toHaveBeenCalledWith('dashboards_toolbar_add_clicked', {
+    item: 'add_visualization',
+    isDynamicDashboard: false,
+  });
   expect(locationService.partial).toHaveBeenCalled();
   expect(onCreateNewPanel).toHaveBeenCalled();
 });
@@ -121,7 +121,10 @@ it('creates new row when clicked on menu item Row', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'Row' }));
   });
 
-  expect(reportInteraction).toHaveBeenCalledWith('dashboards_toolbar_add_clicked', { item: 'add_row' });
+  expect(reportInteraction).toHaveBeenCalledWith('dashboards_toolbar_add_clicked', {
+    item: 'add_row',
+    isDynamicDashboard: false,
+  });
   expect(locationService.partial).not.toHaveBeenCalled();
   expect(onCreateNewRow).toHaveBeenCalled();
 });
@@ -133,7 +136,10 @@ it('adds a library panel when clicked on menu item Import from library', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'Import from library' }));
   });
 
-  expect(reportInteraction).toHaveBeenCalledWith('dashboards_toolbar_add_clicked', { item: 'import_from_library' });
+  expect(reportInteraction).toHaveBeenCalledWith('dashboards_toolbar_add_clicked', {
+    item: 'import_from_library',
+    isDynamicDashboard: false,
+  });
   expect(locationService.partial).not.toHaveBeenCalled();
   expect(onAddLibraryPanel).toHaveBeenCalled();
 });
@@ -141,11 +147,4 @@ it('adds a library panel when clicked on menu item Import from library', () => {
 it('renders menu list without Widget button when feature flag is disabled', () => {
   setup();
   expect(screen.queryByText('Widget')).not.toBeInTheDocument();
-});
-
-it('renders menu list with Widget button when feature flag is enabled', () => {
-  config.featureToggles.vizAndWidgetSplit = true;
-  setup();
-
-  expect(screen.getByText('Widget')).toBeInTheDocument();
 });

@@ -5,8 +5,9 @@
  * Please keep the references to other files here to a minimum, if we reference a file that uses GrafanaBootData from `window` the worker will fail to load.
  */
 
-import { compact, uniqBy } from 'lodash';
+import { chain, compact } from 'lodash';
 
+import { type LabelMatcher } from '@grafana/alerting/unstable';
 import { Matcher, MatcherOperator, ObjectMatcher, Route } from 'app/plugins/datasource/alertmanager/types';
 
 import { Labels } from '../../../../types/unified-alerting-dto';
@@ -58,6 +59,8 @@ export function parseMatcher(matcher: string): Matcher {
 
 /**
  * This function combines parseMatcher and parsePromQLStyleMatcher, always returning an array of Matcher[] regardless of input syntax
+ * 1. { foo=bar, bar=baz }
+ * 2. foo=bar
  */
 export function parseMatcherToArray(matcher: string): Matcher[] {
   return isPromQLStyleMatcher(matcher) ? parsePromQLStyleMatcher(matcher) : [parseMatcher(matcher)];
@@ -71,6 +74,15 @@ export function parsePromQLStyleMatcher(matcher: string): Matcher[] {
     throw new Error('not a PromQL style matcher');
   }
 
+  return parsePromQLStyleMatcherLoose(matcher);
+}
+
+/**
+ * This function behaves the same as "parsePromQLStyleMatcher" but does not check if the matcher is formatted with { }
+ * In other words; it accepts both "{ foo=bar, bar=baz }" and "foo=bar,bar=baz"
+ * @throws
+ */
+export function parsePromQLStyleMatcherLoose(matcher: string): Matcher[] {
   // split by `,` but not when it's used as a label value
   const commaUnlessQuoted = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/;
   const parts = matcher.replace(/^\{/, '').replace(/\}$/, '').trim().split(commaUnlessQuoted);
@@ -84,13 +96,30 @@ export function parsePromQLStyleMatcher(matcher: string): Matcher[] {
     }));
 }
 
+/**
+ * This function behaves the same as "parsePromQLStyleMatcherLoose" but instead of throwing an error for incorrect syntax
+ * it returns an empty Array of matchers instead.
+ */
+export function parsePromQLStyleMatcherLooseSafe(matcher: string): Matcher[] {
+  try {
+    return parsePromQLStyleMatcherLoose(matcher);
+  } catch {
+    return [];
+  }
+}
+
 // Parses a list of entries like like "['foo=bar', 'baz=~bad*']" into SilenceMatcher[]
 export function parseQueryParamMatchers(matcherPairs: string[]): Matcher[] {
-  const parsedMatchers = matcherPairs.filter((x) => !!x.trim()).map((x) => parseMatcher(x));
-
-  // Due to migration, old alert rules might have a duplicated alertname label
-  // To handle that case want to filter out duplicates and make sure there are only unique labels
-  return uniqBy(parsedMatchers, (matcher) => matcher.name);
+  return (
+    chain(matcherPairs)
+      .map((m) => m.trim()) // trim spaces
+      .compact() // remove empty strings
+      .flatMap(parsePromQLStyleMatcherLooseSafe)
+      // Due to migration, old alert rules might have a duplicated alertname label
+      // To handle that case want to filter out duplicates and make sure there are only unique labels
+      .uniqBy('name')
+      .value()
+  );
 }
 
 export const getMatcherQueryParams = (labels: Labels) => {
@@ -159,8 +188,13 @@ export function quoteWithEscapeIfRequired(input: string) {
   return shouldQuote ? quoteWithEscape(input) : input;
 }
 
+export function unquoteIfRequired(input: string) {
+  return quoteWithEscapeIfRequired(unquoteWithUnescape(input));
+}
+
 export const encodeMatcher = ({ name, operator, value }: MatcherFieldValue) => {
   const encodedLabelName = quoteWithEscapeIfRequired(name);
+  // @TODO why not use quoteWithEscapeIfRequired?
   const encodedLabelValue = quoteWithEscape(value);
 
   return `${encodedLabelName}${operator}${encodedLabelValue}`;
@@ -194,6 +228,8 @@ export const matcherFormatter = {
   },
 } as const;
 
+export type MatcherFormatter = keyof typeof matcherFormatter;
+
 export function isPromQLStyleMatcher(input: string): boolean {
   return input.startsWith('{') && input.endsWith('}');
 }
@@ -217,6 +253,12 @@ function matcherToOperator(matcher: Matcher): MatcherOperator {
   }
 }
 
-export type MatcherFormatter = keyof typeof matcherFormatter;
+export function convertObjectMatcherToAlertingPackageMatcher(matcher: ObjectMatcher): LabelMatcher {
+  const [label, type, value] = matcher;
 
-export type Label = [string, string];
+  return {
+    label,
+    type,
+    value,
+  };
+}

@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 
 import { Button, Spinner, useStyles2 } from '@grafana/ui';
@@ -16,7 +16,7 @@ import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import validators from 'app/percona/shared/helpers/validators';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import { MAX_DAYS, MIN_DAYS } from '../Advanced/Advanced.constants';

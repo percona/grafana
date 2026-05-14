@@ -1,6 +1,5 @@
 import { css } from '@emotion/css';
 import { uniqueId } from 'lodash';
-import React from 'react';
 
 import {
   DataSourcePluginOptionsEditorProps,
@@ -13,6 +12,7 @@ import { Field, InlineLabel, InlineSwitch, Input, SecretInput, useStyles2 } from
 import { InfluxOptions, InfluxSecureJsonData } from '../../../types';
 
 import { WIDTH_SHORT } from './constants';
+import { trackInfluxDBConfigV1SQLDatabaseInputField, trackInfluxDBConfigV1SQLTokenInputField } from './trackingv1';
 
 export type Props = DataSourcePluginOptionsEditorProps<InfluxOptions, InfluxSecureJsonData>;
 
@@ -44,6 +44,7 @@ export const InfluxSqlConfig = (props: Props) => {
               },
             });
           }}
+          onBlur={trackInfluxDBConfigV1SQLDatabaseInputField}
         />
       </Field>
       <Field horizontal label={<InlineLabel width={WIDTH_SHORT}>Token</InlineLabel>} className={styles.horizontalField}>
@@ -55,6 +56,7 @@ export const InfluxSqlConfig = (props: Props) => {
           onReset={() => updateDatasourcePluginResetOption(props, 'token')}
           onChange={onUpdateDatasourceSecureJsonDataOption(props, 'token')}
           isConfigured={Boolean(secureJsonFields && secureJsonFields.token)}
+          onBlur={trackInfluxDBConfigV1SQLTokenInputField}
         />
       </Field>
       <Field

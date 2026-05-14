@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import { formatDistanceToNow } from 'date-fns';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { Card, Checkbox, useTheme2 } from '@grafana/ui';
@@ -32,7 +32,7 @@ export const StoredNotificationItem = ({
   const styles = getStyles(theme);
 
   return (
-    <Card className={className} onClick={onClick}>
+    <Card noMargin className={className} onClick={onClick}>
       <Card.Heading>{title}</Card.Heading>
       <Card.Description>{children}</Card.Description>
       <Card.Figure>

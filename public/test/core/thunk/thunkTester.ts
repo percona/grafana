@@ -9,13 +9,13 @@ export interface ThunkGiven {
 }
 
 export interface ThunkWhen {
-  whenThunkIsDispatched: (...args: any) => Promise<Array<PayloadAction<any>>>;
+  whenThunkIsDispatched: (...args: unknown[]) => Promise<Array<PayloadAction<any>>>;
 }
 
 export const thunkTester = (initialState: unknown, debug?: boolean): ThunkGiven => {
   const store = mockStore(initialState);
   let thunkUnderTest: any = null;
-  let dispatchedActions: Array<PayloadAction<any>> = [];
+  let dispatchedActions: PayloadAction[] = [];
 
   const givenThunk = (thunkFunction: any): ThunkWhen => {
     thunkUnderTest = thunkFunction;
@@ -23,7 +23,7 @@ export const thunkTester = (initialState: unknown, debug?: boolean): ThunkGiven 
     return instance;
   };
 
-  const whenThunkIsDispatched = async (...args: any): Promise<Array<PayloadAction<any>>> => {
+  const whenThunkIsDispatched = async (...args: unknown[]): Promise<PayloadAction[]> => {
     await store.dispatch(thunkUnderTest(...args));
 
     dispatchedActions = store.getActions();

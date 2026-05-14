@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 
 import { LogRowModel } from '@grafana/data';
 
-import { makeLogs } from '../__mocks__/makeLogs';
+import { makeLogs } from '../mocks/makeLogs';
 
 import { LiveLogsWithTheme } from './LiveLogs';
 

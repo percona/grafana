@@ -1,3 +1,5 @@
+import { RoleDto } from 'app/api/clients/legacy';
+
 /**
  * UserPermission is a map storing permissions in a form of
  * {
@@ -77,6 +79,9 @@ export enum AccessControlAction {
   DashboardsPermissionsRead = 'dashboards.permissions:read',
   DashboardsPermissionsWrite = 'dashboards.permissions:write',
   DashboardsPublicWrite = 'dashboards.public:write',
+  SnapshotsCreate = 'snapshots:create',
+  SnapshotsDelete = 'snapshots:delete',
+  SnapshotsRead = 'snapshots:read',
 
   FoldersRead = 'folders:read',
   FoldersWrite = 'folders:write',
@@ -126,10 +131,37 @@ export enum AccessControlAction {
   AlertingProvisioningReadSecrets = 'alert.provisioning.secrets:read',
   AlertingProvisioningRead = 'alert.provisioning:read',
   AlertingProvisioningWrite = 'alert.provisioning:write',
+  AlertingRulesProvisioningRead = 'alert.rules.provisioning:read',
+  AlertingRulesProvisioningWrite = 'alert.rules.provisioning:write',
+  AlertingNotificationsProvisioningRead = 'alert.notifications.provisioning:read',
+  AlertingNotificationsProvisioningWrite = 'alert.notifications.provisioning:write',
+  AlertingProvisioningSetStatus = 'alert.provisioning.provenance:write',
 
-  ActionAPIKeysRead = 'apikeys:read',
-  ActionAPIKeysCreate = 'apikeys:create',
-  ActionAPIKeysDelete = 'apikeys:delete',
+  // Alerting receivers actions
+  AlertingReceiversPermissionsRead = 'receivers.permissions:read',
+  AlertingReceiversPermissionsWrite = 'receivers.permissions:write',
+  AlertingReceiversCreate = 'alert.notifications.receivers:create',
+  AlertingReceiversWrite = 'alert.notifications.receivers:write',
+  AlertingReceiversRead = 'alert.notifications.receivers:read',
+  AlertingReceiversUpdateProtected = 'alert.notifications.receivers.protected:write',
+
+  // Alerting routes actions
+  AlertingRoutesRead = 'alert.notifications.routes:read',
+  AlertingRoutesWrite = 'alert.notifications.routes:write',
+
+  // Alerting time intervals actions
+  AlertingTimeIntervalsRead = 'alert.notifications.time-intervals:read',
+  AlertingTimeIntervalsWrite = 'alert.notifications.time-intervals:write',
+
+  // Alerting templates actions
+  AlertingTemplatesRead = 'alert.notifications.templates:read',
+  AlertingTemplatesWrite = 'alert.notifications.templates:write',
+  AlertingTemplatesDelete = 'alert.notifications.templates:delete',
+  AlertingNotificationsTemplatesTest = 'alert.notifications.templates.test:write',
+
+  // Alerting enrichments actions
+  AlertingEnrichmentsRead = 'alert.enrichments:read',
+  AlertingEnrichmentsWrite = 'alert.enrichments:write',
 
   PluginsInstall = 'plugins:install',
   PluginsWrite = 'plugins:write',
@@ -137,17 +169,19 @@ export enum AccessControlAction {
   // Settings
   SettingsRead = 'settings:read',
   SettingsWrite = 'settings:write',
+
+  // GroupSync
+  GroupSyncMappingsRead = 'groupsync.mappings:read',
+  GroupSyncMappingsWrite = 'groupsync.mappings:write',
+
+  // Migration Assistant
+  MigrationAssistantMigrate = 'migrationassistant:migrate',
+
+  // Saved Queries
+  QueriesRead = 'queries:read',
+  QueriesWrite = 'queries:write',
 }
 
-export interface Role {
-  uid: string;
-  name: string;
-  displayName: string;
-  description: string;
-  group: string;
-  global: boolean;
-  delegatable?: boolean;
-  version: number;
-  created: string;
-  updated: string;
+export interface Role extends RoleDto {
+  filteredDisplayName: string; // name to be shown in filtered role list
 }

@@ -1,10 +1,10 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { FC, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { AppEvents, PageLayoutType } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import {
   PMM_ACCESS_ROLES_PAGE,
   PMM_ACCESS_ROLE_EDIT_PAGE,
@@ -21,7 +21,7 @@ import { EditRolePageParams } from './EditRolePage.types';
 
 const EditRolePage: FC = () => {
   const dispatch = useAppDispatch();
-  const { id } = useParams<EditRolePageParams>();
+  const { id } = useParams() as EditRolePageParams;
   const [role, setRole] = useState<AddEditFormValues>();
   const [isLoading, setIsLoading] = useState(true);
 

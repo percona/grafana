@@ -9,7 +9,7 @@ import {
   TimeRange,
   toOption as toOptionFromData,
 } from '@grafana/data';
-import { CompletionItemKind, EditorMode, LanguageDefinition } from '@grafana/experimental';
+import { CompletionItemKind, EditorMode, LanguageDefinition } from '@grafana/plugin-ui';
 
 import { QueryWithDefaults } from './defaults';
 import {
@@ -50,6 +50,8 @@ export enum QueryFormat {
   Table = 'table',
 }
 
+export type SQLQueryMeta = { valueField?: string; textField?: string };
+
 export interface SQLQuery extends DataQuery {
   alias?: string;
   format?: QueryFormat;
@@ -59,7 +61,10 @@ export interface SQLQuery extends DataQuery {
   sql?: SQLExpression;
   editorMode?: EditorMode;
   rawQuery?: boolean;
+  meta?: SQLQueryMeta;
 }
+
+export type SQLVariableQuery = { query: string } & SQLQuery;
 
 export interface NameValue {
   name: string;
@@ -129,12 +134,22 @@ export interface DB {
   tables: (dataset?: string) => Promise<string[]>;
   fields: (query: SQLQuery, order?: boolean) => Promise<SQLSelectableValue[]>;
   validateQuery: (query: SQLQuery, range?: TimeRange) => Promise<ValidationResults>;
-  dsID: () => number;
   dispose?: (dsID?: string) => void;
   lookup?: (path?: string) => Promise<Array<{ name: string; completion: string }>>;
   getEditorLanguageDefinition: () => LanguageDefinition;
   toRawSql: (query: SQLQuery) => string;
-  functions?: () => string[];
+  functions: () => Func[];
+}
+
+export interface FuncParameter {
+  name: string;
+  required?: boolean;
+  options?: (query: SQLQuery) => Promise<SelectableValue[]>;
+}
+export interface Func {
+  name: string;
+  parameters?: FuncParameter[];
+  description?: string;
 }
 
 export interface QueryEditorProps {

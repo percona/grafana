@@ -1,13 +1,14 @@
 import uPlot, { Scale, Range } from 'uplot';
 
 import { DecimalCount, incrRoundDn, incrRoundUp, isBooleanUnit } from '@grafana/data';
-import { ScaleOrientation, ScaleDirection, ScaleDistribution } from '@grafana/schema';
+import { ScaleOrientation, ScaleDirection, ScaleDistribution, StackingMode } from '@grafana/schema';
 
 import { PlotConfigBuilder } from '../types';
 
 export interface ScaleProps {
   scaleKey: string;
   isTime?: boolean;
+  auto?: boolean;
   min?: number | null;
   max?: number | null;
   softMin?: number | null;
@@ -20,6 +21,9 @@ export interface ScaleProps {
   linearThreshold?: number;
   centeredZero?: boolean;
   decimals?: DecimalCount;
+  stackingMode?: StackingMode;
+  padMinBy?: number;
+  padMaxBy?: number;
 }
 
 export class UPlotScaleBuilder extends PlotConfigBuilder<ScaleProps, Scale> {
@@ -31,6 +35,7 @@ export class UPlotScaleBuilder extends PlotConfigBuilder<ScaleProps, Scale> {
   getConfig(): Scale {
     let {
       isTime,
+      auto,
       scaleKey,
       min: hardMin,
       max: hardMax,
@@ -41,7 +46,20 @@ export class UPlotScaleBuilder extends PlotConfigBuilder<ScaleProps, Scale> {
       orientation,
       centeredZero,
       decimals,
+      stackingMode,
+      padMinBy = 0.1,
+      padMaxBy = 0.1,
     } = this.props;
+
+    if (stackingMode === StackingMode.Percent) {
+      if (hardMin == null && softMin == null) {
+        softMin = 0;
+      }
+
+      if (hardMax == null && softMax == null) {
+        softMax = 1;
+      }
+    }
 
     const distr = this.props.distribution;
 
@@ -55,8 +73,9 @@ export class UPlotScaleBuilder extends PlotConfigBuilder<ScaleProps, Scale> {
                 : distr === ScaleDistribution.Ordinal
                   ? 2
                   : 1,
-          log: distr === ScaleDistribution.Log || distr === ScaleDistribution.Symlog ? this.props.log ?? 2 : undefined,
-          asinh: distr === ScaleDistribution.Symlog ? this.props.linearThreshold ?? 1 : undefined,
+          log:
+            distr === ScaleDistribution.Log || distr === ScaleDistribution.Symlog ? (this.props.log ?? 2) : undefined,
+          asinh: distr === ScaleDistribution.Symlog ? (this.props.linearThreshold ?? 1) : undefined,
         }
       : {};
 
@@ -129,13 +148,13 @@ export class UPlotScaleBuilder extends PlotConfigBuilder<ScaleProps, Scale> {
 
     const rangeConfig: Range.Config = {
       min: {
-        pad: 0.1,
+        pad: padMinBy,
         hard: hardMin ?? -Infinity,
         soft: softMin || 0,
         mode: softMinMode,
       },
       max: {
-        pad: 0.1,
+        pad: padMaxBy,
         hard: hardMax ?? Infinity,
         soft: softMax || 0,
         mode: softMaxMode,
@@ -243,7 +262,7 @@ export class UPlotScaleBuilder extends PlotConfigBuilder<ScaleProps, Scale> {
       return minMax;
     };
 
-    let auto = !isTime && !hasFixedRange;
+    auto ??= !isTime && !hasFixedRange;
 
     if (isBooleanUnit(scaleKey)) {
       auto = false;

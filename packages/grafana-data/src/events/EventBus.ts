@@ -55,7 +55,7 @@ export class EventBusSrv implements EventBus, LegacyEmitter {
   /**
    * Legacy functions
    */
-  emit<T>(event: AppEvent<T> | string, payload?: T | any): void {
+  emit<T>(event: AppEvent<T> | string, payload?: T): void {
     // console.log(`Deprecated emitter function used (emit), use $emit`);
 
     if (typeof event === 'string') {
@@ -65,7 +65,7 @@ export class EventBusSrv implements EventBus, LegacyEmitter {
     }
   }
 
-  on<T>(event: AppEvent<T> | string, handler: LegacyEventHandler<T>, scope?: any) {
+  on<T>(event: AppEvent<T> | string, handler: LegacyEventHandler<T>) {
     // console.log(`Deprecated emitter function used (on), use $on`);
 
     // need this wrapper to make old events compatible with old handlers
@@ -77,13 +77,6 @@ export class EventBusSrv implements EventBus, LegacyEmitter {
       this.emitter.on(event, handler.wrapper);
     } else {
       this.emitter.on(event.name, handler.wrapper);
-    }
-
-    if (scope) {
-      const unbind = scope.$on('$destroy', () => {
-        this.off(event, handler);
-        unbind();
-      });
     }
   }
 

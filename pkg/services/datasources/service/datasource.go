@@ -6,15 +6,21 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	authlib "github.com/grafana/authlib/types"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	sdkproxy "github.com/grafana/grafana-plugin-sdk-go/backend/proxy"
-
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
+	queryV0 "github.com/grafana/grafana/pkg/apis/query/v0alpha1"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/httpclient"
@@ -30,12 +36,15 @@ import (
 	"github.com/grafana/grafana/pkg/services/secrets"
 	"github.com/grafana/grafana/pkg/services/secrets/kvstore"
 	"github.com/grafana/grafana/pkg/setting"
-	"github.com/grafana/grafana/pkg/util/errutil"
 )
 
 const (
 	maxDatasourceNameLen = 190
 	maxDatasourceUrlLen  = 255
+)
+
+var (
+	_ queryV0.DataSourceConnectionProvider = (*Service)(nil)
 )
 
 type Service struct {
@@ -51,10 +60,10 @@ type Service struct {
 	pluginStore               pluginstore.Store
 	pluginClient              plugins.Client
 	basePluginContextProvider plugincontext.BasePluginContextProvider
+	retriever                 DataSourceRetriever
 
 	ptc proxyTransportCache
 }
-
 type proxyTransportCache struct {
 	cache map[int64]cachedRoundTripper
 	sync.Mutex
@@ -70,6 +79,7 @@ func ProvideService(
 	features featuremgmt.FeatureToggles, ac accesscontrol.AccessControl, datasourcePermissionsService accesscontrol.DatasourcePermissionsService,
 	quotaService quota.Service, pluginStore pluginstore.Store, pluginClient plugins.Client,
 	basePluginContextProvider plugincontext.BasePluginContextProvider,
+	retriever DataSourceRetriever,
 ) (*Service, error) {
 	dslogger := log.New("datasources")
 	store := &SqlStore{db: db, logger: dslogger, features: features}
@@ -89,6 +99,7 @@ func ProvideService(
 		pluginStore:               pluginStore,
 		pluginClient:              pluginClient,
 		basePluginContextProvider: basePluginContextProvider,
+		retriever:                 retriever,
 	}
 
 	ac.RegisterScopeAttributeResolver(NewNameScopeResolver(store))
@@ -117,6 +128,8 @@ func (s *Service) Usage(ctx context.Context, scopeParams *quota.ScopeParameters)
 type DataSourceRetriever interface {
 	// GetDataSource gets a datasource.
 	GetDataSource(ctx context.Context, query *datasources.GetDataSourceQuery) (*datasources.DataSource, error)
+	// GetDataSourceInNamespace gets a datasource by namespace, name (datasource uid), and group (datasource type).
+	GetDataSourceInNamespace(ctx context.Context, namespace, name, group string) (*datasources.DataSource, error)
 }
 
 // NewNameScopeResolver provides an ScopeAttributeResolver able to
@@ -173,7 +186,11 @@ func NewIDScopeResolver(db DataSourceRetriever) (string, accesscontrol.ScopeAttr
 }
 
 func (s *Service) GetDataSource(ctx context.Context, query *datasources.GetDataSourceQuery) (*datasources.DataSource, error) {
-	return s.SQLStore.GetDataSource(ctx, query)
+	return s.retriever.GetDataSource(ctx, query)
+}
+
+func (s *Service) GetDataSourceInNamespace(ctx context.Context, namespace, name, group string) (*datasources.DataSource, error) {
+	return s.retriever.GetDataSourceInNamespace(ctx, namespace, name, group)
 }
 
 func (s *Service) GetDataSources(ctx context.Context, query *datasources.GetDataSourcesQuery) ([]*datasources.DataSource, error) {
@@ -198,6 +215,93 @@ func (s *Service) GetDataSourcesByType(ctx context.Context, query *datasources.G
 		query.AliasIDs = p.AliasIDs
 	}
 	return s.SQLStore.GetDataSourcesByType(ctx, query)
+}
+
+// ListConnections implements v0alpha1.DataSourceConnectionProvider.
+func (s *Service) ListConnections(ctx context.Context, query queryV0.DataSourceConnectionQuery) (*queryV0.DataSourceConnectionList, error) {
+	user, err := identity.GetRequester(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ns, err := authlib.ParseNamespace(query.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	if ns.OrgID == 0 {
+		return nil, fmt.Errorf("missing valid namespace")
+	}
+	if ns.OrgID != user.GetOrgID() { // We may allow services to access other orgs in the future
+		return nil, fmt.Errorf("user must be in the requested namespace")
+	}
+
+	result := &queryV0.DataSourceConnectionList{
+		TypeMeta: v1.TypeMeta{
+			APIVersion: queryV0.SchemeGroupVersion.String(),
+			Kind:       "DataSourceConnectionList",
+		},
+		Items: []queryV0.DataSourceConnection{},
+	}
+
+	var dss []*datasources.DataSource
+	if query.Name != "" {
+		ds, err := s.GetDataSource(ctx, &datasources.GetDataSourceQuery{
+			OrgID: ns.OrgID,
+			UID:   query.Name,
+		})
+		if err != nil {
+			return nil, err
+		}
+		if ds != nil {
+			// If both name+plugin exist, we need to verify the type
+			if query.Plugin != "" && ds.Type != query.Plugin {
+				p, _ := s.pluginStore.Plugin(ctx, ds.Type)
+				if !(slices.Contains(p.AliasIDs, query.Plugin)) {
+					return result, nil
+				}
+			}
+			dss = []*datasources.DataSource{ds} // will check authz before returning
+		}
+	} else if query.Plugin != "" {
+		dss, err = s.GetDataSourcesByType(ctx, &datasources.GetDataSourcesByTypeQuery{
+			OrgID: ns.OrgID,
+			Type:  query.Plugin, // will support alias
+		})
+	} else {
+		dss, err = s.GetDataSources(ctx, &datasources.GetDataSourcesQuery{
+			OrgID:           ns.OrgID,
+			DataSourceLimit: 10000, // Do a full query
+		})
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ds := range dss {
+		// Skip datasources they can not see
+		evaluator := accesscontrol.EvalPermission(datasources.ActionRead,
+			datasources.ScopeProvider.GetResourceScopeUID(ds.UID))
+		if ok, _ := s.ac.Evaluate(ctx, user, evaluator); !ok {
+			continue
+		}
+
+		v, err := s.asConnection(ds)
+		if err != nil {
+			return nil, err
+		}
+		result.Items = append(result.Items, *v)
+	}
+	return result, nil
+}
+
+func (s *Service) asConnection(ds *datasources.DataSource) (*queryV0.DataSourceConnection, error) {
+	return &queryV0.DataSourceConnection{
+		Title:      ds.Name,
+		APIGroup:   fmt.Sprintf("%s.datasource.grafana.app", ds.Type),
+		APIVersion: "v0alpha1", // TODO, get this from the plugin
+		Name:       ds.UID,
+		Plugin:     ds.Type,
+	}, nil
 }
 
 func (s *Service) AddDataSource(ctx context.Context, cmd *datasources.AddDataSourceCommand) (*datasources.DataSource, error) {
@@ -255,15 +359,13 @@ func (s *Service) AddDataSource(ctx context.Context, cmd *datasources.AddDataSou
 	}
 
 	var dataSource *datasources.DataSource
-	return dataSource, s.db.InTransaction(ctx, func(ctx context.Context) error {
+	err = s.db.InTransaction(ctx, func(ctx context.Context) error {
 		var err error
 
 		cmd.EncryptedSecureJsonData = make(map[string][]byte)
-		if !s.features.IsEnabled(ctx, featuremgmt.FlagDisableSecretsCompatibility) {
-			cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
-			if err != nil {
-				return err
-			}
+		cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
+		if err != nil {
+			return err
 		}
 
 		cmd.UpdateSecretFn = func() error {
@@ -280,21 +382,31 @@ func (s *Service) AddDataSource(ctx context.Context, cmd *datasources.AddDataSou
 			return err
 		}
 
-		// This belongs in Data source permissions, and we probably want
-		// to do this with a hook in the store and rollback on fail.
-		// We can't use events, because there's no way to communicate
-		// failure, and we want "not being able to set default perms"
-		// to fail the creation.
-		permissions := []accesscontrol.SetResourcePermissionCommand{
-			{BuiltinRole: "Viewer", Permission: "Query"},
-			{BuiltinRole: "Editor", Permission: "Query"},
+		if s.cfg.RBAC.PermissionsOnCreation("datasource") {
+			// This belongs in Data source permissions, and we probably want
+			// to do this with a hook in the store and rollback on fail.
+			// We can't use events, because there's no way to communicate
+			// failure, and we want "not being able to set default perms"
+			// to fail the creation.
+			permissions := []accesscontrol.SetResourcePermissionCommand{
+				{BuiltinRole: "Viewer", Permission: "Query"},
+				{BuiltinRole: "Editor", Permission: "Query"},
+			}
+			if cmd.UserID != 0 {
+				permissions = append(permissions, accesscontrol.SetResourcePermissionCommand{UserID: cmd.UserID, Permission: "Admin"})
+			}
+			if _, err = s.permissionsService.SetPermissions(ctx, cmd.OrgID, dataSource.UID, permissions...); err != nil {
+				return err
+			}
 		}
-		if cmd.UserID != 0 {
-			permissions = append(permissions, accesscontrol.SetResourcePermissionCommand{UserID: cmd.UserID, Permission: "Admin"})
-		}
-		_, err = s.permissionsService.SetPermissions(ctx, cmd.OrgID, dataSource.UID, permissions...)
-		return err
+
+		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return dataSource, nil
 }
 
 // This will valid validate the instance settings return a version that is safe to be saved
@@ -322,10 +434,7 @@ func (s *Service) prepareInstanceSettings(ctx context.Context, settings *backend
 	}
 
 	// When the APIVersion is set, the client must also implement AdmissionHandler
-	if p.APIVersion == "" {
-		if settings.APIVersion != "" {
-			return nil, fmt.Errorf("invalid request apiVersion (datasource does not have one configured)")
-		}
+	if settings.APIVersion == "" {
 		return settings, nil // NOOP
 	}
 
@@ -366,8 +475,12 @@ func (s *Service) prepareInstanceSettings(ctx context.Context, settings *backend
 		rsp, err := s.pluginClient.ValidateAdmission(ctx, req)
 		if err != nil {
 			if errors.Is(err, plugins.ErrMethodNotImplemented) {
+				if settings.APIVersion == "v0alpha1" {
+					// For v0alpha1 we don't require plugins to implement ValidateAdmission
+					return settings, nil
+				}
 				return nil, errutil.Internal("plugin.unimplemented").
-					Errorf("plugin (%s) with apiVersion=%s must implement ValidateAdmission", p.ID, p.APIVersion)
+					Errorf("plugin (%s) with apiVersion=%s must implement ValidateAdmission", p.ID, settings.APIVersion)
 			}
 			return nil, err
 		}
@@ -387,8 +500,12 @@ func (s *Service) prepareInstanceSettings(ctx context.Context, settings *backend
 	rsp, err := s.pluginClient.MutateAdmission(ctx, req)
 	if err != nil {
 		if errors.Is(err, plugins.ErrMethodNotImplemented) {
+			if settings.APIVersion == "v0alpha1" {
+				// For v0alpha1 we don't require plugins to implement MutateAdmission
+				return settings, nil
+			}
 			return nil, errutil.Internal("plugin.unimplemented").
-				Errorf("plugin (%s) with apiVersion=%s must implement MutateAdmission", p.ID, p.APIVersion)
+				Errorf("plugin (%s) with apiVersion=%s must implement MutateAdmission", p.ID, settings.APIVersion)
 		}
 		return nil, err
 	}
@@ -468,12 +585,15 @@ func (s *Service) UpdateDataSource(ctx context.Context, cmd *datasources.UpdateD
 
 		query := &datasources.GetDataSourceQuery{
 			ID:    cmd.ID,
+			UID:   cmd.UID,
 			OrgID: cmd.OrgID,
 		}
 		dataSource, err = s.SQLStore.GetDataSource(ctx, query)
 		if err != nil {
 			return err
 		}
+		cmd.UID = dataSource.UID
+		cmd.ID = dataSource.ID
 
 		// Validate the command
 		jd, err := cmd.JsonData.ToDB()
@@ -517,6 +637,17 @@ func (s *Service) UpdateDataSource(ctx context.Context, cmd *datasources.UpdateD
 			if err != nil {
 				return err
 			}
+		}
+
+		// preserve existing lbac rules when updating datasource if we're not updating lbac rules
+		// TODO: Refactor to store lbac rules separate from a datasource
+		if !cmd.AllowLBACRuleUpdates {
+			s.logger.Debug("Overriding LBAC rules with stored ones using updateLBACRules API",
+				"reason", "overriding_lbac_rules_from_datasource_api",
+				"datasource_id", dataSource.ID,
+				"datasource_uid", dataSource.UID)
+
+			cmd.JsonData = RetainExistingLBACRules(dataSource.JsonData, cmd.JsonData)
 		}
 
 		if cmd.Name != "" && cmd.Name != dataSource.Name {
@@ -719,7 +850,7 @@ func (s *Service) httpClientOptions(ctx context.Context, ds *datasources.DataSou
 		}
 	}
 
-	if ds.JsonData != nil && ds.JsonData.Get("enableSecureSocksProxy").MustBool(false) {
+	if ds.IsSecureSocksDSProxyEnabled() {
 		proxyOpts := &sdkproxy.Options{
 			Enabled: true,
 			Auth: &sdkproxy.AuthOptions{
@@ -896,7 +1027,7 @@ func awsServiceNamespace(dsType string, jsonData *simplejson.Json) string {
 		} else {
 			return "es"
 		}
-	case datasources.DS_PROMETHEUS, datasources.DS_ALERTMANAGER:
+	case datasources.DS_PROMETHEUS, datasources.DS_AMAZON_PROMETHEUS, datasources.DS_ALERTMANAGER:
 		return "aps"
 	default:
 		panic(fmt.Sprintf("Unsupported datasource %q", dsType))
@@ -922,11 +1053,9 @@ func (s *Service) fillWithSecureJSONData(ctx context.Context, cmd *datasources.U
 	}
 
 	cmd.EncryptedSecureJsonData = make(map[string][]byte)
-	if !s.features.IsEnabled(ctx, featuremgmt.FlagDisableSecretsCompatibility) {
-		cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
-		if err != nil {
-			return err
-		}
+	cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -960,4 +1089,31 @@ func (s *Service) CustomHeaders(ctx context.Context, ds *datasources.DataSource)
 		return nil, fmt.Errorf("failed to get custom headers: %w", err)
 	}
 	return s.getCustomHeaders(ds.JsonData, values), nil
+}
+
+func RetainExistingLBACRules(storedJsonData, cmdJsonData *simplejson.Json) *simplejson.Json {
+	// If there are no stored data, we should remove the key from the command json data
+	if storedJsonData == nil {
+		if cmdJsonData != nil {
+			cmdJsonData.Del("teamHttpHeaders")
+		}
+		return cmdJsonData
+	}
+
+	previousRules := storedJsonData.Get("teamHttpHeaders").Interface()
+	// If there are no previous rules, we should remove the key from the command json data
+	if previousRules == nil {
+		if cmdJsonData != nil {
+			cmdJsonData.Del("teamHttpHeaders")
+		}
+		return cmdJsonData
+	}
+
+	if cmdJsonData == nil {
+		// It's fine to instantiate a new JsonData here
+		// Because it's done in the SQLStore.UpdateDataSource anyway
+		cmdJsonData = simplejson.New()
+	}
+	cmdJsonData.Set("teamHttpHeaders", previousRules)
+	return cmdJsonData
 }

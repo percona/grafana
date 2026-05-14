@@ -1,5 +1,6 @@
-import { toDataFrame } from '../../dataframe';
-import { FieldType, DataTransformerConfig } from '../../types';
+import { toDataFrame } from '../../dataframe/processDataFrame';
+import { FieldType } from '../../types/dataFrame';
+import { DataTransformerConfig } from '../../types/transformations';
 import { mockTransformationsRegistry } from '../../utils/tests/mockTransformationsRegistry';
 import { transformDataFrame } from '../transformDataFrame';
 
@@ -93,6 +94,10 @@ describe('OrganizeFields Transformer', () => {
             name: 'time',
             type: FieldType.time,
             values: [3000, 4000, 5000, 6000],
+            state: {
+              displayName: 'time',
+              multipleFrames: false,
+            },
           },
         ]);
       });

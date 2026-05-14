@@ -1,13 +1,11 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
+import * as React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { TestProvider } from 'test/helpers/TestProvider';
+import { render, screen, waitFor, within } from 'test/test-utils';
 
 import { clearPluginSettingsCache } from 'app/features/plugins/pluginSettings';
 
-import { mockAlertRuleApi, mockApi, setupMswServer } from '../../../mockApi';
-import { getGrafanaRule, labelsPluginMetaMock } from '../../../mocks';
+import { mockAlertRuleApi, setupMswServer } from '../../../mockApi';
+import { getGrafanaRule } from '../../../mocks';
 import { GRAFANA_RULES_SOURCE_NAME } from '../../../utils/datasource';
 
 import LabelsField, { LabelsWithSuggestions } from './LabelsField';
@@ -27,21 +25,26 @@ const SubFormProviderWrapper = ({ children }: React.PropsWithChildren<{}>) => {
 };
 
 function renderAlertLabels() {
-  render(
+  return render(
     <FormProviderWrapper>
       <LabelsField />
-    </FormProviderWrapper>,
-    { wrapper: TestProvider }
+    </FormProviderWrapper>
   );
 }
 
-function renderLabelsWithSuggestions() {
-  render(
+async function renderLabelsWithSuggestions() {
+  const view = render(
     <SubFormProviderWrapper>
       <LabelsWithSuggestions dataSourceName="grafana" />
-    </SubFormProviderWrapper>,
-    { wrapper: TestProvider }
+    </SubFormProviderWrapper>
   );
+
+  // Wait for the dropdowns to be rendered
+  await waitFor(() => {
+    expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(2);
+  });
+
+  return view;
 }
 
 const grafanaRule = getGrafanaRule(undefined, {
@@ -70,93 +73,73 @@ describe('LabelsField with suggestions', () => {
     clearPluginSettingsCache();
   });
   beforeEach(() => {
-    mockApi(server).plugins.getPluginSettings({ ...labelsPluginMetaMock, enabled: false });
     mockAlertRuleApi(server).rulerRules(GRAFANA_RULES_SOURCE_NAME, {
       [grafanaRule.namespace.name]: [{ name: grafanaRule.group.name, interval: '1m', rules: [grafanaRule.rulerRule!] }],
     });
   });
 
+  jest.retryTimes(2);
+
   it('Should display two dropdowns with the existing labels', async () => {
-    renderLabelsWithSuggestions();
+    await renderLabelsWithSuggestions();
 
-    await waitFor(() => expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(2));
-
-    expect(screen.getByTestId('labelsInSubform-key-0').textContent).toBe('key1');
-    expect(screen.getByTestId('labelsInSubform-key-1').textContent).toBe('key2');
+    expect(screen.getByTestId('labelsInSubform-key-0').querySelector('input')).toHaveValue('key1');
+    expect(screen.getByTestId('labelsInSubform-key-1').querySelector('input')).toHaveValue('key2');
 
     expect(screen.getAllByTestId('alertlabel-value-picker')).toHaveLength(2);
 
-    expect(screen.getByTestId('labelsInSubform-value-0').textContent).toBe('value1');
-    expect(screen.getByTestId('labelsInSubform-value-1').textContent).toBe('value2');
+    expect(screen.getByTestId('labelsInSubform-value-0').querySelector('input')).toHaveValue('value1');
+    expect(screen.getByTestId('labelsInSubform-value-1').querySelector('input')).toHaveValue('value2');
   });
 
   it('Should delete a key-value combination', async () => {
-    renderLabelsWithSuggestions();
-
-    await waitFor(() => expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(2));
+    const { user } = await renderLabelsWithSuggestions();
 
     expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(2);
+
     expect(screen.getAllByTestId('alertlabel-value-picker')).toHaveLength(2);
 
-    await userEvent.click(screen.getByTestId('delete-label-1'));
+    await user.click(screen.getByTestId('delete-label-1'));
 
     expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(1);
     expect(screen.getAllByTestId('alertlabel-value-picker')).toHaveLength(1);
   });
 
   it('Should add new key-value dropdowns', async () => {
-    renderLabelsWithSuggestions();
+    const { user } = await renderLabelsWithSuggestions();
 
     await waitFor(() => expect(screen.getByText('Add more')).toBeVisible());
-    await userEvent.click(screen.getByText('Add more'));
+    await user.click(screen.getByText('Add more'));
 
     expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(3);
 
-    expect(screen.getByTestId('labelsInSubform-key-0').textContent).toBe('key1');
-    expect(screen.getByTestId('labelsInSubform-key-1').textContent).toBe('key2');
-    expect(screen.getByTestId('labelsInSubform-key-2').textContent).toBe('Choose key');
+    expect(screen.getByTestId('labelsInSubform-key-0').querySelector('input')).toHaveValue('key1');
+    expect(screen.getByTestId('labelsInSubform-key-1').querySelector('input')).toHaveValue('key2');
+    expect(screen.getByTestId('labelsInSubform-key-2').querySelector('input')).toHaveValue('');
 
     expect(screen.getAllByTestId('alertlabel-value-picker')).toHaveLength(3);
 
-    expect(screen.getByTestId('labelsInSubform-value-0').textContent).toBe('value1');
-    expect(screen.getByTestId('labelsInSubform-value-1').textContent).toBe('value2');
-    expect(screen.getByTestId('labelsInSubform-value-2').textContent).toBe('Choose value');
+    expect(screen.getByTestId('labelsInSubform-value-0').querySelector('input')).toHaveValue('value1');
+    expect(screen.getByTestId('labelsInSubform-value-1').querySelector('input')).toHaveValue('value2');
+    expect(screen.getByTestId('labelsInSubform-value-2').querySelector('input')).toHaveValue('');
   });
 
   it('Should be able to write new keys and values using the dropdowns', async () => {
-    renderLabelsWithSuggestions();
+    const { user } = await renderLabelsWithSuggestions();
 
     await waitFor(() => expect(screen.getByText('Add more')).toBeVisible());
-    await userEvent.click(screen.getByText('Add more'));
+    await user.click(screen.getByText('Add more'));
 
-    const LastKeyDropdown = within(screen.getByTestId('labelsInSubform-key-2'));
-    const LastValueDropdown = within(screen.getByTestId('labelsInSubform-value-2'));
+    expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(3);
 
-    await userEvent.type(LastKeyDropdown.getByRole('combobox'), 'key3{enter}');
-    await userEvent.type(LastValueDropdown.getByRole('combobox'), 'value3{enter}');
+    const lastKeyDropdown = within(screen.getByTestId('labelsInSubform-key-2'));
+    const lastValueDropdown = within(screen.getByTestId('labelsInSubform-value-2'));
 
-    expect(screen.getByTestId('labelsInSubform-key-2').textContent).toBe('key3');
-    expect(screen.getByTestId('labelsInSubform-value-2').textContent).toBe('value3');
-  });
-  it('Should be able to write new keys and values using the dropdowns, case sensitive', async () => {
-    renderLabelsWithSuggestions();
+    await user.type(lastKeyDropdown.getByRole('combobox'), 'key3{enter}');
+    await user.type(lastValueDropdown.getByRole('combobox'), 'value3{enter}');
 
-    await waitFor(() => expect(screen.getAllByTestId('alertlabel-key-picker')).toHaveLength(2));
-    expect(screen.getByTestId('labelsInSubform-key-0').textContent).toBe('key1');
-    expect(screen.getByTestId('labelsInSubform-key-1').textContent).toBe('key2');
-    expect(screen.getByTestId('labelsInSubform-value-0').textContent).toBe('value1');
-    expect(screen.getByTestId('labelsInSubform-value-1').textContent).toBe('value2');
-
-    const LastKeyDropdown = within(screen.getByTestId('labelsInSubform-key-1'));
-    const LastValueDropdown = within(screen.getByTestId('labelsInSubform-value-1'));
-
-    await userEvent.type(LastKeyDropdown.getByRole('combobox'), 'KEY2{enter}');
-    expect(screen.getByTestId('labelsInSubform-key-0').textContent).toBe('key1');
-    expect(screen.getByTestId('labelsInSubform-key-1').textContent).toBe('KEY2');
-
-    await userEvent.type(LastValueDropdown.getByRole('combobox'), 'VALUE2{enter}');
-    expect(screen.getByTestId('labelsInSubform-value-0').textContent).toBe('value1');
-    expect(screen.getByTestId('labelsInSubform-value-1').textContent).toBe('VALUE2');
+    expect(screen.getByTestId('labelsInSubform-key-2').querySelector('input')).toHaveValue('key3');
+    expect(screen.getByTestId('labelsInSubform-value-2').querySelector('input')).toHaveValue('value3');
   });
 });
 

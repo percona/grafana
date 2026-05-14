@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
-import { setupMockedDataSource } from '../../../__mocks__/CloudWatchDataSource';
-import { CloudWatchMetricsQuery } from '../../../types';
+import { CloudWatchMetricsQuery } from '../../../dataquery.gen';
+import { setupMockedDataSource } from '../../../mocks/CloudWatchDataSource';
 
 import { FilterItem } from './FilterItem';
 

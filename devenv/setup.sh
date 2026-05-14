@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 bulkDashboard() {
 
@@ -17,6 +17,13 @@ bulkDashboard() {
 bulkFolders() {
 	./bulk-folders/bulk-folders.sh "$1"
 	ln -s -f ../../../devenv/bulk-folders/bulk-folders.yaml ../conf/provisioning/dashboards/bulk-folders.yaml
+}
+
+scopes() {
+	echo -e "\xE2\x9C\x94 Setting up scopes, scope nodes, and scope navigations"
+	cd scopes
+	go run scopes.go
+	cd ..
 }
 
 requiresJsonnet() {
@@ -49,6 +56,12 @@ undev() {
     rm -rf bulk-folders/Bulk\ Folder*
     echo -e "    \xE2\x9C\x94 Reverting bulk-folders provisioning"
 
+    # Removing scopes, scope nodes, and scope navigations
+    cd scopes
+    go run scopes.go -clean
+    cd ..
+    echo -e "    \xE2\x9C\x94 Deleting scopes, scope nodes, and scope navigations"
+
     # Removing the symlinks
     rm -f ../conf/provisioning/dashboards/custom.yaml
     rm -f ../conf/provisioning/dashboards/bulk-folders.yaml
@@ -63,6 +76,7 @@ usage() {
 	echo "  bulk-dashboards                      - provision 400 dashboards"
 	echo "  bulk-folders [folders] [dashboards]  - provision many folders with dashboards"
 	echo "  bulk-folders                         - provision 200 folders with 3 dashboards in each"
+	echo "  scopes                               - provision scopes, scope nodes, and scope navigations"
 	echo "  no args                              - provision core datasources and dev dashboards"
 	echo "  undev                                - removes any provisioning done by the setup.sh"
 }
@@ -80,6 +94,8 @@ main() {
 		bulkDashboard
 	elif [[ $cmd == "bulk-folders" ]]; then
 		bulkFolders "$arg1"
+	elif [[ $cmd == "scopes" ]]; then
+		scopes
 	elif [[ $cmd == "undev" ]]; then
  	   undev
 	else

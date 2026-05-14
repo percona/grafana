@@ -8,9 +8,11 @@
 //
 // Run 'make gen-cue' from repository root to regenerate.
 
+// Generated from public/app/plugins/panel/state-timeline/panelcfg.cue file.
+
 import * as ui from '@grafana/schema';
 
-export interface Options extends ui.OptionsWithLegend, ui.OptionsWithTooltip, ui.OptionsWithTimezones {
+export interface Options extends ui.OptionsWithLegend, ui.OptionsWithTooltip, ui.OptionsWithTimezones, ui.OptionsWithAnnotations {
   /**
    * Controls value alignment on the timelines
    */
@@ -19,6 +21,10 @@ export interface Options extends ui.OptionsWithLegend, ui.OptionsWithTooltip, ui
    * Merge equal consecutive values
    */
   mergeValues?: boolean;
+  /**
+   * Enables pagination when > 0
+   */
+  perPage?: number;
   /**
    * Controls the row height
    */
@@ -32,11 +38,12 @@ export interface Options extends ui.OptionsWithLegend, ui.OptionsWithTooltip, ui
 export const defaultOptions: Partial<Options> = {
   alignValue: 'left',
   mergeValues: true,
+  perPage: 20,
   rowHeight: 0.9,
   showValue: ui.VisibilityMode.Auto,
 };
 
-export interface FieldConfig extends ui.HideableFieldConfig {
+export interface FieldConfig extends ui.AxisConfig, ui.HideableFieldConfig {
   fillOpacity?: number;
   lineWidth?: number;
 }

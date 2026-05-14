@@ -1,5 +1,6 @@
 import { toDataFrame } from '../../dataframe/processDataFrame';
-import { DataTransformerConfig, Field, FieldType } from '../../types';
+import { FieldType, Field } from '../../types/dataFrame';
+import { DataTransformerConfig } from '../../types/transformations';
 import { mockTransformationsRegistry } from '../../utils/tests/mockTransformationsRegistry';
 import { ReducerID } from '../fieldReducer';
 import { transformDataFrame } from '../transformDataFrame';
@@ -45,7 +46,7 @@ describe('GroupToSubframe transformer', () => {
           values: ['one', 'two', 'three'],
         },
         {
-          name: 'Nested frames',
+          name: '__nestedFrames',
           type: FieldType.nestedFrames,
           config: {},
           values: [
@@ -152,7 +153,7 @@ describe('GroupToSubframe transformer', () => {
         },
         {
           config: {},
-          name: 'Nested frames',
+          name: '__nestedFrames',
           type: FieldType.nestedFrames,
           values: [
             [

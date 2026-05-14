@@ -1,11 +1,12 @@
 import { css, cx } from '@emotion/css';
 import { isString, uniqueId } from 'lodash';
-import React, { ReactNode, useCallback, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import { Accept, DropEvent, DropzoneOptions, FileError, FileRejection, useDropzone, ErrorCode } from 'react-dropzone';
 
 import { formattedValueToString, getValueFormat, GrafanaTheme2 } from '@grafana/data';
+import { t, Trans } from '@grafana/i18n';
 
-import { useTheme2 } from '../../themes';
+import { useTheme2 } from '../../themes/ThemeContext';
 import { Alert } from '../Alert/Alert';
 import { Icon } from '../Icon/Icon';
 
@@ -46,6 +47,11 @@ export interface FileDropzoneProps {
    */
   fileListRenderer?: (file: DropzoneFile, removeFile: (file: DropzoneFile) => void) => ReactNode;
   onFileRemove?: (file: DropzoneFile) => void;
+  /**
+   * Optional id attribute for the underlying input element
+   * Use to link a label to the input for accessibility
+   */
+  id?: string;
 }
 
 export interface DropzoneFile {
@@ -57,7 +63,20 @@ export interface DropzoneFile {
   retryUpload?: () => void;
 }
 
-export function FileDropzone({ options, children, readAs, onLoad, fileListRenderer, onFileRemove }: FileDropzoneProps) {
+/**
+ * A dropzone component to use for file uploads.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/inputs-filedropzone--docs
+ */
+export function FileDropzone({
+  options,
+  children,
+  readAs,
+  onLoad,
+  fileListRenderer,
+  onFileRemove,
+  id,
+}: FileDropzoneProps) {
   const [files, setFiles] = useState<DropzoneFile[]>([]);
   const [fileErrors, setErrorMessages] = useState<FileError[]>([]);
 
@@ -185,15 +204,20 @@ export function FileDropzone({ options, children, readAs, onLoad, fileListRender
   };
 
   const renderErrorMessages = (errors: FileError[]) => {
+    const size = formattedValueToString(formattedSize);
     return (
       <div className={styles.errorAlert}>
-        <Alert title="Upload failed" severity="error" onRemove={clearAlert}>
+        <Alert
+          title={t('grafana-ui.file-dropzone.error-title', 'Upload failed')}
+          severity="error"
+          onRemove={clearAlert}
+        >
           {errors.map((error) => {
             switch (error.code) {
               case ErrorCode.FileTooLarge:
                 return (
                   <div key={error.message + error.code}>
-                    File is larger than {formattedValueToString(formattedSize)}
+                    <Trans i18nKey="grafana-ui.file-dropzone.file-too-large">File is larger than {{ size }}</Trans>
                   </div>
                 );
               default:
@@ -212,13 +236,13 @@ export function FileDropzone({ options, children, readAs, onLoad, fileListRender
   return (
     <div className={styles.container}>
       <div data-testid="dropzone" {...getRootProps({ className: styles.dropzone })}>
-        <input {...getInputProps()} />
+        <input {...getInputProps()} id={id} />
         {children ?? <FileDropzoneDefaultChildren primaryText={getPrimaryText(files, options)} />}
       </div>
       {fileErrors.length > 0 && renderErrorMessages(fileErrors)}
       <small className={cx(styles.small, styles.acceptContainer)}>
         {options?.maxSize && `Max file size: ${formattedValueToString(formattedSize)}`}
-        {options?.maxSize && options?.accept && <span className={styles.acceptSeparator}>|</span>}
+        {options?.maxSize && options?.accept && <span className={styles.acceptSeparator}>{'|'}</span>}
         {options?.accept && getAcceptedFileTypeText(options.accept)}
       </small>
       {fileList}

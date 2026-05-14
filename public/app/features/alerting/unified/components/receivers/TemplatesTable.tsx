@@ -1,45 +1,53 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import { Fragment, useState } from 'react';
 
-import { ConfirmModal, useStyles2 } from '@grafana/ui';
-import { AlertManagerCortexConfig } from 'app/plugins/datasource/alertmanager/types';
-import { useDispatch } from 'app/types';
+import { Trans, t } from '@grafana/i18n';
+import { logError } from '@grafana/runtime';
+import { Badge, ConfirmModal, Tooltip, useStyles2 } from '@grafana/ui';
+import { useAppNotification } from 'app/core/copy/appNotification';
+import { CodeText } from 'app/features/alerting/unified/components/common/TextVariants';
+import { GRAFANA_RULES_SOURCE_NAME } from 'app/features/alerting/unified/utils/datasource';
 
 import { Authorize } from '../../components/Authorize';
 import { AlertmanagerAction } from '../../hooks/useAbilities';
-import { deleteTemplateAction } from '../../state/actions';
 import { getAlertTableStyles } from '../../styles/table';
-import { makeAMLink } from '../../utils/misc';
+import { isProvisionedResource } from '../../utils/k8s/utils';
+import { makeAMLink, stringifyErrorLike } from '../../utils/misc';
 import { CollapseToggle } from '../CollapseToggle';
 import { DetailsField } from '../DetailsField';
 import { ProvisioningBadge } from '../Provisioning';
+import {
+  NotificationTemplate,
+  useDeleteNotificationTemplate,
+  useNotificationTemplateMetadata,
+} from '../contact-points/useNotificationTemplates';
 import { ActionIcon } from '../rules/ActionIcon';
 
 import { TemplateEditor } from './TemplateEditor';
 
 interface Props {
-  config: AlertManagerCortexConfig;
   alertManagerName: string;
+  templates: NotificationTemplate[];
 }
 
-export const TemplatesTable = ({ config, alertManagerName }: Props) => {
-  const dispatch = useDispatch();
-  const [expandedTemplates, setExpandedTemplates] = useState<Record<string, boolean>>({});
+export const TemplatesTable = ({ alertManagerName, templates }: Props) => {
+  const appNotification = useAppNotification();
+  const [deleteTemplate] = useDeleteNotificationTemplate({ alertmanager: alertManagerName });
+
   const tableStyles = useStyles2(getAlertTableStyles);
 
-  const templateRows = useMemo(() => {
-    const templates = Object.entries(config.template_files);
+  const [templateToDelete, setTemplateToDelete] = useState<NotificationTemplate | undefined>();
 
-    return templates.map(([name, template]) => ({
-      name,
-      template,
-      provenance: (config.template_file_provenances ?? {})[name],
-    }));
-  }, [config]);
-  const [templateToDelete, setTemplateToDelete] = useState<string>();
-
-  const deleteTemplate = () => {
+  const onDeleteTemplate = async () => {
     if (templateToDelete) {
-      dispatch(deleteTemplateAction(templateToDelete, alertManagerName));
+      try {
+        await deleteTemplate.execute({ uid: templateToDelete.uid });
+        appNotification.success('Template deleted', `Template ${templateToDelete.title} has been deleted`);
+      } catch (error) {
+        appNotification.error('Error deleting template', `Error deleting template ${templateToDelete.title}`);
+
+        const loggableError = error instanceof Error ? error : new Error(stringifyErrorLike(error));
+        logError(loggableError);
+      }
     }
     setTemplateToDelete(undefined);
   };
@@ -54,8 +62,10 @@ export const TemplatesTable = ({ config, alertManagerName }: Props) => {
         </colgroup>
         <thead>
           <tr>
-            <th></th>
-            <th>Template</th>
+            <th />
+            <th>
+              <Trans i18nKey="alerting.templates-table.template-group">Template group</Trans>
+            </th>
             <Authorize
               actions={[
                 AlertmanagerAction.CreateNotificationTemplate,
@@ -63,110 +73,154 @@ export const TemplatesTable = ({ config, alertManagerName }: Props) => {
                 AlertmanagerAction.DeleteNotificationTemplate,
               ]}
             >
-              <th>Actions</th>
+              <th>
+                <Trans i18nKey="alerting.templates-table.actions">Actions</Trans>
+              </th>
             </Authorize>
           </tr>
         </thead>
         <tbody>
-          {!templateRows.length && (
+          {!templates.length && (
             <tr className={tableStyles.evenRow}>
-              <td colSpan={3}>No templates defined.</td>
+              <td colSpan={3}>
+                <Trans i18nKey="alerting.templates-table.no-templates-defined">No templates defined.</Trans>
+              </td>
             </tr>
           )}
-          {templateRows.map(({ name, template, provenance }, idx) => {
-            const isExpanded = !!expandedTemplates[name];
-            return (
-              <Fragment key={name}>
-                <tr key={name} className={idx % 2 === 0 ? tableStyles.evenRow : undefined}>
-                  <td>
-                    <CollapseToggle
-                      isCollapsed={!expandedTemplates[name]}
-                      onToggle={() => setExpandedTemplates({ ...expandedTemplates, [name]: !isExpanded })}
-                    />
-                  </td>
-                  <td>
-                    {name} {provenance && <ProvisioningBadge />}
-                  </td>
-                  <td className={tableStyles.actionsCell}>
-                    {provenance && (
-                      <ActionIcon
-                        to={makeAMLink(
-                          `/alerting/notifications/templates/${encodeURIComponent(name)}/edit`,
-                          alertManagerName
-                        )}
-                        tooltip="view template"
-                        icon="file-alt"
-                      />
-                    )}
-                    {!provenance && (
-                      <Authorize actions={[AlertmanagerAction.UpdateNotificationTemplate]}>
-                        <ActionIcon
-                          to={makeAMLink(
-                            `/alerting/notifications/templates/${encodeURIComponent(name)}/edit`,
-                            alertManagerName
-                          )}
-                          tooltip="edit template"
-                          icon="pen"
-                        />
-                      </Authorize>
-                    )}
-                    <Authorize actions={[AlertmanagerAction.CreateContactPoint]}>
-                      <ActionIcon
-                        to={makeAMLink(
-                          `/alerting/notifications/templates/${encodeURIComponent(name)}/duplicate`,
-                          alertManagerName
-                        )}
-                        tooltip="Copy template"
-                        icon="copy"
-                      />
-                    </Authorize>
-                    {!provenance && (
-                      <Authorize actions={[AlertmanagerAction.DeleteNotificationTemplate]}>
-                        <ActionIcon
-                          onClick={() => setTemplateToDelete(name)}
-                          tooltip="delete template"
-                          icon="trash-alt"
-                        />
-                      </Authorize>
-                    )}
-                  </td>
-                </tr>
-                {isExpanded && (
-                  <tr className={idx % 2 === 0 ? tableStyles.evenRow : undefined}>
-                    <td></td>
-                    <td colSpan={2}>
-                      <DetailsField label="Description" horizontal={true}>
-                        <TemplateEditor
-                          width={'auto'}
-                          height={'auto'}
-                          autoHeight={true}
-                          value={template}
-                          showLineNumbers={false}
-                          monacoOptions={{
-                            readOnly: true,
-                            scrollBeyondLastLine: false,
-                          }}
-                        />
-                      </DetailsField>
-                    </td>
-                  </tr>
-                )}
-              </Fragment>
-            );
-          })}
+          {templates.map((notificationTemplate, idx) => (
+            <TemplateRow
+              key={notificationTemplate.uid}
+              notificationTemplate={notificationTemplate}
+              idx={idx}
+              alertManagerName={alertManagerName}
+              onDeleteClick={setTemplateToDelete}
+            />
+          ))}
         </tbody>
       </table>
 
       {!!templateToDelete && (
         <ConfirmModal
           isOpen={true}
-          title="Delete template"
-          body={`Are you sure you want to delete template "${templateToDelete}"?`}
-          confirmText="Yes, delete"
-          onConfirm={deleteTemplate}
+          title={t('alerting.templates-table.title-delete-template-group', 'Delete template group')}
+          body={t(
+            'alerting.templates-table.body-delete-template-group',
+            'Are you sure you want to delete template group "{{template}}"?',
+            { template: templateToDelete.title }
+          )}
+          confirmText={t('alerting.templates-table.confirmText-yes-delete', 'Yes, delete')}
+          onConfirm={onDeleteTemplate}
           onDismiss={() => setTemplateToDelete(undefined)}
         />
       )}
     </>
   );
 };
+
+interface TemplateRowProps {
+  notificationTemplate: NotificationTemplate;
+  idx: number;
+  alertManagerName: string;
+  onDeleteClick: (template: NotificationTemplate) => void;
+}
+
+function TemplateRow({ notificationTemplate, idx, alertManagerName, onDeleteClick }: TemplateRowProps) {
+  const tableStyles = useStyles2(getAlertTableStyles);
+  const isGrafanaAlertmanager = alertManagerName === GRAFANA_RULES_SOURCE_NAME;
+
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { provenance } = useNotificationTemplateMetadata(notificationTemplate);
+  const isProvisioned = isProvisionedResource(provenance);
+
+  const { uid, title: name, content: template, missing } = notificationTemplate;
+  const misconfiguredBadgeText = t('alerting.templates.misconfigured-badge-text', 'Misconfigured');
+  return (
+    <Fragment key={uid}>
+      <tr className={idx % 2 === 0 ? tableStyles.evenRow : undefined}>
+        <td>
+          <CollapseToggle isCollapsed={!isExpanded} onToggle={() => setIsExpanded(!isExpanded)} />
+        </td>
+        <td>
+          {name} {isProvisioned && <ProvisioningBadge tooltip provenance={provenance} />}{' '}
+          {missing && !isGrafanaAlertmanager && (
+            <Tooltip
+              content={
+                <>
+                  <Trans i18nKey="alerting.templates.misconfigured-warning">This template is misconfigured.</Trans>
+                  <br />
+                  <Trans i18nKey="alerting.templates.misconfigured-warning-details">
+                    Templates must be defined in both the{' '}
+                    <CodeText content={t('alerting.template-row.content-templatefiles', 'template_files')} /> and{' '}
+                    <CodeText content={t('alerting.template-row.content-templates', 'templates')} /> sections of your
+                    alertmanager configuration.
+                  </Trans>
+                </>
+              }
+            >
+              <span>
+                <Badge text={misconfiguredBadgeText} color="orange" />
+              </span>
+            </Tooltip>
+          )}
+        </td>
+        <td className={tableStyles.actionsCell}>
+          {isProvisioned && (
+            <ActionIcon
+              to={makeAMLink(`/alerting/notifications/templates/${encodeURIComponent(uid)}/edit`, alertManagerName)}
+              tooltip={t('alerting.template-row.tooltip-view-template', 'view template')}
+              icon="file-alt"
+            />
+          )}
+          {!isProvisioned && (
+            <Authorize actions={[AlertmanagerAction.UpdateNotificationTemplate]}>
+              <ActionIcon
+                to={makeAMLink(`/alerting/notifications/templates/${encodeURIComponent(uid)}/edit`, alertManagerName)}
+                tooltip={t('alerting.template-row.tooltip-edit-template-group', 'Edit template group')}
+                icon="pen"
+              />
+            </Authorize>
+          )}
+          <Authorize actions={[AlertmanagerAction.CreateNotificationTemplate]}>
+            <ActionIcon
+              to={makeAMLink(
+                `/alerting/notifications/templates/${encodeURIComponent(uid)}/duplicate`,
+                alertManagerName
+              )}
+              tooltip={t('alerting.template-row.tooltip-copy-template-group', 'Copy template group')}
+              icon="copy"
+            />
+          </Authorize>
+          {!isProvisioned && (
+            <Authorize actions={[AlertmanagerAction.DeleteNotificationTemplate]}>
+              <ActionIcon
+                onClick={() => onDeleteClick(notificationTemplate)}
+                tooltip={t('alerting.template-row.tooltip-delete-template-group', 'Delete template group')}
+                icon="trash-alt"
+              />
+            </Authorize>
+          )}
+        </td>
+      </tr>
+      {isExpanded && (
+        <tr className={idx % 2 === 0 ? tableStyles.evenRow : undefined}>
+          <td />
+          <td colSpan={2}>
+            <DetailsField label="" horizontal={true}>
+              <TemplateEditor
+                width={'auto'}
+                height={'auto'}
+                autoHeight={true}
+                value={template}
+                showLineNumbers={false}
+                monacoOptions={{
+                  readOnly: true,
+                  scrollBeyondLastLine: false,
+                }}
+              />
+            </DetailsField>
+          </td>
+        </tr>
+      )}
+    </Fragment>
+  );
+}

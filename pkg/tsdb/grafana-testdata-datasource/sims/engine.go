@@ -35,7 +35,7 @@ type SimulationEngine struct {
 
 func (s *SimulationEngine) register(info simulationInfo) error {
 	if info.create == nil {
-		return fmt.Errorf("invalid simulation -- missing create function: " + info.Type)
+		return fmt.Errorf("invalid simulation -- missing create function: %s", info.Type)
 	}
 	if info.Type == "" {
 		return fmt.Errorf("missing type")
@@ -153,6 +153,9 @@ func (s *SimulationEngine) QueryData(ctx context.Context, req *backend.QueryData
 			stepMillis := q.Interval.Milliseconds()
 
 			maxPoints := q.MaxDataPoints * 2
+			if maxPoints > 10000 {
+				maxPoints = 10000
+			}
 			for i := int64(0); i < maxPoints && timeWalkerMs < to; i++ {
 				t := time.UnixMilli(timeWalkerMs).UTC()
 				vals := sim.GetValues(t)

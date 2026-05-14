@@ -1,12 +1,13 @@
 import { cx, css } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 import SVG from 'react-inlinesvg';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 
-import { useStyles2 } from '../../themes';
-import { IconSize, isIconSize } from '../../types';
-import { t } from '../../utils/i18n';
+import { useStyles2 } from '../../themes/ThemeContext';
+import { IconSize, isIconSize } from '../../types/icon';
+import { spin } from '../../utils/keyframes';
 import { Icon } from '../Icon/Icon';
 import { getIconRoot, getIconSubDir } from '../Icon/utils';
 
@@ -28,6 +29,10 @@ interface PropsWithDeprecatedSize extends Omit<Props, 'size'> {
 
 /**
  * @public
+ *
+ * Spinner is `fa-spinner` icon animated. It is used to alert a user to wait for an activity to complete.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/information-spinner--docs
  */
 export const Spinner = ({
   className,
@@ -46,7 +51,6 @@ export const Spinner = ({
   // TODO remove once we fully remove the deprecated type
   if (typeof size !== 'string' || !isIconSize(size)) {
     const iconRoot = getIconRoot();
-    const iconName = 'spinner';
     const subDir = getIconSubDir(iconName, 'default');
     const svgPath = `${iconRoot}${subDir}/${iconName}.svg`;
     return (
@@ -65,7 +69,7 @@ export const Spinner = ({
           src={svgPath}
           width={size}
           height={size}
-          className={cx('fa-spin', deprecatedStyles.icon, className)}
+          className={cx(styles.spin, deprecatedStyles.icon, className)}
           style={style}
         />
       </div>
@@ -84,12 +88,7 @@ export const Spinner = ({
       )}
     >
       <Icon
-        className={cx(
-          {
-            'fa-spin': !prefersReducedMotion,
-          },
-          iconClassName
-        )}
+        className={cx(styles.spin, iconClassName)}
         name={iconName}
         size={size}
         aria-label={t('grafana-ui.spinner.aria-label', 'Loading')}
@@ -101,6 +100,12 @@ export const Spinner = ({
 const getStyles = (theme: GrafanaTheme2) => ({
   inline: css({
     display: 'inline-block',
+    lineHeight: 0,
+  }),
+  spin: css({
+    [theme.transitions.handleMotion('no-preference')]: {
+      animation: `${spin} 2s infinite linear`,
+    },
   }),
 });
 

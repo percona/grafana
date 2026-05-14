@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
+import * as React from 'react';
 
 import { DataHoverClearEvent, DataHoverEvent } from '@grafana/data';
 import { LegendDisplayMode } from '@grafana/schema';
@@ -12,9 +13,13 @@ import { mapMouseEventToMode } from './utils';
 
 /**
  * @public
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/plugins-vizlegend--docs
  */
 export function VizLegend<T>({
   items,
+  thresholdItems,
+  mappingItems,
   displayMode,
   sortBy: sortKey,
   seriesVisibilityChangeBehavior = SeriesVisibilityChangeBehavior.Isolate,
@@ -82,6 +87,24 @@ export function VizLegend<T>({
     [onToggleSeriesVisibility, onLabelClick, seriesVisibilityChangeBehavior]
   );
 
+  const makeVizLegendList = useCallback(
+    (items: VizLegendItem[]) => {
+      return (
+        <VizLegendList<T>
+          className={className}
+          placement={placement}
+          onLabelMouseOver={onMouseOver}
+          onLabelMouseOut={onMouseOut}
+          onLabelClick={onLegendLabelClick}
+          itemRenderer={itemRenderer}
+          readonly={readonly}
+          items={items}
+        />
+      );
+    },
+    [className, placement, onMouseOver, onMouseOut, onLegendLabelClick, itemRenderer, readonly]
+  );
+
   switch (displayMode) {
     case LegendDisplayMode.Table:
       return (
@@ -101,17 +124,19 @@ export function VizLegend<T>({
         />
       );
     case LegendDisplayMode.List:
+      const isThresholdsEnabled = thresholdItems && thresholdItems.length > 1;
+      const isValueMappingEnabled = mappingItems && mappingItems.length > 0;
       return (
-        <VizLegendList<T>
-          className={className}
-          items={items}
-          placement={placement}
-          onLabelMouseOver={onMouseOver}
-          onLabelMouseOut={onMouseOut}
-          onLabelClick={onLegendLabelClick}
-          itemRenderer={itemRenderer}
-          readonly={readonly}
-        />
+        <>
+          {/* render items when single series and there is no thresholds and no value mappings
+           * render items when multi series and there is no thresholds
+           */}
+          {!isThresholdsEnabled && (!isValueMappingEnabled || items.length > 1) && makeVizLegendList(items)}
+          {/* render threshold colors if From thresholds scheme selected */}
+          {isThresholdsEnabled && makeVizLegendList(thresholdItems)}
+          {/* render value mapping colors */}
+          {isValueMappingEnabled && makeVizLegendList(mappingItems)}
+        </>
       );
     default:
       return null;

@@ -70,7 +70,7 @@ import (
 //     Responses:
 //       202: MuteTimeInterval
 //       400: ValidationError
-//       409: GenericPublicError
+//       409: PublicError
 
 // swagger:route DELETE /v1/provisioning/mute-timings/{name} provisioning stable RouteDeleteMuteTiming
 //
@@ -78,9 +78,7 @@ import (
 //
 //     Responses:
 //       204: description: The mute timing was deleted successfully.
-//       409: GenericPublicError
-
-// swagger:route
+//       409: PublicError
 
 // swagger:model
 type MuteTimings []MuteTimeInterval
@@ -117,6 +115,7 @@ type MuteTimingHeaders struct {
 
 // swagger:model
 type MuteTimeInterval struct {
+	UID                     string `json:"-" yaml:"-"`
 	config.MuteTimeInterval `json:",inline" yaml:",inline"`
 	Version                 string     `json:"version,omitempty"`
 	Provenance              Provenance `json:"provenance,omitempty"`
@@ -127,7 +126,7 @@ func (mt *MuteTimeInterval) ResourceType() string {
 }
 
 func (mt *MuteTimeInterval) ResourceID() string {
-	return mt.MuteTimeInterval.Name
+	return mt.Name
 }
 
 type MuteTimeIntervalExport struct {

@@ -1,194 +1,116 @@
-import { css, cx, keyframes } from '@emotion/css';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useFormContext, Controller } from 'react-hook-form';
+import { QueryStatus } from '@reduxjs/toolkit/query';
+import { isEmpty } from 'lodash';
+import { useEffect } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
-import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { base64UrlEncode } from '@grafana/alerting';
 import {
-  ActionMeta,
-  Field,
-  FieldValidationMessage,
-  IconButton,
-  Select,
-  Stack,
-  TextLink,
-  useStyles2,
-} from '@grafana/ui';
+  ContactPointSelector as GrafanaManagedContactPointSelector,
+  notificationsAPIv0alpha1,
+} from '@grafana/alerting/unstable';
+import { Trans, t } from '@grafana/i18n';
+import { Field, FieldValidationMessage, Stack, TextLink } from '@grafana/ui';
 import { RuleFormValues } from 'app/features/alerting/unified/types/rule-form';
-import { createUrl } from 'app/features/alerting/unified/utils/url';
-
-import { ContactPointWithMetadata } from '../../../../contact-points/utils';
+import { stringifyFieldSelector } from 'app/features/alerting/unified/utils/k8s/utils';
+import { createRelativeUrl } from 'app/features/alerting/unified/utils/url';
 
 export interface ContactPointSelectorProps {
   alertManager: string;
-  options: Array<{
-    label: string;
-    value: ContactPointWithMetadata;
-    description: React.JSX.Element;
-  }>;
-  onSelectContactPoint: (contactPoint?: ContactPointWithMetadata) => void;
-  refetchReceivers: () => Promise<unknown>;
 }
 
-const MAX_CONTACT_POINTS_RENDERED = 500;
-
-export function ContactPointSelector({
-  alertManager,
-  options,
-  onSelectContactPoint,
-  refetchReceivers,
-}: ContactPointSelectorProps) {
-  const styles = useStyles2(getStyles);
+export function ContactPointSelector({ alertManager }: ContactPointSelectorProps) {
   const { control, watch, trigger } = useFormContext<RuleFormValues>();
 
-  const contactPointInForm = watch(`contactPoints.${alertManager}.selectedContactPoint`);
+  const selectedContactPointField = `contactPoints.${alertManager}.selectedContactPoint` as const;
+  const contactPointInForm = watch(selectedContactPointField);
 
-  const selectedContactPointWithMetadata = options.find((option) => option.value.name === contactPointInForm)?.value;
-  const selectedContactPointSelectableValue: SelectableValue<ContactPointWithMetadata> =
-    selectedContactPointWithMetadata
-      ? { value: selectedContactPointWithMetadata, label: selectedContactPointWithMetadata.name }
-      : { value: undefined, label: '' };
+  // check if the contact point still exists, we'll use listReceiver to check if the contact point exists because getReceiver doesn't work with
+  // contact point titles but with UUIDs (which is not what we store on the alert rule definition)
+  const encodedContactPoint = contactPointInForm ? base64UrlEncode(contactPointInForm) : '';
+  const { currentData, status } = notificationsAPIv0alpha1.endpoints.listReceiver.useQuery(
+    {
+      fieldSelector: stringifyFieldSelector([['metadata.name', encodedContactPoint]]),
+    },
+    { skip: !contactPointInForm }
+  );
 
-  const LOADING_SPINNER_DURATION = 1000;
+  const contactPointNotFound = contactPointInForm && status === QueryStatus.fulfilled && isEmpty(currentData?.items);
 
-  const [loadingContactPoints, setLoadingContactPoints] = useState(false);
-  // we need to keep track if the fetching takes more than 1 second, so we can show the loading spinner until the fetching is done
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  // if we have a contact point selected, check if it still exists in the event that someone has deleted it
-  const validateContactPoint = useCallback(() => {
-    if (contactPointInForm) {
-      trigger(`contactPoints.${alertManager}.selectedContactPoint`, { shouldFocus: true });
-    }
-  }, [alertManager, contactPointInForm, trigger]);
-
-  const onClickRefresh = () => {
-    setLoadingContactPoints(true);
-    Promise.all([refetchReceivers(), sleep(LOADING_SPINNER_DURATION)]).finally(() => {
-      setLoadingContactPoints(false);
-      validateContactPoint();
-    });
-  };
-
-  // validate the contact point and check if it still exists when mounting the component
+  // validate the contact point and check if it still exists when we've gotten a response from the API
   useEffect(() => {
-    validateContactPoint();
-  }, [validateContactPoint]);
+    if (contactPointInForm && status === QueryStatus.fulfilled) {
+      trigger(selectedContactPointField, { shouldFocus: true });
+    }
+  }, [contactPointInForm, selectedContactPointField, status, trigger]);
 
   return (
-    <Stack direction="column">
-      <Stack direction="row" alignItems="center">
-        <Field label="Contact point" data-testid="contact-point-picker">
-          <Controller
-            render={({ field: { onChange, ref, ...field }, fieldState: { error } }) => (
-              <>
-                <div className={styles.contactPointsSelector}>
-                  <Select<ContactPointWithMetadata>
-                    virtualized={options.length > MAX_CONTACT_POINTS_RENDERED}
-                    aria-label="Contact point"
-                    defaultValue={selectedContactPointSelectableValue}
-                    onChange={(value: SelectableValue<ContactPointWithMetadata>, _: ActionMeta) => {
-                      onChange(value?.value?.name);
-                      onSelectContactPoint(value?.value);
-                    }}
-                    // We are passing a JSX.Element into the "description" for options, which isn't how the TS typings are defined.
-                    // The regular Select component will render it just fine, but we can't update the typings because SelectableValue
-                    // is shared with other components where the "description" _has_ to be a string.
-                    // I've tried unsuccessfully to separate the typings just I'm giving up :'(
-                    // @ts-ignore
-                    options={options}
-                    width={50}
-                  />
-                  <div className={styles.contactPointsInfo}>
-                    <IconButton
-                      name="sync"
-                      onClick={onClickRefresh}
-                      aria-label="Refresh contact points"
-                      tooltip="Refresh contact points list"
-                      className={cx(styles.refreshButton, {
-                        [styles.loading]: loadingContactPoints,
-                      })}
-                    />
-                    <LinkToContactPoints />
-                  </div>
-                </div>
+    <Stack direction="row" alignItems="center">
+      <Field
+        noMargin
+        label={t('alerting.contact-point-selector.contact-point-picker-label-contact-point', 'Contact point')}
+        data-testid="contact-point-picker"
+      >
+        <Controller
+          name={selectedContactPointField}
+          render={({ field: { onChange }, fieldState: { error } }) => (
+            <>
+              <Stack>
+                <GrafanaManagedContactPointSelector
+                  isClearable={false}
+                  onChange={(contactPoint) => onChange(contactPoint.spec.title)}
+                  width={50}
+                  value={contactPointInForm}
+                />
+                <LinkToContactPoints />
+              </Stack>
 
-                {/* Error can come from the required validation we have in here, or from the manual setError we do in the parent component.
-                The only way I found to check the custom error is to check if the field has a value and if it's not in the options. */}
+              {/* Error can come from the required validation we have in here, or from the manual setError we do in the parent component.
+              The only way I found to check the custom error is to check if the field has a value and if it's not in the options. */}
 
-                {error && <FieldValidationMessage>{error?.message}</FieldValidationMessage>}
-              </>
-            )}
-            rules={{
-              required: {
-                value: true,
-                message: 'Contact point is required.',
-              },
-              validate: {
-                contactPointExists: (value: string) => {
-                  if (options.some((option) => option.value.name === value)) {
-                    return true;
+              {error && <FieldValidationMessage>{error?.message}</FieldValidationMessage>}
+            </>
+          )}
+          rules={{
+            validate: () => {
+              if (contactPointNotFound) {
+                return t(
+                  'alerting.contactPoints.validation.notFound',
+                  `Contact point "{{contactPoint}}" could not be found`,
+                  {
+                    contactPoint: contactPointInForm,
                   }
-                  return `Contact point ${contactPointInForm} does not exist.`;
-                },
-              },
-            }}
-            control={control}
-            name={`contactPoints.${alertManager}.selectedContactPoint`}
-          />
-        </Field>
-      </Stack>
+                );
+              }
+              return true;
+            },
+            required: {
+              value: true,
+              message: t(
+                'alerting.contact-point-selector.message.contact-point-is-required',
+                'Contact point is required.'
+              ),
+            },
+          }}
+          control={control}
+        />
+      </Field>
     </Stack>
   );
 }
 function LinkToContactPoints() {
   const hrefToContactPoints = '/alerting/notifications';
   return (
-    <TextLink external href={createUrl(hrefToContactPoints)} aria-label="View or create contact points">
-      View or create contact points
+    <TextLink
+      external
+      href={createRelativeUrl(hrefToContactPoints)}
+      aria-label={t(
+        'alerting.link-to-contact-points.aria-label-view-or-create-contact-points',
+        'View or create contact points'
+      )}
+    >
+      <Trans i18nKey="alerting.link-to-contact-points.view-or-create-contact-points">
+        View or create contact points
+      </Trans>
     </TextLink>
   );
 }
-
-const rotation = keyframes({
-  from: {
-    transform: 'rotate(720deg)',
-  },
-  to: {
-    transform: 'rotate(0deg)',
-  },
-});
-
-const getStyles = (theme: GrafanaTheme2) => ({
-  contactPointsSelector: css({
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing(1),
-    marginTop: theme.spacing(1),
-  }),
-  contactPointsInfo: css({
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing(1),
-  }),
-  refreshButton: css({
-    color: theme.colors.text.secondary,
-    cursor: 'pointer',
-    borderRadius: theme.shape.radius.circle,
-    overflow: 'hidden',
-  }),
-  loading: css({
-    pointerEvents: 'none',
-    [theme.transitions.handleMotion('no-preference')]: {
-      animation: `${rotation} 2s infinite linear`,
-    },
-    [theme.transitions.handleMotion('reduce')]: {
-      animation: `${rotation} 6s infinite linear`,
-    },
-  }),
-  warn: css({
-    color: theme.colors.warning.text,
-  }),
-});

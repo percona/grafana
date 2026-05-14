@@ -1,8 +1,6 @@
-import React, { useMemo } from 'react';
-
-import { AbsoluteTimeRange, DataFrame, dateTime, EventBus, LoadingState, SplitOpen } from '@grafana/data';
+import { DataFrame, DataLinksContext, EventBus, LoadingState, SplitOpen, TimeRange } from '@grafana/data';
 import { PanelRenderer } from '@grafana/runtime';
-import { PanelChrome, PanelContext, PanelContextProvider } from '@grafana/ui';
+import { PanelChrome } from '@grafana/ui';
 
 import { getPanelPluginMeta } from '../plugins/importPanelPlugin';
 
@@ -14,47 +12,19 @@ export interface Props {
   timeZone: string;
   pluginId: string;
   frames: DataFrame[];
-  absoluteRange: AbsoluteTimeRange;
+  timeRange: TimeRange;
   state: LoadingState;
   splitOpenFn: SplitOpen;
   eventBus: EventBus;
 }
 
-export function CustomContainer({
-  width,
-  height,
-  timeZone,
-  state,
-  pluginId,
-  frames,
-  absoluteRange,
-  splitOpenFn,
-  eventBus,
-}: Props) {
-  const timeRange = useMemo(
-    () => ({
-      from: dateTime(absoluteRange.from),
-      to: dateTime(absoluteRange.to),
-      raw: {
-        from: dateTime(absoluteRange.from),
-        to: dateTime(absoluteRange.to),
-      },
-    }),
-    [absoluteRange.from, absoluteRange.to]
-  );
-
+export function CustomContainer({ width, height, timeZone, state, pluginId, frames, timeRange, splitOpenFn }: Props) {
   const plugin = getPanelPluginMeta(pluginId);
 
   const dataLinkPostProcessor = useExploreDataLinkPostProcessor(splitOpenFn, timeRange);
 
-  const panelContext: PanelContext = {
-    dataLinkPostProcessor,
-    eventBus,
-    eventsScope: 'explore',
-  };
-
   return (
-    <PanelContextProvider value={panelContext}>
+    <DataLinksContext.Provider value={{ dataLinkPostProcessor }}>
       <PanelChrome title={plugin.name} width={width} height={height} loadingState={state}>
         {(innerWidth, innerHeight) => (
           <PanelRenderer
@@ -67,6 +37,6 @@ export function CustomContainer({
           />
         )}
       </PanelChrome>
-    </PanelContextProvider>
+    </DataLinksContext.Provider>
   );
 }

@@ -1,24 +1,23 @@
 import { css } from '@emotion/css';
-import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useWindowSize } from 'react-use';
 
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { selectors as e2eSelectors } from '@grafana/e2e-selectors';
+import { Trans, t } from '@grafana/i18n';
 import { FieldSet, Button, ButtonGroup, Field, Input, RadioButtonGroup, Spinner, useStyles2 } from '@grafana/ui';
-import { Trans, t } from 'app/core/internationalization';
 import { contextSrv } from 'app/core/services/context_srv';
 import {
   useAddRecipientMutation,
   useDeleteRecipientMutation,
   useGetPublicDashboardQuery,
   useReshareAccessToRecipientMutation,
-  useUpdatePublicDashboardMutation,
+  useUpdatePublicDashboardAccessMutation,
 } from 'app/features/dashboard/api/publicDashboardApi';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 import { DashboardScene } from 'app/features/dashboard-scene/scene/DashboardScene';
 import { DashboardInteractions } from 'app/features/dashboard-scene/utils/interactions';
-import { AccessControlAction } from 'app/types';
+import { AccessControlAction } from 'app/types/accessControl';
 
 import { PublicDashboard, PublicDashboardShareType, validEmailRegex } from '../SharePublicDashboardUtils';
 
@@ -101,7 +100,7 @@ export const EmailSharingConfiguration = ({ dashboard }: { dashboard: DashboardM
 
   const dashboardUid = dashboard instanceof DashboardScene ? dashboard.state.uid : dashboard.uid;
   const { data: publicDashboard } = useGetPublicDashboardQuery(dashboardUid);
-  const [updateShareType] = useUpdatePublicDashboardMutation();
+  const [updateShareType] = useUpdatePublicDashboardAccessMutation();
   const [addEmail, { isLoading: isAddEmailLoading }] = useAddRecipientMutation();
 
   const hasWritePermissions = contextSrv.hasPermission(AccessControlAction.DashboardsPublicWrite);
@@ -191,7 +190,8 @@ export const EmailSharingConfiguration = ({ dashboard }: { dashboard: DashboardM
               <div className={styles.emailContainer}>
                 <Input
                   className={styles.emailInput}
-                  placeholder="email"
+                  // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
+                  placeholder="me@example.com"
                   autoCapitalize="none"
                   {...register('email', {
                     required: t('public-dashboard.email-sharing.input-required-email-text', 'Email is required'),

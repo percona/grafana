@@ -13,18 +13,18 @@ import (
 	"github.com/grafana/grafana/pkg/services/datasources"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/user"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 func TestIntegrationDeleteCorrelation(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	ctx := NewTestEnv(t)
 
 	adminUser := ctx.createUser(user.CreateUserCommand{
 		DefaultOrgRole: string(org.RoleAdmin),
-		Password:       "admin",
-		Login:          "admin",
+		Password:       "admin2",
+		Login:          "admin2",
 	})
 
 	editorUser := ctx.createUser(user.CreateUserCommand{
@@ -135,6 +135,7 @@ func TestIntegrationDeleteCorrelation(t *testing.T) {
 			TargetUID:   &writableDs,
 			OrgId:       writableDsOrgId,
 			Provisioned: true,
+			Type:        correlations.CorrelationType("query"),
 		})
 
 		res := ctx.Delete(DeleteParams{
@@ -160,6 +161,7 @@ func TestIntegrationDeleteCorrelation(t *testing.T) {
 			SourceUID: writableDs,
 			TargetUID: &writableDs,
 			OrgId:     writableDsOrgId,
+			Type:      correlations.CorrelationType("query"),
 		})
 
 		res := ctx.Delete(DeleteParams{
@@ -192,6 +194,7 @@ func TestIntegrationDeleteCorrelation(t *testing.T) {
 			SourceUID: writableDs,
 			TargetUID: &readOnlyDS,
 			OrgId:     writableDsOrgId,
+			Type:      correlations.CorrelationType("query"),
 		})
 
 		res := ctx.Delete(DeleteParams{
@@ -225,6 +228,7 @@ func TestIntegrationDeleteCorrelation(t *testing.T) {
 			TargetUID:   &readOnlyDS,
 			OrgId:       writableDsOrgId,
 			Provisioned: false,
+			Type:        correlations.CorrelationType("query"),
 		})
 
 		ctx.createCorrelation(correlations.CreateCorrelationCommand{
@@ -232,6 +236,7 @@ func TestIntegrationDeleteCorrelation(t *testing.T) {
 			TargetUID:   &readOnlyDS,
 			OrgId:       writableDsOrgId,
 			Provisioned: true,
+			Type:        correlations.CorrelationType("query"),
 		})
 
 		res := ctx.Delete(DeleteParams{

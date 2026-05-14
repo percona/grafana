@@ -8,8 +8,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/ini.v1"
 
+	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/org"
+	"github.com/grafana/grafana/pkg/setting"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 func TestMain(m *testing.M) {
@@ -20,6 +25,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestIntegrationIsUniqueConstraintViolation(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	store, _ := InitTestDB(t)
 
 	testCases := []struct {
@@ -63,6 +70,63 @@ func TestIntegrationIsUniqueConstraintViolation(t *testing.T) {
 			})
 			require.Error(t, err)
 			assert.True(t, store.dialect.IsUniqueConstraintViolation(err))
+		})
+	}
+}
+
+func TestInitEngine_ParseTimeInConnectionString(t *testing.T) {
+	tests := []struct {
+		name               string
+		connectionString   string
+		dbType             string
+		expectedConnection string
+	}{
+		{
+			name:               "MySQL with parseTime already present",
+			connectionString:   "mysql://user:password@localhost:3306/alreadypresent?parseTime=false",
+			dbType:             "mysql",
+			expectedConnection: "user:password@tcp(localhost:3306)/alreadypresent?collation=utf8mb4_unicode_ci&allowNativePasswords=true&clientFoundRows=true&parseTime=true&sql_mode=ANSI_QUOTES&parseTime=false",
+		},
+		{
+			name:               "MySQL with feature enabled",
+			connectionString:   "mysql://user:password@localhost:3306/existingparams?charset=utf8",
+			dbType:             "mysql",
+			expectedConnection: "user:password@tcp(localhost:3306)/existingparams?collation=utf8mb4_unicode_ci&allowNativePasswords=true&clientFoundRows=true&parseTime=true&sql_mode=ANSI_QUOTES&charset=utf8",
+		},
+		{
+			name:               "MySQL with feature enabled",
+			connectionString:   "mysql://user:password@localhost:3306/existingparams?charset=utf8",
+			dbType:             "mysqlWithHooks",
+			expectedConnection: "user:password@tcp(localhost:3306)/existingparams?collation=utf8mb4_unicode_ci&allowNativePasswords=true&clientFoundRows=true&parseTime=true&sql_mode=ANSI_QUOTES&charset=utf8",
+		},
+		{
+			name:               "Postgres",
+			connectionString:   "postgres://username:password@localhost:5432/mydatabase",
+			dbType:             "postgres",
+			expectedConnection: "user=username host=localhost port=5432 dbname=mydatabase sslmode='' sslcert='' sslkey='' sslrootcert='' password=password",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			raw, err := ini.Load([]byte(`
+				[database]
+				url = ` + tt.connectionString))
+			require.NoError(t, err)
+
+			ftMgr := featuremgmt.WithFeatures()
+
+			ss := &SQLStore{
+				cfg: &setting.Cfg{
+					Raw: raw,
+				},
+				features: ftMgr,
+				log:      log.New(),
+			}
+
+			// don't check the error, the db isn't running. Just check the connection string is okay
+			_ = ss.initEngine(nil)
+			assert.Equal(t, tt.expectedConnection, ss.dbCfg.ConnectionString)
 		})
 	}
 }

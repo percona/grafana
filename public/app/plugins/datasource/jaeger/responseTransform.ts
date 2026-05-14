@@ -1,13 +1,5 @@
-import {
-  DataFrame,
-  DataSourceInstanceSettings,
-  FieldType,
-  MutableDataFrame,
-  TraceLog,
-  TraceSpanRow,
-} from '@grafana/data';
+import { DataFrame, FieldType, MutableDataFrame, TraceLog, TraceSpanRow } from '@grafana/data';
 
-import transformTraceData from './_importedDependencies/model/transform-trace-data';
 import { JaegerResponse, Span, TraceProcess, TraceResponse } from './types';
 
 export function createTraceFrame(data: TraceResponse): DataFrame {
@@ -24,6 +16,7 @@ export function createTraceFrame(data: TraceResponse): DataFrame {
       { name: 'startTime', type: FieldType.number },
       { name: 'duration', type: FieldType.number },
       { name: 'logs', type: FieldType.other },
+      { name: 'references', type: FieldType.other, values: [] },
       { name: 'tags', type: FieldType.other },
       { name: 'warnings', type: FieldType.other },
       { name: 'stackTraces', type: FieldType.other },
@@ -44,10 +37,12 @@ export function createTraceFrame(data: TraceResponse): DataFrame {
 }
 
 function toSpanRow(span: Span, processes: Record<string, TraceProcess>): TraceSpanRow {
+  const parentSpanID = span.references?.find((r) => r.refType === 'CHILD_OF')?.spanID;
+
   return {
     spanID: span.spanID,
     traceID: span.traceID,
-    parentSpanID: span.references?.find((r) => r.refType === 'CHILD_OF')?.spanID,
+    parentSpanID: parentSpanID,
     operationName: span.operationName,
     // from micro to millis
     startTime: span.startTime / 1000,
@@ -59,64 +54,9 @@ function toSpanRow(span: Span, processes: Record<string, TraceProcess>): TraceSp
     tags: span.tags,
     warnings: span.warnings ?? undefined,
     stackTraces: span.stackTraces,
+    references: span.references?.filter((r) => r.spanID !== parentSpanID) ?? [], // parentSpanID is pushed to references in the transformTraceDataFrame method
     serviceName: processes[span.processID].serviceName,
     serviceTags: processes[span.processID].tags,
-  };
-}
-
-export function createTableFrame(data: TraceResponse[], instanceSettings: DataSourceInstanceSettings): DataFrame {
-  const frame = new MutableDataFrame({
-    fields: [
-      {
-        name: 'traceID',
-        type: FieldType.string,
-        config: {
-          unit: 'string',
-          displayNameFromDS: 'Trace ID',
-          links: [
-            {
-              title: 'Trace: ${__value.raw}',
-              url: '',
-              internal: {
-                datasourceUid: instanceSettings.uid,
-                datasourceName: instanceSettings.name,
-                query: {
-                  query: '${__value.raw}',
-                },
-              },
-            },
-          ],
-        },
-      },
-      { name: 'traceName', type: FieldType.string, config: { displayNameFromDS: 'Trace name' } },
-      { name: 'startTime', type: FieldType.time, config: { displayNameFromDS: 'Start time' } },
-      { name: 'duration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'µs' } },
-    ],
-    meta: {
-      preferredVisualisationType: 'table',
-    },
-  });
-  // Show the most recent traces
-  const traceData = data.map(transformToTraceData).sort((a, b) => b?.startTime! - a?.startTime!);
-
-  for (const trace of traceData) {
-    frame.add(trace);
-  }
-
-  return frame;
-}
-
-function transformToTraceData(data: TraceResponse) {
-  const traceData = transformTraceData(data);
-  if (!traceData) {
-    return;
-  }
-
-  return {
-    traceID: traceData.traceID,
-    startTime: traceData.startTime / 1000,
-    duration: traceData.duration,
-    traceName: traceData.traceName,
   };
 }
 

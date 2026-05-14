@@ -2,13 +2,14 @@ package plugins
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginstore"
@@ -90,18 +91,16 @@ func (cr *configReaderImpl) parsePluginConfig(path string, file fs.DirEntry) (*p
 
 func validateRequiredField(apps []*pluginsAsConfig) error {
 	for i := range apps {
-		var errStrings []string
+		errs := []error{}
 		for index, app := range apps[i].Apps {
 			if app.PluginID == "" {
-				errStrings = append(
-					errStrings,
-					fmt.Sprintf("app item %d in configuration doesn't contain required field type", index+1),
-				)
+				err := fmt.Errorf("app item %d in configuration doesn't contain required field type", index+1)
+				errs = append(errs, err)
 			}
 		}
 
-		if len(errStrings) != 0 {
-			return fmt.Errorf(strings.Join(errStrings, "\n"))
+		if len(errs) != 0 {
+			return errors.Join(errs...)
 		}
 	}
 

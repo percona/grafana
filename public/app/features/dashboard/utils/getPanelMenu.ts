@@ -1,9 +1,7 @@
 import { PanelMenuItem, urlUtil, PluginExtensionLink } from '@grafana/data';
-import { AngularComponent, locationService } from '@grafana/runtime';
-import { PanelCtrl } from 'app/angular/panel/panel_ctrl';
-import config from 'app/core/config';
+import { t } from '@grafana/i18n';
+import { locationService } from '@grafana/runtime';
 import { createErrorNotification } from 'app/core/copy/appNotification';
-import { t } from 'app/core/internationalization';
 import { notifyApp } from 'app/core/reducers/appNotification';
 import { contextSrv } from 'app/core/services/context_srv';
 import { getMessageFromError } from 'app/core/utils/errors';
@@ -21,11 +19,10 @@ import {
   toggleLegend,
   unlinkLibraryPanel,
 } from 'app/features/dashboard/utils/panel';
-import { DashboardInteractions } from 'app/features/dashboard-scene/utils/interactions';
 import { InspectTab } from 'app/features/inspector/types';
 import { isPanelModelLibraryPanel } from 'app/features/library-panels/guard';
 import { createExtensionSubMenu } from 'app/features/plugins/extensions/utils';
-import { SHARED_DASHBOARD_QUERY } from 'app/plugins/datasource/dashboard';
+import { SHARED_DASHBOARD_QUERY } from 'app/plugins/datasource/dashboard/constants';
 import { dispatch, store } from 'app/store/store';
 
 import { getCreateAlertInMenuAvailability } from '../../alerting/unified/utils/access-control';
@@ -35,15 +32,13 @@ import { getTimeSrv } from '../services/TimeSrv';
 export function getPanelMenu(
   dashboard: DashboardModel,
   panel: PanelModel,
-  extensions: PluginExtensionLink[],
-  angularComponent?: AngularComponent | null
+  extensions: PluginExtensionLink[]
 ): PanelMenuItem[] {
   const onViewPanel = (event: React.MouseEvent) => {
     event.preventDefault();
     locationService.partial({
       viewPanel: panel.id,
     });
-    DashboardInteractions.panelMenuItemClicked('view');
   };
 
   const onEditPanel = (event: React.MouseEvent) => {
@@ -51,26 +46,21 @@ export function getPanelMenu(
     locationService.partial({
       editPanel: panel.id,
     });
-
-    DashboardInteractions.panelMenuItemClicked('edit');
   };
 
   const onSharePanel = (event: React.MouseEvent) => {
     event.preventDefault();
     sharePanel(dashboard, panel);
-    DashboardInteractions.panelMenuItemClicked('share');
   };
 
   const onAddLibraryPanel = (event: React.MouseEvent) => {
     event.preventDefault();
     addLibraryPanel(dashboard, panel);
-    DashboardInteractions.panelMenuItemClicked('createLibraryPanel');
   };
 
   const onUnlinkLibraryPanel = (event: React.MouseEvent) => {
     event.preventDefault();
     unlinkLibraryPanel(panel);
-    DashboardInteractions.panelMenuItemClicked('unlinkLibraryPanel');
   };
 
   const onInspectPanel = (tab?: InspectTab) => {
@@ -78,35 +68,26 @@ export function getPanelMenu(
       inspect: panel.id,
       inspectTab: tab,
     });
-    DashboardInteractions.panelMenuInspectClicked(tab ?? InspectTab.Data);
-  };
-
-  const onMore = (event: React.MouseEvent) => {
-    event.preventDefault();
   };
 
   const onDuplicatePanel = (event: React.MouseEvent) => {
     event.preventDefault();
     duplicatePanel(dashboard, panel);
-    DashboardInteractions.panelMenuItemClicked('duplicate');
   };
 
   const onCopyPanel = (event: React.MouseEvent) => {
     event.preventDefault();
     copyPanel(panel);
-    DashboardInteractions.panelMenuItemClicked('copy');
   };
 
   const onRemovePanel = (event: React.MouseEvent) => {
     event.preventDefault();
     removePanel(dashboard, panel, true);
-    DashboardInteractions.panelMenuItemClicked('remove');
   };
 
   const onNavigateToExplore = (event: React.MouseEvent) => {
     event.preventDefault();
-    const openInNewWindow =
-      event.ctrlKey || event.metaKey ? (url: string) => window.open(`${config.appSubUrl}${url}`) : undefined;
+    const openInNewWindow = event.ctrlKey || event.metaKey ? (url: string) => window.open(url) : undefined;
     store.dispatch(
       navigateToExplore(panel, {
         timeRange: getTimeSrv().timeRange(),
@@ -114,13 +95,11 @@ export function getPanelMenu(
         openInNewWindow,
       }) as any
     );
-    DashboardInteractions.panelMenuItemClicked('explore');
   };
 
   const onToggleLegend = (event: React.MouseEvent) => {
     event.preventDefault();
     toggleLegend(panel);
-    DashboardInteractions.panelMenuItemClicked('toggleLegend');
   };
 
   const menu: PanelMenuItem[] = [];
@@ -189,17 +168,6 @@ export function getPanelMenu(
     type: 'submenu',
     text: t('panel.header-menu.inspect', `Inspect`),
     iconClassName: 'info-circle',
-    onClick: (e: React.MouseEvent<HTMLElement>) => {
-      const currentTarget = e.currentTarget;
-      const target = e.target;
-
-      if (
-        target === currentTarget ||
-        (target instanceof HTMLElement && target.closest('[role="menuitem"]') === currentTarget)
-      ) {
-        onInspectPanel();
-      }
-    },
     shortcut: 'i',
     subMenu: inspectMenu,
   });
@@ -215,7 +183,7 @@ export function getPanelMenu(
     }
     const ruleFormUrl = urlUtil.renderUrl('/alerting/new', {
       defaults: JSON.stringify(formValues),
-      returnTo: location.pathname + location.search,
+      returnTo: window.location.pathname + window.location.search,
     });
 
     locationService.push(ruleFormUrl);
@@ -224,7 +192,6 @@ export function getPanelMenu(
   const onCreateAlert = (event: React.MouseEvent) => {
     event.preventDefault();
     createAlert();
-    DashboardInteractions.panelMenuItemClicked('create-alert');
   };
 
   const subMenu: PanelMenuItem[] = [];
@@ -271,29 +238,6 @@ export function getPanelMenu(
     });
   }
 
-  // add old angular panel options
-  if (angularComponent) {
-    const scope = angularComponent.getScope();
-    const panelCtrl: PanelCtrl = scope.$$childHead.ctrl;
-    const angularMenuItems = panelCtrl.getExtendedMenu();
-
-    for (const item of angularMenuItems) {
-      const reactItem: PanelMenuItem = {
-        text: item.text,
-        href: item.href,
-        shortcut: item.shortcut,
-      };
-
-      if (item.click) {
-        reactItem.onClick = () => {
-          scope.$eval(item.click, { ctrl: panelCtrl });
-        };
-      }
-
-      subMenu.push(reactItem);
-    }
-  }
-
   if (panel.options.legend) {
     subMenu.push({
       text: panel.options.legend.showLegend
@@ -324,7 +268,7 @@ export function getPanelMenu(
 
   if (extensions.length > 0 && !panel.isEditing) {
     menu.push({
-      text: 'Extensions',
+      text: t('dashboard.get-panel-menu.text.extensions', 'Extensions'),
       iconClassName: 'plug',
       type: 'submenu',
       subMenu: createExtensionSubMenu(extensions),
@@ -337,7 +281,6 @@ export function getPanelMenu(
       text: t('panel.header-menu.more', `More...`),
       iconClassName: 'cube',
       subMenu,
-      onClick: onMore,
     });
   }
 

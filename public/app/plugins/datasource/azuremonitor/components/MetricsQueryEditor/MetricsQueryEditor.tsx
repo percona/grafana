@@ -1,13 +1,13 @@
-import React from 'react';
+import { PanelData } from '@grafana/data';
+import { EditorRows, EditorRow, EditorFieldGroup } from '@grafana/plugin-ui';
 
-import { PanelData } from '@grafana/data/src/types';
-import { EditorRows, EditorRow, EditorFieldGroup } from '@grafana/experimental';
-
-import { multiResourceCompatibleTypes } from '../../azureMetadata';
+import { multiResourceCompatibleTypes } from '../../azureMetadata/resourceTypes';
+import { AzureMonitorResource } from '../../dataquery.gen';
 import type Datasource from '../../datasource';
 import { selectors } from '../../e2e/selectors';
-import type { AzureMonitorQuery, AzureMonitorOption, AzureMonitorErrorish, AzureMonitorResource } from '../../types';
-import ResourceField from '../ResourceField';
+import { AzureMonitorQuery } from '../../types/query';
+import { AzureMonitorOption, AzureMonitorErrorish } from '../../types/types';
+import ResourceField from '../ResourceField/ResourceField';
 import { ResourceRow, ResourceRowGroup, ResourceRowType } from '../ResourcePicker/types';
 import { parseResourceDetails } from '../ResourcePicker/utils';
 

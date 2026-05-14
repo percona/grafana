@@ -1,85 +1,75 @@
-name: 'Ephemeral instances: PR comment'
-on:
-  issue_comment:
-    types: [created]
-jobs:
-  config:
-    if: github.event.sender.type == 'User' &&
-        github.event.issue.pull_request &&
-        startsWith(github.event.comment.body, '/deploy-to-hg')
-    runs-on:
-      labels: ubuntu-latest-8-cores
-    outputs:
-      has-secrets: ${{ steps.check.outputs.has-secrets }}
-    steps:
-      - name: "Check for secrets"
-        id: check
-        shell: bash
-        run: |
-          if [ -n "${{ (secrets.EI_APP_ID != '' &&
-                        secrets.EI_APP_PRIVATE_KEY != '' &&
-                        secrets.EI_GCOM_HOST != '' &&
-                        secrets.EI_GCOM_TOKEN != '' &&
-                        secrets.EI_EPHEMERAL_INSTANCES_REGISTRY != '' &&
-                        secrets.EI_GCP_SERVICE_ACCOUNT_KEY_BASE64 != '' &&
-                        secrets.EI_EPHEMERAL_ORG_ID != ''
-                        ) || '' }}" ]; then
-            echo "has-secrets=1" >> "$GITHUB_OUTPUT"
-          fi
+name: "Ephemeral instances"
 
-  handle-pull-request-event:
-    needs: config
-    if: needs.config.outputs.has-secrets &&
-        github.event.sender.type == 'User' &&
-        github.event.issue.pull_request &&
-        startsWith(github.event.comment.body, '/deploy-to-hg')
+on:
+  # @PERCONA - disable workflow
+  workflow_dispatch:
+permissions: {}
+
+jobs:
+  handle-ephemeral-instances:
+    if: |
+      github.repository_owner == 'grafana' &&
+      (
+        (github.event.issue.pull_request && startsWith(github.event.comment.body, '/deploy-to-hg') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')) ||
+        github.event.action == 'closed'
+      )
     runs-on:
-      labels: ubuntu-latest-8-cores
+      labels: ubuntu-x64-xlarge
     continue-on-error: true
+    permissions:
+      # For commenting.
+      pull-requests: write
+      # No contents permission is needed because we will impersonate an app to create the PR instead.
+      id-token: write # required for vault access
+
     steps:
+      - name: Get vault secrets
+        id: vault-secrets
+        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        with:
+          # Secrets placed in ci/repo/grafana/grafana/
+          repo_secrets: |
+            APP_ID=ephemeral-instances-bot:app-id
+            APP_PEM=ephemeral-instances-bot:app-private-key
+            GCOM_HOST=ephemeral-instances-bot:gcom-host
+            GCOM_TOKEN=ephemeral-instances-bot:gcom-token
+            REGISTRY=ephemeral-instances-bot:registry
+            GCP_SA_ACCOUNT_KEY_BASE64=ephemeral-instances-bot:sa-key
+          # Secrets placed in the ci/common/<path> path in Vault
+          common_secrets: |
+            DOCKERHUB_USERNAME=dockerhub:username
+            DOCKERHUB_PASSWORD=dockerhub:password
+
+      - name: Log in to Docker Hub to avoid unauthenticated image pull rate-limiting
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_PASSWORD }}
+
       - name: Generate a GitHub app installation token
         id: generate_token
-        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92 # v1.8.0
         with:
-          app_id: ${{ secrets.EI_APP_ID }}
-          private_key: ${{ secrets.EI_APP_PRIVATE_KEY }}
+          app_id: ${{ env.APP_ID }}
+          private_key: ${{ env.APP_PEM }}
 
       - name: Checkout ephemeral instances repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: grafana/ephemeral-grafana-instances-github-action
           token: ${{ steps.generate_token.outputs.token }}
           ref: main
           path: ephemeral
+          persist-credentials: false
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - name: build and deploy ephemeral instance
+        uses: ./ephemeral
         with:
-          go-version-file: ephemeral/go.mod
-
-      - name: Get latest grafana version number
-        run: |
-          # if package.json contains e.g. 11.0.0-pre, this writes 11.0.0 to version.txt
-          curl https://raw.githubusercontent.com/grafana/grafana/main/package.json | jq -r .version | grep -o  '^[0-9\.]*' > version.txt
-
-      - name: Run action
-        env:
-          GITHUB_EVENT: ${{ toJson(github.event)}}
-        run: |
-          # Create a prerelease version number using the latest version from the package.json in the grafana repo.
-          export GRAFANA_VERSION="$(cat version.txt)"
-          echo "${GRAFANA_VERSION}"
-
-          cd $GITHUB_WORKSPACE/ephemeral/src
-          go run . \
-            -GITHUB_TOKEN="${{ steps.generate_token.outputs.token }}" \
-            -GITHUB_WORKFLOW_RUN_ID="${{ github.run_id }}" \
-            -GITHUB_EVENT="$GITHUB_EVENT" \
-            -GITHUB_TRIGGERING_ACTOR="${{ github.triggering_actor }}" \
-            -GCOM_HOST="${{ secrets.EI_GCOM_HOST }}" \
-            -GCOM_TOKEN="${{ secrets.EI_GCOM_TOKEN }}" \
-            -HOSTED_GRAFANA_IMAGE_TAG="$GRAFANA_VERSION-ephemeral-oss-${{ github.event.issue.number}}-${{ github.run_number }}-${{ github.run_attempt }}" \
-            -REGISTRY="${{ secrets.EI_EPHEMERAL_INSTANCES_REGISTRY }}" \
-            -GRAFANA_VERSION="$GRAFANA_VERSION" \
-            -GCP_SERVICE_ACCOUNT_KEY_BASE64="${{ secrets.EI_GCP_SERVICE_ACCOUNT_KEY_BASE64 }}" \
-            -EPHEMERAL_ORG_ID="${{ secrets.EI_EPHEMERAL_ORG_ID }}" || true
+          github-token: ${{ steps.generate_token.outputs.token }}
+          gcom-host: ${{ env.GCOM_HOST }}
+          gcom-token: ${{ env.GCOM_TOKEN }}
+          registry: "${{ env.REGISTRY }}"
+          gcp-service-account-key: ${{ env.GCP_SA_ACCOUNT_KEY_BASE64 }}
+          ephemeral-org-id: ephemeral
+          oss-or-enterprise: oss
+          verbose: true

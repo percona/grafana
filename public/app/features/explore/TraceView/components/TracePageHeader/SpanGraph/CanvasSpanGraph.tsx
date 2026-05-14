@@ -19,20 +19,21 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { withTheme2, stylesFactory } from '@grafana/ui';
 
 import { autoColor } from '../../Theme';
-import { TNil } from '../../types';
+import TNil from '../../types/TNil';
 import { getRgbColorByKey } from '../../utils/color-generator';
 
 import renderIntoCanvas from './render-into-canvas';
 
 const getStyles = stylesFactory((theme: GrafanaTheme2) => {
   return {
-    CanvasSpanGraph: css`
-      label: CanvasSpanGraph;
-      background: ${autoColor(theme, '#fafafa')};
-      height: 60px;
-      position: absolute;
-      width: 100%;
-    `,
+    CanvasSpanGraph: css({
+      label: 'CanvasSpanGraph',
+      background: autoColor(theme, '#fafafa'),
+      height: '60px',
+      position: 'absolute',
+      width: '100%',
+      imageRendering: 'crisp-edges',
+    }),
   };
 });
 

@@ -1,7 +1,7 @@
 import { ComponentType } from 'react';
 
-import { LinkTarget } from './dataLink';
 import { IconName } from './icon';
+import { LinkTarget } from './linkTarget';
 
 export interface NavLinkDTO {
   id?: string;
@@ -14,6 +14,7 @@ export interface NavLinkDTO {
   sortWeight?: number;
   hideFromTabs?: boolean;
   roundIcon?: boolean;
+  isNew?: boolean;
   /**
    * This is true for some sections that have no children (but is still a section)
    **/
@@ -39,12 +40,6 @@ export interface NavModelItem extends NavLinkDTO {
   tabCounter?: number;
   hideFromBreadcrumbs?: boolean;
   emptyMessage?: string;
-
-  // @PERCONA
-  isDivider?: boolean;
-  isHeading?: boolean;
-  showChildren?: boolean;
-  showDot?: boolean;
 }
 
 /**

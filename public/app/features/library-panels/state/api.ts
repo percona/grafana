@@ -1,13 +1,16 @@
 import { lastValueFrom } from 'rxjs';
 
-import { defaultDashboard } from '@grafana/schema';
-import { DashboardModel } from 'app/features/dashboard/state';
-import { DashboardGridItem } from 'app/features/dashboard-scene/scene/DashboardGridItem';
-import { LibraryVizPanel } from 'app/features/dashboard-scene/scene/LibraryVizPanel';
+import { VizPanel } from '@grafana/scenes';
+import { LibraryPanel, defaultDashboard } from '@grafana/schema';
+import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
+import { AutoGridItem } from 'app/features/dashboard-scene/scene/layout-auto-grid/AutoGridItem';
+import { DashboardGridItem } from 'app/features/dashboard-scene/scene/layout-default/DashboardGridItem';
 import { vizPanelToPanel } from 'app/features/dashboard-scene/serialization/transformSceneToSaveModel';
+import { getLibraryPanelBehavior } from 'app/features/dashboard-scene/utils/utils';
+import { getGrafanaSearcher } from 'app/features/search/service/searcher';
+import { DashboardQueryResult } from 'app/features/search/service/types';
 
 import { getBackendSrv } from '../../../core/services/backend_srv';
-import { DashboardSearchItem } from '../../search/types';
 import {
   LibraryElementConnectionDTO,
   LibraryElementDTO,
@@ -24,6 +27,7 @@ export interface GetLibraryPanelsOptions {
   sortDirection?: string;
   typeFilter?: string[];
   folderFilterUIDs?: string[];
+  signal?: AbortSignal;
 }
 
 export async function getLibraryPanels({
@@ -34,6 +38,7 @@ export async function getLibraryPanels({
   sortDirection = '',
   typeFilter = [],
   folderFilterUIDs = [],
+  signal,
 }: GetLibraryPanelsOptions = {}): Promise<LibraryElementsSearchResult> {
   const params = new URLSearchParams();
   params.append('searchString', searchString);
@@ -45,10 +50,15 @@ export async function getLibraryPanels({
   params.append('page', page.toString(10));
   params.append('kind', LibraryElementKind.Panel.toString(10));
 
-  const { result } = await getBackendSrv().get<{ result: LibraryElementsSearchResult }>(
-    `/api/library-elements?${params.toString()}`
+  const response = await lastValueFrom(
+    getBackendSrv().fetch<{ result: LibraryElementsSearchResult }>({
+      method: 'GET',
+      url: `/api/library-elements?${params.toString()}`,
+      abortSignal: signal,
+      showErrorAlert: false,
+    })
   );
-  return result;
+  return response.data.result;
 }
 
 export async function getLibraryPanel(uid: string, isHandled = false): Promise<LibraryElementDTO> {
@@ -82,7 +92,14 @@ export async function getLibraryPanel(uid: string, isHandled = false): Promise<L
 }
 
 export async function getLibraryPanelByName(name: string): Promise<LibraryElementDTO[]> {
-  const { result } = await getBackendSrv().get<{ result: LibraryElementDTO[] }>(`/api/library-elements/name/${name}`);
+  const { result } = await getBackendSrv().get<{ result: LibraryElementDTO[] }>(
+    `/api/library-elements/name/${name}`,
+    undefined,
+    undefined,
+    {
+      validatePath: true,
+    }
+  );
   return result;
 }
 
@@ -126,56 +143,77 @@ export async function getLibraryPanelConnectedDashboards(
   return result;
 }
 
-export async function getConnectedDashboards(uid: string): Promise<DashboardSearchItem[]> {
+export async function getConnectedDashboards(uid: string): Promise<DashboardQueryResult[] | null> {
   const connections = await getLibraryPanelConnectedDashboards(uid);
   if (connections.length === 0) {
-    return [];
+    return null;
   }
 
-  const searchHits = await getBackendSrv().search({ dashboardUIDs: connections.map((c) => c.connectionUid) });
-
-  return searchHits;
+  const result = await getGrafanaSearcher().search({ uid: connections.map((c) => c.connectionUid) });
+  return result.view.toArray();
 }
 
-export function libraryVizPanelToSaveModel(libraryPanel: LibraryVizPanel) {
-  const { panel, uid, name, _loadedPanel } = libraryPanel.state;
+export function libraryVizPanelToSaveModel(vizPanel: VizPanel) {
+  const libraryPanelBehavior = getLibraryPanelBehavior(vizPanel);
 
-  const gridItem = libraryPanel.parent;
+  const { uid, name, _loadedPanel } = libraryPanelBehavior!.state;
 
-  if (!gridItem || !(gridItem instanceof DashboardGridItem)) {
-    throw new Error('LibraryVizPanel must be a child of DashboardGridItem');
+  const layoutItem = vizPanel.parent;
+  if (!layoutItem) {
+    throw new Error('Trying to save a library panel that does not have a layout parent');
   }
 
+  const gridPos =
+    layoutItem instanceof DashboardGridItem
+      ? {
+          x: layoutItem.state.x ?? 0,
+          y: layoutItem.state.y ?? 0,
+          w: layoutItem.state.width ?? 0,
+          h: layoutItem.state.height ?? 0,
+        }
+      : layoutItem instanceof AutoGridItem
+        ? { x: 0, y: 0, w: 6, h: 3 }
+        : undefined;
+
+  if (!gridPos) {
+    throw new Error('Trying to save a library panel that does not have a supported layout parent');
+  }
+
+  // we need all the panel properties to save the library panel,
+  // so we clone it and remove the behaviour to get what we need
   const saveModel = {
+    ..._loadedPanel,
     uid,
-    folderUID: _loadedPanel?.folderUid,
     name,
-    version: _loadedPanel?.version || 0,
-    model: vizPanelToPanel(
-      panel!,
-      {
-        x: gridItem.state.x ?? 0,
-        y: gridItem.state.y ?? 0,
-        w: gridItem.state.width ?? 0,
-        h: gridItem.state.height ?? 0,
-      },
-      false,
-      gridItem
-    ),
+    type: vizPanel.state.pluginId,
+    model: vizPanelToPanel(vizPanel.clone({ $behaviors: undefined }), gridPos, false, layoutItem),
     kind: LibraryElementKind.Panel,
+    version: _loadedPanel?.version || 0,
   };
   return saveModel;
 }
 
-export async function updateLibraryVizPanel(libraryPanel: LibraryVizPanel): Promise<LibraryElementDTO> {
-  const { uid, folderUID, name, model, version, kind } = libraryVizPanelToSaveModel(libraryPanel);
+export async function updateLibraryVizPanel(vizPanel: VizPanel): Promise<LibraryPanel> {
+  const { uid, folderUid, name, model, version, kind } = libraryVizPanelToSaveModel(vizPanel);
 
   const { result } = await getBackendSrv().patch(`/api/library-elements/${uid}`, {
-    folderUID,
+    folderUid,
     name,
     model,
     version,
     kind,
   });
   return result;
+}
+
+export async function saveLibPanel(panel: VizPanel) {
+  const updatedLibPanel = await updateLibraryVizPanel(panel);
+
+  const libPanelBehavior = getLibraryPanelBehavior(panel);
+
+  if (!libPanelBehavior) {
+    throw new Error('Could not find library panel behavior for panel');
+  }
+
+  libPanelBehavior.setPanelFromLibPanel(updatedLibPanel);
 }

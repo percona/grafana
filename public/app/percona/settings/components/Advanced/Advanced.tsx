@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { Button, Icon, Spinner, useStyles2 } from '@grafana/ui';
@@ -15,7 +15,7 @@ import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import validators from 'app/percona/shared/helpers/validators';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import { AdvancedChangePayload } from '../../Settings.types';
@@ -35,7 +35,47 @@ import { convertCheckIntervalsToHours, convertHoursStringToSeconds, convertSecon
 import { SwitchRow } from './SwitchRow';
 
 const {
-  advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
+  tooltipLinkText,
+  advanced: {
+    action,
+    retentionLabel,
+    retentionTooltip,
+    retentionUnits,
+    telemetryLabel,
+    telemetryLink,
+    telemetryTooltip,
+    telemetrySummaryTitle,
+    updatesLabel,
+    updatesLink,
+    updatesTooltip,
+    advisorsLabel,
+    advisorsLink,
+    advisorsTooltip,
+    publicAddressLabel,
+    publicAddressTooltip,
+    publicAddressButton,
+    accessControl,
+    accessControlTooltip,
+    accessControlLink,
+    alertingLabel,
+    alertingTooltip,
+    alertingLink,
+    azureDiscoverLabel,
+    azureDiscoverTooltip,
+    azureDiscoverLink,
+    technicalPreviewLegend,
+    technicalPreviewDescription,
+    technicalPreviewLinkText,
+    backupLabel,
+    backupLink,
+    backupTooltip,
+    enableInternalPgQanLabel,
+    enableInternalPgQanLink,
+    enableInternalPgQanTooltip,
+    sttCheckIntervalsLabel,
+    sttCheckIntervalTooltip,
+    sttCheckIntervalUnit,
+  },
 } = Messages;
 
 export const Advanced: FC = () => {
@@ -55,47 +95,10 @@ export const Advanced: FC = () => {
     alertingEnabled,
     telemetrySummaries,
     enableAccessControl,
+    enableInternalPgQan,
   } = settings!;
   const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
-  const {
-    advanced: {
-      action,
-      retentionLabel,
-      retentionTooltip,
-      retentionUnits,
-      telemetryLabel,
-      telemetryLink,
-      telemetryTooltip,
-      telemetrySummaryTitle,
-      telemetryDisclaimer,
-      updatesLabel,
-      updatesLink,
-      updatesTooltip,
-      advisorsLabel,
-      advisorsLink,
-      advisorsTooltip,
-      publicAddressLabel,
-      publicAddressTooltip,
-      publicAddressButton,
-      accessControl,
-      accessControlTooltip,
-      accessControlLink,
-      alertingLabel,
-      alertingTooltip,
-      alertingLink,
-      azureDiscoverLabel,
-      azureDiscoverTooltip,
-      azureDiscoverLink,
-      technicalPreviewLegend,
-      technicalPreviewDescription,
-      technicalPreviewLinkText,
-      backupLabel,
-      backupLink,
-      backupTooltip,
-    },
-    tooltipLinkText,
-  } = Messages;
 
   const initialValues: AdvancedFormProps = {
     retention: convertSecondsToDays(dataRetention),
@@ -111,6 +114,7 @@ export const Advanced: FC = () => {
     frequentInterval,
     telemetrySummaries,
     accessControl: enableAccessControl,
+    enableInternalPgQan,
   };
   const [loading, setLoading] = useState(false);
 
@@ -128,6 +132,7 @@ export const Advanced: FC = () => {
       frequentInterval,
       updates,
       accessControl,
+      enableInternalPgQan,
     } = values;
     const sttCheckIntervals = {
       rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
@@ -140,12 +145,13 @@ export const Advanced: FC = () => {
       enable_telemetry: telemetry,
       enable_advisor: stt,
       enable_azurediscover: azureDiscover,
-      pmm_public_address: publicAddress,
+      pmm_public_address: publicAddress || '',
       enable_alerting: alerting,
       advisor_run_intervals: !!stt ? sttCheckIntervals : undefined,
       enable_backup_management: backup,
       enable_updates: updates,
       enable_access_control: accessControl,
+      enable_internal_pg_qan: enableInternalPgQan,
     };
 
     setLoading(true);
@@ -212,10 +218,6 @@ export const Advanced: FC = () => {
                     dataTestId="advanced-telemetry"
                     component={SwitchRow}
                   />
-                  <div className={styles.infoBox}>
-                    <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
-                    <p>{telemetryDisclaimer}</p>
-                  </div>
                   <Field
                     name="updates"
                     type="checkbox"
@@ -224,16 +226,6 @@ export const Advanced: FC = () => {
                     tooltipLinkText={tooltipLinkText}
                     link={updatesLink}
                     dataTestId="advanced-updates"
-                    component={SwitchRow}
-                  />
-                  <Field
-                    name="stt"
-                    type="checkbox"
-                    label={advisorsLabel}
-                    tooltip={advisorsTooltip}
-                    tooltipLinkText={tooltipLinkText}
-                    link={advisorsLink}
-                    dataTestId="advanced-advisors"
                     component={SwitchRow}
                   />
                   <Field
@@ -254,6 +246,16 @@ export const Advanced: FC = () => {
                     tooltipLinkText={tooltipLinkText}
                     link={backupLink}
                     dataTestId="advanced-backup"
+                    component={SwitchRow}
+                  />
+                  <Field
+                    name="enableInternalPgQan"
+                    type="checkbox"
+                    label={enableInternalPgQanLabel}
+                    tooltip={enableInternalPgQanTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={enableInternalPgQanLink}
+                    dataTestId="enable-internal-pg-qan"
                     component={SwitchRow}
                   />
                   <div className={styles.advancedRow}>
@@ -277,6 +279,16 @@ export const Advanced: FC = () => {
                       </Button>
                     </div>
                   </div>
+                  <Field
+                    name="stt"
+                    type="checkbox"
+                    label={advisorsLabel}
+                    tooltip={advisorsTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={advisorsLink}
+                    dataTestId="advanced-advisors"
+                    component={SwitchRow}
+                  />
                   <div className={styles.advancedRow}>
                     <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
                       <div className={settingsStyles.labelWrapper} data-testid="check-intervals-label">

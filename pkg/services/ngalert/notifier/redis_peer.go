@@ -23,14 +23,18 @@ import (
 )
 
 type redisConfig struct {
-	addr        string
-	username    string
-	password    string
-	db          int
-	name        string
-	prefix      string
-	maxConns    int
-	clusterMode bool
+	addr             string
+	username         string
+	password         string
+	db               int
+	name             string
+	prefix           string
+	maxConns         int
+	clusterMode      bool
+	sentinelMode     bool
+	masterName       string
+	sentinelUsername string
+	sentinelPassword string
 
 	tlsEnabled bool
 	tls        dstls.ClientConfig
@@ -64,6 +68,7 @@ type redisPeer struct {
 	states    map[string]alertingCluster.State
 	subs      map[string]*redis.PubSub
 	statesMtx sync.RWMutex
+	subsMtx   sync.RWMutex
 
 	readyc    chan struct{}
 	shutdownc chan struct{}
@@ -110,21 +115,19 @@ func newRedisPeer(cfg redisConfig, logger log.Logger, reg prometheus.Registerer,
 		}
 	}
 
-	opts := &redis.UniversalOptions{
+	rdb := redis.NewUniversalClient(&redis.UniversalOptions{
 		Addrs:     addrs,
 		Username:  cfg.username,
 		Password:  cfg.password,
 		DB:        cfg.db,
 		PoolSize:  poolSize,
 		TLSConfig: tlsClientConfig,
-	}
 
-	var rdb redis.UniversalClient
-	if cfg.clusterMode {
-		rdb = redis.NewClusterClient(opts.Cluster())
-	} else {
-		rdb = redis.NewClient(opts.Simple())
-	}
+		// Options specific to Sentinel mode.
+		MasterName:       cfg.masterName,
+		SentinelUsername: cfg.sentinelUsername,
+		SentinelPassword: cfg.sentinelPassword,
+	})
 
 	cmd := rdb.Ping(context.Background())
 	if cmd.Err() != nil {
@@ -225,8 +228,10 @@ func newRedisPeer(cfg redisConfig, logger log.Logger, reg prometheus.Registerer,
 	p.nodePingDuration = nodePingDuration
 	p.nodePingFailures = nodePingFailures
 
+	p.subsMtx.Lock()
 	p.subs[fullStateChannel] = p.redis.Subscribe(context.Background(), p.withPrefix(fullStateChannel))
 	p.subs[fullStateChannelReq] = p.redis.Subscribe(context.Background(), p.withPrefix(fullStateChannelReq))
+	p.subsMtx.Unlock()
 
 	go p.heartbeatLoop()
 	go p.membersSyncLoop()
@@ -461,7 +466,9 @@ func (p *redisPeer) AddState(key string, state alertingCluster.State, _ promethe
 	// As we also want to get the state from other nodes, we subscribe to the key.
 	sub := p.redis.Subscribe(context.Background(), p.withPrefix(key))
 	go p.receiveLoop(sub)
+	p.subsMtx.Lock()
 	p.subs[key] = sub
+	p.subsMtx.Unlock()
 	return newRedisChannel(p, key, p.withPrefix(key), update)
 }
 
@@ -507,17 +514,29 @@ func (p *redisPeer) fullStateReqReceiveLoop() {
 		select {
 		case <-p.shutdownc:
 			return
-		case data := <-p.subs[fullStateChannelReq].Channel():
-			// The payload of a full state request is the name of the peer that is
-			// requesting the full state. In case we received our own request, we
-			// can just ignore it. Redis pub/sub fanouts to all clients, regardless
-			// if a client was also the publisher.
-			if data.Payload == p.name {
+		default:
+			p.subsMtx.RLock()
+			sub, ok := p.subs[fullStateChannelReq]
+			p.subsMtx.RUnlock()
+
+			if !ok {
+				time.Sleep(waitForMsgIdle)
 				continue
 			}
-			p.fullStateSyncPublish()
-		default:
-			time.Sleep(waitForMsgIdle)
+
+			select {
+			case data := <-sub.Channel():
+				// The payload of a full state request is the name of the peer that is
+				// requesting the full state. In case we received our own request, we
+				// can just ignore it. Redis pub/sub fanouts to all clients, regardless
+				// if a client was also the publisher.
+				if data.Payload == p.name {
+					continue
+				}
+				p.fullStateSyncPublish()
+			default:
+				time.Sleep(waitForMsgIdle)
+			}
 		}
 	}
 }
@@ -527,10 +546,22 @@ func (p *redisPeer) fullStateSyncReceiveLoop() {
 		select {
 		case <-p.shutdownc:
 			return
-		case data := <-p.subs[fullStateChannel].Channel():
-			p.mergeFullState([]byte(data.Payload))
 		default:
-			time.Sleep(waitForMsgIdle)
+			p.subsMtx.RLock()
+			sub, ok := p.subs[fullStateChannel]
+			p.subsMtx.RUnlock()
+
+			if !ok {
+				time.Sleep(waitForMsgIdle)
+				continue
+			}
+
+			select {
+			case data := <-sub.Channel():
+				p.mergeFullState([]byte(data.Payload))
+			default:
+				time.Sleep(waitForMsgIdle)
+			}
 		}
 	}
 }

@@ -1,5 +1,4 @@
 import { css } from '@emotion/css';
-import React from 'react';
 
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { Segment, SegmentInput, useStyles2 } from '@grafana/ui';
@@ -56,7 +55,13 @@ export function FunctionParamEditor({ editableParam, onChange, onExpandedChange,
         }}
         onExpandedChange={onExpandedChange}
         // input style
-        style={{ height: '25px', paddingTop: '2px', marginTop: '2px', paddingLeft: '4px', minWidth: '100px' }}
+        style={{
+          height: '25px',
+          paddingTop: '2px',
+          marginTop: '2px',
+          paddingLeft: '4px',
+          minWidth: '100px',
+        }}
       ></SegmentInput>
     );
   }
@@ -66,12 +71,16 @@ const getStyles = (theme: GrafanaTheme2) => ({
   segment: css({
     margin: 0,
     padding: 0,
+    overflowWrap: 'anywhere',
+    height: '100%',
   }),
-  input: css`
-    margin: 0;
-    padding: 0;
-    input {
-      height: 25px;
+  input: css({
+    margin: 0,
+    padding: 0,
+    input: {
+      height: '25px',
     },
-  `,
+    overflowWrap: 'anywhere',
+    height: '100%',
+  }),
 });

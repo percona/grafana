@@ -1,10 +1,10 @@
 import { css } from '@emotion/css';
-import React, { AnchorHTMLAttributes, forwardRef } from 'react';
+import { AnchorHTMLAttributes, forwardRef } from 'react';
 
 import { GrafanaTheme2, locationUtil, textUtil, ThemeTypographyVariantTypes } from '@grafana/data';
 
-import { useTheme2 } from '../../themes';
-import { IconName, IconSize } from '../../types';
+import { useTheme2 } from '../../themes/ThemeContext';
+import { IconName, IconSize } from '../../types/icon';
 import { Icon } from '../Icon/Icon';
 import { customWeight } from '../Text/utils';
 
@@ -27,7 +27,7 @@ interface TextLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 't
   weight?: 'light' | 'regular' | 'medium' | 'bold';
   /** Set the icon to be shown. An external link will show the 'external-link-alt' icon as default.*/
   icon?: IconName;
-  children: string;
+  children: React.ReactNode;
 }
 
 const svgSizes: {
@@ -43,6 +43,11 @@ const svgSizes: {
   bodySmall: 'xs',
 };
 
+/**
+ * The TextLink component renders an anchor tag `<a>` that takes users to another page, external or internal to Grafana.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/foundations-textlink--docs
+ */
 export const TextLink = forwardRef<HTMLAnchorElement, TextLinkProps>(
   (
     { href, color = 'link', external = false, inline = true, variant = 'body', weight, icon, children, ...rest },

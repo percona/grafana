@@ -1,7 +1,8 @@
-import React from 'react';
+import * as React from 'react';
+import type { JSX } from 'react';
 
-import { Button, ModalsController, ButtonProps } from '@grafana/ui/src';
-import { t } from 'app/core/internationalization';
+import { t } from '@grafana/i18n';
+import { Button, ModalsController, ButtonProps } from '@grafana/ui';
 import { useDeletePublicDashboardMutation } from 'app/features/dashboard/api/publicDashboardApi';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 
@@ -41,17 +42,13 @@ export const DeletePublicDashboardButton = ({
   return (
     <ModalsController>
       {({ showModal, hideModal }) => {
-        const translatedRevocationButtonText = t(
-          'public-dashboard-list.button.revoke-button-text',
-          'Revoke public URL'
-        );
+        const translatedRevocationButtonText = t('shared-dashboard-list.button.revoke-button-text', 'Revoke access');
         return (
           <Button
             aria-label={translatedRevocationButtonText}
             title={translatedRevocationButtonText}
             onClick={() =>
               showModal(DeletePublicDashboardModal, {
-                dashboardTitle: publicDashboard.title,
                 onConfirm: () => onDeletePublicDashboardClick(publicDashboard, hideModal),
                 onDismiss: () => {
                   onDismiss ? onDismiss() : hideModal();

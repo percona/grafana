@@ -132,18 +132,12 @@
                   "from": {
                     "description": "From is the start time of the query.",
                     "type": "string",
-                    "default": "now-6h",
-                    "examples": [
-                      "now-1h"
-                    ]
+                    "default": "now-6h"
                   },
                   "to": {
                     "description": "To is the end time of the query.",
                     "type": "string",
-                    "default": "now",
-                    "examples": [
-                      "now"
-                    ]
+                    "default": "now"
                   }
                 },
                 "additionalProperties": false
@@ -213,7 +207,7 @@
                 "type": "string"
               },
               "reducer": {
-                "description": "The reducer\n\n\nPossible enum values:\n - `\"sum\"` \n - `\"mean\"` \n - `\"min\"` \n - `\"max\"` \n - `\"count\"` \n - `\"last\"` ",
+                "description": "The reducer\n\n\nPossible enum values:\n - `\"sum\"` \n - `\"mean\"` \n - `\"min\"` \n - `\"max\"` \n - `\"count\"` \n - `\"last\"` \n - `\"median\"` ",
                 "type": "string",
                 "enum": [
                   "sum",
@@ -221,7 +215,8 @@
                   "min",
                   "max",
                   "count",
-                  "last"
+                  "last",
+                  "median"
                 ],
                 "x-enum-description": {}
               },
@@ -307,18 +302,12 @@
                   "from": {
                     "description": "From is the start time of the query.",
                     "type": "string",
-                    "default": "now-6h",
-                    "examples": [
-                      "now-1h"
-                    ]
+                    "default": "now-6h"
                   },
                   "to": {
                     "description": "To is the end time of the query.",
                     "type": "string",
-                    "default": "now",
-                    "examples": [
-                      "now"
-                    ]
+                    "default": "now"
                   }
                 },
                 "additionalProperties": false
@@ -367,7 +356,7 @@
                 "additionalProperties": false
               },
               "downsampler": {
-                "description": "The downsample function\n\n\nPossible enum values:\n - `\"sum\"` \n - `\"mean\"` \n - `\"min\"` \n - `\"max\"` \n - `\"count\"` \n - `\"last\"` ",
+                "description": "The downsample function\n\n\nPossible enum values:\n - `\"sum\"` \n - `\"mean\"` \n - `\"min\"` \n - `\"max\"` \n - `\"count\"` \n - `\"last\"` \n - `\"median\"` ",
                 "type": "string",
                 "enum": [
                   "sum",
@@ -375,7 +364,8 @@
                   "min",
                   "max",
                   "count",
-                  "last"
+                  "last",
+                  "median"
                 ],
                 "x-enum-description": {}
               },
@@ -460,18 +450,12 @@
                   "from": {
                     "description": "From is the start time of the query.",
                     "type": "string",
-                    "default": "now-6h",
-                    "examples": [
-                      "now-1h"
-                    ]
+                    "default": "now-6h"
                   },
                   "to": {
                     "description": "To is the end time of the query.",
                     "type": "string",
-                    "default": "now",
-                    "examples": [
-                      "now"
-                    ]
+                    "default": "now"
                   }
                 },
                 "additionalProperties": false
@@ -557,7 +541,8 @@
                           "type": "string",
                           "enum": [
                             "and",
-                            "or"
+                            "or",
+                            "logic-or"
                           ],
                           "x-enum-description": {}
                         }
@@ -690,18 +675,12 @@
                   "from": {
                     "description": "From is the start time of the query.",
                     "type": "string",
-                    "default": "now-6h",
-                    "examples": [
-                      "now-1h"
-                    ]
+                    "default": "now-6h"
                   },
                   "to": {
                     "description": "To is the end time of the query.",
                     "type": "string",
-                    "default": "now",
-                    "examples": [
-                      "now"
-                    ]
+                    "default": "now"
                   }
                 },
                 "additionalProperties": false
@@ -751,8 +730,14 @@
                           "enum": [
                             "gt",
                             "lt",
+                            "eq",
+                            "ne",
+                            "gte",
+                            "lte",
                             "within_range",
-                            "outside_range"
+                            "outside_range",
+                            "within_range_included",
+                            "outside_range_included"
                           ],
                           "x-enum-description": {}
                         }
@@ -783,8 +768,14 @@
                           "enum": [
                             "gt",
                             "lt",
+                            "eq",
+                            "ne",
+                            "gte",
+                            "lte",
                             "within_range",
-                            "outside_range"
+                            "outside_range",
+                            "within_range_included",
+                            "outside_range_included"
                           ],
                           "x-enum-description": {}
                         }
@@ -898,18 +889,12 @@
                   "from": {
                     "description": "From is the start time of the query.",
                     "type": "string",
-                    "default": "now-6h",
-                    "examples": [
-                      "now-1h"
-                    ]
+                    "default": "now-6h"
                   },
                   "to": {
                     "description": "To is the end time of the query.",
                     "type": "string",
-                    "default": "now",
-                    "examples": [
-                      "now"
-                    ]
+                    "default": "now"
                   }
                 },
                 "additionalProperties": false
@@ -927,6 +912,7 @@
             "type": "object",
             "required": [
               "expression",
+              "format",
               "type",
               "refId"
             ],
@@ -960,6 +946,9 @@
                 "examples": [
                   "SELECT * FROM A LIMIT 1"
                 ]
+              },
+              "format": {
+                "type": "string"
               },
               "hide": {
                 "description": "true if query is disabled (ie should not be returned to the dashboard)\nNOTE: this does not always imply that the query should not be executed since\nthe results from a hidden query may be used as the input to other queries (SSE etc)",
@@ -1033,18 +1022,12 @@
                   "from": {
                     "description": "From is the start time of the query.",
                     "type": "string",
-                    "default": "now-6h",
-                    "examples": [
-                      "now-1h"
-                    ]
+                    "default": "now-6h"
                   },
                   "to": {
                     "description": "To is the end time of the query.",
                     "type": "string",
-                    "default": "now",
-                    "examples": [
-                      "now"
-                    ]
+                    "default": "now"
                   }
                 },
                 "additionalProperties": false

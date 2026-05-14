@@ -1,11 +1,10 @@
-import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useAsync } from 'react-use';
 
 import { CoreApp } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { getDataSourceSrv } from '@grafana/runtime';
-import { Field, LoadingPlaceholder, Alert } from '@grafana/ui';
-import { Trans, t } from 'app/core/internationalization';
+import { Field, LoadingPlaceholder, Alert, TextLink } from '@grafana/ui';
 
 interface Props {
   dsUid?: string;
@@ -35,13 +34,12 @@ export const QueryEditorField = ({ dsUid, invalid, error, name }: Props) => {
         <span>
           <Trans i18nKey="correlations.query-editor.query-description">
             Define the query that is run when the link is clicked. You can use{' '}
-            <a
+            <TextLink
               href="https://grafana.com/docs/grafana/latest/panels-visualizations/configure-data-links/"
-              target="_blank"
-              rel="noreferrer"
+              external
             >
               variables
-            </a>{' '}
+            </TextLink>{' '}
             to access specific field values.
           </Trans>
         </span>
@@ -53,12 +51,14 @@ export const QueryEditorField = ({ dsUid, invalid, error, name }: Props) => {
         name={name}
         rules={{
           validate: {
-            hasQueryEditor: () =>
-              QueryEditor !== undefined ||
-              t(
-                'correlations.query-editor.control-rules',
-                'The selected target data source must export a query editor.'
-              ),
+            hasQueryEditor: (_, formVals) => {
+              return formVals.type === 'query' && QueryEditor === undefined
+                ? t(
+                    'correlations.query-editor.control-rules',
+                    'The selected target data source must export a query editor.'
+                  )
+                : true;
+            },
           },
         }}
         render={({ field: { value, onChange } }) => {

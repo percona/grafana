@@ -1,45 +1,47 @@
 package provisioning
 
 import (
-	"errors"
 	"fmt"
 
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
+	"github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
-	"github.com/grafana/grafana/pkg/util/errutil"
 )
 
 var ErrValidation = fmt.Errorf("invalid object specification")
 var ErrNotFound = fmt.Errorf("object not found")
-var ErrPermissionDenied = errors.New("permission denied")
 
 var (
-	ErrNoAlertmanagerConfiguration  = errutil.Internal("alerting.notification.configMissing", errutil.WithPublicMessage("No alertmanager configuration present in this organization"))
-	ErrBadAlertmanagerConfiguration = errutil.Internal("alerting.notification.configCorrupted").MustTemplate("Failed to unmarshal the Alertmanager configuration", errutil.WithPublic("Current Alertmanager configuration in the storage is corrupted. Reset the configuration or rollback to a recent valid one."))
-
-	ErrProvenanceChangeNotAllowed = errutil.Forbidden("alerting.notifications.invalidProvenance").MustTemplate(
-		"Resource with provenance status '{{ .Public.CurrentProvenance }}' cannot be managed via API that handles resources with provenance status '{{ .Public.TargetProvenance }}'",
-		errutil.WithPublic("Resource with provenance status '{{ .Public.CurrentProvenance }}' cannot be managed via API that handles resources with provenance status '{{ .Public.TargetProvenance }}'. You must use appropriate API to manage this resource"),
-	)
-
 	ErrVersionConflict = errutil.Conflict("alerting.notifications.conflict")
 
-	ErrTimeIntervalNotFound = errutil.NotFound("alerting.notifications.time-intervals.notFound")
-	ErrTimeIntervalExists   = errutil.BadRequest("alerting.notifications.time-intervals.nameExists", errutil.WithPublicMessage("Time interval with this name already exists. Use a different name or update existing one."))
-	ErrTimeIntervalInvalid  = errutil.BadRequest("alerting.notifications.time-intervals.invalidFormat").MustTemplate("Invalid format of the submitted time interval", errutil.WithPublic("Time interval is in invalid format. Correct the payload and try again."))
-	ErrTimeIntervalInUse    = errutil.Conflict("alerting.notifications.time-intervals.used", errutil.WithPublicMessage("Time interval is used by one or many notification policies"))
+	ErrTimeIntervalNotFound                     = errutil.NotFound("alerting.notifications.time-intervals.notFound")
+	ErrTimeIntervalExists                       = errutil.BadRequest("alerting.notifications.time-intervals.nameExists", errutil.WithPublicMessage("Time interval with this name already exists. Use a different name or update existing one."))
+	ErrTimeIntervalInvalid                      = errutil.BadRequest("alerting.notifications.time-intervals.invalidFormat").MustTemplate("Invalid format of the submitted time interval", errutil.WithPublic("Time interval is in invalid format. Correct the payload and try again."))
+	ErrTimeIntervalInUse                        = errutil.Conflict("alerting.notifications.time-intervals.used").MustTemplate("Time interval is used")
+	ErrTimeIntervalDependentResourcesProvenance = errutil.Conflict("alerting.notifications.time-intervals.usedProvisioned").MustTemplate(
+		"Time interval cannot be renamed because it is used by provisioned {{ if .Public.UsedByRules }}alert rules{{ end }}{{ if .Public.UsedByRoutes }}{{ if .Public.UsedByRules }} and {{ end }}notification policies{{ end }}",
+		errutil.WithPublic(`Time interval cannot be renamed because it is used by provisioned {{ if .Public.UsedByRules }}alert rules{{ end }}{{ if .Public.UsedByRoutes }}{{ if .Public.UsedByRules }} and {{ end }}notification policies{{ end }}. You must update those resources first using the original provision method.`),
+	)
+	ErrTimeIntervalOrigin = errutil.BadRequest("alerting.notifications.time-intervals.originInvalid").MustTemplate(
+		"Time interval '{{ .Public.Name }}' cannot be {{ .Public.Action }}d because it belongs to an imported configuration.",
+		errutil.WithPublic("Time interval '{{ .Public.Name }}' cannot be {{ .Public.Action }}d because it belongs to an imported configuration. Finish the import of the configuration first."),
+	)
 
-	ErrContactPointReferenced = errutil.BadRequest("alerting.notifications.contact-points.referenced", errutil.WithPublicMessage("Contact point is currently referenced by a notification policy."))
+	ErrTemplateNotFound = errutil.NotFound("alerting.notifications.templates.notFound")
+	ErrTemplateInvalid  = errutil.BadRequest("alerting.notifications.templates.invalidFormat").MustTemplate("Invalid format of the submitted template", errutil.WithPublic("Template is in invalid format. Correct the payload and try again."))
+	ErrTemplateExists   = errutil.BadRequest("alerting.notifications.templates.nameExists", errutil.WithPublicMessage("Template file with this name already exists. Use a different name or update existing one."))
+	ErrTemplateOrigin   = errutil.BadRequest("alerting.notifications.templates.originInvalid").MustTemplate(
+		"Template '{{ .Public.Name }}' cannot be {{ .Public.Action }}d because it belongs to an imported configuration.",
+		errutil.WithPublic("Template '{{ .Public.Name }}' cannot be {{ .Public.Action }}d because it belongs to an imported configuration. Finish the import of the configuration first."),
+	)
+
+	ErrContactPointReferenced = errutil.Conflict("alerting.notifications.contact-points.referenced", errutil.WithPublicMessage("Contact point is currently referenced by a notification policy."))
+	ErrContactPointUsedInRule = errutil.Conflict("alerting.notifications.contact-points.used-by-rule", errutil.WithPublicMessage("Contact point is currently used in the notification settings of one or many alert rules."))
+	contactPointUidExists     = "Receiver configuration with UID '{{ .Public.UID }}' already exists in contact point '{{ .Public.Name }}'. Please use unique identifiers for receivers across all contact points."
+	ErrContactPointUidExists  = errutil.Conflict("alerting.notifications.contact-points.uidInUse").MustTemplate(
+		contactPointUidExists, errutil.WithPublic(contactPointUidExists),
+	)
 )
-
-func makeErrBadAlertmanagerConfiguration(err error) error {
-	data := errutil.TemplateData{
-		Public: map[string]interface{}{
-			"Error": err.Error(),
-		},
-		Error: err,
-	}
-	return ErrBadAlertmanagerConfiguration.Build(data)
-}
 
 // MakeErrTimeIntervalInvalid creates an error with the ErrTimeIntervalInvalid template
 func MakeErrTimeIntervalInvalid(err error) error {
@@ -53,18 +55,70 @@ func MakeErrTimeIntervalInvalid(err error) error {
 	return ErrTimeIntervalInvalid.Build(data)
 }
 
-func MakeErrProvenanceChangeNotAllowed(from, to models.Provenance) error {
-	if to == "" {
-		to = "none"
+func MakeErrTimeIntervalInUse(usedByRoutes bool, rules []models.AlertRuleKey) error {
+	uids := make([]string, 0, len(rules))
+	for _, key := range rules {
+		uids = append(uids, key.UID)
 	}
-	if from == "" {
-		from = "none"
+	data := make(map[string]any, 2)
+	if len(uids) > 0 {
+		data["UsedByRules"] = uids
 	}
+	if usedByRoutes {
+		data["UsedByRoutes"] = true
+	}
+
+	return ErrTimeIntervalInUse.Build(errutil.TemplateData{
+		Public: data,
+		Error:  nil,
+	})
+}
+
+// MakeErrTimeIntervalInvalid creates an error with the ErrTimeIntervalInvalid template
+func MakeErrTemplateInvalid(err error) error {
 	data := errutil.TemplateData{
 		Public: map[string]interface{}{
-			"TargetProvenance": to,
-			"SourceProvenance": from,
+			"Error": err.Error(),
 		},
+		Error: err,
 	}
-	return ErrProvenanceChangeNotAllowed.Build(data)
+
+	return ErrTemplateInvalid.Build(data)
+}
+
+func MakeErrTimeIntervalDependentResourcesProvenance(usedByRoutes bool, rules []models.AlertRuleKey) error {
+	uids := make([]string, 0, len(rules))
+	for _, key := range rules {
+		uids = append(uids, key.UID)
+	}
+	data := make(map[string]any, 2)
+	if len(uids) > 0 {
+		data["UsedByRules"] = uids
+	}
+	if usedByRoutes {
+		data["UsedByRoutes"] = true
+	}
+
+	return ErrTimeIntervalDependentResourcesProvenance.Build(errutil.TemplateData{
+		Public: data,
+	})
+}
+
+func MakeErrContactPointUidExists(uid, name string) error {
+	return ErrContactPointUidExists.Build(errutil.TemplateData{
+		Public: map[string]any{
+			"UID":  uid,
+			"Name": name,
+		},
+	})
+}
+
+func makeErrTemplateOrigin(t definitions.NotificationTemplate, action string) error {
+	return ErrTemplateOrigin.Build(errutil.TemplateData{Public: map[string]interface{}{"Action": action, "Name": t.Name}})
+}
+
+func makeErrMuteTimeIntervalOrigin(mt definitions.MuteTimeInterval, action string) error {
+	return ErrTimeIntervalOrigin.Build(errutil.TemplateData{
+		Public: map[string]interface{}{"Action": action, "Name": mt.Name},
+	})
 }

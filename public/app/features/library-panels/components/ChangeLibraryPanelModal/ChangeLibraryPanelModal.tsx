@@ -1,8 +1,9 @@
-import React from 'react';
+import type { JSX } from 'react';
 
+import { t } from '@grafana/i18n';
 import { ConfirmModal } from '@grafana/ui';
 
-import { PanelModel } from '../../../dashboard/state';
+import { PanelModel } from '../../../dashboard/state/PanelModel';
 import { isPanelModelLibraryPanel } from '../../guard';
 
 export interface ChangeLibraryPanelModalProps {
@@ -21,7 +22,11 @@ export const ChangeLibraryPanelModal = ({ onConfirm, onDismiss, panel }: ChangeL
     <ConfirmModal
       onConfirm={onConfirm}
       onDismiss={onDismiss}
-      confirmText={isLibraryPanel ? 'Change' : 'Replace'}
+      confirmText={
+        isLibraryPanel
+          ? t('library-panels.change-library-panel-modal.confirmText-change', 'Change')
+          : t('library-panels.change-library-panel-modal.confirmText-replace', 'Replace')
+      }
       title={title}
       body={body}
       dismissText="Cancel"

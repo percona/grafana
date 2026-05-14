@@ -1,10 +1,9 @@
 import { render, screen, within } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 
 import { configureStore } from 'app/store/configureStore';
 
-import { getMockInvitees } from '../users/__mocks__/userMocks';
+import { getMockInvitees } from '../users/mocks/userMocks';
 
 import InviteesTable from './InviteesTable';
 
@@ -56,7 +55,7 @@ describe('InviteesTable', () => {
     expect(rows.length).toEqual(6);
 
     rows.forEach((row) => {
-      expect(within(row).getByRole('button', { name: 'Revoke Invite' })).toBeInTheDocument();
+      expect(within(row).getByRole('button', { name: 'Revoke invite' })).toBeInTheDocument();
     });
   });
 });

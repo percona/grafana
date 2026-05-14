@@ -1,0 +1,32 @@
+name: "K8s Codegen Check"
+
+on:
+  # @PERCONA - disable workflow
+  workflow_dispatch:
+jobs:
+  check:
+    name: K8s Codegen Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    - name: Set go version
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
+      with:
+        go-version-file: go.mod
+
+    - name: Update k8s codegen
+      run: ./hack/update-codegen.sh
+
+    - name: Check for k8s codegen changes
+      run: |
+        if ! git diff --exit-code --quiet; then
+          echo "Changes detected:"
+          git diff
+          echo "Please run './hack/update-codegen.sh' and commit the changes."
+          exit 1
+        fi

@@ -1,46 +1,17 @@
 package extsvcaccounts
 
 import (
-	"context"
-	"time"
-
-	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/services/extsvcauth"
-	"github.com/grafana/grafana/pkg/services/serviceaccounts"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type metrics struct {
-	storedCount  prometheus.GaugeFunc
 	savedCount   prometheus.Counter
 	deletedCount prometheus.Counter
 }
 
-func newMetrics(reg prometheus.Registerer, saSvc serviceaccounts.Service, logger log.Logger) *metrics {
+func newMetrics(reg prometheus.Registerer) *metrics {
 	var m metrics
 
-	m.storedCount = prometheus.NewGaugeFunc(
-		prometheus.GaugeOpts{
-			Namespace: metricsNamespace,
-			Name:      "extsvc_total",
-			Help:      "Number of external service accounts in store",
-		},
-		func() float64 {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			res, err := saSvc.SearchOrgServiceAccounts(ctx, &serviceaccounts.SearchOrgServiceAccountsQuery{
-				OrgID:        extsvcauth.TmpOrgID,
-				Filter:       serviceaccounts.FilterOnlyExternal,
-				CountOnly:    true,
-				SignedInUser: extsvcuser,
-			})
-			if err != nil {
-				logger.Error("Could not compute extsvc_total metric", "error", err)
-				return 0.0
-			}
-			return float64(res.TotalCount)
-		},
-	)
 	m.savedCount = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: metricsNamespace,
 		Name:      "extsvc_saved_total",
@@ -53,7 +24,6 @@ func newMetrics(reg prometheus.Registerer, saSvc serviceaccounts.Service, logger
 	})
 
 	if reg != nil {
-		reg.MustRegister(m.storedCount)
 		reg.MustRegister(m.savedCount)
 		reg.MustRegister(m.deletedCount)
 	}

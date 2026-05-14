@@ -3,38 +3,26 @@ import { useMemo } from 'react';
 
 import {
   DataFrame,
-  DataFrameJSON,
   Field as DataFrameField,
+  DataFrameJSON,
   FieldType,
-  getDisplayProcessor,
   GrafanaTheme2,
+  getDisplayProcessor,
 } from '@grafana/data';
-import { fieldIndexComparer } from '@grafana/data/src/field/fieldComparers';
+import { fieldIndexComparer } from '@grafana/data/internal';
 import { MappingType, ThresholdsMode } from '@grafana/schema';
 import { useTheme2 } from '@grafana/ui';
 
-import { labelsMatchMatchers, parseMatchers } from '../../../utils/alertmanager';
+import { labelsMatchMatchers } from '../../../utils/alertmanager';
+import { parsePromQLStyleMatcherLooseSafe } from '../../../utils/matchers';
 
-import { extractCommonLabels, Line, LogRecord, omitLabels } from './common';
+import { LogRecord, extractCommonLabels, historyDataFrameToLogRecords, omitLabels } from './common';
 
 export function useRuleHistoryRecords(stateHistory?: DataFrameJSON, filter?: string) {
   const theme = useTheme2();
 
   return useMemo(() => {
-    // merge timestamp with "line"
-    const tsValues = stateHistory?.data?.values[0] ?? [];
-    const timestamps: number[] = isNumbers(tsValues) ? tsValues : [];
-    const lines = stateHistory?.data?.values[1] ?? [];
-
-    const logRecords = timestamps.reduce((acc: LogRecord[], timestamp: number, index: number) => {
-      const line = lines[index];
-      // values property can be undefined for some instance states (e.g. NoData)
-      if (isLine(line)) {
-        acc.push({ timestamp, line });
-      }
-
-      return acc;
-    }, []);
+    const logRecords = historyDataFrameToLogRecords(stateHistory);
 
     // group all records by alert instance (unique set of labels)
     const logRecordsByInstance = groupBy(logRecords, (record: LogRecord) => {
@@ -50,7 +38,7 @@ export function useRuleHistoryRecords(stateHistory?: DataFrameJSON, filter?: str
 
     const commonLabels = extractCommonLabels(groupLabelsArray);
 
-    const filterMatchers = filter ? parseMatchers(filter) : [];
+    const filterMatchers = filter ? parsePromQLStyleMatcherLooseSafe(filter) : [];
     const filteredGroupedLines = Object.entries(logRecordsByInstance).filter(([key]) => {
       const labels = JSON.parse(key);
       return labelsMatchMatchers(labels, filterMatchers);
@@ -67,14 +55,6 @@ export function useRuleHistoryRecords(stateHistory?: DataFrameJSON, filter?: str
       totalRecordsCount: logRecords.length,
     };
   }, [stateHistory, filter, theme]);
-}
-
-export function isNumbers(value: unknown[]): value is number[] {
-  return value.every((v) => typeof v === 'number');
-}
-
-export function isLine(value: unknown): value is Line {
-  return typeof value === 'object' && value !== null && 'current' in value && 'previous' in value;
 }
 
 // Each alert instance is represented by a data frame
@@ -108,7 +88,7 @@ export function logRecordsToDataFrame(
         values: timeField.values.map((_, i) => timeField.values[timeIndex[i]]),
       },
       {
-        name: 'state',
+        name: 'State',
         type: FieldType.string,
         values: stateValues.map((_, i) => stateValues[timeIndex[i]]),
         config: {
@@ -119,16 +99,28 @@ export function logRecordsToDataFrame(
           custom: { fillOpacity: 100 },
           mappings: [
             {
+              type: MappingType.RegexToText,
+              options: {
+                //  Map as a regex so we capture `Normal`, and `Normal (Updated)`
+                pattern: '/^normal/i',
+                result: { color: theme.colors.success.main },
+              },
+            },
+            {
+              type: MappingType.RegexToText,
+              options: {
+                pattern: '/Alerting/',
+                result: { color: theme.colors.error.main },
+              },
+            },
+            {
               type: MappingType.ValueToText,
               options: {
-                Alerting: {
-                  color: theme.colors.error.main,
-                },
                 Pending: {
                   color: theme.colors.warning.main,
                 },
-                Normal: {
-                  color: theme.colors.success.main,
+                Recovering: {
+                  color: theme.colors.warning.main,
                 },
                 NoData: {
                   color: theme.colors.info.main,

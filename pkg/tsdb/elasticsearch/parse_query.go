@@ -1,10 +1,12 @@
 package elasticsearch
 
 import (
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"fmt"
 
-	"github.com/grafana/grafana/pkg/components/simplejson"
-	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+
+	"github.com/grafana/grafana/pkg/tsdb/elasticsearch/simplejson"
 )
 
 func parseQuery(tsdbQuery []backend.DataQuery, logger log.Logger) ([]*Query, error) {
@@ -19,10 +21,17 @@ func parseQuery(tsdbQuery []backend.DataQuery, logger log.Logger) ([]*Query, err
 		// please do not create a new field with that name, to avoid potential problems with old, persisted queries.
 
 		rawQuery := model.Get("query").MustString()
+		rawDSLQuery := model.Get("rawDSLQuery").MustString()
+
+		var editorType *string
+		if et := model.Get("editorType").MustString(); et != "" {
+			editorType = &et
+		}
+
 		bucketAggs, err := parseBucketAggs(model)
 		if err != nil {
 			logger.Error("Failed to parse bucket aggs in query", "error", err, "model", string(q.JSON))
-			return nil, err
+			return nil, backend.DownstreamError(err)
 		}
 		metrics, err := parseMetrics(model)
 		if err != nil {
@@ -35,6 +44,7 @@ func parseQuery(tsdbQuery []backend.DataQuery, logger log.Logger) ([]*Query, err
 
 		queries = append(queries, &Query{
 			RawQuery:      rawQuery,
+			RawDSLQuery:   rawDSLQuery,
 			BucketAggs:    bucketAggs,
 			Metrics:       metrics,
 			Alias:         alias,
@@ -43,6 +53,7 @@ func parseQuery(tsdbQuery []backend.DataQuery, logger log.Logger) ([]*Query, err
 			RefID:         q.RefID,
 			MaxDataPoints: q.MaxDataPoints,
 			TimeRange:     q.TimeRange,
+			EditorType:    editorType,
 		})
 	}
 
@@ -59,12 +70,12 @@ func parseBucketAggs(model *simplejson.Json) ([]*BucketAgg, error) {
 
 		agg.Type, err = aggJSON.Get("type").String()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bucket aggs type: %w", err)
 		}
 
 		agg.ID, err = aggJSON.Get("id").String()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bucket aggs id: %w", err)
 		}
 
 		agg.Field = aggJSON.Get("field").MustString()

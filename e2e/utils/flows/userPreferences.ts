@@ -1,11 +1,14 @@
-import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
+import { Preferences as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
 
 import { e2e } from '..';
 import { fromBaseUrl } from '../support/url';
 
 const defaultUserPreferences = {
   timezone: '', // "Default" option
-} as const; // TODO: when we update typescript >4.9 change to `as const satisfies UserPreferencesDTO`
+  navbar: {
+    bookmarkUrls: [],
+  },
+} as const satisfies UserPreferencesDTO; // TODO: when we update typescript >4.9 change to `as const satisfies UserPreferencesDTO`
 
 // Only accept preferences we have defaults for as arguments. To allow a new preference to be set, add a default for it
 type UserPreferences = Pick<UserPreferencesDTO, keyof typeof defaultUserPreferences>;

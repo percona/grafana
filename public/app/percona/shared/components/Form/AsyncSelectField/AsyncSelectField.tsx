@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 import { AsyncSelect } from '@grafana/ui';
 
@@ -11,7 +11,17 @@ import { AsyncSelectFieldProps } from './AsyncSelectField.types';
 const AsyncSelectFieldWrapper: FC<AsyncSelectFieldProps<any>> = ({ label, name, className, ...props }) => (
   <>
     <Label label={label} dataTestId={`${name}-select-label`} />
-    <AsyncSelect className={className} {...props} />
+    <AsyncSelect
+      className={className}
+      {...props}
+      onChange={(value) => {
+        props.onChange(value, {
+          name,
+          action: 'select-option',
+          option: value,
+        });
+      }}
+    />
   </>
 );
 

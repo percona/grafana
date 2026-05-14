@@ -1,24 +1,23 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
+import { FC, useState, useEffect, useCallback, useMemo } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
 import { SelectableValue, DateTime, dateTime, AppEvents, PageLayoutType } from '@grafana/data';
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
-import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { triggerDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { GET_SERVICES_CANCEL_TOKEN, DUMP_URL, TWELVE_HOURS } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';
@@ -27,10 +26,11 @@ import { ExportDatasetProps } from './ExportDataset.types';
 
 const { Form } = withTypes<ExportDatasetProps>();
 
-const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
+const ExportDataset: FC = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { isLoading, services: fetchedServices } = useSelector(getServices);
+  const initialValues = useMemo<Partial<ExportDatasetProps>>(() => ({ load: true }), []);
 
   const serviceNames = useMemo(
     () =>
@@ -109,6 +109,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       <Page.Contents>
         <Form
           onSubmit={handleSubmit}
+          initialValues={initialValues}
           render={({ handleSubmit, form }) => (
             <form onSubmit={handleSubmit} className={styles.form}>
               <PageToolbar title={Messages.breadCrumbTitle} onGoBack={handleGoBack}>

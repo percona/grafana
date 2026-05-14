@@ -3,9 +3,6 @@ package validation
 import (
 	"context"
 	"errors"
-	"fmt"
-	"regexp"
-	"slices"
 	"time"
 
 	"github.com/grafana/grafana/pkg/plugins"
@@ -59,6 +56,11 @@ func newModuleJSValidator() *ModuleJSValidator {
 }
 
 func (v *ModuleJSValidator) Validate(_ context.Context, p *plugins.Plugin) error {
+	// CDN plugins are ignored because the module.js is guaranteed to exist
+	if p.FS.Type().CDN() {
+		return nil
+	}
+
 	if !p.IsRenderer() && !p.IsCorePlugin() {
 		f, err := p.FS.Open("module.js")
 		if err != nil {
@@ -94,6 +96,11 @@ func newAngularDetector(cfg *config.PluginManagementCfg, angularInspector angula
 }
 
 func (a *AngularDetector) Validate(ctx context.Context, p *plugins.Plugin) error {
+	// CDN plugins are ignored because they should not be using Angular
+	if p.FS.Type().CDN() {
+		return nil
+	}
+
 	if p.IsExternalPlugin() {
 		var err error
 
@@ -106,7 +113,7 @@ func (a *AngularDetector) Validate(ctx context.Context, p *plugins.Plugin) error
 		}
 
 		// Do not initialize plugins if they're using Angular and Angular support is disabled
-		if p.Angular.Detected && !a.cfg.AngularSupportEnabled {
+		if p.Angular.Detected {
 			a.log.Error("Refusing to initialize plugin because it's using Angular, which has been disabled", "pluginId", p.ID)
 			return (&plugins.Error{
 				PluginID:  p.ID,
@@ -114,39 +121,5 @@ func (a *AngularDetector) Validate(ctx context.Context, p *plugins.Plugin) error
 			}).WithMessage("angular plugins are not supported")
 		}
 	}
-	p.Angular.HideDeprecation = slices.Contains(a.cfg.HideAngularDeprecation, p.ID)
-	return nil
-}
-
-// APIVersionValidation implements a ValidateFunc for validating plugin API versions.
-type APIVersionValidation struct {
-}
-
-// APIVersionValidationStep returns a new ValidateFunc for validating plugin signatures.
-func APIVersionValidationStep() ValidateFunc {
-	sv := &APIVersionValidation{}
-	return sv.Validate
-}
-
-// Validate validates the plugin signature. If a signature error is encountered, the error is recorded with the
-// pluginerrs.ErrorTracker.
-func (v *APIVersionValidation) Validate(ctx context.Context, p *plugins.Plugin) error {
-	if p.APIVersion != "" {
-		if !p.Backend {
-			return fmt.Errorf("plugin %s has an API version but is not a backend plugin", p.ID)
-		}
-		// Eventually, all backend plugins will be supported
-		if p.Type != plugins.TypeDataSource {
-			return fmt.Errorf("plugin %s has an API version but is not a datasource plugin", p.ID)
-		}
-		m, err := regexp.MatchString(`^v([\d]+)(?:(alpha|beta)([\d]+))?$`, p.APIVersion)
-		if err != nil {
-			return fmt.Errorf("failed to verify apiVersion %s: %v", p.APIVersion, err)
-		}
-		if !m {
-			return fmt.Errorf("plugin %s has an invalid API version %s", p.ID, p.APIVersion)
-		}
-	}
-
 	return nil
 }

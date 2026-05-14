@@ -46,7 +46,7 @@ export function nestedSetToLevels(
   let offset = 0;
 
   let parent: LevelItem | undefined = undefined;
-  const uniqueLabels: Record<string, LevelItem[]> = {};
+  const uniqueLabels: Record<string, LevelItem[]> = Object.create(null);
 
   for (let i = 0; i < container.data.length; i++) {
     const currentLevel = container.getLevel(i);
@@ -237,7 +237,7 @@ export function checkFields(data: DataFrame): CheckFieldsResult | undefined {
 
   for (const field of fields) {
     const [name, types] = field;
-    const frameField = data.fields.find((f) => f.name === name);
+    const frameField = data?.fields.find((f) => f.name === name);
     if (!frameField) {
       missingFields.push(name);
       continue;

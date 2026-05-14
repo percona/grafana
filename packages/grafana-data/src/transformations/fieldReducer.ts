@@ -1,7 +1,8 @@
 // Libraries
 import { isNumber } from 'lodash';
 
-import { NullValueMode, Field, FieldCalcs, FieldType } from '../types/index';
+import { NullValueMode } from '../types/data';
+import { Field, FieldCalcs, FieldType } from '../types/dataFrame';
 import { Registry, RegistryItem } from '../utils/Registry';
 
 export enum ReducerID {
@@ -13,8 +14,10 @@ export enum ReducerID {
   variance = 'variance',
   stdDev = 'stdDev',
   last = 'last',
+  median = 'median',
   first = 'first',
   count = 'count',
+  countAll = 'countAll',
   range = 'range',
   diff = 'diff',
   diffperc = 'diffperc',
@@ -127,6 +130,17 @@ export enum ReducerID {
   p97 = 'p97',
   p98 = 'p98',
   p99 = 'p99',
+}
+
+export function getFieldTypeForReducer(id: ReducerID, fallback: FieldType): FieldType {
+  return id === ReducerID.count ||
+    id === ReducerID.distinctCount ||
+    id === ReducerID.changeCount ||
+    id === ReducerID.countAll
+    ? FieldType.number
+    : id === ReducerID.allIsNull || id === ReducerID.allIsZero
+      ? FieldType.boolean
+      : fallback;
 }
 
 export function isReducerID(id: string): id is ReducerID {
@@ -278,6 +292,15 @@ export const fieldReducers = new Registry<FieldReducerInfo>(() => [
     preservesUnits: true,
   },
   {
+    id: ReducerID.median,
+    name: 'Median',
+    description: 'Median Value',
+    standard: false,
+    reduce: calculateMedian,
+    aliasIds: ['median'],
+    preservesUnits: true,
+  },
+  {
     id: ReducerID.variance,
     name: 'Variance',
     description: 'Variance of all values in a field',
@@ -308,6 +331,15 @@ export const fieldReducers = new Registry<FieldReducerInfo>(() => [
     description: 'Number of values in response',
     emptyInputResult: 0,
     standard: true,
+    preservesUnits: false,
+  },
+  {
+    id: ReducerID.countAll,
+    name: 'Count all',
+    description: 'Number of values (including empty)',
+    emptyInputResult: 0,
+    standard: false,
+    reduce: (field: Field): FieldCalcs => ({ countAll: field.values.length }),
     preservesUnits: false,
   },
   {
@@ -413,7 +445,7 @@ const buildPercentileReducers = (percentiles = [...Array.from({ length: 99 }, (_
 
   percentiles.forEach((p) => {
     const percentile = p / 100;
-    const id = `p${p}` as ReducerID;
+    const id = `p${p}`;
     const name = `${p}${nth(p)} %`;
     const description = `${p}${nth(p)} percentile value`;
 
@@ -495,7 +527,7 @@ export function doStandardCalcs(field: Field, ignoreNulls: boolean, nullAsZero: 
       }
 
       if (isNumberField) {
-        calcs.sum += currentValue;
+        calcs.sum += currentValue || 0;
         calcs.allIsNull = false;
         calcs.nonNullCount++;
 
@@ -508,15 +540,9 @@ export function doStandardCalcs(field: Field, ignoreNulls: boolean, nullAsZero: 
           if (calcs.lastNotNull! > currentValue) {
             // counter reset
             calcs.previousDeltaUp = false;
-            if (i === data.length - 1) {
-              // reset on last
-              calcs.delta += currentValue;
-            }
           } else {
             if (calcs.previousDeltaUp) {
               calcs.delta += step; // normal increment
-            } else {
-              calcs.delta += currentValue; // account for counter reset
             }
             calcs.previousDeltaUp = true;
           }
@@ -572,8 +598,9 @@ export function doStandardCalcs(field: Field, ignoreNulls: boolean, nullAsZero: 
   }
 
   if (isNumber(calcs.firstNotNull) && isNumber(calcs.diff)) {
-    calcs.diffperc = calcs.diff / calcs.firstNotNull;
+    calcs.diffperc = (calcs.diff / calcs.firstNotNull) * 100;
   }
+
   return calcs;
 }
 
@@ -692,4 +719,33 @@ function calculatePercentile(field: Field, percentile: number, ignoreNulls: bool
   const sorted = data.slice().sort((a, b) => a - b);
   const index = Math.round((sorted.length - 1) * percentile);
   return sorted[index];
+}
+
+function calculateMedian(field: Field<number>, ignoreNulls: boolean, nullAsZero: boolean): FieldCalcs {
+  const numbers: number[] = [];
+
+  for (let i = 0; i < field.values.length; i++) {
+    let currentValue = field.values[i];
+
+    if (currentValue == null) {
+      if (ignoreNulls) {
+        continue;
+      }
+      if (nullAsZero) {
+        currentValue = 0;
+      }
+    }
+
+    numbers.push(currentValue);
+  }
+
+  numbers.sort((a, b) => a - b);
+
+  const mid = Math.floor(numbers.length / 2);
+
+  if (numbers.length % 2 === 0) {
+    return { median: (numbers[mid - 1] + numbers[mid]) / 2 };
+  } else {
+    return { median: numbers[mid] };
+  }
 }

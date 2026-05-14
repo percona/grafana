@@ -1,9 +1,10 @@
 import { css, cx } from '@emotion/css';
-import React, { HTMLProps, useCallback } from 'react';
+import { HTMLProps, useCallback } from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 import { getFocusStyles, getMouseFocusStyles } from '../../themes/mixins';
 
 import { getLabelStyles } from './Label';
@@ -17,12 +18,15 @@ export interface CheckboxProps extends Omit<HTMLProps<HTMLInputElement>, 'value'
   value?: boolean;
   /** htmlValue allows to specify the input "value" attribute */
   htmlValue?: string | number;
-  /** Sets the checkbox into a "mixed" state. This is only a visual change and does not affect the value. */
+  /** Sets the checkbox into a "mixed" state */
   indeterminate?: boolean;
   /** Show an invalid state around the input */
   invalid?: boolean;
 }
 
+/**
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/inputs-checkbox--docs
+ */
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   (
     { label, description, value, htmlValue, onChange, disabled, className, indeterminate, invalid, ...inputProps },
@@ -38,8 +42,6 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     );
     const styles = useStyles2(getCheckboxStyles, invalid);
 
-    const ariaChecked = indeterminate ? 'mixed' : undefined;
-
     return (
       <label className={cx(styles.wrapper, className)}>
         <div className={styles.checkboxWrapper}>
@@ -50,9 +52,21 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             disabled={disabled}
             onChange={handleOnChange}
             value={htmlValue}
-            aria-checked={ariaChecked}
             {...inputProps}
-            ref={ref}
+            ref={(element) => {
+              if (element && indeterminate) {
+                element.indeterminate = true;
+              }
+
+              // we have to manually assign the ref since we need to modify the indeterminate property
+              if (ref) {
+                if (typeof ref === 'function') {
+                  ref(element);
+                } else {
+                  ref.current = element;
+                }
+              }
+            }}
           />
           <span className={styles.checkmark} />
         </div>
@@ -112,10 +126,10 @@ export const getCheckboxStyles = (theme: GrafanaTheme2, invalid = false) => {
           content: '""',
           position: 'absolute',
           zIndex: 2,
-          left: '4px',
+          left: theme.spacing(0.5),
           top: 0,
-          width: '6px',
-          height: '12px',
+          width: theme.spacing(0.75),
+          height: theme.spacing(1.5),
           border: `solid ${theme.colors.primary.contrastText}`,
           borderWidth: '0 3px 3px 0',
           transform: 'rotate(45deg)',
@@ -138,7 +152,7 @@ export const getCheckboxStyles = (theme: GrafanaTheme2, invalid = false) => {
     }),
 
     inputIndeterminate: css({
-      "&[aria-checked='mixed'] + span": {
+      '&:indeterminate + span': {
         border: `1px solid ${getBorderColor(theme.colors.primary.main)}`,
         background: theme.colors.primary.main,
 
@@ -182,7 +196,7 @@ export const getCheckboxStyles = (theme: GrafanaTheme2, invalid = false) => {
       display: 'inline-block',
       width: theme.spacing(checkboxSize),
       height: theme.spacing(checkboxSize),
-      borderRadius: theme.shape.radius.default,
+      borderRadius: theme.shape.radius.sm,
       background: theme.components.input.background,
       border: `1px solid ${getBorderColor(theme.components.input.borderColor)}`,
 
@@ -211,6 +225,8 @@ export const getCheckboxStyles = (theme: GrafanaTheme2, invalid = false) => {
         gridRowStart: 2,
         lineHeight: theme.typography.bodySmall.lineHeight,
         marginTop: 0 /* The margin effectively comes from the top: -2px on the label above it */,
+        // Enable interacting with description when checkbox is disabled
+        zIndex: 1,
       })
     ),
   };

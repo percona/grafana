@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/plugins"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
@@ -94,8 +95,8 @@ func TestDatasourceProxy_proxyDatasourceRequest(t *testing.T) {
 			}}
 
 			p := DataSourceProxyService{
-				PluginRequestValidator: &fakePluginRequestValidator{},
-				pluginStore:            pluginStore,
+				DataSourceRequestValidator: &fakeDataSourceRequestValidator{},
+				pluginStore:                pluginStore,
 			}
 
 			responseRecorder := httptest.NewRecorder()
@@ -129,8 +130,8 @@ func TestDatasourceProxy_proxyDatasourceRequest(t *testing.T) {
 	}
 }
 
-type fakePluginRequestValidator struct{}
+type fakeDataSourceRequestValidator struct{}
 
-func (rv *fakePluginRequestValidator) Validate(_ string, _ *http.Request) error {
+func (rv *fakeDataSourceRequestValidator) Validate(_ string, _ *simplejson.Json, _ *http.Request) error {
 	return nil
 }

@@ -1,5 +1,7 @@
+import { PathValidationError } from '@grafana/data';
+
 import {
-  isContentTypeApplicationJson,
+  isContentTypeJson,
   parseBody,
   parseCredentials,
   parseHeaders,
@@ -25,10 +27,31 @@ describe('parseUrlFromOptions', () => {
     ${{ id: [] }}                                               | ${'api/dashboard'} | ${'api/dashboard'}
   `(
     "when called with params: '$params' and url: '$url' then result should be '$expected'",
-    ({ params, url, expected }) => {
-      expect(parseUrlFromOptions({ params, url })).toEqual(expected);
+    async ({ params, url, expected }) => {
+      await expect(parseUrlFromOptions({ params, url })).toEmitValuesWith((received) => {
+        expect(received).toHaveLength(1);
+        expect(received[0]).toEqual(expected);
+      });
     }
   );
+
+  it('should validate the path if validatePath is true', async () => {
+    await expect(parseUrlFromOptions({ url: '/api/users/%2e%2e/admin', validatePath: true })).toEmitValuesWith(
+      (received) => {
+        expect(received).toHaveLength(1);
+        expect(received[0]).toBeInstanceOf(PathValidationError);
+      }
+    );
+  });
+
+  it('should not validate the path if validatePath is false', async () => {
+    await expect(parseUrlFromOptions({ url: '/api/users/%2e%2e/admin', validatePath: false })).toEmitValuesWith(
+      (received) => {
+        expect(received).toHaveLength(1);
+        expect(received[0]).toEqual('/api/users/%2e%2e/admin');
+      }
+    );
+  });
 });
 
 describe('parseInitFromOptions', () => {
@@ -52,7 +75,6 @@ describe('parseInitFromOptions', () => {
 describe('parseHeaders', () => {
   it.each`
     options                                                                                 | expected
-    ${undefined}                                                                            | ${{ map: { accept: 'application/json, text/plain, */*' } }}
     ${{ propKey: 'some prop value' }}                                                       | ${{ map: { accept: 'application/json, text/plain, */*' } }}
     ${{ method: 'GET' }}                                                                    | ${{ map: { accept: 'application/json, text/plain, */*' } }}
     ${{ method: 'POST' }}                                                                   | ${{ map: { accept: 'application/json, text/plain, */*', 'content-type': 'application/json' } }}
@@ -70,12 +92,14 @@ describe('parseHeaders', () => {
     ${{ method: 'PUT', headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }}  | ${{ map: { accept: 'application/json, text/plain, */*', 'content-type': 'application/x-www-form-urlencoded' } }}
     ${{ headers: { Accept: 'text/plain' } }}                                                | ${{ map: { accept: 'text/plain' } }}
     ${{ headers: { Auth: 'Basic asdasdasd' } }}                                             | ${{ map: { accept: 'application/json, text/plain, */*', auth: 'Basic asdasdasd' } }}
+    ${{ headers: { Key: '🚀' } }}                                                           | ${{ map: { key: '%F0%9F%9A%80', accept: 'application/json, text/plain, */*' } }}
+    ${{ headers: { '🚀': 'value' } }}                                                       | ${{ map: { '%f0%9f%9a%80': 'value', accept: 'application/json, text/plain, */*' } }}
   `("when called with options: '$options' then the result should be '$expected'", ({ options, expected }) => {
     expect(parseHeaders(options)).toEqual(expected);
   });
 });
 
-describe('isContentTypeApplicationJson', () => {
+describe('isContentTypeJson', () => {
   it.each`
     headers                                                                 | expected
     ${undefined}                                                            | ${false}
@@ -85,7 +109,7 @@ describe('isContentTypeApplicationJson', () => {
     ${new Headers({ 'content-type': 'application/x-www-form-urlencoded' })} | ${false}
     ${new Headers({ auth: 'Basic akdjasdkjalksdjasd' })}                    | ${false}
   `("when called with headers: 'headers' then the result should be '$expected'", ({ headers, expected }) => {
-    expect(isContentTypeApplicationJson(headers)).toEqual(expected);
+    expect(isContentTypeJson(headers)).toEqual(expected);
   });
 });
 

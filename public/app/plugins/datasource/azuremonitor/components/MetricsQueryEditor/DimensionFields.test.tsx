@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { openMenu } from 'react-select-event';
 
 import { selectors } from '@grafana/e2e-selectors';
 
-import createMockDatasource from '../../__mocks__/datasource';
-import createMockPanelData from '../../__mocks__/panelData';
-import createMockQuery from '../../__mocks__/query';
+import createMockDatasource from '../../mocks/datasource';
+import createMockPanelData from '../../mocks/panelData';
+import createMockQuery from '../../mocks/query';
 import { selectOptionInTest } from '../../utils/testUtils';
 
 import DimensionFields from './DimensionFields';
@@ -238,7 +237,7 @@ describe(`Azure Monitor QueryEditor`, () => {
         dimensionOptions={dimensionOptions}
       />
     );
-    const labelSelect = screen.getByLabelText('dimension-labels-select');
+    const labelSelect = screen.getByTestId('dimension-labels-select');
     await openMenu(labelSelect);
     const options = await screen.findAllByTestId(selectors.components.Select.option);
     expect(options).toHaveLength(2);
@@ -286,7 +285,7 @@ describe(`Azure Monitor QueryEditor`, () => {
         dimensionOptions={dimensionOptions}
       />
     );
-    const labelSelect = screen.getByLabelText('dimension-labels-select');
+    const labelSelect = screen.getByTestId('dimension-labels-select');
     await user.click(labelSelect);
     await openMenu(labelSelect);
     screen.getByText('testlabel');
@@ -324,7 +323,7 @@ describe(`Azure Monitor QueryEditor`, () => {
         dimensionOptions={dimensionOptions}
       />
     );
-    const labelSelect2 = screen.getByLabelText('dimension-labels-select');
+    const labelSelect2 = screen.getByTestId('dimension-labels-select');
     await openMenu(labelSelect2);
     const refreshedOptions = await screen.findAllByLabelText('Select options menu');
     expect(refreshedOptions).toHaveLength(1);

@@ -1,8 +1,10 @@
-import React from 'react';
+import { css } from '@emotion/css';
 
+import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
-import { InlineSwitch } from '@grafana/ui';
+import { InlineSwitch, useStyles2 } from '@grafana/ui';
 
 import { PanelEditor } from './PanelEditor';
 
@@ -11,23 +13,50 @@ export interface Props {
 }
 
 export function PanelEditControls({ panelEditor }: Props) {
-  const vizManager = panelEditor.state.vizManager;
-  const { panel, tableView } = vizManager.useState();
-  const skipDataQuery = config.panels[panel.state.pluginId]?.skipDataQuery;
+  const { tableView, dataPane, useQueryExperienceNext } = panelEditor.useState();
+  const styles = useStyles2(getStyles);
+
+  if (!dataPane) {
+    return null;
+  }
 
   return (
-    <>
-      {!skipDataQuery && (
+    <div className={styles.container}>
+      <InlineSwitch
+        label={t('dashboard-scene.panel-edit-controls.table-view-label-table-view', 'Table view')}
+        showLabel={true}
+        id="table-view"
+        value={tableView ? true : false}
+        onClick={panelEditor.onToggleTableView}
+        aria-label={t('dashboard-scene.panel-edit-controls.table-view-aria-label-toggletableview', 'Toggle table view')}
+        data-testid={selectors.components.PanelEditor.toggleTableView}
+      />
+      {config.featureToggles.queryEditorNext && (
         <InlineSwitch
-          label="Table view"
+          label={t('dashboard-scene.panel-edit-controls.query-editor-version', 'Query editor v2')}
           showLabel={true}
-          id="table-view"
-          value={tableView ? true : false}
-          onClick={() => vizManager.toggleTableView()}
-          aria-label="toggle-table-view"
-          data-testid={selectors.components.PanelEditor.toggleTableView}
+          id="query-editor-version"
+          value={useQueryExperienceNext ?? true}
+          onClick={panelEditor.onToggleQueryEditorVersion}
+          aria-label={t(
+            'dashboard-scene.panel-edit-controls.query-editor-version-toggle',
+            'Toggle between query editor v1 and v2'
+          )}
         />
       )}
-    </>
+    </div>
   );
+}
+
+function getStyles(theme: GrafanaTheme2) {
+  return {
+    container: css({
+      display: 'inline-flex',
+      alignItems: 'center',
+      verticalAlign: 'middle',
+      marginBottom: theme.spacing(1),
+      marginRight: theme.spacing(1),
+      gap: theme.spacing(1),
+    }),
+  };
 }

@@ -1,62 +1,60 @@
-import { t } from 'i18next';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import { AppEvents, dateTime } from '@grafana/data';
-import { getAppEvents } from '@grafana/runtime';
+import { t } from '@grafana/i18n';
+import { reportInteraction } from '@grafana/runtime';
 import { DataQuery } from '@grafana/schema';
-import { Button, Modal } from '@grafana/ui';
-import { isQueryLibraryEnabled, useAddQueryTemplateMutation } from 'app/features/query-library';
-import { AddQueryTemplateCommand } from 'app/features/query-library/types';
+import { Button } from '@grafana/ui';
+import { contextSrv } from 'app/core/services/context_srv';
+import { useDispatch, useSelector } from 'app/types/store';
 
-import { QueryDetails, RichHistoryAddToLibraryForm } from './RichHistoryAddToLibraryForm';
+import { useQueryLibraryContext } from '../QueryLibrary/QueryLibraryContext';
+import { changeQueries } from '../state/query';
+import { selectExploreDSMaps } from '../state/selectors';
 
 type Props = {
   query: DataQuery;
 };
 
 export const RichHistoryAddToLibrary = ({ query }: Props) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [addQueryTemplate, { isSuccess }] = useAddQueryTemplateMutation();
+  const [hasBeenSaved, setHasBeenSaved] = useState(false);
+  const { openDrawer, queryLibraryEnabled } = useQueryLibraryContext();
+  const dispatch = useDispatch();
+  const exploreActiveDS = useSelector(selectExploreDSMaps);
+  const exploreId = exploreActiveDS.exploreToDS[0]?.exploreId;
 
-  const handleAddQueryTemplate = async (addQueryTemplateCommand: AddQueryTemplateCommand) => {
-    const result = await addQueryTemplate(addQueryTemplateCommand);
-    if (!result.error) {
-      getAppEvents().publish({
-        type: AppEvents.alertSuccess.name,
-        payload: [
-          t('explore.rich-history-card.query-template-added', 'Query template successfully added to the library'),
-        ],
-      });
+  const onSelectQuery = (newQuery: DataQuery) => {
+    reportInteraction('grafana_explore_query_replaced_from_library');
+    if (exploreId) {
+      dispatch(changeQueries({ exploreId, queries: [newQuery] }));
     }
   };
 
-  const buttonLabel = t('explore.rich-history-card.add-to-library', 'Add to library');
+  const buttonLabel = t('explore.rich-history-card.add-to-library', 'Save query');
 
-  const submit = (data: QueryDetails) => {
-    const timestamp = dateTime().toISOString();
-    const temporaryDefaultTitle = data.description || `Imported from Explore - ${timestamp}`;
-    handleAddQueryTemplate({ title: temporaryDefaultTitle, targets: [query] });
-  };
+  if (!contextSrv.isEditor) {
+    return null;
+  }
 
-  return isQueryLibraryEnabled() && !isSuccess ? (
+  return queryLibraryEnabled && !hasBeenSaved ? (
     <>
-      <Button variant="secondary" aria-label={buttonLabel} onClick={() => setIsOpen(true)}>
+      <Button
+        variant="secondary"
+        aria-label={buttonLabel}
+        onClick={() => {
+          openDrawer({
+            query,
+            onSelectQuery,
+            options: {
+              onSave: () => {
+                setHasBeenSaved(true);
+              },
+              context: 'rich-history',
+            },
+          });
+        }}
+      >
         {buttonLabel}
       </Button>
-      <Modal
-        title={t('explore.add-to-library-modal.title', 'Add query to Query Library')}
-        isOpen={isOpen}
-        onDismiss={() => setIsOpen(false)}
-      >
-        <RichHistoryAddToLibraryForm
-          onCancel={() => setIsOpen(() => false)}
-          query={query}
-          onSave={(data) => {
-            submit(data);
-            setIsOpen(false);
-          }}
-        />
-      </Modal>
     </>
-  ) : undefined;
+  ) : null;
 };

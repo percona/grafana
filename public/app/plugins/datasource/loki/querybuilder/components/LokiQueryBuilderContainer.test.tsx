@@ -1,8 +1,7 @@
-import { render, screen, waitFor, findAllByRole } from '@testing-library/react';
+import { render, screen, waitFor, findAllByRole, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
-import { createLokiDatasource } from '../../__mocks__/datasource';
+import { createLokiDatasource } from '../../mocks/datasource';
 
 import { LokiQueryBuilderContainer } from './LokiQueryBuilderContainer';
 
@@ -20,7 +19,9 @@ describe('LokiQueryBuilderContainer', () => {
     };
     props.datasource.getDataSamples = jest.fn().mockResolvedValue([]);
 
-    render(<LokiQueryBuilderContainer {...props} />);
+    await act(async () => {
+      render(<LokiQueryBuilderContainer {...props} />);
+    });
     const selector = await screen.findByLabelText('selector');
     expect(selector.textContent).toBe('{job="testjob"}');
     await addOperation('Range functions', 'Rate');
@@ -46,7 +47,9 @@ describe('LokiQueryBuilderContainer', () => {
     props.datasource.languageProvider.fetchLabelValues = jest.fn().mockReturnValue(['grafana', 'loki']);
     props.onChange = jest.fn();
 
-    render(<LokiQueryBuilderContainer {...props} />);
+    await act(async () => {
+      render(<LokiQueryBuilderContainer {...props} />);
+    });
     await userEvent.click(screen.getByLabelText('Add'));
     const labels = screen.getByText(/Label filters/);
     const selects = await findAllByRole(getSelectParent(labels)!, 'combobox');
@@ -79,7 +82,9 @@ describe('LokiQueryBuilderContainer', () => {
       showExplain: false,
     };
     props.datasource.getDataSamples = jest.fn().mockResolvedValue([]);
-    render(<LokiQueryBuilderContainer {...props} />);
+    await act(async () => {
+      render(<LokiQueryBuilderContainer {...props} />);
+    });
     expect(screen.getByText('{')).toHaveClass('token punctuation');
     expect(screen.getByText('"baz"')).toHaveClass('token label-value attr-value');
     expect(screen.getByText('|')).toHaveClass('token pipe-operator operator');
@@ -99,7 +104,9 @@ describe('LokiQueryBuilderContainer', () => {
     };
     props.datasource.getDataSamples = jest.fn().mockResolvedValue([]);
 
-    render(<LokiQueryBuilderContainer {...props} />);
+    await act(async () => {
+      render(<LokiQueryBuilderContainer {...props} />);
+    });
     expect(screen.getAllByText('You have conflicting label filters')).toHaveLength(2);
   });
 
@@ -116,7 +123,9 @@ describe('LokiQueryBuilderContainer', () => {
     };
     props.datasource.getDataSamples = jest.fn().mockResolvedValue([]);
 
-    render(<LokiQueryBuilderContainer {...props} />);
+    await act(async () => {
+      render(<LokiQueryBuilderContainer {...props} />);
+    });
     expect(screen.getByText('<')).toBeInTheDocument();
     expect(screen.getByText('expr')).toBeInTheDocument();
     expect(screen.getByText('>')).toBeInTheDocument();

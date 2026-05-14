@@ -1,7 +1,8 @@
 import { css } from '@emotion/css';
 import { isString } from 'lodash';
 import { FeatureLike } from 'ol/Feature';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 
 import { DataFrame, FieldType, getFieldDisplayName, GrafanaTheme2 } from '@grafana/data';
 import { Collapse, TabContent, useStyles2 } from '@grafana/ui';
@@ -37,7 +38,6 @@ export const DataHoverRows = ({ layers, activeTabIndex }: Props) => {
                   return shouldDisplayCollapse ? (
                     <Collapse
                       key={key}
-                      collapsible
                       label={generateLabel(feature, idx)}
                       isOpen={rowMap.get(key)}
                       onToggle={() => {
@@ -107,7 +107,7 @@ export const generateLabel = (feature: FeatureLike, idx: number): string | React
 };
 
 const getStyles = (theme: GrafanaTheme2) => ({
-  collapsibleRow: css`
-    margin-bottom: 0;
-  `,
+  collapsibleRow: css({
+    marginBottom: 0,
+  }),
 });

@@ -1,15 +1,11 @@
 package es
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
-	"net/url"
-	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -17,13 +13,13 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
-	exp "github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
-	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/infra/tracing"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/tracing"
 )
 
 // Used in logging to mark a stage
-var (
+const (
 	StagePrepareRequest  = "prepareRequest"
 	StageDatabaseRequest = "databaseRequest"
 	StageParseResponse   = "parseResponse"
@@ -38,6 +34,7 @@ type DatasourceInfo struct {
 	Interval                   string
 	MaxConcurrentShardRequests int64
 	IncludeFrozen              bool
+	ClusterInfo                ClusterInfo
 }
 
 type ConfiguredFields struct {
@@ -54,10 +51,10 @@ type Client interface {
 }
 
 // NewClient creates a new elasticsearch client
-var NewClient = func(ctx context.Context, ds *DatasourceInfo, logger log.Logger, tracer tracing.Tracer) (Client, error) {
-	logger = logger.New("entity", "client")
+var NewClient = func(ctx context.Context, ds *DatasourceInfo, logger log.Logger) (Client, error) {
+	logger = logger.FromContext(ctx).With("entity", "client")
 
-	ip, err := newIndexPattern(ds.Interval, ds.Database)
+	ip, err := NewIndexPattern(ds.Interval, ds.Database)
 	if err != nil {
 		logger.Error("Failed creating index pattern", "error", err, "interval", ds.Interval, "index", ds.Database)
 		return nil, err
@@ -71,7 +68,9 @@ var NewClient = func(ctx context.Context, ds *DatasourceInfo, logger log.Logger,
 		ds:               ds,
 		configuredFields: ds.ConfiguredFields,
 		indexPattern:     ip,
-		tracer:           tracer,
+		transport:        newHTTPTransport(ctx, ds.HTTPClient, ds.URL, logger),
+		encoder:          newRequestEncoder(logger),
+		parser:           newResponseParser(logger),
 	}, nil
 }
 
@@ -81,7 +80,9 @@ type baseClientImpl struct {
 	configuredFields ConfiguredFields
 	indexPattern     IndexPattern
 	logger           log.Logger
-	tracer           tracing.Tracer
+	transport        *httpTransport
+	encoder          *requestEncoder
+	parser           *responseParser
 }
 
 func (c *baseClientImpl) GetConfiguredFields() ConfiguredFields {
@@ -95,76 +96,22 @@ type multiRequest struct {
 }
 
 func (c *baseClientImpl) executeBatchRequest(uriPath, uriQuery string, requests []*multiRequest) (*http.Response, error) {
-	bytes, err := c.encodeBatchRequests(requests)
+	payload, err := c.encoder.encodeBatchRequests(requests)
 	if err != nil {
 		return nil, err
 	}
-	return c.executeRequest(http.MethodPost, uriPath, uriQuery, bytes)
-}
-
-func (c *baseClientImpl) encodeBatchRequests(requests []*multiRequest) ([]byte, error) {
-	start := time.Now()
-
-	payload := bytes.Buffer{}
-	for _, r := range requests {
-		reqHeader, err := json.Marshal(r.header)
-		if err != nil {
-			return nil, err
-		}
-		payload.WriteString(string(reqHeader) + "\n")
-
-		reqBody, err := json.Marshal(r.body)
-		if err != nil {
-			return nil, err
-		}
-
-		body := string(reqBody)
-		body = strings.ReplaceAll(body, "$__interval_ms", strconv.FormatInt(r.interval.Milliseconds(), 10))
-		body = strings.ReplaceAll(body, "$__interval", r.interval.String())
-
-		payload.WriteString(body + "\n")
-	}
-
-	elapsed := time.Since(start)
-	c.logger.Debug("Completed encoding of batch requests to json", "duration", elapsed)
-
-	return payload.Bytes(), nil
-}
-
-func (c *baseClientImpl) executeRequest(method, uriPath, uriQuery string, body []byte) (*http.Response, error) {
-	c.logger.Debug("Sending request to Elasticsearch", "url", c.ds.URL)
-	u, err := url.Parse(c.ds.URL)
-	if err != nil {
-		return nil, err
-	}
-	u.Path = path.Join(u.Path, uriPath)
-	u.RawQuery = uriQuery
-
-	var req *http.Request
-	if method == http.MethodPost {
-		req, err = http.NewRequestWithContext(c.ctx, http.MethodPost, u.String(), bytes.NewBuffer(body))
-	} else {
-		req, err = http.NewRequestWithContext(c.ctx, http.MethodGet, u.String(), nil)
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/x-ndjson")
-
-	//nolint:bodyclose
-	resp, err := c.ds.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return c.transport.executeBatchRequest(uriPath, uriQuery, payload)
 }
 
 func (c *baseClientImpl) ExecuteMultisearch(r *MultiSearchRequest) (*MultiSearchResponse, error) {
 	var err error
-	multiRequests := c.createMultiSearchRequests(r.Requests)
+	multiRequests, err := c.createMultiSearchRequests(r.Requests)
+	if err != nil {
+		return nil, err
+	}
+
 	queryParams := c.getMultiSearchQueryParameters()
-	_, span := c.tracer.Start(c.ctx, "datasource.elasticsearch.queryData.executeMultisearch", trace.WithAttributes(
+	_, span := tracing.DefaultTracer().Start(c.ctx, "datasource.elasticsearch.queryData.executeMultisearch", trace.WithAttributes(
 		attribute.String("queryParams", queryParams),
 		attribute.String("url", c.ds.URL),
 	))
@@ -184,9 +131,9 @@ func (c *baseClientImpl) ExecuteMultisearch(r *MultiSearchRequest) (*MultiSearch
 			status = "cancelled"
 		}
 		lp := []any{"error", err, "status", status, "duration", time.Since(start), "stage", StageDatabaseRequest}
-		sourceErr := exp.Error{}
+		sourceErr := backend.ErrorWithSource{}
 		if errors.As(err, &sourceErr) {
-			lp = append(lp, "statusSource", sourceErr.Source())
+			lp = append(lp, "statusSource", sourceErr.ErrorSource())
 		}
 		if clientRes != nil {
 			lp = append(lp, "statusCode", clientRes.StatusCode)
@@ -203,10 +150,7 @@ func (c *baseClientImpl) ExecuteMultisearch(r *MultiSearchRequest) (*MultiSearch
 
 	c.logger.Info("Response received from Elasticsearch", "status", "ok", "statusCode", res.StatusCode, "contentLength", res.ContentLength, "duration", time.Since(start), "stage", StageDatabaseRequest)
 
-	start = time.Now()
-	var msr MultiSearchResponse
-	dec := json.NewDecoder(res.Body)
-	_, resSpan := c.tracer.Start(c.ctx, "datasource.elasticsearch.queryData.executeMultisearch.decodeResponse")
+	_, resSpan := tracing.DefaultTracer().Start(c.ctx, "datasource.elasticsearch.queryData.executeMultisearch.decodeResponse")
 	defer func() {
 		if err != nil {
 			resSpan.RecordError(err)
@@ -214,27 +158,26 @@ func (c *baseClientImpl) ExecuteMultisearch(r *MultiSearchRequest) (*MultiSearch
 		}
 		resSpan.End()
 	}()
-	err = dec.Decode(&msr)
+
+	improvedParsingEnabled := isFeatureEnabled(c.ctx, "elasticsearchImprovedParsing")
+	msr, err := c.parser.parseMultiSearchResponse(res.Body, improvedParsingEnabled)
 	if err != nil {
-		c.logger.Error("Failed to decode response from Elasticsearch", "error", err, "duration", time.Since(start))
 		return nil, err
 	}
 
-	c.logger.Debug("Completed decoding of response from Elasticsearch", "duration", time.Since(start))
-
 	msr.Status = res.StatusCode
 
-	return &msr, nil
+	return msr, nil
 }
 
-func (c *baseClientImpl) createMultiSearchRequests(searchRequests []*SearchRequest) []*multiRequest {
+func (c *baseClientImpl) createMultiSearchRequests(searchRequests []*SearchRequest) ([]*multiRequest, error) {
 	multiRequests := []*multiRequest{}
 
 	for _, searchReq := range searchRequests {
 		indices, err := c.indexPattern.GetIndices(searchReq.TimeRange)
 		if err != nil {
-			c.logger.Error("Failed to get indices from index pattern", "error", err)
-			continue
+			err := fmt.Errorf("failed to get indices from index pattern. %s", err)
+			return nil, backend.DownstreamError(err)
 		}
 		mr := multiRequest{
 			header: map[string]any{
@@ -249,12 +192,16 @@ func (c *baseClientImpl) createMultiSearchRequests(searchRequests []*SearchReque
 		multiRequests = append(multiRequests, &mr)
 	}
 
-	return multiRequests
+	return multiRequests, nil
 }
 
 func (c *baseClientImpl) getMultiSearchQueryParameters() string {
 	var qs []string
-	qs = append(qs, fmt.Sprintf("max_concurrent_shard_requests=%d", c.ds.MaxConcurrentShardRequests))
+	// if the build flavor is not serverless, we can use the max concurrent shard requests
+	// this is because serverless clusters do not support max concurrent shard requests
+	if !c.ds.ClusterInfo.IsServerless() && c.ds.MaxConcurrentShardRequests > 0 {
+		qs = append(qs, fmt.Sprintf("max_concurrent_shard_requests=%d", c.ds.MaxConcurrentShardRequests))
+	}
 
 	if c.ds.IncludeFrozen {
 		qs = append(qs, "ignore_throttled=false")
@@ -265,4 +212,15 @@ func (c *baseClientImpl) getMultiSearchQueryParameters() string {
 
 func (c *baseClientImpl) MultiSearch() *MultiSearchRequestBuilder {
 	return NewMultiSearchRequestBuilder()
+}
+
+func isFeatureEnabled(ctx context.Context, feature string) bool {
+	return backend.GrafanaConfigFromContext(ctx).FeatureToggles().IsEnabled(feature)
+}
+
+// StreamMultiSearchResponse processes the JSON response in a streaming fashion
+// This is a public wrapper for backward compatibility
+func StreamMultiSearchResponse(body io.Reader, msr *MultiSearchResponse) error {
+	parser := newResponseParser(log.NewNullLogger())
+	return parser.streamMultiSearchResponse(body, msr)
 }

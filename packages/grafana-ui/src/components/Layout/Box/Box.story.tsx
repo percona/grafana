@@ -1,5 +1,4 @@
 import { Meta, StoryFn } from '@storybook/react';
-import React from 'react';
 
 import { SpacingTokenControl } from '../../../utils/storybook/themeStorybookControls';
 import { Text } from '../../Text/Text';
@@ -24,7 +23,7 @@ const borderRadiusOptions: BorderRadius[] = ['default', 'pill', 'circle'];
 const boxShadowOptions: BoxShadow[] = ['z1', 'z2', 'z3'];
 
 const meta: Meta<typeof Box> = {
-  title: 'General/Layout/Box',
+  title: 'Layout/Box',
   component: Box,
   parameters: {
     docs: {

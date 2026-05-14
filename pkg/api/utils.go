@@ -11,13 +11,14 @@ import (
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/login"
 	"github.com/grafana/grafana/pkg/services/user"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (hs *HTTPServer) GetRedirectURL(c *contextmodel.ReqContext) string {
 	redirectURL := hs.Cfg.AppSubURL + "/"
 	if redirectTo := c.GetCookie("redirect_to"); len(redirectTo) > 0 {
-		if err := hs.ValidateRedirectTo(redirectTo); err == nil {
-			redirectURL = redirectTo
+		if sanitized, err := hs.ValidateRedirectTo(redirectTo); err == nil {
+			redirectURL = sanitized
 		} else {
 			hs.log.FromContext(c.Req.Context()).Debug("Ignored invalid redirect_to cookie value", "redirect_to", redirectTo)
 		}
@@ -48,7 +49,7 @@ func (hs *HTTPServer) isExternalUser(ctx context.Context, userID int64) (bool, e
 		return true, err
 	}
 
-	return login.IsProviderEnabled(hs.Cfg, info.AuthModule, hs.SocialService.GetOAuthInfoProvider(info.AuthModule)), nil
+	return hs.isProviderEnabled(hs.Cfg, info.AuthModule), nil
 }
 
 func ValidateAndNormalizeEmail(email string) (string, error) {
@@ -62,4 +63,10 @@ func ValidateAndNormalizeEmail(email string) (string, error) {
 	}
 
 	return e.Address, nil
+}
+
+func (hs *HTTPServer) injectSpan(c *contextmodel.ReqContext, name string) (*contextmodel.ReqContext, trace.Span) {
+	ctx, span := hs.tracer.Start(c.Req.Context(), name)
+	c.Req = c.Req.WithContext(ctx)
+	return c, span
 }

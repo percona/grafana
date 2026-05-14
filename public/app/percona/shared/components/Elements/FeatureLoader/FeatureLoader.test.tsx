@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { FeatureLoader } from './FeatureLoader';
 
@@ -19,12 +18,12 @@ jest.mock('app/percona/shared/helpers/logger', () => {
 
 describe('FeatureLoader', () => {
   it('should not have children while loading settings', async () => {
-    const { container } = render(
+    render(
       <Provider
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: true, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: true, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -33,7 +32,8 @@ describe('FeatureLoader', () => {
         </FeatureLoader>
       </Provider>
     );
-    expect(container.querySelector('.fa-spin')).toBeInTheDocument();
+
+    expect(screen.getByTestId('Spinner')).toBeInTheDocument();
     expect(screen.queryByText('Dummy')).not.toBeInTheDocument();
   });
 
@@ -43,7 +43,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -62,7 +62,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: false },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+            settings: { loading: false, result: { alertingEnabled: false } },
           },
         } as StoreState)}
       >
@@ -81,7 +81,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+            settings: { loading: false, result: { alertingEnabled: false } },
           },
         } as StoreState)}
       >
@@ -100,7 +100,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+            settings: { loading: false, result: { alertingEnabled: false } },
           },
         } as StoreState)}
       >

@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 // eslint-disable-next-line lodash/import-scope
 import lodash from 'lodash';
-import React from 'react';
 import selectEvent from 'react-select-event';
 
 import { ResourceResponse, LogGroupResponse } from '../../../resources/types';
@@ -285,7 +284,7 @@ describe('LogGroupsSelector', () => {
       />
     );
     await userEvent.click(screen.getByText('Select log groups'));
-    await userEvent.click(screen.getByRole('button', { name: 'select-clear-value' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Clear value' }));
     await userEvent.click(screen.getByText('Add log groups'));
     expect(onChange).toHaveBeenCalledWith([
       {

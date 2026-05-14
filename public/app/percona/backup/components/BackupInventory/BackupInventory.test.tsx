@@ -1,22 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { BackupInventory } from './BackupInventory';
 
 jest.mock('./BackupInventory.service');
 jest.mock('app/percona/backup/components/StorageLocations/StorageLocations.service');
 jest.mock('app/percona/shared/core/hooks/recurringCall.hook');
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: () => ({
-    pathname: '/',
-  }),
-}));
 
 describe('BackupInventory', () => {
   it('should send correct data to Table', async () => {
@@ -24,12 +18,14 @@ describe('BackupInventory', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true } },
           },
         } as StoreState)}
       >
-        {wrapWithGrafanaContextMock(<BackupInventory />)}
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<BackupInventory />)}
+        </MemoryRouter>
       </Provider>
     );
 

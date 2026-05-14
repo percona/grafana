@@ -1,94 +1,137 @@
-// Libraries
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
+import { Params, useParams } from 'react-router-dom-v5-compat';
+import { usePrevious } from 'react-use';
 
 import { PageLayoutType } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
+import { UrlSyncContextProvider } from '@grafana/scenes';
+import { Box } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import PageLoader from 'app/core/components/PageLoader/PageLoader';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import store from 'app/core/store';
+import {
+  DashboardBrandingFooter,
+  DashboardBrandingFooterVariant,
+} from 'app/features/dashboard/components/PublicDashboard/DashboardBrandingFooter';
+import { DashboardPageError } from 'app/features/dashboard/containers/DashboardPageError';
 import { DashboardPageRouteParams, DashboardPageRouteSearchParams } from 'app/features/dashboard/containers/types';
-import { DASHBOARD_FROM_LS_KEY } from 'app/features/dashboard/state/initDashboard';
-import { DashboardDTO, DashboardRoutes } from 'app/types';
+import { getDashboardSceneProfiler } from 'app/features/dashboard/services/DashboardProfiler';
+import { DashboardPreviewBanner } from 'app/features/provisioning/components/Dashboards/DashboardPreviewBanner';
+import { DashboardRoutes } from 'app/types/dashboard';
 
+import { DashboardConversionWarningBanner } from '../components/DashboardConversionWarningBanner';
 import { DashboardPrompt } from '../saving/DashboardPrompt';
+import { preserveDashboardSceneStateInLocalStorage } from '../utils/dashboardSessionState';
 
 import { getDashboardScenePageStateManager } from './DashboardScenePageStateManager';
+import { shouldHideDashboardKioskFooter } from './utils';
 
-export interface Props extends GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams> {}
+export interface Props
+  extends Omit<GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams>, 'match'> {}
 
-export function DashboardScenePage({ match, route, queryParams, history }: Props) {
+export function DashboardScenePage({ route, queryParams, location }: Props) {
+  const params = useParams();
+  const { type, slug, uid } = params;
+  // Used by /admin/provisioning/:slug/dashboard/preview/* to load dashboards based on their file path in a remote repository
+  // Also used by /dashboard/assistant-preview/* to load the assistant preview dashboard
+  const path = params['*'];
+  const prevMatch = usePrevious({ params });
   const stateManager = getDashboardScenePageStateManager();
-
   const { dashboard, isLoading, loadError } = stateManager.useState();
-
   // After scene migration is complete and we get rid of old dashboard we should refactor dashboardWatcher so this route reload is not need
-  const routeReloadCounter = (history.location.state as any)?.routeReloadCounter;
-
-  // Check if the user is coming from Explore, it's indicated byt the dashboard existence in local storage
-  const comingFromExplore = useMemo(() => {
-    return Boolean(store.getObject<DashboardDTO>(DASHBOARD_FROM_LS_KEY));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [match.params.uid, match.params.slug, match.params.type]);
+  const routeReloadCounter = (location.state as any)?.routeReloadCounter;
+  const prevParams = useRef<Params<string>>(params);
 
   useEffect(() => {
-    if (route.routeName === DashboardRoutes.Normal && match.params.type === 'snapshot') {
-      stateManager.loadSnapshot(match.params.slug!);
+    if (route.routeName === DashboardRoutes.Normal && type === 'snapshot') {
+      stateManager.loadSnapshot(slug!);
     } else {
       stateManager.loadDashboard({
-        uid: match.params.uid ?? '',
+        uid:
+          (route.routeName === DashboardRoutes.Provisioning || route.routeName === DashboardRoutes.AssistantPreview
+            ? path
+            : uid) ?? '',
+        type,
+        slug,
         route: route.routeName as DashboardRoutes,
         urlFolderUid: queryParams.folderUid,
-        keepDashboardFromExploreInLocalStorage: false,
       });
     }
 
     return () => {
+      getDashboardSceneProfiler().cancelProfile();
+      preserveDashboardSceneStateInLocalStorage(locationService.getSearch(), uid);
       stateManager.clearState();
+      stateManager.resetActiveManager();
     };
-  }, [
-    stateManager,
-    match.params.uid,
-    route.routeName,
-    queryParams.folderUid,
-    routeReloadCounter,
-    match.params.slug,
-    match.params.type,
-  ]);
 
-  // Effect that handles explore->dashboards workflow
+    // removing slug and path (which has slug in it) from dependencies to prevent unmount when data links reference
+    //  the same dashboard with no slug in url
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateManager, uid, route.routeName, queryParams.folderUid, routeReloadCounter, type]);
+
   useEffect(() => {
-    // When coming from explore and adding to an existing dashboard, we should enter edit mode
-    if (dashboard && comingFromExplore) {
-      if (route.routeName !== DashboardRoutes.New) {
-        dashboard.onEnterEditMode(comingFromExplore);
+    // This use effect corrects URL without refresh when navigating to the same dashboard
+    //  using data link that has no slug in url
+    if (route.routeName === DashboardRoutes.Normal) {
+      // correct URL only when there are no new slug
+      // if slug is defined and incorrect it will be corrected in stateManager
+      if (uid === prevParams.current.uid && prevParams.current.slug && !slug) {
+        const correctedUrl = `/d/${uid}/${prevParams.current.slug}`;
+        locationService.replace({
+          ...locationService.getLocation(),
+          pathname: correctedUrl,
+        });
       }
     }
-  }, [dashboard, comingFromExplore, route.routeName]);
+
+    return () => {
+      prevParams.current = { uid, slug: !slug ? prevParams.current.slug : slug };
+    };
+  }, [route, slug, type, uid]);
 
   if (!dashboard) {
+    let errorElement;
+    if (loadError) {
+      errorElement = <DashboardPageError error={loadError} type={type} />;
+    }
+
     return (
-      <Page layout={PageLayoutType.Canvas} data-testid={'dashboard-scene-page'}>
-        {isLoading && <PageLoader />}
-        {loadError && <h2>{loadError}</h2>}
-      </Page>
+      errorElement || (
+        <Page navId="dashboards/browse" layout={PageLayoutType.Canvas} data-testid={'dashboard-scene-page'}>
+          <Box paddingY={4} display="flex" direction="column" alignItems="center">
+            {isLoading && <PageLoader />}
+          </Box>
+        </Page>
+      )
     );
   }
 
   // Do not render anything when transitioning from one dashboard to another
-  if (
-    match.params.type !== 'snapshot' &&
-    dashboard.state.uid &&
-    dashboard.state.uid !== match.params.uid &&
-    route.routeName !== DashboardRoutes.Home
-  ) {
+  // A bit tricky for transition to or from Home dashboard that does not have a uid in the url (but could have it in the dashboard model)
+  // if prevMatch is undefined we are going from normal route to home route or vice versa
+  if (type !== 'snapshot' && (!prevMatch || uid !== prevMatch?.params.uid)) {
+    console.log('skipping rendering');
     return null;
   }
 
+  // `locationSearchToObject()` parses `?kiosk` as `true` (boolean param). Some clients can emit `?kiosk=`, which parses as ''.
+  const isKioskMode = queryParams.kiosk === '1' || queryParams.kiosk === true || queryParams.kiosk === '';
+  const hideFooter = shouldHideDashboardKioskFooter(queryParams.hideLogo);
+
   return (
-    <>
+    <UrlSyncContextProvider scene={dashboard} updateUrlOnInit={true} createBrowserHistorySteps={true}>
+      <DashboardPreviewBanner queryParams={queryParams} route={route.routeName} slug={slug} path={path} />
+      <DashboardConversionWarningBanner dashboard={dashboard} />
       <dashboard.Component model={dashboard} key={dashboard.state.key} />
       <DashboardPrompt dashboard={dashboard} />
-    </>
+      <DashboardBrandingFooter
+        variant={DashboardBrandingFooterVariant.Kiosk}
+        paddingX={2}
+        useMinHeight={true}
+        hide={!isKioskMode || hideFooter}
+      />
+    </UrlSyncContextProvider>
   );
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/grafana/grafana/pkg/api/routing"
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/tracing"
+	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
 	"github.com/grafana/grafana/pkg/services/accesscontrol/acimpl"
 	"github.com/grafana/grafana/pkg/services/accesscontrol/actest"
@@ -23,6 +24,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/services/user/userimpl"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 type setUserPermissionTest struct {
@@ -30,7 +32,9 @@ type setUserPermissionTest struct {
 	callHook bool
 }
 
-func TestService_SetUserPermission(t *testing.T) {
+func TestIntegrationService_SetUserPermission(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	tests := []setUserPermissionTest{
 		{
 			desc:     "should call hook when updating user permissions",
@@ -74,7 +78,9 @@ type setTeamPermissionTest struct {
 	callHook bool
 }
 
-func TestService_SetTeamPermission(t *testing.T) {
+func TestIntegrationService_SetTeamPermission(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	tests := []setTeamPermissionTest{
 		{
 			desc:     "should call hook when updating user permissions",
@@ -95,7 +101,12 @@ func TestService_SetTeamPermission(t *testing.T) {
 			})
 
 			// seed team
-			team, err := teamSvc.CreateTeam(context.Background(), "test", "test@test.com", 1)
+			teamCmd := team.CreateTeamCommand{
+				Name:  "test",
+				Email: "test@test.com",
+				OrgID: 1,
+			}
+			team, err := teamSvc.CreateTeam(context.Background(), &teamCmd)
 			require.NoError(t, err)
 
 			var hookCalled bool
@@ -118,7 +129,9 @@ type setBuiltInRolePermissionTest struct {
 	callHook bool
 }
 
-func TestService_SetBuiltInRolePermission(t *testing.T) {
+func TestIntegrationService_SetBuiltInRolePermission(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	tests := []setBuiltInRolePermissionTest{
 		{
 			desc:     "should call hook when updating user permissions",
@@ -160,7 +173,9 @@ type setPermissionsTest struct {
 	expectErr bool
 }
 
-func TestService_SetPermissions(t *testing.T) {
+func TestIntegrationService_SetPermissions(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	tests := []setPermissionsTest{
 		{
 			desc: "should set all permissions",
@@ -210,7 +225,12 @@ func TestService_SetPermissions(t *testing.T) {
 			// seed user
 			_, err := usrSvc.Create(context.Background(), &user.CreateUserCommand{Login: "user", OrgID: 1})
 			require.NoError(t, err)
-			_, err = teamSvc.CreateTeam(context.Background(), "team", "", 1)
+
+			teamCmd := team.CreateTeamCommand{
+				Name:  "test",
+				OrgID: 1,
+			}
+			_, err = teamSvc.CreateTeam(context.Background(), &teamCmd)
 			require.NoError(t, err)
 
 			permissions, err := service.SetPermissions(context.Background(), 1, "1", tt.commands...)
@@ -224,18 +244,18 @@ func TestService_SetPermissions(t *testing.T) {
 	}
 }
 
-func TestService_RegisterActionSets(t *testing.T) {
+func TestIntegrationService_RegisterActionSets(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	type registerActionSetsTest struct {
 		desc               string
-		actionSetsEnabled  bool
 		options            Options
 		expectedActionSets []ActionSet
 	}
 
 	tests := []registerActionSetsTest{
 		{
-			desc:              "should register folder action sets if action sets are enabled",
-			actionSetsEnabled: true,
+			desc: "should register folder action sets if action sets are enabled",
 			options: Options{
 				Resource: "folders",
 				PermissionsToActions: map[string][]string{
@@ -250,13 +270,12 @@ func TestService_RegisterActionSets(t *testing.T) {
 				},
 				{
 					Action:  "folders:edit",
-					Actions: []string{"folders:read", "dashboards:read", "folders:write", "dashboards:write"},
+					Actions: []string{"folders:read", "dashboards:read", "folders:write", "dashboards:write", "folders:create"},
 				},
 			},
 		},
 		{
-			desc:              "should register dashboard action set if action sets are enabled",
-			actionSetsEnabled: true,
+			desc: "should register dashboard action set if action sets are enabled",
 			options: Options{
 				Resource: "dashboards",
 				PermissionsToActions: map[string][]string{
@@ -270,25 +289,11 @@ func TestService_RegisterActionSets(t *testing.T) {
 				},
 			},
 		},
-		{
-			desc:              "should not register dashboard action set if action sets are not enabled",
-			actionSetsEnabled: false,
-			options: Options{
-				Resource: "dashboards",
-				PermissionsToActions: map[string][]string{
-					"View": {"dashboards:read"},
-				},
-			},
-			expectedActionSets: []ActionSet{},
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			features := featuremgmt.WithFeatures()
-			if tt.actionSetsEnabled {
-				features = featuremgmt.WithFeatures(featuremgmt.FlagAccessActionSets)
-			}
 			ac := acimpl.ProvideAccessControl(features)
 			actionSets := NewActionSetService()
 			_, err := New(
@@ -307,6 +312,159 @@ func TestService_RegisterActionSets(t *testing.T) {
 				for permission := range tt.options.PermissionsToActions {
 					actionSetName := GetActionSetName(tt.options.Resource, permission)
 					assert.Nil(t, actionSets.ResolveActionSet(actionSetName))
+				}
+			}
+		})
+	}
+}
+
+func TestStore_RegisterActionSet(t *testing.T) {
+	type actionSetTest struct {
+		desc               string
+		pluginID           string
+		pluginActions      []plugins.ActionSet
+		coreActionSets     []ActionSet
+		expectedErr        bool
+		expectedActionSets []ActionSet
+	}
+
+	tests := []actionSetTest{
+		{
+			desc:     "should be able to register a plugin action set",
+			pluginID: "test-app",
+			pluginActions: []plugins.ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"test-app.resource:read"},
+				},
+			},
+			expectedActionSets: []ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"test-app.resource:read"},
+				},
+			},
+		},
+		{
+			desc:     "should be able to register multiple plugin action sets",
+			pluginID: "test-app",
+			pluginActions: []plugins.ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"test-app.resource:read"},
+				},
+				{
+					Action:  "folders:edit",
+					Actions: []string{"test-app.resource:write", "test-app.resource:delete"},
+				},
+			},
+			expectedActionSets: []ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"test-app.resource:read"},
+				},
+				{
+					Action:  "folders:edit",
+					Actions: []string{"test-app.resource:write", "test-app.resource:delete"},
+				},
+			},
+		},
+		{
+			desc:     "action set actions should be added not replaced",
+			pluginID: "test-app",
+			pluginActions: []plugins.ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"test-app.resource:read"},
+				},
+				{
+					Action:  "folders:edit",
+					Actions: []string{"test-app.resource:write", "test-app.resource:delete"},
+				},
+			},
+			coreActionSets: []ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"folders:read"},
+				},
+				{
+					Action:  "folders:edit",
+					Actions: []string{"folders:write", "folders:delete"},
+				},
+				{
+					Action:  "folders:admin",
+					Actions: []string{"folders.permissions:read"},
+				},
+			},
+			expectedActionSets: []ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"folders:read", "test-app.resource:read"},
+				},
+				{
+					Action:  "folders:edit",
+					Actions: []string{"folders:write", "test-app.resource:write", "folders:delete", "test-app.resource:delete"},
+				},
+				{
+					Action:  "folders:admin",
+					Actions: []string{"folders.permissions:read"},
+				},
+			},
+		},
+		{
+			desc:     "should not be able to register an action that doesn't have a plugin prefix",
+			pluginID: "test-app",
+			pluginActions: []plugins.ActionSet{
+				{
+					Action:  "folders:view",
+					Actions: []string{"test-app.resource:read"},
+				},
+				{
+					Action:  "folders:edit",
+					Actions: []string{"users:read", "test-app.resource:delete"},
+				},
+			},
+			expectedErr: true,
+		},
+		{
+			desc:     "should not be able to register action set that is not in the allow list",
+			pluginID: "test-app",
+			pluginActions: []plugins.ActionSet{
+				{
+					Action:  "folders:super-admin",
+					Actions: []string{"test-app.resource:read"},
+				},
+			},
+			expectedErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			asService := NewActionSetService()
+
+			err := asService.RegisterActionSets(context.Background(), tt.pluginID, tt.pluginActions)
+			if tt.expectedErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			for _, set := range tt.coreActionSets {
+				asService.StoreActionSet(set.Action, set.Actions)
+			}
+
+			for _, expected := range tt.expectedActionSets {
+				actions := asService.ResolveActionSet(expected.Action)
+				if expected.Action == "folders:edit" || expected.Action == "folders:admin" {
+					expected.Actions = append(expected.Actions, "folders:create")
+				}
+				assert.ElementsMatch(t, expected.Actions, actions)
+			}
+
+			if len(tt.expectedActionSets) == 0 {
+				for _, set := range tt.pluginActions {
+					registeredActions := asService.ResolveActionSet(set.Action)
+					assert.Empty(t, registeredActions, "no actions from plugin action sets should have been registered")
 				}
 			}
 		})
@@ -335,9 +493,10 @@ func setupTestEnvironment(t *testing.T, ops Options) (*Service, user.Service, te
 	license := licensingtest.NewFakeLicensing()
 	license.On("FeatureEnabled", "accesscontrol.enforcement").Return(true).Maybe()
 	acService := &actest.FakeService{}
-	ac := acimpl.ProvideAccessControl(featuremgmt.WithFeatures())
+	features := featuremgmt.WithFeatures()
+	ac := acimpl.ProvideAccessControl(features)
 	service, err := New(
-		cfg, ops, featuremgmt.WithFeatures(), routing.NewRouteRegister(), license,
+		cfg, ops, features, routing.NewRouteRegister(), license,
 		ac, acService, sql, teamSvc, userSvc, NewActionSetService(),
 	)
 	require.NoError(t, err)

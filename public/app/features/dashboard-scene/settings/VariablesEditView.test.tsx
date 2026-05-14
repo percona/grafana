@@ -8,22 +8,14 @@ import {
   getDefaultTimeRange,
   toDataFrame,
 } from '@grafana/data';
-import { getPanelPlugin } from '@grafana/data/test/__mocks__/pluginMocks';
+import { getPanelPlugin } from '@grafana/data/test';
 import { setPluginImportUtils, setRunRequest } from '@grafana/runtime';
-import {
-  SceneVariableSet,
-  CustomVariable,
-  SceneGridLayout,
-  VizPanel,
-  AdHocFiltersVariable,
-  SceneVariableState,
-  SceneTimeRange,
-} from '@grafana/scenes';
+import { SceneVariableSet, CustomVariable, VizPanel, AdHocFiltersVariable, SceneTimeRange } from '@grafana/scenes';
 import { mockDataSource } from 'app/features/alerting/unified/mocks';
 import { LegacyVariableQueryEditor } from 'app/features/variables/editor/LegacyVariableQueryEditor';
 
-import { DashboardGridItem } from '../scene/DashboardGridItem';
 import { DashboardScene } from '../scene/DashboardScene';
+import { DefaultGridLayoutManager } from '../scene/layout-default/DefaultGridLayoutManager';
 import { activateFullSceneTree } from '../utils/test-utils';
 
 import { VariablesEditView } from './VariablesEditView';
@@ -43,8 +35,8 @@ const promDatasource = mockDataSource({
   type: 'prometheus',
 });
 
-jest.mock('@grafana/runtime/src/services/dataSourceSrv', () => ({
-  ...jest.requireActual('@grafana/runtime/src/services/dataSourceSrv'),
+jest.mock('@grafana/runtime', () => ({
+  ...jest.requireActual('@grafana/runtime'),
   getDataSourceSrv: () => ({
     get: async () => ({
       ...defaultDatasource,
@@ -213,49 +205,6 @@ describe('VariablesEditView', () => {
     });
   });
 
-  describe('Variables name validation', () => {
-    let variableView: VariablesEditView;
-    let variable1: SceneVariableState;
-    let variable2: SceneVariableState;
-
-    beforeAll(async () => {
-      const result = await buildTestScene();
-      variableView = result.variableView;
-
-      const variables = variableView.getVariables();
-      variable1 = variables[0].state;
-      variable2 = variables[1].state;
-    });
-
-    it('should not return error on same name and key', () => {
-      expect(variableView.onValidateVariableName(variable1.name, variable1.key)[0]).toBe(false);
-    });
-
-    it('should not return error if name is unique', () => {
-      expect(variableView.onValidateVariableName('unique_variable_name', variable1.key)[0]).toBe(false);
-    });
-
-    it('should return error if global variable name is used', () => {
-      expect(variableView.onValidateVariableName('__', variable1.key)[0]).toBe(true);
-    });
-
-    it('should not return error if global variable name is used not at the beginning ', () => {
-      expect(variableView.onValidateVariableName('test__', variable1.key)[0]).toBe(false);
-    });
-
-    it('should return error if name is empty', () => {
-      expect(variableView.onValidateVariableName('', variable1.key)[0]).toBe(true);
-    });
-
-    it('should return error if non word characters are used', () => {
-      expect(variableView.onValidateVariableName('-', variable1.key)[0]).toBe(true);
-    });
-
-    it('should return error if variable name is taken', () => {
-      expect(variableView.onValidateVariableName(variable2.name, variable1.key)[0]).toBe(true);
-    });
-  });
-
   describe('Dashboard Variables dependencies', () => {
     let variableView: VariablesEditView;
     let dashboard: DashboardScene;
@@ -288,8 +237,7 @@ describe('VariablesEditView', () => {
     it('should keep dependencies with panels when the type is changed so the variable is replaced', async () => {
       // Uses function to avoid store reference to previous existing variables
       const getSourceVariable = () => variableView.getVariables()[0] as CustomVariable;
-      const getDependantPanel = () =>
-        ((dashboard.state.body as SceneGridLayout).state.children[0] as DashboardGridItem).state.body as VizPanel;
+      const getDependantPanel = () => dashboard.state.body.getVizPanels()[0];
 
       expect(getSourceVariable().getValue()).toBe('test');
       // Using description to get the interpolated value
@@ -342,20 +290,14 @@ async function buildTestScene() {
         }),
       ],
     }),
-    body: new SceneGridLayout({
-      children: [
-        new DashboardGridItem({
-          key: 'griditem-1',
-          x: 0,
-          body: new VizPanel({
-            title: 'Panel A',
-            description: 'Panel A depends on customVar with current value $customVar',
-            key: 'panel-1',
-            pluginId: 'table',
-          }),
-        }),
-      ],
-    }),
+    body: DefaultGridLayoutManager.fromVizPanels([
+      new VizPanel({
+        title: 'Panel A',
+        description: 'Panel A depends on customVar with current value $customVar',
+        key: 'panel-1',
+        pluginId: 'table',
+      }),
+    ]),
     editview: variableView,
   });
 

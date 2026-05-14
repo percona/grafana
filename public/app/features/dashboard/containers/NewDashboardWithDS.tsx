@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
+import { Trans } from '@grafana/i18n';
 import { getDataSourceSrv, locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
-import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import { useDispatch } from 'app/types';
+import { useDispatch } from 'app/types/store';
 
 import { setInitialDatasource } from '../state/reducers';
 
-export default function NewDashboardWithDS(props: GrafanaRouteComponentProps<{ datasourceUid: string }>) {
+export default function NewDashboardWithDS() {
   const [error, setError] = useState<string | null>(null);
-  const { datasourceUid } = props.match.params;
+  const { datasourceUid } = useParams();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -21,14 +22,18 @@ export default function NewDashboardWithDS(props: GrafanaRouteComponentProps<{ d
 
     dispatch(setInitialDatasource(datasourceUid));
 
-    locationService.replace('/dashboard/new');
+    locationService.replace(`/dashboard/new?dashboardLibraryDatasourceUid=${datasourceUid}`);
   }, [datasourceUid, dispatch]);
 
   if (error) {
     return (
       <Page navId="dashboards">
         <Page.Contents>
-          <div>Data source with UID &quot;{datasourceUid}&quot; not found.</div>
+          <div>
+            <Trans i18nKey="dashboard.new-dashboard-with-ds.not-found">
+              Data source with UID &quot;{{ datasourceUid }}&quot; not found.
+            </Trans>
+          </div>
         </Page.Contents>
       </Page>
     );

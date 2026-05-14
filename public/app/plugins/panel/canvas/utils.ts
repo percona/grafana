@@ -1,20 +1,16 @@
 import { isNumber, isString } from 'lodash';
 
-import { AppEvents, Field, getFieldDisplayName, LinkModel, PluginState, SelectableValue } from '@grafana/data';
-import appEvents from 'app/core/app_events';
-import { hasAlphaPanels, config } from 'app/core/config';
-import {
-  CanvasConnection,
-  CanvasElementItem,
-  CanvasElementOptions,
-  ConnectionDirection,
-} from 'app/features/canvas/element';
+import { DataFrame, Field, AppEvents, getFieldDisplayName, PluginState, SelectableValue } from '@grafana/data';
+import { config } from '@grafana/runtime';
+import { ConnectionDirection } from '@grafana/schema';
+import { appEvents } from 'app/core/app_events';
+import { hasAlphaPanels } from 'app/core/config';
+import { CanvasConnection, CanvasElementItem, CanvasElementOptions } from 'app/features/canvas/element';
 import { notFoundItem } from 'app/features/canvas/elements/notFound';
 import { advancedElementItems, canvasElementRegistry, defaultElementItems } from 'app/features/canvas/registry';
 import { ElementState } from 'app/features/canvas/runtime/element';
 import { FrameState } from 'app/features/canvas/runtime/frame';
 import { Scene, SelectionParams } from 'app/features/canvas/runtime/scene';
-import { DimensionContext } from 'app/features/dimensions';
 
 import { AnchorPoint, ConnectionState, LineStyle, StrokeDasharray } from './types';
 
@@ -105,172 +101,10 @@ export function onAddItem(sel: SelectableValue<string>, rootLayer: FrameState | 
   }
 }
 
-/*
- * Provided a given field add any matching data links
- * Mutates the links object in place which is then returned by the `getDataLinks` function downstream
- */
-const addDataLinkForField = (
-  field: Field<unknown>,
-  data: string | undefined,
-  linkLookup: Set<string>,
-  links: Array<LinkModel<Field>>
-): void => {
-  if (field?.getLinks) {
-    const disp = field.display ? field.display(data) : { text: `${data}`, numeric: +data! };
-    // TODO add more control over which row index each element uses
-    const valueRowIndex = field.values.length - 1;
-    field.getLinks({ calculatedValue: disp, valueRowIndex }).forEach((link) => {
-      const key = `${link.title}/${link.href}`;
-      if (!linkLookup.has(key)) {
-        links.push(link);
-        linkLookup.add(key);
-      }
-    });
-  }
-};
-
-// TODO: This could be refactored a fair amount, ideally the element specific config code should be owned by each element and not in this shared util file
-export function getDataLinks(
-  dimensionContext: DimensionContext,
-  elementOptions: CanvasElementOptions,
-  data: string | undefined
-): LinkModel[] {
-  const panelData = dimensionContext.getPanelData();
-  const frames = panelData?.series;
-
-  const links: Array<LinkModel<Field>> = [];
-  const linkLookup = new Set<string>();
-
-  const elementConfig = elementOptions.config;
-
-  frames?.forEach((frame) => {
-    const visibleFields = frame.fields.filter((field) => !Boolean(field.config.custom?.hideFrom?.tooltip));
-
-    // Text config
-    const isTextTiedToFieldData =
-      elementConfig?.text?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.text?.field);
-    const isTextColorTiedToFieldData =
-      elementConfig?.color?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.color?.field);
-
-    // General element config
-    const isElementBackgroundColorTiedToFieldData =
-      elementOptions?.background?.color?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementOptions?.background?.color?.field);
-    const isElementBackgroundImageTiedToFieldData =
-      elementOptions?.background?.image?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementOptions?.background?.image?.field);
-    const isElementBorderColorTiedToFieldData =
-      elementOptions?.border?.color?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementOptions?.border?.color?.field);
-
-    // Icon config
-    const isIconSVGTiedToFieldData =
-      elementConfig?.path?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.path?.field);
-    const isIconColorTiedToFieldData =
-      elementConfig?.fill?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.fill?.field);
-
-    // Wind turbine config (maybe remove / not support this?)
-    const isWindTurbineRPMTiedToFieldData =
-      elementConfig?.rpm?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.rpm?.field);
-
-    // Server config
-    const isServerBlinkRateTiedToFieldData =
-      elementConfig?.blinkRate?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.blinkRate?.field);
-    const isServerStatusColorTiedToFieldData =
-      elementConfig?.statusColor?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.statusColor?.field);
-    const isServerBulbColorTiedToFieldData =
-      elementConfig?.bulbColor?.field &&
-      visibleFields.some((field) => getFieldDisplayName(field, frame) === elementConfig?.bulbColor?.field);
-
-    if (isTextTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.text?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isTextColorTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.color?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isElementBackgroundColorTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementOptions?.background?.color?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isElementBackgroundImageTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementOptions?.background?.image?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isElementBorderColorTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementOptions?.border?.color?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isIconSVGTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.path?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isIconColorTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.fill?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isWindTurbineRPMTiedToFieldData) {
-      const field = visibleFields.filter((field) => getFieldDisplayName(field, frame) === elementConfig?.rpm?.field)[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isServerBlinkRateTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.blinkRate?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isServerStatusColorTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.statusColor?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-
-    if (isServerBulbColorTiedToFieldData) {
-      const field = visibleFields.filter(
-        (field) => getFieldDisplayName(field, frame) === elementConfig?.bulbColor?.field
-      )[0];
-      addDataLinkForField(field, data, linkLookup, links);
-    }
-  });
-
-  return links;
-}
-
 export function isConnectionSource(element: ElementState) {
   return element.options.connections && element.options.connections.length > 0;
 }
+
 export function isConnectionTarget(element: ElementState, sceneByName: Map<string, ElementState>) {
   const connections = getConnections(sceneByName);
   return connections.some((connection) => connection.target === element);
@@ -368,6 +202,100 @@ export const calculateCoordinates = (
   return { x1, y1, x2, y2 };
 };
 
+export const calculateCoordinates2 = (source: ElementState, target: ElementState, info: CanvasConnection) => {
+  const { x: x1, y: y1 } = getRotatedConnectionPoint(source.div!, info.source.x, info.source.y);
+
+  let x2 = 0;
+  let y2 = 0;
+  const targetDiv = target.div;
+  if (info.targetName && targetDiv) {
+    ({ x: x2, y: y2 } = getRotatedConnectionPoint(targetDiv, info.target.x, info.target.y));
+  } else {
+    x2 = info.target.x;
+    y2 = info.target.y;
+  }
+
+  return { x1, y1, x2, y2 };
+};
+
+export const getElementTransformAndDimensions = (element: Element) => {
+  const style = window.getComputedStyle(element);
+
+  const transform = style.transform;
+
+  let x = 0;
+  let y = 0;
+  let rotation = 0;
+
+  if (transform !== 'none') {
+    // Use DOMMatrix to parse the transform string
+    const matrix = new DOMMatrix(transform);
+
+    // Extract x and y values
+    x = matrix.m41;
+    y = matrix.m42;
+
+    // Extract rotation in radians and convert to degrees
+    // For 2D transforms, rotation = atan2(m21, m11)
+    rotation = -Math.atan2(matrix.m21, matrix.m11) * (180 / Math.PI);
+  }
+
+  // Get the width and height of the element
+  // TODO: there sould be a better way than parseFloat
+  const width = parseFloat(style.width);
+  const height = parseFloat(style.height);
+
+  return { left: x, top: y, width, height, x, y, rotation };
+};
+
+export const getNormalizedRotatedOffset = (div: HTMLDivElement, x: number, y: number) => {
+  const { left, top, width, height, rotation } = getElementTransformAndDimensions(div);
+  // Calculate center of source element
+  const centerX = left + width / 2;
+  const centerY = top + height / 2;
+
+  // Calculate the offset from the center to the connection start point
+  let dx = x - centerX;
+  let dy = y - centerY;
+
+  // Adjust for rotation
+  const rad = rotation * (Math.PI / 180);
+  const cos = Math.cos(-rad);
+  const sin = Math.sin(-rad);
+  // Rotate the delta by the negative of the element's rotation
+  const rotatedDx = dx * cos - dy * sin;
+  const rotatedDy = dx * sin + dy * cos;
+
+  // Convert to normalized coordinates
+  const normalizedX = rotatedDx / (width / 2);
+  const normalizedY = -rotatedDy / (height / 2);
+
+  return { x: normalizedX, y: normalizedY };
+};
+
+export const getRotatedConnectionPoint = (div: HTMLDivElement, normalizedX: number, normalizedY: number) => {
+  const { left, top, width, height, rotation } = getElementTransformAndDimensions(div);
+  const centerX = left + width / 2;
+  const centerY = top + height / 2;
+
+  // Calculate offset from center before rotation
+  const offsetX = (normalizedX * width) / 2;
+  const offsetY = -(normalizedY * height) / 2;
+
+  // Convert rotation to radians
+  const rad = rotation * (Math.PI / 180);
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  // Apply rotation to offset
+  const rotatedOffsetX = offsetX * cos - offsetY * sin;
+  const rotatedOffsetY = offsetX * sin + offsetY * cos;
+
+  const x = centerX + rotatedOffsetX;
+  const y = centerY + rotatedOffsetY;
+
+  return { x, y };
+};
+
 export const calculateMidpoint = (x1: number, y1: number, x2: number, y2: number) => {
   return { x: (x1 + x2) / 2, y: (y1 + y2) / 2 };
 };
@@ -398,8 +326,8 @@ export const calculateDistance = (x1: number, y1: number, x2: number, y2: number
 // @TODO revisit, currently returning last row index for field
 export const getRowIndex = (fieldName: string | undefined, scene: Scene) => {
   if (fieldName) {
-    const series = scene.context.getPanelData()?.series[0];
-    const field = series?.fields.find((f) => (f.name = fieldName));
+    const series = scene.data?.series[0];
+    const field = series?.fields.find((field) => field.name === fieldName);
     const data = field?.values;
     return data ? data.length - 1 : 0;
   }
@@ -417,7 +345,9 @@ export const getConnectionStyles = (
   const strokeColor = info.color ? scene.context.getColor(info.color).value() : defaultArrowColor;
   const strokeWidth = info.size ? scene.context.getScale(info.size).get(lastRowIndex) : defaultArrowSize;
   const strokeRadius = info.radius ? scene.context.getScale(info.radius).get(lastRowIndex) : 0;
-  const arrowDirection = info.direction ? info.direction : defaultArrowDirection;
+  const arrowDirection = info.direction
+    ? scene.context.getDirection(info.direction).get(lastRowIndex)
+    : defaultArrowDirection;
   const lineStyle = getLineStyle(info.lineStyle?.style);
   const shouldAnimate = info.lineStyle?.animate;
 
@@ -437,23 +367,54 @@ const getLineStyle = (lineStyle?: LineStyle) => {
 
 export const getParentBoundingClientRect = (scene: Scene) => {
   if (config.featureToggles.canvasPanelPanZoom) {
-    const transformRef = scene.transformComponentRef?.current;
-    return transformRef?.instance.contentComponent?.getBoundingClientRect();
+    return scene.viewportDiv?.getBoundingClientRect();
   }
 
   return scene.div?.getBoundingClientRect();
 };
 
-export const getTransformInstance = (scene: Scene) => {
-  if (config.featureToggles.canvasPanelPanZoom) {
-    return scene.transformComponentRef?.current?.instance;
-  }
-  return undefined;
-};
+export function getElementFields(frames: DataFrame[], opts: CanvasElementOptions) {
+  const fields = new Set<Field>();
+  const cfg = opts.config ?? {};
 
-export const getParent = (scene: Scene) => {
-  if (config.featureToggles.canvasPanelPanZoom) {
-    return scene.transformComponentRef?.current?.instance.contentComponent;
+  frames.forEach((frame) => {
+    frame.fields.forEach((field) => {
+      const name = getFieldDisplayName(field, frame, frames);
+
+      // (intentional fall-through)
+      switch (name) {
+        // General element config
+        case opts.background?.color?.field:
+        case opts.background?.image?.field:
+        case opts.border?.color?.field:
+        // Text config
+        case cfg.text?.field:
+        case cfg.color?.field:
+        // Icon config
+        case cfg.path?.field:
+        case cfg.fill?.field:
+        // Server config
+        case cfg.blinkRate?.field:
+        case cfg.statusColor?.field:
+        case cfg.bulbColor?.field:
+        // Wind turbine config (maybe remove / not support this?)
+        case cfg.rpm?.field:
+          fields.add(field);
+      }
+    });
+  });
+
+  return [...fields];
+}
+
+export function applyStyles(styles: React.CSSProperties, target: HTMLDivElement) {
+  // INFO: CSSProperties can't be applied using setProperty, so we use Object.assign
+  Object.assign(target.style, styles);
+}
+
+export function removeStyles(styles: React.CSSProperties, target: HTMLDivElement) {
+  for (const key in styles) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
+    target.style[key as any] = '';
   }
-  return scene.div;
-};
+}

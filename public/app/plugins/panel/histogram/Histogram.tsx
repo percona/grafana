@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import uPlot, { AlignedData } from 'uplot';
 
 import {
@@ -9,11 +9,9 @@ import {
   getFieldSeriesColor,
   GrafanaTheme2,
   roundDecimals,
-} from '@grafana/data';
-import {
   histogramBucketSizes,
   histogramFrameBucketMaxFieldName,
-} from '@grafana/data/src/transformations/transformers/histogram';
+} from '@grafana/data';
 import { VizLegendOptions, ScaleDistribution, AxisPlacement, ScaleDirection, ScaleOrientation } from '@grafana/schema';
 import {
   Themeable2,
@@ -24,7 +22,7 @@ import {
   measureText,
   UPLOT_AXIS_FONT_SIZE,
 } from '@grafana/ui';
-import { getStackingGroups, preparePlotData2 } from '@grafana/ui/src/components/uPlot/utils';
+import { getStackingGroups, preparePlotData2 } from '@grafana/ui/internal';
 
 import { defaultFieldConfig, FieldConfig, Options } from './panelcfg.gen';
 
@@ -46,7 +44,7 @@ export interface HistogramProps extends Themeable2 {
   structureRev?: number; // a number that will change when the frames[] structure changes
   legend: VizLegendOptions;
   rawSeries?: DataFrame[];
-  children?: (builder: UPlotConfigBuilder, frame: DataFrame) => React.ReactNode;
+  children?: (builder: UPlotConfigBuilder, frame: DataFrame, xMinOnlyFrame: DataFrame) => React.ReactNode;
 }
 
 export function getBucketSize(frame: DataFrame) {
@@ -114,7 +112,7 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2) => {
     direction: ScaleDirection.Right,
     range: useLogScale
       ? (u, wantedMin, wantedMax) => {
-          return uPlot.rangeLog(wantedMin, wantedMax * bucketFactor, 2, true);
+          return uPlot.rangeLog(wantedMin, (wantedMax ?? 1) * bucketFactor, 2, true);
         }
       : (u, wantedMin, wantedMax) => {
           // these settings will prevent zooming, probably okay?
@@ -206,6 +204,12 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2) => {
       y: false,
       setScale: true,
     },
+    dataIdx: (u, _, closestIdx, xValue) =>
+      isOrdinalX ? Math.floor(xValue) : xValue < u.data[0][closestIdx] ? closestIdx - 1 : closestIdx,
+    focus: {
+      prox: 1e6,
+      bias: 1,
+    },
   });
 
   let stackingGroups = getStackingGroups(xMinOnlyFrame(frame));
@@ -283,6 +287,7 @@ interface State {
   alignedData: AlignedData;
   alignedFrame: DataFrame;
   config?: UPlotConfigBuilder;
+  xMinOnlyFrame: DataFrame;
 }
 
 export class Histogram extends React.Component<HistogramProps, State> {
@@ -295,12 +300,14 @@ export class Histogram extends React.Component<HistogramProps, State> {
     const { alignedFrame } = props;
 
     const config = withConfig ? prepConfig(alignedFrame, this.props.theme) : this.state.config!;
-    const alignedData = preparePlotData(config, xMinOnlyFrame(alignedFrame));
+    const xMinOnly = xMinOnlyFrame(alignedFrame);
+    const alignedData = preparePlotData(config, xMinOnly);
 
     return {
       alignedFrame,
       alignedData,
       config,
+      xMinOnlyFrame: xMinOnly,
     };
   }
 
@@ -347,7 +354,7 @@ export class Histogram extends React.Component<HistogramProps, State> {
       <VizLayout width={width} height={height} legend={this.renderLegend(config)}>
         {(vizWidth: number, vizHeight: number) => (
           <UPlotChart config={this.state.config!} data={this.state.alignedData} width={vizWidth} height={vizHeight}>
-            {children ? children(config, alignedFrame) : null}
+            {children ? children(config, alignedFrame, this.state.xMinOnlyFrame) : null}
           </UPlotChart>
         )}
       </VizLayout>

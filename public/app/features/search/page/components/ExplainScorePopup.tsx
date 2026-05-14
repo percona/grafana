@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { DataFrame } from '@grafana/data';
 import { CodeEditor, Modal, ModalTabsHeader, TabContent } from '@grafana/ui';
@@ -34,7 +34,14 @@ export function ExplainScorePopup({ name, explain, frame, row }: Props) {
   );
 
   return (
-    <Modal title={modalHeader} isOpen={isOpen} onDismiss={() => setOpen(false)} closeOnBackdropClick closeOnEscape>
+    <Modal
+      ariaLabel={name}
+      title={modalHeader}
+      isOpen={isOpen}
+      onDismiss={() => setOpen(false)}
+      closeOnBackdropClick
+      closeOnEscape
+    >
       <TabContent>
         {activeTab === tabs[0].value && (
           <CodeEditor

@@ -1,21 +1,17 @@
 import { renderHook } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
-import React from 'react';
-import { MemoryRouter, Router } from 'react-router-dom';
+import * as React from 'react';
+import { Provider } from 'react-redux';
 
-import store from 'app/core/store';
+import { store } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { AlertManagerImplementation } from 'app/plugins/datasource/alertmanager/types';
+import { configureStore } from 'app/store/configureStore';
 
 import * as useAlertManagerSources from '../hooks/useAlertManagerSources';
 import { ALERTMANAGER_NAME_LOCAL_STORAGE_KEY } from '../utils/constants';
 import { AlertManagerDataSource, GRAFANA_RULES_SOURCE_NAME } from '../utils/datasource';
 
 import { AlertmanagerProvider, isAlertManagerWithConfigAPI, useAlertmanager } from './AlertmanagerContext';
-
-const grafanaAm: AlertManagerDataSource = {
-  name: GRAFANA_RULES_SOURCE_NAME,
-  imgUrl: '',
-};
 
 const externalAmProm: AlertManagerDataSource = {
   name: 'PrometheusAm',
@@ -27,16 +23,21 @@ const externalAmMimir: AlertManagerDataSource = {
   imgUrl: '',
 };
 
+function getProviderWrapper() {
+  const reduxStore = configureStore();
+  return ({ children }: React.PropsWithChildren) => (
+    <Provider store={reduxStore}>
+      <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
+    </Provider>
+  );
+}
+
 describe('useAlertmanager', () => {
   it('Should return undefined alert manager name when there are no available alert managers', () => {
     jest
       .spyOn(useAlertManagerSources, 'useAlertManagersByPermission')
       .mockReturnValueOnce({ availableExternalDataSources: [], availableInternalDataSources: [] });
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <MemoryRouter>
-        <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
-      </MemoryRouter>
-    );
+    const wrapper = getProviderWrapper();
 
     const { result } = renderHook(() => useAlertmanager(), { wrapper });
     expect(result.current.selectedAlertmanager).toBe(undefined);
@@ -48,14 +49,10 @@ describe('useAlertmanager', () => {
       availableInternalDataSources: [{ name: GRAFANA_RULES_SOURCE_NAME, imgUrl: '', hasConfigurationAPI: true }],
     });
 
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <MemoryRouter>
-        <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
-      </MemoryRouter>
-    );
+    const wrapper = getProviderWrapper();
 
     const { result } = renderHook(() => useAlertmanager(), { wrapper });
-    expect(result.current.selectedAlertmanager).toBe(grafanaAm.name);
+    expect(result.current.selectedAlertmanager).toBe(GRAFANA_RULES_SOURCE_NAME);
   });
 
   it('Should return alert manager included in the query param when available', () => {
@@ -63,14 +60,9 @@ describe('useAlertmanager', () => {
       .spyOn(useAlertManagerSources, 'useAlertManagersByPermission')
       .mockReturnValueOnce({ availableExternalDataSources: [externalAmProm], availableInternalDataSources: [] });
 
-    const history = createMemoryHistory();
-    history.push({ search: `alertmanager=${externalAmProm.name}` });
+    locationService.push({ search: `alertmanager=${externalAmProm.name}` });
 
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <Router history={history}>
-        <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
-      </Router>
-    );
+    const wrapper = getProviderWrapper();
 
     const { result } = renderHook(() => useAlertmanager(), { wrapper });
     expect(result.current.selectedAlertmanager).toBe(externalAmProm.name);
@@ -81,14 +73,9 @@ describe('useAlertmanager', () => {
       .spyOn(useAlertManagerSources, 'useAlertManagersByPermission')
       .mockReturnValueOnce({ availableExternalDataSources: [], availableInternalDataSources: [] });
 
-    const history = createMemoryHistory();
-    history.push({ search: `alertmanager=Not available external AM` });
+    locationService.push({ search: `alertmanager=Not available external AM` });
 
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <Router history={history}>
-        <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
-      </Router>
-    );
+    const wrapper = getProviderWrapper();
 
     const { result } = renderHook(() => useAlertmanager(), { wrapper });
     expect(result.current.selectedAlertmanager).toBe(undefined);
@@ -99,14 +86,10 @@ describe('useAlertmanager', () => {
       .spyOn(useAlertManagerSources, 'useAlertManagersByPermission')
       .mockReturnValueOnce({ availableExternalDataSources: [externalAmProm], availableInternalDataSources: [] });
 
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <MemoryRouter>
-        <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
-      </MemoryRouter>
-    );
+    const wrapper = getProviderWrapper();
 
     store.set(ALERTMANAGER_NAME_LOCAL_STORAGE_KEY, externalAmProm.name);
-
+    locationService.push({ search: '' });
     const { result } = renderHook(() => useAlertmanager(), { wrapper });
     expect(result.current.selectedAlertmanager).toBe(externalAmProm.name);
   });
@@ -117,14 +100,9 @@ describe('useAlertmanager', () => {
       availableInternalDataSources: [],
     });
 
-    const history = createMemoryHistory();
-    history.push({ search: `alertmanager=${externalAmProm.name}` });
+    locationService.push({ search: `alertmanager=${externalAmProm.name}` });
 
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <Router history={history}>
-        <AlertmanagerProvider accessType="instance">{children}</AlertmanagerProvider>
-      </Router>
-    );
+    const wrapper = getProviderWrapper();
 
     store.set(ALERTMANAGER_NAME_LOCAL_STORAGE_KEY, externalAmMimir.name);
 

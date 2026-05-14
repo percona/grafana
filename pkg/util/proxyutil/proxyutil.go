@@ -7,7 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/grafana/grafana/pkg/services/auth/identity"
+	claims "github.com/grafana/authlib/types"
+
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 )
 
 const (
@@ -90,12 +92,6 @@ func ClearCookieHeader(req *http.Request, keepCookiesNames []string, skipCookies
 	}
 }
 
-// SetProxyResponseHeaders sets proxy response headers.
-// Sets Content-Security-Policy: sandbox
-func SetProxyResponseHeaders(header http.Header) {
-	header.Set("Content-Security-Policy", "sandbox")
-}
-
 // SetViaHeader adds Grafana's reverse proxy to the proxy chain.
 // Defined in RFC 9110 7.6.3 https://datatracker.ietf.org/doc/html/rfc9110#name-via
 func SetViaHeader(header http.Header, major, minor int) {
@@ -114,8 +110,7 @@ func ApplyUserHeader(sendUserHeader bool, req *http.Request, user identity.Reque
 		return
 	}
 
-	namespace, _ := user.GetNamespacedID()
-	if namespace == identity.NamespaceUser || namespace == identity.NamespaceServiceAccount {
+	if user.IsIdentityType(claims.TypeUser) {
 		req.Header.Set(UserHeaderName, user.GetLogin())
 	}
 }

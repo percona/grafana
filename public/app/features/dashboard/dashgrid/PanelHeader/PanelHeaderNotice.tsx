@@ -1,9 +1,9 @@
 import { css } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2, QueryResultMetaNotice } from '@grafana/data';
 import { Icon, ToolbarButton, Tooltip, useStyles2 } from '@grafana/ui';
-import { getFocusStyles, getMouseFocusStyles } from '@grafana/ui/src/themes/mixins';
+import { getFocusStyles, getMouseFocusStyles } from '@grafana/ui/internal';
 
 interface Props {
   notice: QueryResultMetaNotice;

@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
+// @PERCONA
+// @ts-nocheck
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { useAsync } from 'react-use';
 import { Subscription } from 'rxjs';
 
-import { llms } from '@grafana/experimental';
+import { llm } from '@grafana/llm';
 import { createMonitoringLogger } from '@grafana/runtime';
 import { useAppNotification } from 'app/core/copy/appNotification';
 
-import { isLLMPluginEnabled, DEFAULT_OAI_MODEL } from './utils';
+import { DEFAULT_LLM_MODEL, isLLMPluginEnabled } from './utils';
 
 // Declared instead of imported from utils to make this hook modular
 // Ideally we will want to move the hook itself to a different scope later.
-type Message = llms.openai.Message;
+type Message = llm.Message;
 
 const genAILogger = createMonitoringLogger('features.dashboards.genai');
 
@@ -20,33 +22,40 @@ export enum StreamStatus {
   COMPLETED = 'completed',
 }
 
-export const TIMEOUT = 10000;
+export const TIMEOUT = 10000; // 10 seconds
 
-// TODO: Add tests
-export function useOpenAIStream(
-  model = DEFAULT_OAI_MODEL,
-  temperature = 1
-): {
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  setStopGeneration: React.Dispatch<React.SetStateAction<boolean>>;
+interface Options {
+  model: string;
+  temperature: number;
+  onResponse?: (response: string) => void;
+  timeout?: number;
+}
+
+const defaultOptions = {
+  model: DEFAULT_LLM_MODEL,
+  temperature: 1,
+  timeout: TIMEOUT,
+};
+
+interface UseLLMStreamResponse {
+  setMessages: Dispatch<SetStateAction<Message[]>>;
+  stopGeneration: () => void;
   messages: Message[];
   reply: string;
   streamStatus: StreamStatus;
-  error: Error | undefined;
-  value:
-    | {
-        enabled: boolean | undefined;
-        stream?: undefined;
-      }
-    | {
-        enabled: boolean | undefined;
-        stream: Subscription;
-      }
-    | undefined;
-} {
+  error?: Error;
+  value?: {
+    enabled?: boolean | undefined;
+    stream?: Subscription;
+  };
+}
+
+// TODO: Add tests
+export function useLLMStream(options: Options = defaultOptions): UseLLMStreamResponse {
+  const { model, temperature, onResponse, timeout } = { ...defaultOptions, ...options };
   // The messages array to send to the LLM, updated when the button is clicked.
   const [messages, setMessages] = useState<Message[]>([]);
-  const [stopGeneration, setStopGeneration] = useState(false);
+
   // The latest reply from the LLM.
   const [reply, setReply] = useState('');
   const [streamStatus, setStreamStatus] = useState<StreamStatus>(StreamStatus.IDLE);
@@ -59,11 +68,10 @@ export function useOpenAIStream(
     (e: Error) => {
       setStreamStatus(StreamStatus.IDLE);
       setMessages([]);
-      setStopGeneration(false);
       setError(e);
       notifyError(
-        'Failed to generate content using OpenAI',
-        `Please try again or if the problem persists, contact your organization admin.`
+        'Failed to generate content using LLM',
+        'Please try again or if the problem persists, contact your organization admin.'
       );
       console.error(e);
       genAILogger.logError(e, { messages: JSON.stringify(messages), model, temperature: String(temperature) });
@@ -90,7 +98,7 @@ export function useOpenAIStream(
     setStreamStatus(StreamStatus.GENERATING);
     setError(undefined);
     // Stream the completions. Each element is the next stream chunk.
-    const stream = llms.openai
+    const stream = llm
       .streamChatCompletions({
         model,
         temperature,
@@ -99,7 +107,7 @@ export function useOpenAIStream(
       .pipe(
         // Accumulate the stream content into a stream of strings, where each
         // element contains the accumulated message so far.
-        llms.openai.accumulateContent()
+        llm.accumulateContent()
         // The stream is just a regular Observable, so we can use standard rxjs
         // functionality to update state, e.g. recording when the stream
         // has completed.
@@ -117,11 +125,8 @@ export function useOpenAIStream(
         complete: () => {
           setReply(partialReply);
           setStreamStatus(StreamStatus.COMPLETED);
-          setTimeout(() => {
-            setStreamStatus(StreamStatus.IDLE);
-          });
+          onResponse?.(partialReply);
           setMessages([]);
-          setStopGeneration(false);
           setError(undefined);
         },
       }),
@@ -131,35 +136,31 @@ export function useOpenAIStream(
   // Unsubscribe from the stream when the component unmounts.
   useEffect(() => {
     return () => {
-      if (value?.stream) {
-        value.stream.unsubscribe();
-      }
+      value?.stream?.unsubscribe();
     };
   }, [value]);
 
   // Unsubscribe from the stream when user stops the generation.
-  useEffect(() => {
-    if (stopGeneration) {
-      value?.stream?.unsubscribe();
-      setStreamStatus(StreamStatus.IDLE);
-      setStopGeneration(false);
-      setError(undefined);
-      setMessages([]);
-    }
-  }, [stopGeneration, value?.stream]);
+  const stopGeneration = useCallback(() => {
+    value?.stream?.unsubscribe();
+    setStreamStatus(StreamStatus.IDLE);
+    setError(undefined);
+    setMessages([]);
+  }, [value]);
 
   // If the stream is generating and we haven't received a reply, it times out.
   useEffect(() => {
-    let timeout: NodeJS.Timeout | undefined;
+    let timeoutId: NodeJS.Timeout | undefined;
     if (streamStatus === StreamStatus.GENERATING && reply === '') {
-      timeout = setTimeout(() => {
-        onError(new Error(`OpenAI stream timed out after ${TIMEOUT}ms`));
-      }, TIMEOUT);
+      timeoutId = setTimeout(() => {
+        onError(new Error(`LLM stream timed out after ${timeout}ms`));
+      }, timeout);
     }
+
     return () => {
-      timeout && clearTimeout(timeout);
+      clearTimeout(timeoutId);
     };
-  }, [streamStatus, reply, onError]);
+  }, [streamStatus, reply, onError, timeout]);
 
   if (asyncError || enabledError) {
     setError(asyncError || enabledError);
@@ -167,7 +168,7 @@ export function useOpenAIStream(
 
   return {
     setMessages,
-    setStopGeneration,
+    stopGeneration,
     messages,
     reply,
     streamStatus,

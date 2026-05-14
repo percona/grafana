@@ -1,27 +1,36 @@
 import { css } from '@emotion/css';
 import * as H from 'history';
-import React, { useContext, useEffect, useMemo } from 'react';
-import { Prompt } from 'react-router';
+import { memo, useContext, useEffect, useMemo } from 'react';
 
+import { Trans, t } from '@grafana/i18n';
 import { locationService } from '@grafana/runtime';
-import { Dashboard } from '@grafana/schema/dist/esm/index.gen';
+import { Dashboard } from '@grafana/schema';
+import { Spec as DashboardV2Spec } from '@grafana/schema/apis/dashboard.grafana.app/v2';
 import { ModalsContext, Modal, Button, useStyles2 } from '@grafana/ui';
+import { Prompt } from 'app/core/components/FormPrompt/Prompt';
 import { contextSrv } from 'app/core/services/context_srv';
+import { ObjectMeta } from 'app/features/apiserver/types';
+import { isDashboardV2Spec } from 'app/features/dashboard/api/utils';
+import { DASHBOARD_LIBRARY_ROUTES } from 'app/features/dashboard/dashgrid/types';
+import { DashboardMeta } from 'app/types/dashboard';
 
+import { SaveLibraryVizPanelModal } from '../panel-edit/SaveLibraryVizPanelModal';
 import { DashboardScene } from '../scene/DashboardScene';
+import { getLibraryPanelBehavior, hasActualSaveChanges, isLibraryPanel } from '../utils/utils';
 
 interface DashboardPromptProps {
   dashboard: DashboardScene;
 }
 
-export const DashboardPrompt = React.memo(({ dashboard }: DashboardPromptProps) => {
+export const DashboardPrompt = memo(({ dashboard }: DashboardPromptProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const originalPath = useMemo(() => locationService.getLocation().pathname, [dashboard]);
+  const originalLocation = useMemo(() => locationService.getLocation(), [dashboard]);
+  const originalPath = useMemo(() => originalLocation.pathname, [originalLocation]);
   const { showModal, hideModal } = useContext(ModalsContext);
 
   useEffect(() => {
     const handleUnload = (event: BeforeUnloadEvent) => {
-      if (ignoreChanges(dashboard, dashboard.getInitialSaveModel())) {
+      if (ignoreChanges(dashboard)) {
         return;
       }
 
@@ -38,36 +47,39 @@ export const DashboardPrompt = React.memo(({ dashboard }: DashboardPromptProps) 
   }, [dashboard]);
 
   const onHistoryBlock = (location: H.Location) => {
-    // const panelInEdit = dashboard.state.editPanel;
-    // const search = new URLSearchParams(location.search);
+    const panelEditor = dashboard.state.editPanel;
+    const vizPanel = panelEditor?.getPanel();
+    const search = new URLSearchParams(location.search);
 
-    // TODO: Are we leaving panel edit & library panel?
+    // Are we leaving panel edit & library panel?
+    if (panelEditor && vizPanel && isLibraryPanel(vizPanel) && panelEditor.state.isDirty && !search.has('editPanel')) {
+      const libPanelBehavior = getLibraryPanelBehavior(vizPanel);
 
-    // if (panelInEdit && panelInEdit.libraryPanel && panelInEdit.hasChanged && !search.has('editPanel')) {
-    //   showModal(SaveLibraryPanelModal, {
-    //     isUnsavedPrompt: true,
-    //     panel: dashboard.panelInEdit as PanelModelWithLibraryPanel,
-    //     folderUid: dashboard.meta.folderUid ?? '',
-    //     onConfirm: () => {
-    //       hideModal();
-    //       moveToBlockedLocationAfterReactStateUpdate(location);
-    //     },
-    //     onDiscard: () => {
-    //       dispatch(discardPanelChanges());
-    //       moveToBlockedLocationAfterReactStateUpdate(location);
-    //       hideModal();
-    //     },
-    //     onDismiss: hideModal,
-    //   });
-    //   return false;
-    // }
+      showModal(SaveLibraryVizPanelModal, {
+        dashboard,
+        isUnsavedPrompt: true,
+        libraryPanel: libPanelBehavior!,
+        onConfirm: () => {
+          panelEditor.onConfirmSaveLibraryPanel();
+          hideModal();
+          moveToBlockedLocationAfterReactStateUpdate(location);
+        },
+        onDiscard: () => {
+          panelEditor.onDiscard();
+          hideModal();
+          moveToBlockedLocationAfterReactStateUpdate(location);
+        },
+        onDismiss: hideModal,
+      });
+      return false;
+    }
 
     // Are we still on the same dashboard?
     if (originalPath === location.pathname) {
       return true;
     }
 
-    if (ignoreChanges(dashboard, dashboard.getInitialSaveModel())) {
+    if (ignoreChanges(dashboard)) {
       return true;
     }
 
@@ -89,7 +101,11 @@ export const DashboardPrompt = React.memo(({ dashboard }: DashboardPromptProps) 
       onDiscard: () => {
         dashboard.exitEditMode({ skipConfirm: true });
         hideModal();
-        moveToBlockedLocationAfterReactStateUpdate(location);
+        if (originalPath === DASHBOARD_LIBRARY_ROUTES.Template) {
+          moveToBlockedLocationAfterReactStateUpdate(location, true);
+        } else {
+          moveToBlockedLocationAfterReactStateUpdate(location);
+        }
       },
       onDismiss: hideModal,
     });
@@ -102,9 +118,9 @@ export const DashboardPrompt = React.memo(({ dashboard }: DashboardPromptProps) 
 
 DashboardPrompt.displayName = 'DashboardPrompt';
 
-function moveToBlockedLocationAfterReactStateUpdate(location?: H.Location | null) {
+function moveToBlockedLocationAfterReactStateUpdate(location?: H.Location | null, replace = false) {
   if (location) {
-    setTimeout(() => locationService.push(location), 10);
+    setTimeout(() => (replace ? locationService.replace(location) : locationService.push(location)), 10);
   }
 }
 
@@ -120,20 +136,24 @@ export const UnsavedChangesModal = ({ onDiscard, onDismiss, onSaveDashboardClick
   return (
     <Modal
       isOpen={true}
-      title="Unsaved changes"
+      title={t('dashboard-scene.unsaved-changes-modal.title-unsaved-changes', 'Unsaved changes')}
       onDismiss={onDismiss}
       icon="exclamation-triangle"
       className={styles.modal}
     >
-      <h5>Do you want to save your changes?</h5>
+      <h5>
+        <Trans i18nKey="dashboard-scene.unsaved-changes-modal.changes">Do you want to save your changes?</Trans>
+      </h5>
       <Modal.ButtonRow>
         <Button variant="secondary" onClick={onDismiss} fill="outline">
-          Cancel
+          <Trans i18nKey="dashboard-scene.unsaved-changes-modal.cancel">Cancel</Trans>
         </Button>
         <Button variant="destructive" onClick={onDiscard}>
-          Discard
+          <Trans i18nKey="dashboard-scene.unsaved-changes-modal.discard">Discard</Trans>
         </Button>
-        <Button onClick={onSaveDashboardClick}>Save dashboard</Button>
+        <Button onClick={onSaveDashboardClick}>
+          <Trans i18nKey="dashboard-scene.unsaved-changes-modal.save-dashboard">Save dashboard</Trans>
+        </Button>
       </Modal.ButtonRow>
     </Modal>
   );
@@ -148,13 +168,15 @@ const getStyles = () => ({
 /**
  * For some dashboards and users changes should be ignored *
  */
-export function ignoreChanges(current: DashboardScene | null, original?: Dashboard) {
+export function ignoreChanges(scene: DashboardScene | null) {
+  const original = scene?.getInitialSaveModel();
+
   if (!original) {
     return true;
   }
 
   // Ignore changes if original is unsaved
-  if (original.version === 0) {
+  if (scene?.state.meta.version === 0) {
     return true;
   }
 
@@ -163,14 +185,41 @@ export function ignoreChanges(current: DashboardScene | null, original?: Dashboa
     return true;
   }
 
-  if (!current) {
+  if (!scene) {
     return true;
   }
 
-  const { canSave, fromScript, fromFile } = current.state.meta;
+  const dashboard = scene.getSaveModel();
+  // Ignore changes if the dashboard is empty (new dashboard)
+  if (isEmptyDashboard(dashboard, scene?.serializer.metadata)) {
+    return true;
+  }
+
+  const { canSave, fromScript, fromFile } = scene.state.meta;
   if (!contextSrv.isEditor && !canSave) {
     return true;
   }
 
-  return !canSave || fromScript || fromFile;
+  return !canSave || fromScript || fromFile || (scene.state.isEditing && !hasActualSaveChanges(scene));
+}
+
+export function isEmptyDashboard(
+  dashboard: Dashboard | DashboardV2Spec,
+  metadata?: DashboardMeta | ObjectMeta
+): boolean {
+  if (isDashboardV2Spec(dashboard)) {
+    const hasNoPanels = Object.keys(dashboard.elements).length === 0;
+    const hasNoLinks = !dashboard.links.length;
+    const hasNoTemplates = !dashboard.variables.length;
+    const hasNoUid = !metadata || !('name' in metadata) || !metadata.name;
+
+    return hasNoPanels && hasNoLinks && hasNoTemplates && hasNoUid;
+  }
+
+  const hasNoPanels = !dashboard.panels?.length;
+  const hasNoLinks = !dashboard.links?.length;
+  const hasNoTemplates = !dashboard.templating?.list?.length;
+  const hasNoUid = !dashboard.uid;
+
+  return hasNoPanels && hasNoLinks && hasNoTemplates && hasNoUid;
 }

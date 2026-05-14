@@ -1,10 +1,13 @@
 import { css } from '@emotion/css';
 import { debounce } from 'lodash';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import * as React from 'react';
 
 import { DataFrame, CSVConfig, readCSV, GrafanaTheme2 } from '@grafana/data';
+import { t, Trans } from '@grafana/i18n';
 
-import { stylesFactory, withTheme2 } from '../../themes';
+import { withTheme2 } from '../../themes/ThemeContext';
+import { stylesFactory } from '../../themes/stylesFactory';
 import { Themeable2 } from '../../types/theme';
 import { Icon } from '../Icon/Icon';
 import { TextArea } from '../TextArea/TextArea';
@@ -72,7 +75,7 @@ export class UnThemedTableInputCSV extends PureComponent<Props, State> {
       <div className={styles.tableInputCsv}>
         <TextArea
           style={{ width, height }}
-          placeholder="Enter CSV here..."
+          placeholder={t('grafana-ui.table.csv-placeholder', 'Enter CSV here...')}
           value={this.state.text}
           onChange={this.onTextChange}
           className={styles.textarea}
@@ -80,9 +83,14 @@ export class UnThemedTableInputCSV extends PureComponent<Props, State> {
         {data && (
           <footer className={styles.footer}>
             {data.map((frame, index) => {
+              const rows = frame.length;
+              const columns = frame.fields.length;
               return (
                 <span key={index}>
-                  Rows:{frame.length}, Columns:{frame.fields.length} &nbsp;
+                  <Trans i18nKey="grafana-ui.table.csv-counts">
+                    Rows:{{ rows }}, Columns:{{ columns }}
+                  </Trans>
+                  &nbsp;
                   <Icon name="check-circle" />
                 </span>
               );
@@ -94,6 +102,11 @@ export class UnThemedTableInputCSV extends PureComponent<Props, State> {
   }
 }
 
+/**
+ * @deprecated
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/inputs-deprecated-tableinputcsv--docs
+ */
 export const TableInputCSV = withTheme2(UnThemedTableInputCSV);
 TableInputCSV.displayName = 'TableInputCSV';
 
@@ -110,8 +123,9 @@ const getStyles = stylesFactory((theme: GrafanaTheme2) => {
       position: 'absolute',
       bottom: '15px',
       right: '15px',
-      border: '1px solid #222',
+      border: `1px solid ${theme.colors.success.border}`,
       background: theme.colors.success.main,
+      color: theme.colors.success.contrastText,
       padding: `1px ${theme.spacing(0.5)}`,
       fontSize: '80%',
     }),

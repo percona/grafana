@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import { ConstantVariable } from '@grafana/scenes';
 
-import { ConstantVariableEditor } from './ConstantVariableEditor';
+import { ConstantVariableEditor, getConstantVariableOptions } from './ConstantVariableEditor';
 
 describe('ConstantVariableEditor', () => {
   let constantVar: ConstantVariable;
@@ -36,6 +35,11 @@ describe('ConstantVariableEditor', () => {
 
     await userEvent.tab();
     expect(constantVar.state.value).toBe(newValue);
+  });
+
+  it('should get variable options', () => {
+    const options = getConstantVariableOptions(constantVar);
+    expect(options).toHaveLength(1);
   });
 });
 

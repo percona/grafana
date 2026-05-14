@@ -1,10 +1,15 @@
 import { act, render, screen } from '@testing-library/react';
-import React from 'react';
 import { selectOptionInTest } from 'test/helpers/selectOptionInTest';
 
-import { setupMockedDataSource } from '../../../../__mocks__/CloudWatchDataSource';
-import { QueryEditorExpressionType, QueryEditorPropertyType } from '../../../../expressions';
-import { CloudWatchMetricsQuery, MetricEditorMode, MetricQueryType, SQLExpression } from '../../../../types';
+import {
+  CloudWatchMetricsQuery,
+  MetricEditorMode,
+  MetricQueryType,
+  SQLExpression,
+  QueryEditorExpressionType,
+  QueryEditorPropertyType,
+} from '../../../../dataquery.gen';
+import { setupMockedDataSource } from '../../../../mocks/CloudWatchDataSource';
 
 import SQLBuilderSelectRow from './SQLBuilderSelectRow';
 
@@ -17,7 +22,7 @@ const makeSQLQuery = (sql?: SQLExpression): CloudWatchMetricsQuery => ({
   region: 'us-east-1',
   namespace: 'ec2',
   dimensions: { somekey: 'somevalue' },
-  metricQueryType: MetricQueryType.Query,
+  metricQueryType: MetricQueryType.Insights,
   metricEditorMode: MetricEditorMode.Builder,
   sql: sql,
 });

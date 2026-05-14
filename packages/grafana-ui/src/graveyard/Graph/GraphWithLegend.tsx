@@ -1,7 +1,7 @@
 // Libraries
 
 import { css } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 
 import { GrafanaTheme2, GraphSeriesValue } from '@grafana/data';
 import { LegendDisplayMode, LegendPlacement } from '@grafana/schema';
@@ -9,7 +9,7 @@ import { LegendDisplayMode, LegendPlacement } from '@grafana/schema';
 import { CustomScrollbar } from '../../components/CustomScrollbar/CustomScrollbar';
 import { VizLegend } from '../../components/VizLegend/VizLegend';
 import { VizLegendItem } from '../../components/VizLegend/types';
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 
 import { Graph, GraphProps } from './Graph';
 

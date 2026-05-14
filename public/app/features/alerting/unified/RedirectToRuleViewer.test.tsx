@@ -1,10 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { useLocation } from 'react-use';
-import { TestProvider } from 'test/helpers/TestProvider';
+import { render, screen } from 'test/test-utils';
 
 import { DataSourceJsonData, PluginMeta } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
 
 import { CombinedRule, Rule } from '../../../types/unified-alerting';
 import { PromRuleType } from '../../../types/unified-alerting-dto';
@@ -15,9 +12,9 @@ import { getRulesSourceByName } from './utils/datasource';
 
 jest.mock('./hooks/useCombinedRule');
 jest.mock('./utils/datasource');
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  Redirect: jest.fn(({}) => `Redirected`),
+jest.mock('react-router-dom-v5-compat', () => ({
+  ...jest.requireActual('react-router-dom-v5-compat'),
+  Navigate: jest.fn(({}) => `Redirected`),
 }));
 
 jest.mock('react-use', () => ({
@@ -28,13 +25,7 @@ jest.mock('react-use', () => ({
 const renderRedirectToRuleViewer = (pathname: string, search?: string) => {
   jest.mocked(useLocation).mockReturnValue({ pathname, trigger: '', search });
 
-  locationService.push(pathname);
-
-  return render(
-    <TestProvider>
-      <RedirectToRuleViewer />
-    </TestProvider>
-  );
+  return render(<RedirectToRuleViewer />, { historyOptions: { initialEntries: [pathname] } });
 };
 
 const mockRuleSourceByName = () => {
@@ -42,7 +33,6 @@ const mockRuleSourceByName = () => {
     name: 'prom test',
     type: 'prometheus',
     uid: 'asdf23',
-    id: 1,
     meta: {} as PluginMeta,
     jsonData: {} as DataSourceJsonData,
     access: 'proxy',
@@ -85,6 +75,9 @@ describe('Redirect to Rule viewer', () => {
   });
 
   it('should properly decode rule name', () => {
+    // TODO: Fix console warning that happens once CompatRouter is wrapped around this component render
+    jest.spyOn(console, 'warn').mockImplementation();
+
     const rulesMatchingSpy = jest.spyOn(combinedRuleHooks, 'useCloudCombinedRulesMatching').mockReturnValue({
       rules: [mockedRules[0]],
       loading: false,
@@ -121,6 +114,9 @@ describe('Redirect to Rule viewer', () => {
   });
 
   it('should properly decode source name', () => {
+    // TODO: Fix console warning that happens once CompatRouter is wrapped around this component render
+    jest.spyOn(console, 'warn').mockImplementation();
+
     const rulesMatchingSpy = jest.spyOn(combinedRuleHooks, 'useCloudCombinedRulesMatching').mockReturnValue({
       rules: [mockedRules[0]],
       loading: false,
@@ -176,7 +172,6 @@ const mockedRules: CombinedRule[] = [
         name: 'prom test',
         type: 'prometheus',
         uid: 'asdf23',
-        id: 1,
         meta: {} as PluginMeta,
         jsonData: {} as DataSourceJsonData,
         access: 'proxy',
@@ -209,7 +204,6 @@ const mockedRules: CombinedRule[] = [
         name: 'prom test',
         type: 'prometheus',
         uid: 'asdf23',
-        id: 1,
         meta: {} as PluginMeta,
         jsonData: {} as DataSourceJsonData,
         access: 'proxy',

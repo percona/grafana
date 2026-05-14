@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
 import { HistoryWrapper, locationService, setLocationService } from '@grafana/runtime';
 import * as Reducers from 'app/percona/shared/core/reducers';
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { stubRoles, stubUsers, stubUsersMap } from '../../../__mocks__/stubs';
 

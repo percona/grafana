@@ -14,22 +14,21 @@
 
 import { css } from '@emotion/css';
 import cx from 'classnames';
-import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
 
 import { FALLBACK_TRACE_NAME } from '../constants';
-import { TNil } from '../types';
+import TNil from '../types/TNil';
 
 import BreakableText from './BreakableText';
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    TraceName: css`
-      label: TraceName;
-      font-size: ${theme.typography.size.lg};
-    `,
+    TraceName: css({
+      label: 'TraceName',
+      fontSize: theme.typography.size.lg,
+    }),
   };
 };
 

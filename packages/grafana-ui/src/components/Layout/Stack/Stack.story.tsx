@@ -1,14 +1,23 @@
 import { Meta, StoryFn } from '@storybook/react';
-import React from 'react';
 
 import { ThemeSpacingTokens } from '@grafana/data';
 
-import { useTheme2 } from '../../../themes';
+import { useTheme2 } from '../../../themes/ThemeContext';
 import { SpacingTokenControl } from '../../../utils/storybook/themeStorybookControls';
 import { JustifyContent, Wrap, Direction } from '../types';
 
 import { Stack } from './Stack';
 import mdx from './Stack.mdx';
+
+const meta: Meta<typeof Stack> = {
+  title: 'Layout/Stack',
+  component: Stack,
+  parameters: {
+    docs: {
+      page: mdx,
+    },
+  },
+};
 
 const Item = ({ color, text, height }: { color: string; text?: string | number; height?: string }) => {
   return (
@@ -27,21 +36,11 @@ const Item = ({ color, text, height }: { color: string; text?: string | number; 
   );
 };
 
-const meta: Meta<typeof Stack> = {
-  title: 'General/Layout/Stack',
-  component: Stack,
-  parameters: {
-    docs: {
-      page: mdx,
-    },
-  },
-};
-
-export const Basic: StoryFn<typeof Stack> = ({ direction, wrap, alignItems, justifyContent, gap }) => {
+export const Basic: StoryFn<typeof Stack> = (args) => {
   const theme = useTheme2();
   return (
     <div style={{ width: '600px', height: '600px', border: '1px solid grey' }}>
-      <Stack direction={direction} wrap={wrap} alignItems={alignItems} justifyContent={justifyContent} gap={gap}>
+      <Stack {...args}>
         {Array.from({ length: 5 }).map((_, i) => (
           <Item key={i} color={theme.colors.warning.main} text={i + 1} />
         ))}
@@ -52,6 +51,8 @@ export const Basic: StoryFn<typeof Stack> = ({ direction, wrap, alignItems, just
 
 Basic.argTypes = {
   gap: SpacingTokenControl,
+  rowGap: SpacingTokenControl,
+  columnGap: SpacingTokenControl,
   direction: { control: 'select', options: ['row', 'row-reverse', 'column', 'column-reverse'] },
   wrap: { control: 'select', options: ['nowrap', 'wrap', 'wrap-reverse'] },
   alignItems: {
@@ -81,13 +82,13 @@ export const AlignItemsExamples: StoryFn<typeof Stack> = () => {
   return (
     <div style={{ width: '600px' }}>
       <p>Align items flex-start</p>
-      <Stack direction="row" wrap="wrap" alignItems="flex-start" justifyContent="start" gap={2}>
+      <Stack direction="row" wrap alignItems="flex-start" justifyContent="start" gap={2}>
         {Array.from({ length: 5 }).map((_, i) => (
           <Item key={i} color={theme.colors.error.main} text={i + 1} />
         ))}
       </Stack>
       <p>Align items flex-end</p>
-      <Stack direction="row" wrap="wrap" alignItems="flex-end" justifyContent="end" gap={2}>
+      <Stack direction="row" wrap alignItems="flex-end" justifyContent="end" gap={2}>
         {Array.from({ length: 5 }).map((_, i) => (
           <Item key={i} color={theme.colors.error.main} text={i + 1} />
         ))}
@@ -99,13 +100,13 @@ export const AlignItemsExamples: StoryFn<typeof Stack> = () => {
         ))}
       </Stack>
       <p>Align items center</p>
-      <Stack direction="row" wrap="wrap" alignItems="center" justifyContent="center" gap={2}>
+      <Stack direction="row" wrap alignItems="center" justifyContent="center" gap={2}>
         {Array.from({ length: 5 }).map((_, i) => (
           <Item key={i} color={theme.colors.error.main} text={i + 1} />
         ))}
       </Stack>
       <p>Align items stretch</p>
-      <Stack direction="row" wrap="wrap" alignItems="stretch" justifyContent="center" gap={2}>
+      <Stack direction="row" wrap alignItems="stretch" justifyContent="center" gap={2}>
         <Item color={theme.colors.error.main} height="10em" />
         <Item color={theme.colors.error.main} />
         <Item color={theme.colors.error.main} height="3em" />
@@ -132,7 +133,7 @@ export const JustifyContentExamples: StoryFn<typeof Stack> = () => {
       {justifyContentOptions.map((justifyContent) => (
         <>
           <p>Justify Content {justifyContent}</p>
-          <Stack direction="row" wrap="wrap" alignItems="center" justifyContent={justifyContent} gap={2}>
+          <Stack direction="row" wrap alignItems="center" justifyContent={justifyContent} gap={2}>
             {Array.from({ length: 5 }).map((_, i) => (
               <Item key={i} color={theme.colors.warning.main} text={i + 1} />
             ))}
@@ -151,7 +152,7 @@ export const GapExamples: StoryFn<typeof Stack> = () => {
       {gapOptions.map((gap) => (
         <>
           <p>Gap with spacingToken set to {gap}</p>
-          <Stack direction="row" wrap="wrap" alignItems="flex-start" justifyContent="flex-start" gap={gap}>
+          <Stack direction="row" wrap alignItems="flex-start" justifyContent="flex-start" gap={gap}>
             {Array.from({ length: 5 }).map((_, i) => (
               <Item key={i} color={theme.colors.error.main} text={i + 1} />
             ))}
@@ -189,7 +190,7 @@ export const DirectionExamples: StoryFn<typeof Stack> = () => {
       {directionOptions.map((direction) => (
         <>
           <p>Direction {direction}</p>
-          <Stack direction={direction} wrap="wrap" alignItems="center" justifyContent="center" gap={2}>
+          <Stack direction={direction} wrap alignItems="center" justifyContent="center" gap={2}>
             {Array.from({ length: 5 }).map((_, i) => (
               <Item key={i} color={theme.colors.warning.main} text={i + 1} />
             ))}

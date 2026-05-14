@@ -14,12 +14,13 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/middleware/cookies"
 	"github.com/grafana/grafana/pkg/models/usertoken"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	"github.com/grafana/grafana/pkg/services/authn"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
+	"github.com/grafana/grafana/pkg/services/dashboards/dashboardaccess"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/util"
@@ -29,10 +30,14 @@ import (
 func Middleware(ac AccessControl) func(Evaluator) web.Handler {
 	return func(evaluator Evaluator) web.Handler {
 		return func(c *contextmodel.ReqContext) {
+			ctx, span := tracer.Start(c.Req.Context(), "accesscontrol.Middleware")
+			defer span.End()
+			c.Req = c.Req.WithContext(ctx)
+
 			if c.AllowAnonymous {
 				forceLogin, _ := strconv.ParseBool(c.Req.URL.Query().Get("forceLogin")) // ignoring error, assuming false for non-true values is ok.
 				orgID, err := strconv.ParseInt(c.Req.URL.Query().Get("orgId"), 10, 64)
-				if err == nil && orgID > 0 && orgID != c.SignedInUser.GetOrgID() {
+				if err == nil && orgID > 0 && orgID != c.GetOrgID() {
 					forceLogin = true
 				}
 
@@ -59,7 +64,11 @@ func Middleware(ac AccessControl) func(Evaluator) web.Handler {
 }
 
 func authorize(c *contextmodel.ReqContext, ac AccessControl, user identity.Requester, evaluator Evaluator) {
-	injected, err := evaluator.MutateScopes(c.Req.Context(), scopeInjector(scopeParams{
+	ctx, span := tracer.Start(c.Req.Context(), "accesscontrol.authorize")
+	defer span.End()
+	c.Req = c.Req.WithContext(ctx)
+
+	injected, err := evaluator.MutateScopes(ctx, scopeInjector(scopeParams{
 		OrgID:     user.GetOrgID(),
 		URLParams: web.Params(c.Req),
 	}))
@@ -68,7 +77,7 @@ func authorize(c *contextmodel.ReqContext, ac AccessControl, user identity.Reque
 		return
 	}
 
-	hasAccess, err := ac.Evaluate(c.Req.Context(), user, injected)
+	hasAccess, err := ac.Evaluate(ctx, user, injected)
 	if !hasAccess || err != nil {
 		deny(c, injected, err)
 		return
@@ -79,12 +88,21 @@ func deny(c *contextmodel.ReqContext, evaluator Evaluator, err error) {
 	id := newID()
 	if err != nil {
 		c.Logger.Error("Error from access control system", "error", err, "accessErrorID", id)
+		// Return 404s for dashboard not found errors, our plugins rely on being able to distinguish between access denied and not found.
+		var dashboardErr dashboardaccess.DashboardErr
+		if ok := errors.As(err, &dashboardErr); ok {
+			if c.IsApiRequest() && dashboardErr.StatusCode == http.StatusNotFound {
+				c.JSON(http.StatusNotFound, map[string]string{
+					"title":   "Not found", // the component needs to pick this up
+					"message": dashboardErr.Error(),
+				})
+				return
+			}
+		}
 	} else {
-		namespace, identifier := c.SignedInUser.GetNamespacedID()
 		c.Logger.Info(
 			"Access denied",
-			"namespace", namespace,
-			"userID", identifier,
+			"id", c.GetID(),
 			"accessErrorID", id,
 			"permissions", evaluator.GoString(),
 		)
@@ -92,8 +110,13 @@ func deny(c *contextmodel.ReqContext, evaluator Evaluator, err error) {
 
 	if !c.IsApiRequest() {
 		// TODO(emil): I'd like to show a message after this redirect, not sure how that can be done?
-		writeRedirectCookie(c)
-		c.Redirect(setting.AppSubUrl + "/")
+		if !c.UseSessionStorageRedirect {
+			writeRedirectCookie(c)
+			c.Redirect(setting.AppSubUrl + "/")
+			return
+		}
+
+		c.Redirect(setting.AppSubUrl + "/" + getRedirectToQueryParam(c))
 		return
 	}
 
@@ -119,13 +142,25 @@ func unauthorized(c *contextmodel.ReqContext) {
 		return
 	}
 
-	writeRedirectCookie(c)
+	if !c.UseSessionStorageRedirect {
+		writeRedirectCookie(c)
+	}
+
 	if errors.Is(c.LookupTokenErr, authn.ErrTokenNeedsRotation) {
-		c.Redirect(setting.AppSubUrl + "/user/auth-tokens/rotate")
+		if !c.UseSessionStorageRedirect {
+			c.Redirect(setting.AppSubUrl + "/user/auth-tokens/rotate")
+			return
+		}
+		c.Redirect(setting.AppSubUrl + "/user/auth-tokens/rotate" + getRedirectToQueryParam(c))
 		return
 	}
 
-	c.Redirect(setting.AppSubUrl + "/login")
+	if !c.UseSessionStorageRedirect {
+		c.Redirect(setting.AppSubUrl + "/login")
+		return
+	}
+
+	c.Redirect(setting.AppSubUrl + "/login" + getRedirectToQueryParam(c))
 }
 
 func tokenRevoked(c *contextmodel.ReqContext, err *usertoken.TokenRevokedError) {
@@ -140,8 +175,13 @@ func tokenRevoked(c *contextmodel.ReqContext, err *usertoken.TokenRevokedError) 
 		return
 	}
 
-	writeRedirectCookie(c)
-	c.Redirect(setting.AppSubUrl + "/login")
+	if !c.UseSessionStorageRedirect {
+		writeRedirectCookie(c)
+		c.Redirect(setting.AppSubUrl + "/login")
+		return
+	}
+
+	c.Redirect(setting.AppSubUrl + "/login" + getRedirectToQueryParam(c))
 }
 
 func writeRedirectCookie(c *contextmodel.ReqContext) {
@@ -154,6 +194,21 @@ func writeRedirectCookie(c *contextmodel.ReqContext) {
 	redirectTo = removeForceLoginParams(redirectTo)
 
 	cookies.WriteCookie(c.Resp, "redirect_to", url.QueryEscape(redirectTo), 0, nil)
+}
+
+func getRedirectToQueryParam(c *contextmodel.ReqContext) string {
+	redirectTo := c.Req.RequestURI
+	if setting.AppSubUrl != "" && strings.HasPrefix(redirectTo, setting.AppSubUrl) {
+		redirectTo = strings.TrimPrefix(redirectTo, setting.AppSubUrl)
+	}
+
+	if redirectTo == "/" {
+		return ""
+	}
+
+	// remove any forceLogin=true params
+	redirectTo = removeForceLoginParams(redirectTo)
+	return "?redirectTo=" + url.QueryEscape(redirectTo)
 }
 
 var forceLoginParamsRegexp = regexp.MustCompile(`&?forceLogin=true`)
@@ -179,9 +234,13 @@ type OrgIDGetter func(c *contextmodel.ReqContext) (int64, error)
 func AuthorizeInOrgMiddleware(ac AccessControl, authnService authn.Service) func(OrgIDGetter, Evaluator) web.Handler {
 	return func(getTargetOrg OrgIDGetter, evaluator Evaluator) web.Handler {
 		return func(c *contextmodel.ReqContext) {
+			ctx, span := tracer.Start(c.Req.Context(), "accesscontrol.AuthorizeInOrgMiddleware")
+			defer span.End()
+			c.Req = c.Req.WithContext(ctx)
+
 			targetOrgID, err := getTargetOrg(c)
 			if err != nil {
-				if errors.Is(err, ErrInvalidRequestBody) {
+				if errors.Is(err, ErrInvalidRequestBody) || errors.Is(err, ErrInvalidRequest) {
 					c.JSON(http.StatusBadRequest, map[string]string{
 						"message": err.Error(),
 						"traceID": tracing.TraceIDFromContext(c.Req.Context(), false),
@@ -193,11 +252,11 @@ func AuthorizeInOrgMiddleware(ac AccessControl, authnService authn.Service) func
 			}
 
 			var orgUser identity.Requester = c.SignedInUser
-			if targetOrgID != c.SignedInUser.GetOrgID() {
-				orgUser, err = authnService.ResolveIdentity(c.Req.Context(), targetOrgID, c.SignedInUser.GetID())
+			if targetOrgID != c.GetOrgID() {
+				orgUser, err = authnService.ResolveIdentity(c.Req.Context(), targetOrgID, c.GetID())
 				if err == nil && orgUser.GetOrgID() == NoOrgID {
 					// User is not a member of the target org, so only their global permissions are relevant
-					orgUser, err = authnService.ResolveIdentity(c.Req.Context(), GlobalOrgID, c.SignedInUser.GetID())
+					orgUser, err = authnService.ResolveIdentity(c.Req.Context(), GlobalOrgID, c.GetID())
 				}
 				if err != nil {
 					deny(c, nil, fmt.Errorf("failed to authenticate user in target org: %w", err))
@@ -207,10 +266,10 @@ func AuthorizeInOrgMiddleware(ac AccessControl, authnService authn.Service) func
 			authorize(c, ac, orgUser, evaluator)
 
 			// guard against nil map
-			if c.SignedInUser.Permissions == nil {
-				c.SignedInUser.Permissions = make(map[int64]map[string][]string)
+			if c.Permissions == nil {
+				c.Permissions = make(map[int64]map[string][]string)
 			}
-			c.SignedInUser.Permissions[orgUser.GetOrgID()] = orgUser.GetPermissions()
+			c.Permissions[orgUser.GetOrgID()] = orgUser.GetPermissions()
 		}
 	}
 }
@@ -237,7 +296,7 @@ func UseGlobalOrg(c *contextmodel.ReqContext) (int64, error) {
 // UseGlobalOrSingleOrg returns the global organization or the current organization in a single organization setup
 func UseGlobalOrSingleOrg(cfg *setting.Cfg) OrgIDGetter {
 	return func(c *contextmodel.ReqContext) (int64, error) {
-		if cfg.RBACSingleOrganization {
+		if cfg.RBAC.SingleOrganization {
 			return c.GetOrgID(), nil
 		}
 		return GlobalOrgID, nil
@@ -249,12 +308,11 @@ func UseGlobalOrSingleOrg(cfg *setting.Cfg) OrgIDGetter {
 func UseOrgFromRequestData(c *contextmodel.ReqContext) (int64, error) {
 	query, err := getOrgQueryFromRequest(c)
 	if err != nil {
-		// Special case of macaron handling invalid params
-		return NoOrgID, org.ErrOrgNotFound.Errorf("failed to get organization from context: %w", err)
+		return NoOrgID, err
 	}
 
 	if query.OrgId == nil {
-		return c.SignedInUser.GetOrgID(), nil
+		return c.GetOrgID(), nil
 	}
 
 	return *query.OrgId, nil
@@ -266,20 +324,16 @@ func UseGlobalOrgFromRequestData(cfg *setting.Cfg) OrgIDGetter {
 	return func(c *contextmodel.ReqContext) (int64, error) {
 		query, err := getOrgQueryFromRequest(c)
 		if err != nil {
-			if errors.Is(err, ErrInvalidRequestBody) {
-				return NoOrgID, err
-			}
-			// Special case of macaron handling invalid params
-			return NoOrgID, org.ErrOrgNotFound.Errorf("failed to get organization from context: %w", err)
+			return NoOrgID, err
 		}
 
 		// We only check permissions in the global organization if we are not running a SingleOrganization setup
 		// That allows Organization Admins to modify global roles and make global assignments.
-		if query.Global && !cfg.RBACSingleOrganization {
+		if query.Global && !cfg.RBAC.SingleOrganization {
 			return GlobalOrgID, nil
 		}
 
-		return c.SignedInUser.GetOrgID(), nil
+		return c.GetOrgID(), nil
 	}
 }
 
@@ -288,11 +342,11 @@ func UseGlobalOrgFromRequestParams(cfg *setting.Cfg) OrgIDGetter {
 	return func(c *contextmodel.ReqContext) (int64, error) {
 		// We only check permissions in the global organization if we are not running a SingleOrganization setup
 		// That allows Organization Admins to modify global roles and make global assignments, and is intended for use in hosted Grafana.
-		if c.QueryBool("global") && !cfg.RBACSingleOrganization {
+		if c.QueryBool("global") && !cfg.RBAC.SingleOrganization {
 			return GlobalOrgID, nil
 		}
 
-		return c.SignedInUser.GetOrgID(), nil
+		return c.GetOrgID(), nil
 	}
 }
 
@@ -308,7 +362,7 @@ func getOrgQueryFromRequest(c *contextmodel.ReqContext) (*QueryWithOrg, error) {
 		if err.Error() == "unexpected EOF" {
 			return nil, fmt.Errorf("%w: unexpected end of JSON input", ErrInvalidRequestBody)
 		}
-		return nil, err
+		return nil, ErrInvalidRequest.Errorf("error parsing request: %w", err)
 	}
 
 	return query, nil

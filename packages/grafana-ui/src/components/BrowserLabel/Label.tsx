@@ -1,11 +1,12 @@
 import { cx, css } from '@emotion/css';
-import React, { forwardRef, HTMLAttributes, useCallback } from 'react';
+import { forwardRef, HTMLAttributes, useCallback } from 'react';
+import * as React from 'react';
 import Highlighter from 'react-highlight-words';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-import { useTheme2 } from '../../themes';
-import { HighlightPart } from '../../types';
+import { useTheme2 } from '../../themes/ThemeContext';
+import { HighlightPart } from '../../types/completion';
 import { PartialHighlighter } from '../Typeahead/PartialHighlighter';
 
 type OnLabelClick = (name: string, value: string | undefined, event: React.MouseEvent<HTMLElement>) => void;

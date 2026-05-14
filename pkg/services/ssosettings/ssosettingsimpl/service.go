@@ -5,18 +5,20 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/grafana/grafana/pkg/api/routing"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/usagestats"
 	"github.com/grafana/grafana/pkg/login/social"
 	ac "github.com/grafana/grafana/pkg/services/accesscontrol"
-	"github.com/grafana/grafana/pkg/services/auth/identity"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/licensing"
 	"github.com/grafana/grafana/pkg/services/secrets"
@@ -31,17 +33,20 @@ import (
 var _ ssosettings.Service = (*Service)(nil)
 
 type Service struct {
-	logger  log.Logger
-	cfg     *setting.Cfg
-	store   ssosettings.Store
-	ac      ac.AccessControl
-	secrets secrets.Service
-	metrics *metrics
+	logger           log.Logger
+	cfg              *setting.Cfg
+	store            ssosettings.Store
+	settingsProvider setting.Provider
+	ac               ac.AccessControl
+	secrets          secrets.Service
+	metrics          *metrics
 
 	fbStrategies          []ssosettings.FallbackStrategy
 	providersList         []string
 	configurableProviders map[string]bool
 	reloadables           map[string]ssosettings.Reloadable
+	cachedSSOSettings     []*models.SSOSettings
+	cacheMutex            sync.RWMutex
 }
 
 func ProvideService(cfg *setting.Cfg, sqlStore db.DB, ac ac.AccessControl,
@@ -50,6 +55,7 @@ func ProvideService(cfg *setting.Cfg, sqlStore db.DB, ac ac.AccessControl,
 	settingsProvider setting.Provider, licensing licensing.Licensing) *Service {
 	fbStrategies := []ssosettings.FallbackStrategy{
 		strategies.NewOAuthStrategy(cfg),
+		strategies.NewLDAPStrategy(cfg),
 	}
 
 	configurableProviders := make(map[string]bool)
@@ -58,13 +64,13 @@ func ProvideService(cfg *setting.Cfg, sqlStore db.DB, ac ac.AccessControl,
 	}
 
 	providersList := ssosettings.AllOAuthProviders
+	providersList = append(providersList, social.LDAPProviderName)
+	configurableProviders[social.LDAPProviderName] = true
+
 	if licensing.FeatureEnabled(social.SAMLProviderName) {
 		fbStrategies = append(fbStrategies, strategies.NewSAMLStrategy(settingsProvider))
-
-		if features.IsEnabledGlobally(featuremgmt.FlagSsoSettingsSAML) {
-			providersList = append(providersList, social.SAMLProviderName)
-			configurableProviders[social.SAMLProviderName] = true
-		}
+		providersList = append(providersList, social.SAMLProviderName)
+		configurableProviders[social.SAMLProviderName] = true
 	}
 
 	store := database.ProvideStore(sqlStore)
@@ -80,14 +86,14 @@ func ProvideService(cfg *setting.Cfg, sqlStore db.DB, ac ac.AccessControl,
 		providersList:         providersList,
 		configurableProviders: configurableProviders,
 		reloadables:           make(map[string]ssosettings.Reloadable),
+		settingsProvider:      settingsProvider,
+		cachedSSOSettings:     make([]*models.SSOSettings, 0),
 	}
 
 	usageStats.RegisterMetricsFunc(svc.getUsageStats)
 
-	if features.IsEnabledGlobally(featuremgmt.FlagSsoSettingsApi) {
-		ssoSettingsApi := api.ProvideApi(svc, routeRegister, ac)
-		ssoSettingsApi.RegisterAPIEndpoints()
-	}
+	ssoSettingsApi := api.ProvideApi(svc, routeRegister, ac)
+	ssoSettingsApi.RegisterAPIEndpoints()
 
 	return svc
 }
@@ -114,6 +120,28 @@ func (s *Service) GetForProvider(ctx context.Context, provider string) (*models.
 	}
 
 	return s.mergeSSOSettings(dbSettings, systemSettings), nil
+}
+
+func (s *Service) GetForProviderFromCache(ctx context.Context, provider string) (*models.SSOSettings, error) {
+	s.cacheMutex.RLock()
+	defer s.cacheMutex.RUnlock()
+
+	for _, setting := range s.cachedSSOSettings {
+		if setting.Provider == provider {
+			return &models.SSOSettings{
+				Provider: setting.Provider,
+				Source:   setting.Source,
+				Settings: deepCopyMap(setting.Settings),
+			}, nil
+		}
+	}
+
+	// If settings are not in the cache, we return them from the database if the provider is valid
+	if slices.Contains(s.providersList, provider) {
+		return s.GetForProvider(ctx, provider)
+	}
+
+	return nil, nil
 }
 
 func (s *Service) GetForProviderWithRedactedSecrets(ctx context.Context, provider string) (*models.SSOSettings, error) {
@@ -155,6 +183,8 @@ func (s *Service) List(ctx context.Context) ([]*models.SSOSettings, error) {
 
 		result = append(result, s.mergeSSOSettings(dbSettings, fallbackSettings))
 	}
+
+	s.setCachedSSOSettings(result)
 
 	return result, nil
 }
@@ -224,8 +254,61 @@ func (s *Service) Upsert(ctx context.Context, settings *models.SSOSettings, requ
 	return nil
 }
 
-func (s *Service) Patch(ctx context.Context, provider string, data map[string]any) error {
-	panic("not implemented") // TODO: Implement
+func (s *Service) Patch(ctx context.Context, provider string, data map[string]any, requester identity.Requester) error {
+	if !s.isProviderConfigurable(provider) {
+		return ssosettings.ErrNotConfigurable
+	}
+
+	reloadable, ok := s.reloadables[provider]
+	if !ok {
+		return ssosettings.ErrInvalidProvider.Errorf("provider %s not found in reloadables", provider)
+	}
+
+	storedSettings, err := s.GetForProvider(ctx, provider)
+	if err != nil {
+		return err
+	}
+
+	newSettingsMap := make(map[string]any)
+	for k, v := range storedSettings.Settings {
+		newSettingsMap[k] = v
+	}
+	for k, v := range data {
+		newSettingsMap[k] = v
+	}
+
+	newSettings := &models.SSOSettings{
+		Provider: provider,
+		Settings: newSettingsMap,
+	}
+
+	settingsWithSecrets, err := mergeSecrets(newSettings.Settings, storedSettings.Settings)
+	if err != nil {
+		return err
+	}
+	newSettings.Settings = settingsWithSecrets
+
+	err = reloadable.Validate(ctx, *newSettings, *storedSettings, requester)
+	if err != nil {
+		return err
+	}
+
+	newSettings.Settings, err = s.encryptSecrets(ctx, newSettings.Settings)
+	if err != nil {
+		return err
+	}
+
+	err = s.store.Upsert(ctx, newSettings)
+	if err != nil {
+		return err
+	}
+
+	reloadSettings := *newSettings
+	reloadSettings.Settings = overrideMaps(storedSettings.Settings, settingsWithSecrets)
+
+	go s.reload(reloadable, provider, reloadSettings)
+
+	return nil
 }
 
 func (s *Service) Delete(ctx context.Context, provider string) error {
@@ -233,7 +316,7 @@ func (s *Service) Delete(ctx context.Context, provider string) error {
 		return ssosettings.ErrNotConfigurable
 	}
 
-	social, ok := s.reloadables[provider]
+	reloadable, ok := s.reloadables[provider]
 	if !ok {
 		return ssosettings.ErrInvalidProvider.Errorf("provider %s not found in reloadables", provider)
 	}
@@ -243,18 +326,33 @@ func (s *Service) Delete(ctx context.Context, provider string) error {
 		return err
 	}
 
+	// When deleting settings for SAML, clear the Settings table
+	if provider == social.SAMLProviderName {
+		samlSettings := setting.SettingsRemovals{
+			"auth.saml": make([]string, 0, len(s.settingsProvider.Current())),
+		}
+		for k := range s.settingsProvider.Current()["auth.saml"] {
+			samlSettings["auth.saml"] = append(samlSettings["auth.saml"], k)
+		}
+		if err := s.settingsProvider.Update(setting.SettingsBag{}, samlSettings); err != nil {
+			s.logger.Warn("Failed to remove SAML settings from the settings table", "error", err)
+		}
+	}
+
 	currentSettings, err := s.GetForProvider(ctx, provider)
 	if err != nil {
 		s.logger.Error("failed to get current settings, skipping reload", "provider", provider, "error", err)
 		return nil
 	}
 
-	go s.reload(social, provider, *currentSettings)
+	go s.reload(reloadable, provider, *currentSettings)
 
 	return nil
 }
 
 func (s *Service) reload(reloadable ssosettings.Reloadable, provider string, currentSettings models.SSOSettings) {
+	s.updateCachedSSOSettings(provider, &currentSettings)
+
 	err := reloadable.Reload(context.Background(), currentSettings)
 	if err != nil {
 		s.metrics.reloadFailures.WithLabelValues(provider).Inc()
@@ -314,21 +412,23 @@ func (s *Service) getFallbackStrategyFor(provider string) (ssosettings.FallbackS
 }
 
 func (s *Service) encryptSecrets(ctx context.Context, settings map[string]any) (map[string]any, error) {
-	result := make(map[string]any)
-	for k, v := range settings {
-		if IsSecretField(k) && v != "" {
-			strValue, ok := v.(string)
-			if !ok {
-				return result, fmt.Errorf("failed to encrypt %s setting because it is not a string: %v", k, v)
-			}
+	result := deepCopyMap(settings)
+	configs := getConfigMaps(result)
 
-			encryptedSecret, err := s.secrets.Encrypt(ctx, []byte(strValue), secrets.WithoutScope())
-			if err != nil {
-				return result, err
+	for _, config := range configs {
+		for k, v := range config {
+			if IsSecretField(k) && v != "" {
+				strValue, ok := v.(string)
+				if !ok {
+					return result, fmt.Errorf("failed to encrypt %s setting because it is not a string: %v", k, v)
+				}
+
+				encryptedSecret, err := s.secrets.Encrypt(ctx, []byte(strValue), secrets.WithoutScope())
+				if err != nil {
+					return result, err
+				}
+				config[k] = base64.RawStdEncoding.EncodeToString(encryptedSecret)
 			}
-			result[k] = base64.RawStdEncoding.EncodeToString(encryptedSecret)
-		} else {
-			result[k] = v
 		}
 	}
 
@@ -405,29 +505,34 @@ func (s *Service) mergeSSOSettings(dbSettings, systemSettings *models.SSOSetting
 }
 
 func (s *Service) decryptSecrets(ctx context.Context, settings map[string]any) (map[string]any, error) {
-	for k, v := range settings {
-		if IsSecretField(k) && v != "" {
-			strValue, ok := v.(string)
-			if !ok {
-				s.logger.Error("Failed to parse secret value, it is not a string", "key", k)
-				return nil, fmt.Errorf("secret value is not a string")
-			}
+	configs := getConfigMaps(settings)
 
-			decoded, err := base64.RawStdEncoding.DecodeString(strValue)
-			if err != nil {
-				s.logger.Error("Failed to decode secret string", "err", err, "value")
-				return nil, err
-			}
+	for _, config := range configs {
+		for k, v := range config {
+			if IsSecretField(k) && v != "" {
+				strValue, ok := v.(string)
+				if !ok {
+					s.logger.FromContext(ctx).Error("Failed to parse secret value, it is not a string", "key", k)
+					return nil, fmt.Errorf("secret value is not a string")
+				}
 
-			decrypted, err := s.secrets.Decrypt(ctx, decoded)
-			if err != nil {
-				s.logger.Error("Failed to decrypt secret", "err", err)
-				return nil, err
-			}
+				decoded, err := base64.RawStdEncoding.DecodeString(strValue)
+				if err != nil {
+					s.logger.FromContext(ctx).Error("Failed to decode secret string", "err", err, "value")
+					return nil, err
+				}
 
-			settings[k] = string(decrypted)
+				decrypted, err := s.secrets.Decrypt(ctx, decoded)
+				if err != nil {
+					s.logger.FromContext(ctx).Error("Failed to decrypt secret", "err", err)
+					return nil, err
+				}
+
+				config[k] = string(decrypted)
+			}
 		}
 	}
+
 	return settings, nil
 }
 
@@ -439,15 +544,36 @@ func (s *Service) isProviderConfigurable(provider string) bool {
 // removeSecrets removes all the secrets from the map and replaces them with a redacted password
 // and returns a new map
 func removeSecrets(settings map[string]any) map[string]any {
-	result := make(map[string]any)
-	for k, v := range settings {
-		val, ok := v.(string)
-		if ok && val != "" && IsSecretField(k) {
-			result[k] = setting.RedactedPassword
-			continue
+	result := deepCopyMap(settings)
+	configs := getConfigMaps(result)
+
+	for _, config := range configs {
+		for k, v := range config {
+			val, ok := v.(string)
+			if ok && val != "" && IsSecretField(k) {
+				config[k] = setting.RedactedPassword
+			}
 		}
-		result[k] = v
 	}
+	return result
+}
+
+// getConfigMaps returns a list of maps that may contain secrets
+func getConfigMaps(settings map[string]any) []map[string]any {
+	// always include the main settings map
+	result := []map[string]any{settings}
+
+	// for LDAP include settings for each server
+	if config, ok := settings["config"].(map[string]any); ok {
+		if servers, ok := config["servers"].([]any); ok {
+			for _, server := range servers {
+				if serverSettings, ok := server.(map[string]any); ok {
+					result = append(result, serverSettings)
+				}
+			}
+		}
+	}
+
 	return result
 }
 
@@ -494,23 +620,25 @@ func isMergingAllowed(fieldName string) bool {
 
 // mergeSecrets returns a new map with the current value for secrets that have not been updated
 func mergeSecrets(settings map[string]any, storedSettings map[string]any) (map[string]any, error) {
-	settingsWithSecrets := map[string]any{}
-	for k, v := range settings {
-		if IsSecretField(k) {
-			strValue, ok := v.(string)
-			if !ok {
-				return nil, fmt.Errorf("secret value is not a string")
-			}
+	settingsWithSecrets := deepCopyMap(settings)
+	newConfigs := getConfigMaps(settingsWithSecrets)
+	storedConfigs := getConfigMaps(storedSettings)
 
-			if isNewSecretValue(strValue) {
-				settingsWithSecrets[k] = strValue // use the new value
-				continue
+	for i, config := range newConfigs {
+		for k, v := range config {
+			if IsSecretField(k) {
+				strValue, ok := v.(string)
+				if !ok {
+					return nil, fmt.Errorf("secret value is not a string")
+				}
+
+				if !isNewSecretValue(strValue) && len(storedConfigs) > i {
+					config[k] = storedConfigs[i][k] // use the currently stored value
+				}
 			}
-			settingsWithSecrets[k] = storedSettings[k] // keep the currently stored value
-		} else {
-			settingsWithSecrets[k] = v
 		}
 	}
+
 	return settingsWithSecrets, nil
 }
 
@@ -526,7 +654,7 @@ func overrideMaps(maps ...map[string]any) map[string]any {
 
 // IsSecretField returns true if the SSO settings field provided is a secret
 func IsSecretField(fieldName string) bool {
-	secretFieldPatterns := []string{"secret", "private", "certificate"}
+	secretFieldPatterns := []string{"secret", "private", "certificate", "password", "client_key"}
 
 	for _, v := range secretFieldPatterns {
 		if strings.Contains(strings.ToLower(fieldName), strings.ToLower(v)) {
@@ -547,4 +675,60 @@ func isEmptyString(val any) bool {
 
 func isNewSecretValue(value string) bool {
 	return value != setting.RedactedPassword
+}
+
+func deepCopyMap(settings map[string]any) map[string]any {
+	newSettings := make(map[string]any)
+
+	for key, value := range settings {
+		switch v := value.(type) {
+		case map[string]any:
+			newSettings[key] = deepCopyMap(v)
+		case []any:
+			newSettings[key] = deepCopySlice(v)
+		default:
+			newSettings[key] = value
+		}
+	}
+
+	return newSettings
+}
+
+func deepCopySlice(s []any) []any {
+	newSlice := make([]any, len(s))
+
+	for i, value := range s {
+		switch v := value.(type) {
+		case map[string]any:
+			newSlice[i] = deepCopyMap(v)
+		case []any:
+			newSlice[i] = deepCopySlice(v)
+		default:
+			newSlice[i] = value
+		}
+	}
+
+	return newSlice
+}
+
+func (s *Service) setCachedSSOSettings(settings []*models.SSOSettings) {
+	s.cacheMutex.Lock()
+	defer s.cacheMutex.Unlock()
+
+	s.cachedSSOSettings = settings
+}
+
+func (s *Service) updateCachedSSOSettings(provider string, settings *models.SSOSettings) {
+	s.cacheMutex.Lock()
+	defer s.cacheMutex.Unlock()
+
+	for i := range s.cachedSSOSettings {
+		if s.cachedSSOSettings[i].Provider == provider {
+			s.cachedSSOSettings[i] = settings
+			return
+		}
+	}
+
+	// Provider not found, append new settings
+	s.cachedSSOSettings = append(s.cachedSSOSettings, settings)
 }

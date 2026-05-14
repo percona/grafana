@@ -16,45 +16,54 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/tsdb/influxdb/influxql/buffered"
 	"github.com/grafana/grafana/pkg/tsdb/influxdb/influxql/querydata"
 	"github.com/grafana/grafana/pkg/tsdb/influxdb/models"
 )
 
-const defaultRetentionPolicy = "default"
+const (
+	defaultRetentionPolicy = "default"
+	metadataPrefix         = "x-grafana-meta-add-"
+)
 
 var (
 	ErrInvalidHttpMode = errors.New("'httpMode' should be either 'GET' or 'POST'")
+	ErrInvalidUrl      = errors.New("URL must contain scheme and host")
 	glog               = log.New("tsdb.influx_influxql")
 )
 
-func Query(ctx context.Context, tracer trace.Tracer, dsInfo *models.DatasourceInfo, req *backend.QueryDataRequest, features featuremgmt.FeatureToggles) (*backend.QueryDataResponse, error) {
+func Query(ctx context.Context, tracer trace.Tracer, dsInfo *models.DatasourceInfo, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	logger := glog.FromContext(ctx)
 	response := backend.NewQueryDataResponse()
 	var err error
 
+	config := backend.GrafanaConfigFromContext(ctx)
+
 	// We are testing running of queries in parallel behind feature flag
-	if features.IsEnabled(ctx, featuremgmt.FlagInfluxdbRunQueriesInParallel) {
+	if config.FeatureToggles().IsEnabled("influxdbRunQueriesInParallel") {
 		concurrentQueryCount, err := req.PluginContext.GrafanaConfig.ConcurrentQueryCount()
 		if err != nil {
-			logger.Debug(fmt.Sprintf("Concurrent Query Count read/parse error: %v", err), featuremgmt.FlagInfluxdbRunQueriesInParallel)
+			logger.Debug(fmt.Sprintf("Concurrent Query Count read/parse error: %v", err), "influxdbRunQueriesInParallel")
 			concurrentQueryCount = 10
 		}
 
 		responseLock := sync.Mutex{}
 		err = concurrency.ForEachJob(ctx, len(req.Queries), concurrentQueryCount, func(ctx context.Context, idx int) error {
 			reqQuery := req.Queries[idx]
-			query, err := models.QueryParse(reqQuery)
+			query, err := models.QueryParse(reqQuery, logger)
 			if err != nil {
-				return err
+				responseLock.Lock()
+				response.Responses[query.RefID] = backend.DataResponse{
+					Error:       err,
+					ErrorSource: backend.ErrorSourceDownstream,
+				}
+				responseLock.Unlock()
+				return nil
 			}
 
-			rawQuery, err := query.Build(req)
-			if err != nil {
-				return err
-			}
+			// query.Build() unconditionally returns nil for error.
+			rawQuery, _ := query.Build(req)
 
 			query.RefID = reqQuery.RefID
 			query.RawQuery = rawQuery
@@ -65,10 +74,16 @@ func Query(ctx context.Context, tracer trace.Tracer, dsInfo *models.DatasourceIn
 
 			request, err := createRequest(ctx, logger, dsInfo, rawQuery, query.Policy)
 			if err != nil {
-				return err
+				responseLock.Lock()
+				response.Responses[query.RefID] = backend.DataResponse{
+					Error:       err,
+					ErrorSource: backend.ErrorSourceDownstream,
+				}
+				responseLock.Unlock()
+				return nil
 			}
 
-			resp, err := execute(ctx, tracer, dsInfo, logger, query, request, features.IsEnabled(ctx, featuremgmt.FlagInfluxqlStreamingParser))
+			resp, err := execute(ctx, tracer, dsInfo, logger, query, request, config.FeatureToggles().IsEnabled("influxqlStreamingParser"))
 
 			responseLock.Lock()
 			defer responseLock.Unlock()
@@ -85,15 +100,17 @@ func Query(ctx context.Context, tracer trace.Tracer, dsInfo *models.DatasourceIn
 		}
 	} else {
 		for _, reqQuery := range req.Queries {
-			query, err := models.QueryParse(reqQuery)
+			query, err := models.QueryParse(reqQuery, logger)
 			if err != nil {
-				return &backend.QueryDataResponse{}, err
+				response.Responses[query.RefID] = backend.DataResponse{
+					Error:       err,
+					ErrorSource: backend.ErrorSourceDownstream,
+				}
+				continue
 			}
 
-			rawQuery, err := query.Build(req)
-			if err != nil {
-				return &backend.QueryDataResponse{}, err
-			}
+			// query.Build() unconditionally returns nil for error.
+			rawQuery, _ := query.Build(req)
 
 			query.RefID = reqQuery.RefID
 			query.RawQuery = rawQuery
@@ -104,10 +121,14 @@ func Query(ctx context.Context, tracer trace.Tracer, dsInfo *models.DatasourceIn
 
 			request, err := createRequest(ctx, logger, dsInfo, rawQuery, query.Policy)
 			if err != nil {
-				return &backend.QueryDataResponse{}, err
+				response.Responses[query.RefID] = backend.DataResponse{
+					Error:       err,
+					ErrorSource: backend.ErrorSourceDownstream,
+				}
+				continue
 			}
 
-			resp, err := execute(ctx, tracer, dsInfo, logger, query, request, features.IsEnabled(ctx, featuremgmt.FlagInfluxqlStreamingParser))
+			resp, err := execute(ctx, tracer, dsInfo, logger, query, request, config.FeatureToggles().IsEnabled("influxqlStreamingParser"))
 
 			if err != nil {
 				response.Responses[query.RefID] = backend.DataResponse{Error: err}
@@ -124,6 +145,13 @@ func createRequest(ctx context.Context, logger log.Logger, dsInfo *models.Dataso
 	u, err := url.Parse(dsInfo.URL)
 	if err != nil {
 		return nil, err
+	}
+
+	// It's possible that the configuration is bad, and we'll have a URL
+	// without a scheme or host. This is valid from the PoV of the Go std
+	// library url.Parse(), but not for this data source.
+	if u.Host == "" || u.Scheme == "" {
+		return nil, ErrInvalidUrl
 	}
 
 	u.Path = path.Join(u.Path, "query")
@@ -157,9 +185,10 @@ func createRequest(ctx context.Context, logger log.Logger, dsInfo *models.Dataso
 		params.Set("rp", retentionPolicy)
 	}
 
-	if httpMode == "GET" {
+	switch httpMode {
+	case "GET":
 		params.Set("q", queryStr)
-	} else if httpMode == "POST" {
+	case "POST":
 		req.Header.Set("Content-type", "application/x-www-form-urlencoded")
 	}
 
@@ -172,7 +201,9 @@ func createRequest(ctx context.Context, logger log.Logger, dsInfo *models.Dataso
 func execute(ctx context.Context, tracer trace.Tracer, dsInfo *models.DatasourceInfo, logger log.Logger, query *models.Query, request *http.Request, isStreamingParserEnabled bool) (backend.DataResponse, error) {
 	res, err := dsInfo.HTTPClient.Do(request)
 	if err != nil {
-		return backend.DataResponse{}, err
+		return backend.DataResponse{
+			Error: err,
+		}, err
 	}
 	defer func() {
 		if err := res.Body.Close(); err != nil {
@@ -190,7 +221,25 @@ func execute(ctx context.Context, tracer trace.Tracer, dsInfo *models.Datasource
 	} else {
 		resp = buffered.ResponseParse(res.Body, res.StatusCode, query)
 	}
+
+	if len(resp.Frames) > 0 {
+		resp.Frames[0].Meta.Custom = readCustomMetadata(res)
+	}
+
 	return *resp, nil
+}
+
+func readCustomMetadata(res *http.Response) map[string]any {
+	var result map[string]any
+	for k := range res.Header {
+		if key, found := strings.CutPrefix(strings.ToLower(k), metadataPrefix); found {
+			if result == nil {
+				result = make(map[string]any)
+			}
+			result[key] = res.Header.Get(k)
+		}
+	}
+	return result
 }
 
 // startTrace setups a trace but does not panic if tracer is nil which helps with testing

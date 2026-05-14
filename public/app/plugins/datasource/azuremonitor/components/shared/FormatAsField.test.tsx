@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 
-import createMockDatasource from '../../__mocks__/datasource';
-import createMockQuery from '../../__mocks__/query';
-import { ResultFormat } from '../../types';
-import { setFormatAs } from '../TracesQueryEditor/setQueryValue';
+import { SelectableValue } from '@grafana/data';
+
+import { ResultFormat } from '../../dataquery.gen';
+import createMockDatasource from '../../mocks/datasource';
+import createMockQuery from '../../mocks/query';
+import { AzureMonitorQuery } from '../../types/query';
 
 import FormatAsField from './FormatAsField';
 
@@ -13,6 +14,21 @@ const options = [
   { label: 'Trace', value: ResultFormat.Trace },
   { label: 'Time Series', value: ResultFormat.TimeSeries },
 ];
+const setFormatAs = (query: AzureMonitorQuery, formatAs: ResultFormat): AzureMonitorQuery => {
+  return {
+    ...query,
+    azureTraces: {
+      ...query.azureTraces,
+      resultFormat: formatAs,
+    },
+  };
+};
+
+const onLoad = (
+  _query: AzureMonitorQuery,
+  _defaultValue: ResultFormat,
+  _handleChange: (change: SelectableValue<ResultFormat>) => void
+) => {};
 
 const props = {
   query: createMockQuery(),
@@ -26,6 +42,7 @@ const props = {
   defaultValue: ResultFormat.Table,
   setFormatAs,
   resultFormat: undefined,
+  onLoad: onLoad,
 };
 
 describe('FormatAsField', () => {

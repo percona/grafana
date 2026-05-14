@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"io"
 	"net/http"
 	"net/url"
@@ -12,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/grafana/grafana/pkg/api/response"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
@@ -25,7 +26,33 @@ import (
 	"github.com/grafana/grafana/pkg/web"
 )
 
-var searchRegex = regexp.MustCompile(`\{(\w+)\}`)
+const (
+	namespaceQueryTag = "QUERY_NAMESPACE"
+	groupQueryTag     = "QUERY_GROUP"
+)
+
+var (
+	searchRegex = regexp.MustCompile(`\{(\w+)\}`)
+
+	prometheusCompatibleDsTypes = []string{
+		datasources.DS_PROMETHEUS,
+		datasources.DS_AMAZON_PROMETHEUS,
+		datasources.DS_AZURE_PROMETHEUS,
+	}
+)
+
+func isPrometheusCompatible(dsType string) bool {
+	for _, t := range prometheusCompatibleDsTypes {
+		if dsType == t {
+			return true
+		}
+	}
+	return false
+}
+
+func isLotexRulerCompatible(dsType string) bool {
+	return dsType == datasources.DS_LOKI || isPrometheusCompatible(dsType)
+}
 
 func toMacaronPath(path string) string {
 	return string(searchRegex.ReplaceAllFunc([]byte(path), func(s []byte) []byte {
@@ -46,8 +73,8 @@ func getDatasourceByUID(ctx *contextmodel.ReqContext, cache datasources.CacheSer
 			return nil, unexpectedDatasourceTypeError(ds.Type, "alertmanager")
 		}
 	case apimodels.LoTexRulerBackend:
-		if ds.Type != "loki" && ds.Type != "prometheus" {
-			return nil, unexpectedDatasourceTypeError(ds.Type, "loki, prometheus")
+		if !isLotexRulerCompatible(ds.Type) {
+			return nil, unexpectedDatasourceTypeError(ds.Type, "loki, prometheus, amazon prometheus, azure prometheus")
 		}
 	default:
 		return nil, unexpectedDatasourceTypeError(ds.Type, expectedType.String())
@@ -85,7 +112,7 @@ func (p *AlertingProxy) createProxyContext(ctx *contextmodel.ReqContext, request
 	// Some data sources require legacy Editor role in order to perform mutating operations. In this case, we elevate permissions for the context that we
 	// will provide downstream.
 	// TODO (yuri) remove this after RBAC for plugins is implemented
-	if !ctx.SignedInUser.HasRole(org.RoleEditor) {
+	if !ctx.HasRole(org.RoleEditor) {
 		newUser := *ctx.SignedInUser
 		newUser.OrgRole = org.RoleEditor
 		cpy.SignedInUser = &newUser
@@ -206,15 +233,16 @@ func messageExtractor(resp *response.NormalResponse) (any, error) {
 // ErrorResp creates a response with a visible error
 func ErrResp(status int, err error, msg string, args ...any) *response.NormalResponse {
 	if msg != "" {
-		formattedMsg := fmt.Sprintf(msg, args...)
-		err = fmt.Errorf("%s: %w", formattedMsg, err)
+		msg += ": %w"
+		args = append(args, err)
+		err = fmt.Errorf(msg, args...)
 	}
 	return response.Error(status, err.Error(), err)
 }
 
 // accessForbiddenResp creates a response of forbidden access.
 func accessForbiddenResp() response.Response {
-	//nolint:stylecheck // Grandfathered capitalization of error.
+	//nolint:staticcheck // Grandfathered capitalization of error.
 	return ErrResp(http.StatusForbidden, errors.New("Permission denied"), "")
 }
 
@@ -229,4 +257,39 @@ func containsProvisionedAlerts(provenances map[string]ngmodels.Provenance, rules
 		}
 	}
 	return false
+}
+
+func getHash(hashSlice []string) uint64 {
+	sum := fnv.New64()
+	for _, str := range hashSlice {
+		_, _ = sum.Write([]byte(str))
+	}
+	hash := sum.Sum64()
+	return hash
+}
+
+func getRulesGroupParam(ctx *contextmodel.ReqContext, pathGroup string) (string, error) {
+	if pathGroup == groupQueryTag {
+		group := ctx.Query("group")
+		if group == "" {
+			return "", fmt.Errorf("group query parameter is empty")
+		}
+
+		return group, nil
+	}
+
+	return pathGroup, nil
+}
+
+func getRulesNamespaceParam(ctx *contextmodel.ReqContext, pathNamespace string) (string, error) {
+	if pathNamespace == namespaceQueryTag {
+		namespace := ctx.Query("namespace")
+		if namespace == "" {
+			return "", fmt.Errorf("namespace query parameter is empty")
+		}
+
+		return namespace, nil
+	}
+
+	return pathNamespace, nil
 }

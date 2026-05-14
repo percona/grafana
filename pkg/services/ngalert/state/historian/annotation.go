@@ -13,9 +13,11 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/annotations"
+	"github.com/grafana/grafana/pkg/services/folder"
 	"github.com/grafana/grafana/pkg/services/ngalert/eval"
 	"github.com/grafana/grafana/pkg/services/ngalert/metrics"
 	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
@@ -23,17 +25,27 @@ import (
 	history_model "github.com/grafana/grafana/pkg/services/ngalert/state/historian/model"
 )
 
+type AccessControl interface {
+	CanReadAllRules(ctx context.Context, user identity.Requester) (bool, error)
+	AuthorizeAccessInFolder(ctx context.Context, user identity.Requester, rule ngmodels.Namespaced) error
+	HasAccessInFolder(ctx context.Context, user identity.Requester, rule ngmodels.Namespaced) (bool, error)
+}
+
 // AnnotationBackend is an implementation of state.Historian that uses Grafana Annotations as the backing datastore.
 type AnnotationBackend struct {
-	store   AnnotationStore
-	rules   RuleStore
-	clock   clock.Clock
-	metrics *metrics.Historian
-	log     log.Logger
+	store         AnnotationStore
+	rules         RuleStore
+	clock         clock.Clock
+	metrics       *metrics.Historian
+	log           log.Logger
+	ac            AccessControl
+	maxTagsLength int64 // Max length for annotation tags to avoid storage errors
 }
 
 type RuleStore interface {
 	GetAlertRuleByUID(ctx context.Context, query *ngmodels.GetAlertRuleByUIDQuery) (*ngmodels.AlertRule, error)
+	GetUserVisibleNamespaces(ctx context.Context, orgID int64, user identity.Requester) (map[string]*folder.Folder, error)
+	GetAlertRuleVersionFolders(ctx context.Context, orgID int64, guid string) ([]string, error)
 }
 
 type AnnotationStore interface {
@@ -41,13 +53,22 @@ type AnnotationStore interface {
 	Save(ctx context.Context, panel *PanelKey, annotations []annotations.Item, orgID int64, logger log.Logger) error
 }
 
-func NewAnnotationBackend(logger log.Logger, annotations AnnotationStore, rules RuleStore, metrics *metrics.Historian) *AnnotationBackend {
+func NewAnnotationBackend(
+	logger log.Logger,
+	annotations AnnotationStore,
+	rules RuleStore,
+	metrics *metrics.Historian,
+	ac AccessControl,
+	maxTagsLength int64,
+) *AnnotationBackend {
 	return &AnnotationBackend{
-		store:   annotations,
-		rules:   rules,
-		clock:   clock.New(),
-		metrics: metrics,
-		log:     logger,
+		store:         annotations,
+		rules:         rules,
+		clock:         clock.New(),
+		metrics:       metrics,
+		log:           logger,
+		ac:            ac,
+		maxTagsLength: maxTagsLength,
 	}
 }
 
@@ -55,7 +76,7 @@ func NewAnnotationBackend(logger log.Logger, annotations AnnotationStore, rules 
 func (h *AnnotationBackend) Record(ctx context.Context, rule history_model.RuleMeta, states []state.StateTransition) <-chan error {
 	logger := h.log.FromContext(ctx)
 	// Build annotations before starting goroutine, to make sure all data is copied and won't mutate underneath us.
-	annotations := buildAnnotations(rule, states, logger)
+	annotations := h.buildAnnotations(rule, states, logger)
 	panel := parsePanelKey(rule, logger)
 
 	errCh := make(chan error, 1)
@@ -78,8 +99,15 @@ func (h *AnnotationBackend) Record(ctx context.Context, rule history_model.RuleM
 		defer cancel()
 		defer close(errCh)
 		logger := h.log.FromContext(ctx)
+		logger.Debug("Saving state history batch", "samples", len(annotations))
 
-		errCh <- h.store.Save(ctx, panel, annotations, rule.OrgID, logger)
+		err := h.store.Save(ctx, panel, annotations, rule.OrgID, logger)
+		if err != nil {
+			logger.Error("Failed to save history batch", "samples", len(annotations), "err", err)
+			errCh <- err
+			return
+		}
+		logger.Debug("Done saving history batch", "samples", len(annotations))
 	}(writeCtx)
 	return errCh
 }
@@ -105,6 +133,10 @@ func (h *AnnotationBackend) Query(ctx context.Context, query ngmodels.HistoryQue
 	}
 	if rule == nil {
 		return nil, fmt.Errorf("no such rule exists")
+	}
+
+	if err := h.ac.AuthorizeAccessInFolder(ctx, query.SignedInUser, rule); err != nil {
+		return nil, err
 	}
 
 	q := annotations.ItemQuery{
@@ -169,7 +201,7 @@ func (h *AnnotationBackend) Query(ctx context.Context, query ngmodels.HistoryQue
 	return frame, nil
 }
 
-func buildAnnotations(rule history_model.RuleMeta, states []state.StateTransition, logger log.Logger) []annotations.Item {
+func (h *AnnotationBackend) buildAnnotations(rule history_model.RuleMeta, states []state.StateTransition, logger log.Logger) []annotations.Item {
 	items := make([]annotations.Item, 0, len(states))
 	for _, state := range states {
 		if !ShouldRecordAnnotation(state) {
@@ -177,7 +209,7 @@ func buildAnnotations(rule history_model.RuleMeta, states []state.StateTransitio
 		}
 		logger.Debug("Alert state changed creating annotation", "newState", state.Formatted(), "oldState", state.PreviousFormatted())
 
-		annotationText, annotationData := BuildAnnotationTextAndData(rule, state.State)
+		annotationText, annotationData, tags := BuildAnnotationTextAndData(rule, state.State, h.maxTagsLength)
 
 		item := annotations.Item{
 			AlertID:   rule.ID,
@@ -186,6 +218,7 @@ func buildAnnotations(rule history_model.RuleMeta, states []state.StateTransitio
 			NewState:  state.Formatted(),
 			Text:      annotationText,
 			Data:      annotationData,
+			Tags:      tags,
 			Epoch:     state.LastEvaluationTime.UnixNano() / int64(time.Millisecond),
 		}
 
@@ -194,7 +227,9 @@ func buildAnnotations(rule history_model.RuleMeta, states []state.StateTransitio
 	return items
 }
 
-func BuildAnnotationTextAndData(rule history_model.RuleMeta, currentState *state.State) (string, *simplejson.Json) {
+// BuildAnnotationTextAndData creates the annotation text, JSON data, and tags for an alert state transition.
+// maxTagsLength limits the total serialized length of tags to avoid storage errors.
+func BuildAnnotationTextAndData(rule history_model.RuleMeta, currentState *state.State, maxTagsLength int64) (string, *simplejson.Json, []string) {
 	jsonData := simplejson.New()
 	var value string
 
@@ -224,8 +259,11 @@ func BuildAnnotationTextAndData(rule history_model.RuleMeta, currentState *state
 		value = strings.Join(values, ", ")
 	}
 
+	// Filter private labels once and use for both text and tags
 	labels := removePrivateLabels(currentState.Labels)
-	return fmt.Sprintf("%s {%s} - %s", rule.Title, labels.String(), value), jsonData
+	tags := convertLabelsToTags(labels, maxTagsLength)
+
+	return fmt.Sprintf("%s {%s} - %s", rule.Title, labels.String(), value), jsonData, tags
 }
 
 func jsonifyValues(vs map[string]float64) *simplejson.Json {
@@ -243,4 +281,52 @@ func jsonifyValues(vs map[string]float64) *simplejson.Json {
 		}
 	}
 	return j
+}
+
+// convertLabelsToTags converts alert labels to annotation tags.
+// Tags are in "key:value" format, sorted alphabetically.
+// Colons in both label keys and values are replaced with underscores to ensure proper parsing.
+// Tags are truncated if they would exceed maxLength to avoid storage errors.
+// Length calculation accounts for JSON array encoding: ["tag1","tag2",...]
+func convertLabelsToTags(labels data.Labels, maxLength int64) []string {
+	if len(labels) == 0 {
+		return nil
+	}
+
+	// Sort keys for deterministic tag order
+	keys := make([]string, 0, len(labels))
+	for k := range labels {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	// Single pass: create tags and apply length limit
+	tags := make([]string, 0, len(keys))
+	var currentLength int64 = 2 // [ and ]
+
+	for i, k := range keys {
+		// Escape colons in both key and value to ensure proper parsing by tag.ParseTagPairs
+		safeKey := strings.ReplaceAll(k, ":", "_")
+		safeValue := strings.ReplaceAll(labels[k], ":", "_")
+		tag := fmt.Sprintf("%s:%s", safeKey, safeValue)
+
+		// Check if this tag fits within maxLength
+		if maxLength > 0 {
+			tagLength := int64(len(tag) + 2) // quotes
+			if i > 0 {
+				tagLength++ // comma
+			}
+			if currentLength+tagLength > maxLength {
+				break // Stop adding tags
+			}
+			currentLength += tagLength
+		}
+
+		tags = append(tags, tag)
+	}
+
+	if len(tags) == 0 {
+		return nil
+	}
+	return tags
 }

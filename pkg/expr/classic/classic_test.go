@@ -595,11 +595,51 @@ func TestConditionsCmd(t *testing.T) {
 			v.SetMeta([]EvalMatch{{Value: util.Pointer(5.0)}, {Metric: "NoData"}})
 			return newResults(v)
 		},
+	}, {
+		name: "LogicOr will stop subsequent logic checks in condition: true AND true LogicOr false AND false",
+		vars: mathexp.Vars{
+			"A": mathexp.Results{
+				Values: []mathexp.Value{
+					newSeries(util.Pointer(1.0), util.Pointer(5.0)),
+				},
+			},
+		},
+		cmd: &ConditionsCmd{
+			Conditions: []condition{
+				{
+					InputRefID: "A",
+					Reducer:    reducer("max"),
+					Evaluator:  &thresholdEvaluator{Type: "gt", Threshold: 2},
+				},
+				{
+					InputRefID: "A",
+					Reducer:    reducer("min"),
+					Operator:   "and",
+					Evaluator:  &thresholdEvaluator{Type: "gt", Threshold: 0},
+				},
+				{
+					InputRefID: "A",
+					Reducer:    reducer("avg"),
+					Operator:   "logic-or",
+					Evaluator:  &thresholdEvaluator{Type: "gt", Threshold: 6},
+				},
+				{
+					InputRefID: "A",
+					Reducer:    reducer("last"),
+					Operator:   "and",
+					Evaluator:  &thresholdEvaluator{Type: "gt", Threshold: 6},
+				},
+			}},
+		expected: func() mathexp.Results {
+			v := newNumber(util.Pointer(1.0))
+			v.SetMeta([]EvalMatch{{Value: util.Pointer(5.0)}, {Value: util.Pointer(1.0)}})
+			return newResults(v)
+		},
 	}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			res, err := tt.cmd.Execute(context.Background(), time.Now(), tt.vars, tracing.InitializeTracerForTest())
+			res, err := tt.cmd.Execute(context.Background(), time.Now(), tt.vars, tracing.InitializeTracerForTest(), nil)
 			require.NoError(t, err)
 			require.Equal(t, tt.expected(), res)
 		})

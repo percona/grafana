@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import * as React from 'react';
 
 import {
   DisplayValue,
@@ -9,11 +10,13 @@ import {
   GAUGE_DEFAULT_MAXIMUM,
   GAUGE_DEFAULT_MINIMUM,
   GrafanaTheme2,
+  FieldColorModeId,
+  FALLBACK_COLOR,
 } from '@grafana/data';
-import { VizTextDisplayOptions, VizOrientation } from '@grafana/schema';
+import { VizTextDisplayOptions, VizOrientation, Threshold } from '@grafana/schema';
 
 import { calculateFontSize } from '../../utils/measureText';
-import { clearButtonStyles } from '../Button';
+import { clearButtonStyles } from '../Button/Button';
 
 import { calculateGaugeAutoProps, DEFAULT_THRESHOLDS, getFormattedThresholds } from './utils';
 
@@ -31,6 +34,10 @@ export interface Props {
   orientation?: VizOrientation;
 }
 
+/**
+ * @deprecated
+ * The Gauge component is deprecated and will be removed in Grafana 13.0.
+ */
 export class Gauge extends PureComponent<Props> {
   canvasElement: HTMLDivElement | null = null;
 
@@ -95,6 +102,14 @@ export class Gauge extends PureComponent<Props> {
       max = +max.toFixed(decimals);
     }
 
+    let thresholds: Threshold[] = [];
+
+    if (field.color?.mode === FieldColorModeId.Thresholds) {
+      thresholds = getFormattedThresholds(decimals, field, theme);
+    } else {
+      thresholds = [{ value: field.min ?? GAUGE_DEFAULT_MINIMUM, color: value.color ?? FALLBACK_COLOR }];
+    }
+
     const options = {
       series: {
         gauges: {
@@ -112,13 +127,13 @@ export class Gauge extends PureComponent<Props> {
           layout: { margin: 0, thresholdWidth: 0, vMargin: 0 },
           cell: { border: { width: 0 } },
           threshold: {
-            values: getFormattedThresholds(decimals, field, value, theme),
+            values: thresholds,
             label: {
               show: showThresholdLabels,
               margin: thresholdMarkersWidth + 1,
               font: { size: thresholdLabelFontSize },
             },
-            show: showThresholdMarkers,
+            show: showThresholdMarkers && thresholds.length > 1,
             width: thresholdMarkersWidth,
           },
           value: {
@@ -157,7 +172,9 @@ export class Gauge extends PureComponent<Props> {
     const gaugeElement = (
       <div
         style={{ height: `${autoProps.gaugeHeight}px`, width: gaugeWidth }}
-        ref={(element) => (this.canvasElement = element)}
+        ref={(element) => {
+          this.canvasElement = element;
+        }}
       />
     );
 

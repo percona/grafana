@@ -1,0 +1,38 @@
+name: Publish artifacts to bucket
+on:
+  # @PERCONA - disable workflow
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ${{ inputs.runs-on }}
+    name: Publish
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
+        with:
+          name: ${{ inputs.name }}
+          pattern: ${{ inputs.pattern }}
+          run-id: ${{ inputs.run-id }}
+          path: ./artifact
+      - name: Log in to GCS
+        id: login-to-gcs
+        uses: grafana/shared-workflows/actions/login-to-gcs@main
+        with:
+          environment: ${{ inputs.environment }}
+          service_account: ${{ inputs.service-account }}
+      - name: Coalesce artifacts
+        run: |
+          mkdir out
+          find ./artifact -mindepth 2 -maxdepth 2 -exec cp -r {} out/ \;
+          ls -al out
+      - name: Upload artifacts
+        uses: grafana/shared-workflows/actions/push-to-gcs@main
+        with:
+          bucket: ${{ inputs.bucket }}
+          environment: ${{ inputs.environment }}
+          parent: false
+          path: out
+          bucket_path: ${{ inputs.bucket-path }}
+          service_account: ${{ inputs.service-account }}
+          gzip: false

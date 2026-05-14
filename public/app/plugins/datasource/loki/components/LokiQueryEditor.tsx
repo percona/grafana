@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import React, { SyntheticEvent, useCallback, useEffect, useId, useState } from 'react';
+import { memo, SyntheticEvent, useCallback, useEffect, useId, useState } from 'react';
 import { usePrevious } from 'react-use';
 
 import { CoreApp, LoadingState } from '@grafana/data';
@@ -11,8 +11,8 @@ import {
   QueryEditorModeToggle,
   QueryHeaderSwitch,
   QueryEditorMode,
-} from '@grafana/experimental';
-import { config, reportInteraction } from '@grafana/runtime';
+} from '@grafana/plugin-ui';
+import { reportInteraction } from '@grafana/runtime';
 import { Button, ConfirmModal, Space, Stack } from '@grafana/ui';
 
 import { LabelBrowserModal } from '../querybuilder/components/LabelBrowserModal';
@@ -33,7 +33,7 @@ export const testIds = {
 
 export const lokiQueryEditorExplainKey = 'LokiQueryEditorExplainDefault';
 
-export const LokiQueryEditor = React.memo<LokiQueryEditorProps>((props) => {
+export const LokiQueryEditor = memo<LokiQueryEditorProps>((props) => {
   const id = useId();
   const { onChange, onRunQuery, onAddQuery, data, app, queries, datasource, range: timeRange } = props;
   const [parseModalOpen, setParseModalOpen] = useState(false);
@@ -43,13 +43,9 @@ export const LokiQueryEditor = React.memo<LokiQueryEditorProps>((props) => {
   const [queryStats, setQueryStats] = useState<QueryStats | null>(null);
   const [explain, setExplain] = useState(window.localStorage.getItem(lokiQueryEditorExplainKey) === 'true');
 
-  const predefinedOperations = datasource.predefinedOperations;
   const previousTimeRange = usePrevious(timeRange);
 
   const query = getQueryWithDefaults(props.query);
-  if (config.featureToggles.lokiPredefinedOperations && !query.expr && predefinedOperations) {
-    query.expr = `{} ${predefinedOperations}`;
-  }
   const previousQueryExpr = usePrevious(query.expr);
   const previousQueryType = usePrevious(query.queryType);
 
@@ -213,8 +209,8 @@ export const LokiQueryEditor = React.memo<LokiQueryEditorProps>((props) => {
           onChange={onChange}
           onRunQuery={onRunQuery}
           app={app}
-          maxLines={datasource.maxLines}
           queryStats={queryStats}
+          datasource={props.datasource}
         />
       </EditorRows>
     </>

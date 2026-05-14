@@ -1,11 +1,10 @@
 import { Meta } from '@storybook/react';
-import React from 'react';
 
 import { FormattedValueDisplay } from './FormattedValueDisplay';
 import mdx from './FormattedValueDisplay.mdx';
 
 const meta: Meta<typeof FormattedValueDisplay> = {
-  title: 'Visualizations/FormattedValueDisplay',
+  title: 'Plugins/FormattedValueDisplay',
   component: FormattedValueDisplay,
   parameters: {
     docs: {

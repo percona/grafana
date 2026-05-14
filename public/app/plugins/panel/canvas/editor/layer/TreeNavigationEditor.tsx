@@ -1,13 +1,15 @@
 import { css } from '@emotion/css';
 import { Global } from '@emotion/react';
-import Tree, { TreeNodeProps } from 'rc-tree';
-import React, { Key, useEffect, useMemo, useState } from 'react';
+import Tree, { TreeNodeProps } from '@rc-component/tree';
+import { Key, useEffect, useMemo, useState } from 'react';
 
 import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { Button, Icon, Stack, useStyles2, useTheme2 } from '@grafana/ui';
 import { AddLayerButton } from 'app/core/components/Layers/AddLayerButton';
 import { ElementState } from 'app/features/canvas/runtime/element';
+import { frameSelection, reorderElements } from 'app/features/canvas/runtime/sceneElementManagement';
 
 import { getGlobalStyles } from '../../globalStyles';
 import { Options } from '../../panelcfg.gen';
@@ -49,12 +51,20 @@ export const TreeNavigationEditor = ({ item }: StandardEditorProps<unknown, Tree
   }, [item?.settings?.scene.root, selectedBgColor, selection, selectionByUID]);
 
   if (!settings) {
-    return <div>No settings</div>;
+    return (
+      <div>
+        <Trans i18nKey="canvas.tree-navigation-editor.no-settings">No settings</Trans>
+      </div>
+    );
   }
 
   const layer = settings.layer;
   if (!layer) {
-    return <div>Missing layer?</div>;
+    return (
+      <div>
+        <Trans i18nKey="canvas.tree-navigation-editor.missing-layer">Missing layer?</Trans>
+      </div>
+    );
   }
 
   const onSelect = (selectedKeys: Key[], info: { node: { dataRef: ElementState } }) => {
@@ -77,7 +87,7 @@ export const TreeNavigationEditor = ({ item }: StandardEditorProps<unknown, Tree
     const data = onNodeDrop(info, treeData);
 
     setTreeData(data);
-    destEl.parent?.scene.reorderElements(srcEl, destEl, info.dropToGap, destPosition);
+    reorderElements(srcEl, destEl, info.dropToGap, destPosition);
   };
 
   const onExpand = (expandedKeys: Key[]) => {
@@ -94,7 +104,7 @@ export const TreeNavigationEditor = ({ item }: StandardEditorProps<unknown, Tree
     return (
       <Icon
         name="angle-right"
-        title={'Node Icon'}
+        title={t('canvas.tree-navigation-editor.switcher-icon.title-node-icon', 'Node Icon')}
         style={{
           transform: `rotate(${obj.expanded ? 90 : 0}deg)`,
           fill: theme.colors.text.primary,
@@ -118,7 +128,7 @@ export const TreeNavigationEditor = ({ item }: StandardEditorProps<unknown, Tree
   // TODO: This functionality is currently kinda broken / no way to decouple / delete created frames at this time
   const onFrameSelection = () => {
     if (layer.scene) {
-      layer.scene.frameSelection();
+      frameSelection(layer.scene);
     } else {
       console.warn('no scene!');
     }
@@ -149,16 +159,20 @@ export const TreeNavigationEditor = ({ item }: StandardEditorProps<unknown, Tree
 
       <Stack justifyContent="space-between" direction="row">
         <div className={styles.addLayerButton}>
-          <AddLayerButton onChange={(sel) => onAddItem(sel, layer)} options={typeOptions} label={'Add item'} />
+          <AddLayerButton
+            onChange={(sel) => onAddItem(sel, layer)}
+            options={typeOptions}
+            label={t('canvas.tree-navigation-editor.label-add-item', 'Add item')}
+          />
         </div>
         {selection.length > 0 && (
           <Button size="sm" variant="secondary" onClick={onClearSelection}>
-            Clear selection
+            <Trans i18nKey="canvas.tree-navigation-editor.clear-selection">Clear selection</Trans>
           </Button>
         )}
         {selection.length > 1 && config.featureToggles.canvasPanelNesting && (
           <Button size="sm" variant="secondary" onClick={onFrameSelection}>
-            Frame selection
+            <Trans i18nKey="canvas.tree-navigation-editor.frame-selection">Frame selection</Trans>
           </Button>
         )}
       </Stack>

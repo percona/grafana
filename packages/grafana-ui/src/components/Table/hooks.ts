@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import * as React from 'react';
 import { VariableSizeList } from 'react-window';
 
 import { DataFrame } from '@grafana/data';
@@ -13,8 +14,8 @@ import { GrafanaTableState } from './types';
   Select the scrollbar element from the VariableSizeList scope
  */
 export function useFixScrollbarContainer(
-  variableSizeListScrollbarRef: React.RefObject<HTMLDivElement>,
-  tableDivRef: React.RefObject<HTMLDivElement>
+  variableSizeListScrollbarRef: React.RefObject<HTMLDivElement | null>,
+  tableDivRef: React.RefObject<HTMLDivElement | null>
 ) {
   useEffect(() => {
     if (variableSizeListScrollbarRef.current && tableDivRef.current) {
@@ -42,7 +43,7 @@ export function useFixScrollbarContainer(
  */
 export function useResetVariableListSizeCache(
   extendedState: GrafanaTableState,
-  listRef: React.RefObject<VariableSizeList>,
+  listRef: React.RefObject<VariableSizeList | null>,
   data: DataFrame,
   hasUniqueId: boolean
 ) {

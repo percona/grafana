@@ -33,12 +33,11 @@ Complete the following steps to start the Grafana server using systemd and verif
    ```bash
    sudo systemctl daemon-reload
    sudo systemctl start grafana-server
-   sudo systemctl status grafana-server
    ```
 
 1. To verify that the service is running, run the following command:
 
-   ```
+   ```bash
    sudo systemctl status grafana-server
    ```
 
@@ -56,30 +55,29 @@ sudo systemctl enable grafana-server.service
 
 ### Restart the Grafana server using systemd
 
-To restart the Grafana server, run the following commands:
+To restart the Grafana server, run the following command:
 
 ```bash
 sudo systemctl restart grafana-server
 ```
 
-{{% admonition type="note" %}}
+{{< admonition type="note" >}}
 SUSE or openSUSE users might need to start the server with the systemd method, then use the init.d method to configure Grafana to start at boot.
-{{% /admonition %}}
+{{< /admonition >}}
 
 ### Start the Grafana server using init.d
 
 Complete the following steps to start the Grafana server using init.d and verify that it is running:
 
-1. To start the Grafana server, run the following commands:
+1. To start the Grafana server, run the following command:
 
    ```bash
    sudo service grafana-server start
-   sudo service grafana-server status
    ```
 
 1. To verify that the service is running, run the following command:
 
-   ```
+   ```bash
    sudo service grafana-server status
    ```
 
@@ -93,7 +91,7 @@ sudo update-rc.d grafana-server defaults
 
 #### Restart the Grafana server using init.d
 
-To restart the Grafana server, run the following commands:
+To restart the Grafana server, run the following command:
 
 ```bash
 sudo service grafana-server restart
@@ -121,8 +119,8 @@ Alternatively, you can use the `docker compose restart` command to restart Grafa
 
 Configure your `docker-compose.yml` file. For example:
 
-```bash
-version: "3.8"
+```yml
+version: '3.8'
 services:
   grafana:
     image: grafana/grafana:latest
@@ -130,7 +128,7 @@ services:
     restart: unless-stopped
     environment:
       - TERM=linux
-      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-polystat-panel
+      - GF_PLUGINS_PREINSTALL=grafana-clock-panel,grafana-polystat-panel
     ports:
       - '3000:3000'
     volumes:
@@ -212,5 +210,5 @@ To restart Grafana:
 
 After the Grafana server is up and running, consider taking the next steps:
 
-- Refer to [Get Started]({{< relref "../getting-started" >}}) to learn how to build your first dashboard.
-- Refer to [Configuration]({{< relref "./configure-grafana" >}}) to learn about how you can customize your environment.
+- Refer to [Get Started](../../getting-started/) to learn how to build your first dashboard.
+- Refer to [Configuration](../configure-grafana/) to learn about how you can customize your environment.

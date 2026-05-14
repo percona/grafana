@@ -1,6 +1,6 @@
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import type { JSX } from 'react';
 
 import { OrgPicker } from './OrgPicker';
 

@@ -1,16 +1,17 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Select } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { assignRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { getAccessRoles, getUsersInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { OrgUser, UserDTO, useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from './AccessRoleCell.messages';
 import { idsToOptions, toOptions } from './AccessRoleCell.utils';
 import { styles } from './AccessRolesCell.styles';
+import { OrgUser, UserDTO } from 'app/types/user';
 
 interface AccessRoleCellProps {
   user: OrgUser | UserDTO;

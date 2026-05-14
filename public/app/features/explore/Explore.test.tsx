@@ -1,15 +1,23 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { Props as AutoSizerProps } from 'react-virtualized-auto-sizer';
 import { TestProvider } from 'test/helpers/TestProvider';
 
-import { CoreApp, createTheme, DataSourceApi, EventBusSrv, LoadingState, PluginExtensionTypes } from '@grafana/data';
+import {
+  CoreApp,
+  createTheme,
+  DataSourceApi,
+  EventBusSrv,
+  LoadingState,
+  PluginExtensionTypes,
+  store,
+} from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { usePluginLinkExtensions } from '@grafana/runtime';
+import { usePluginLinks } from '@grafana/runtime';
 import { configureStore } from 'app/store/configureStore';
 
 import { ContentOutlineContextProvider } from './ContentOutline/ContentOutlineContext';
 import { Explore, Props } from './Explore';
+import { QueryLibraryContextProviderMock } from './QueryLibrary/mocks';
 import { initialExploreState } from './state/main';
 import { scanStopAction } from './state/query';
 import { createEmptyQueryResponse, makeExplorePaneState } from './state/utils';
@@ -76,10 +84,6 @@ const dummyProps: Props = {
   syncedTimes: false,
   updateTimeRange: jest.fn(),
   graphResult: [],
-  absoluteRange: {
-    from: 0,
-    to: 0,
-  },
   timeZone: 'UTC',
   queryResponse: makeEmptyQueryResponse(LoadingState.NotStarted),
   addQueryRow: jest.fn(),
@@ -100,28 +104,39 @@ const dummyProps: Props = {
   setSupplementaryQueryEnabled: jest.fn(),
   correlationEditorDetails: undefined,
   correlationEditorHelperData: undefined,
-};
-
-jest.mock('@grafana/runtime/src/services/dataSourceSrv', () => {
-  return {
-    getDataSourceSrv: () => ({
-      get: () => Promise.resolve({}),
-      getList: () => [],
-      getInstanceSettings: () => {},
-    }),
-  };
-});
-
-jest.mock('app/core/core', () => ({
-  contextSrv: {
-    hasPermission: () => true,
-    getValidIntervals: (defaultIntervals: string[]) => defaultIntervals,
+  exploreActiveDS: {
+    exploreToDS: [],
+    dsToExplore: [],
   },
-}));
-
+  changeDatasource: jest.fn(),
+  compact: false,
+  changeCompactMode: jest.fn(),
+  queryLibraryRef: undefined,
+  queriesChangedIndexAtRun: 0,
+};
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
-  usePluginLinkExtensions: jest.fn(() => ({ extensions: [] })),
+  config: {
+    ...jest.requireActual('@grafana/runtime').config,
+    featureToggles: {
+      savedQueriesRBAC: false,
+    },
+  },
+  getDataSourceSrv: () => ({
+    get: () => Promise.resolve({}),
+    getList: () => [],
+    getInstanceSettings: () => {},
+  }),
+  usePluginLinks: jest.fn(() => ({ links: [] })),
+}));
+
+jest.mock('app/core/services/context_srv', () => ({
+  contextSrv: {
+    ...jest.requireActual('app/core/services/context_srv').contextSrv,
+    hasPermission: () => true,
+    isSignedIn: true,
+    getValidIntervals: (defaultIntervals: string[]) => defaultIntervals,
+  },
 }));
 
 // for the AutoSizer component to have a width
@@ -135,7 +150,7 @@ jest.mock('react-virtualized-auto-sizer', () => {
     });
 });
 
-const usePluginLinkExtensionsMock = jest.mocked(usePluginLinkExtensions);
+const usePluginLinksMock = jest.mocked(usePluginLinks);
 
 const setup = (overrideProps?: Partial<Props>) => {
   const store = configureStore({
@@ -177,8 +192,8 @@ describe('Explore', () => {
   });
 
   it('should render toolbar extension point if extensions is available', async () => {
-    usePluginLinkExtensionsMock.mockReturnValueOnce({
-      extensions: [
+    usePluginLinksMock.mockReturnValue({
+      links: [
         {
           id: '1',
           pluginId: 'grafana',
@@ -224,6 +239,69 @@ describe('Explore', () => {
       const dataSourcePicker = await screen.findByTestId(selectors.components.DataSourcePicker.container);
 
       expect(dataSourcePicker).toBeInTheDocument();
+    });
+  });
+
+  describe('Content Outline', () => {
+    it('should retrieve the last visible state from local storage', async () => {
+      const getBoolMock = jest.spyOn(store, 'getBool').mockReturnValue(false);
+      setup();
+      const showContentOutlineButton = screen.queryByRole('button', { name: 'Collapse outline' });
+      expect(showContentOutlineButton).not.toBeInTheDocument();
+      getBoolMock.mockRestore();
+    });
+  });
+
+  describe('Saved Queries Integration', () => {
+    it('should enable add query buttons when queryLibraryRef is undefined', async () => {
+      setup({ queryLibraryRef: undefined });
+
+      // Wait for the Explore component to render
+      await screen.findByTestId(selectors.components.DataSourcePicker.container);
+
+      const addQueryButton = screen.getByRole('button', { name: /Add query$/i });
+      expect(addQueryButton).toBeEnabled();
+    });
+
+    it('should disable add query buttons when queryLibraryRef is set (editing from library)', async () => {
+      setup({ queryLibraryRef: 'library-query-123' });
+
+      // Wait for the Explore component to render
+      await screen.findByTestId(selectors.components.DataSourcePicker.container);
+
+      const addQueryButton = screen.getByRole('button', { name: /Add query$/i });
+      expect(addQueryButton).toBeDisabled();
+    });
+
+    it('should disable both add query and add from library buttons when editing from library', async () => {
+      const store = configureStore({
+        explore: {
+          ...initialExploreState,
+          panes: {
+            left: makeExplorePaneState(),
+          },
+        },
+      });
+      const exploreProps = { ...dummyProps, queryLibraryRef: 'library-query-123' };
+
+      render(
+        <TestProvider store={store}>
+          <QueryLibraryContextProviderMock queryLibraryEnabled={true}>
+            <ContentOutlineContextProvider>
+              <Explore {...exploreProps} />
+            </ContentOutlineContextProvider>
+          </QueryLibraryContextProviderMock>
+        </TestProvider>
+      );
+
+      // Wait for the Explore component to render
+      await screen.findByTestId(selectors.components.DataSourcePicker.container);
+
+      const addQueryButton = screen.getByRole('button', { name: /Add query$/i });
+      const addFromLibraryButton = screen.getByRole('button', { name: /Add from saved queries/i });
+
+      expect(addQueryButton).toBeDisabled();
+      expect(addFromLibraryButton).toBeDisabled();
     });
   });
 });

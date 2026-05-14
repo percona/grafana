@@ -1,17 +1,18 @@
 import { css, cx, keyframes } from '@emotion/css';
-import React from 'react';
+import * as React from 'react';
 import tinycolor from 'tinycolor2';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Trans, t } from '@grafana/i18n';
 import { LibraryPanel } from '@grafana/schema';
 import { IconButton, useStyles2 } from '@grafana/ui';
-import { Trans } from 'app/core/internationalization';
 
 import {
   LibraryPanelsSearch,
   LibraryPanelsSearchVariant,
 } from '../../../library-panels/components/LibraryPanelsSearch/LibraryPanelsSearch';
-import { DashboardModel, PanelModel } from '../../state';
+import { DashboardModel } from '../../state/DashboardModel';
+import { PanelModel } from '../../state/PanelModel';
 
 interface Props {
   panel: PanelModel;
@@ -41,17 +42,20 @@ export const AddLibraryPanelWidget = ({ panel, dashboard }: Props) => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={cx('panel-container', styles.callToAction)}>
+      <div className={styles.callToAction}>
         <div className={cx(styles.headerRow, 'grid-drag-handle')}>
           <span>
             <Trans i18nKey="library-panel.add-widget.title">Add panel from panel library</Trans>
           </span>
           <div className="flex-grow-1" />
           <IconButton
-            aria-label="Close 'Add Panel' widget"
+            aria-label={t(
+              'dashboard.add-library-panel-widget.aria-label-close-add-panel-widget',
+              "Close 'Add Panel' widget"
+            )}
             name="times"
             onClick={onCancelAddPanel}
-            tooltip="Close widget"
+            tooltip={t('dashboard.add-library-panel-widget.tooltip-close-widget', 'Close widget')}
           />
         </div>
         <LibraryPanelsSearch onClick={onAddLibraryPanel} variant={LibraryPanelsSearchVariant.Tight} showPanelFilter />
@@ -100,10 +104,19 @@ const getStyles = (theme: GrafanaTheme2) => {
       },
     }),
     callToAction: css({
-      overflow: 'hidden',
+      backgroundColor: theme.components.panel.background,
+      border: `1px solid ${theme.components.panel.borderColor}`,
+      borderRadius: theme.shape.radius.default,
+      display: 'flex',
+      flex: '1 1 0',
+      flexDirection: 'column',
+      height: '100%',
+      position: 'relative',
+      width: '100%',
       outline: '2px dotted transparent',
       outlineOffset: '2px',
-      boxShadow: '0 0 0 2px black, 0 0 0px 4px #1f60c4',
+      overflow: 'hidden',
+
       [theme.transitions.handleMotion('no-preference', 'reduce')]: {
         animation: `${pulsate} 2s ease infinite`,
       },

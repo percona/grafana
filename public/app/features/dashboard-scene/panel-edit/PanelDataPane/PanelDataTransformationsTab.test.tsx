@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import {
   DataTransformerConfig,
@@ -13,14 +12,14 @@ import {
 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { SceneDataTransformer, SceneQueryRunner } from '@grafana/scenes';
+import config from 'app/core/config';
 import { getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
 import { getStandardTransformers } from 'app/features/transformers/standardTransformers';
-import { DashboardDataDTO } from 'app/types';
+import { DashboardDataDTO } from 'app/types/dashboard';
 
 import { transformSaveModelToScene } from '../../serialization/transformSaveModelToScene';
 import { DashboardModelCompatibilityWrapper } from '../../utils/DashboardModelCompatibilityWrapper';
 import { findVizPanelByKey } from '../../utils/utils';
-import { VizPanelManager } from '../VizPanelManager';
 import { testDashboard } from '../testfiles/testDashboard';
 
 import { PanelDataTransformationsTab, PanelDataTransformationsTabRendered } from './PanelDataTransformationsTab';
@@ -53,10 +52,9 @@ const mockData = {
 
 describe('PanelDataTransformationsModel', () => {
   it('can change transformations', () => {
-    const vizPanelManager = setupVizPanelManger('panel-1');
-    const model = new PanelDataTransformationsTab(vizPanelManager);
-    model.onChangeTransformations([{ id: 'calculateField', options: {} }]);
-    expect(model.getDataTransformer().state.transformations).toEqual([{ id: 'calculateField', options: {} }]);
+    const { transformsTab } = setupTabScene('panel-1');
+    transformsTab.onChangeTransformations([{ id: 'calculateField', options: {} }]);
+    expect(transformsTab.getDataTransformer().state.transformations).toEqual([{ id: 'calculateField', options: {} }]);
   });
 });
 
@@ -168,17 +166,27 @@ describe('PanelDataTransformationsTab', () => {
     const reduce = screen.queryByTestId(selectors.components.TransformTab.newTransform('Reduce'));
     expect(reduce).toBeNull();
   });
+
+  it('renders the new empty transformations message with transformationsEmptyPlaceholder on', async () => {
+    config.featureToggles.transformationsEmptyPlaceholder = true;
+    const modelMock = createModelMock(mockData);
+    render(<PanelDataTransformationsTabRendered model={modelMock}></PanelDataTransformationsTabRendered>);
+
+    // Should show SQL transformation card in empty state
+    expect(screen.getByText('Add a Transformation')).toBeInTheDocument();
+  });
 });
 
-const setupVizPanelManger = (panelId: string) => {
+function setupTabScene(panelId: string) {
   const scene = transformSaveModelToScene({ dashboard: testDashboard as unknown as DashboardDataDTO, meta: {} });
   const panel = findVizPanelByKey(scene, panelId)!;
 
-  const vizPanelManager = VizPanelManager.createFor(panel);
+  const transformsTab = new PanelDataTransformationsTab({ panelRef: panel.getRef() });
+  transformsTab.activate();
 
   // The following happens on DahsboardScene activation. For the needs of this test this activation aint needed hence we hand-call it
   // @ts-expect-error
   getDashboardSrv().setCurrent(new DashboardModelCompatibilityWrapper(scene));
 
-  return vizPanelManager;
-};
+  return { transformsTab, panel };
+}

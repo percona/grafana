@@ -10,12 +10,14 @@ import (
 type Plugin struct {
 	plugins.JSONData
 
-	fs                plugins.FS
+	FS                plugins.FS
 	supportsStreaming bool
 
 	Class plugins.Class
 
 	// App fields
+	Parent          *ParentPlugin
+	Children        []string
 	IncludedInAppID string
 	DefaultNavURL   string
 	Pinned          bool
@@ -28,12 +30,15 @@ type Plugin struct {
 	Error *plugins.Error
 
 	// SystemJS fields
-	Module  string
-	BaseURL string
+	Module          string
+	BaseURL         string
+	LoadingStrategy plugins.LoadingStrategy
 
 	Angular plugins.AngularMeta
 
 	ExternalService *auth.ExternalService
+
+	Translations map[string]string
 }
 
 func (p Plugin) SupportsStreaming() bool {
@@ -41,7 +46,7 @@ func (p Plugin) SupportsStreaming() bool {
 }
 
 func (p Plugin) Base() string {
-	return p.fs.Base()
+	return p.FS.Base()
 }
 
 func (p Plugin) IsApp() bool {
@@ -59,8 +64,8 @@ func ToGrafanaDTO(p *plugins.Plugin) Plugin {
 		supportsStreaming = true
 	}
 
-	return Plugin{
-		fs:                p.FS,
+	dto := Plugin{
+		FS:                p.FS,
 		supportsStreaming: supportsStreaming,
 		Class:             p.Class,
 		JSONData:          p.JSONData,
@@ -72,9 +77,32 @@ func ToGrafanaDTO(p *plugins.Plugin) Plugin {
 		SignatureOrg:      p.SignatureOrg,
 		Error:             p.Error,
 		Module:            p.Module,
+		LoadingStrategy:   p.LoadingStrategy,
 		BaseURL:           p.BaseURL,
 		ExternalService:   p.ExternalService,
-
-		Angular: p.Angular,
+		Angular:           p.Angular,
+		Translations:      p.Translations,
 	}
+
+	if p.Parent != nil {
+		dto.Parent = &ParentPlugin{ID: p.Parent.ID}
+	}
+
+	if len(p.Children) > 0 {
+		children := make([]string, 0, len(p.Children))
+		for _, child := range p.Children {
+			if child != nil {
+				children = append(children, child.ID)
+			}
+		}
+		if len(children) > 0 {
+			dto.Children = children
+		}
+	}
+
+	return dto
+}
+
+type ParentPlugin struct {
+	ID string
 }

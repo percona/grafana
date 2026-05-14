@@ -1,32 +1,24 @@
-import { useCallback } from 'react';
+import { GrafanaRulesSourceSymbol, RulesSource } from 'app/types/unified-alerting';
 
-import { RulesSource } from 'app/types/unified-alerting';
+import { featureDiscoveryApi } from '../api/featureDiscoveryApi';
+import { getRulesSourceName } from '../utils/datasource';
 
-import { getRulesSourceName, GRAFANA_RULES_SOURCE_NAME } from '../utils/datasource';
+const { useDiscoverDsFeaturesQuery } = featureDiscoveryApi;
 
-import { useUnifiedAlertingSelector } from './useUnifiedAlertingSelector';
+// datasource has ruler if the discovery api returns a rulerConfig
+/** @deprecated use useHasRulerV2 instead */
+export function useHasRuler(rulesSource: RulesSource) {
+  const rulesSourceName = getRulesSourceName(rulesSource);
 
-// datasource has ruler if it's grafana managed or if we're able to load rules from it
-export function useHasRuler() {
-  const rulerRules = useUnifiedAlertingSelector((state) => state.rulerRules);
+  const { currentData: dsFeatures } = useDiscoverDsFeaturesQuery({ rulesSourceName });
+  const hasRuler = Boolean(dsFeatures?.rulerConfig);
 
-  const hasRuler = useCallback(
-    (rulesSource: string | RulesSource) => {
-      const rulesSourceName = typeof rulesSource === 'string' ? rulesSource : rulesSource.name;
-      return rulesSourceName === GRAFANA_RULES_SOURCE_NAME || !!rulerRules[rulesSourceName]?.result;
-    },
-    [rulerRules]
-  );
+  return { hasRuler, rulerConfig: dsFeatures?.rulerConfig };
+}
 
-  const rulerRulesLoaded = useCallback(
-    (rulesSource: RulesSource) => {
-      const rulesSourceName = getRulesSourceName(rulesSource);
-      const result = rulerRules[rulesSourceName]?.result;
+export function useHasRulerV2(ruleUid: string | typeof GrafanaRulesSourceSymbol) {
+  const { currentData: dsFeatures } = useDiscoverDsFeaturesQuery({ uid: ruleUid });
+  const hasRuler = Boolean(dsFeatures?.rulerConfig);
 
-      return Boolean(result);
-    },
-    [rulerRules]
-  );
-
-  return { hasRuler, rulerRulesLoaded };
+  return { hasRuler, rulerConfig: dsFeatures?.rulerConfig };
 }

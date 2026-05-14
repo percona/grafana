@@ -1,28 +1,19 @@
-import React from 'react';
-
-import {
-  SceneComponentProps,
-  SceneGridLayout,
-  SceneObjectBase,
-  SceneObjectRef,
-  SceneObjectState,
-} from '@grafana/scenes';
+import { t } from '@grafana/i18n';
+import { SceneComponentProps, SceneObjectBase, SceneObjectRef, SceneObjectState, VizPanel } from '@grafana/scenes';
 import { LibraryPanel } from '@grafana/schema';
 import { Drawer } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
 import {
   LibraryPanelsSearch,
   LibraryPanelsSearchVariant,
 } from 'app/features/library-panels/components/LibraryPanelsSearch/LibraryPanelsSearch';
 
-import { dashboardSceneGraph } from '../utils/dashboardSceneGraph';
-import { NEW_PANEL_HEIGHT, NEW_PANEL_WIDTH, getDashboardSceneFor, getVizPanelKeyForPanelId } from '../utils/utils';
+import { getDashboardSceneFor, getDefaultVizPanel } from '../utils/utils';
 
-import { DashboardGridItem } from './DashboardGridItem';
-import { LibraryVizPanel } from './LibraryVizPanel';
+import { LibraryPanelBehavior } from './LibraryPanelBehavior';
+import { isDashboardLayoutItem } from './types/DashboardLayoutItem';
 
 export interface AddLibraryPanelDrawerState extends SceneObjectState {
-  panelToReplaceRef?: SceneObjectRef<LibraryVizPanel>;
+  panelToReplaceRef?: SceneObjectRef<VizPanel>;
 }
 
 export class AddLibraryPanelDrawer extends SceneObjectBase<AddLibraryPanelDrawerState> {
@@ -32,42 +23,28 @@ export class AddLibraryPanelDrawer extends SceneObjectBase<AddLibraryPanelDrawer
 
   public onAddLibraryPanel = (panelInfo: LibraryPanel) => {
     const dashboard = getDashboardSceneFor(this);
-    const layout = dashboard.state.body;
+    const newPanel = getDefaultVizPanel();
 
-    if (!(layout instanceof SceneGridLayout)) {
-      throw new Error('Trying to add a library panel in a layout that is not SceneGridLayout');
-    }
-
-    const panelId = dashboardSceneGraph.getNextPanelId(dashboard);
-
-    const body = new LibraryVizPanel({
-      title: 'Panel Title',
-      uid: panelInfo.uid,
-      name: panelInfo.name,
-      panelKey: getVizPanelKeyForPanelId(panelId),
+    newPanel.setState({
+      // Panel title takes precedence over library panel title when resolving the library panel
+      title: panelInfo.model.title,
+      hoverHeader: !panelInfo.model.title,
+      $behaviors: [new LibraryPanelBehavior({ uid: panelInfo.uid, name: panelInfo.name })],
     });
 
     const panelToReplace = this.state.panelToReplaceRef?.resolve();
 
     if (panelToReplace) {
-      const gridItemToReplace = panelToReplace.parent;
+      const layoutItem = panelToReplace.parent;
 
-      if (!(gridItemToReplace instanceof DashboardGridItem)) {
-        throw new Error('Trying to replace a panel that does not have a DashboardGridItem');
+      if (layoutItem && isDashboardLayoutItem(layoutItem)) {
+        // keep the same key from the panelToReplace
+        // this is important for edit mode
+        newPanel.setState({ key: panelToReplace.state.key });
+        layoutItem.setElementBody(newPanel);
       }
-
-      gridItemToReplace.setState({ body });
     } else {
-      const newGridItem = new DashboardGridItem({
-        height: NEW_PANEL_HEIGHT,
-        width: NEW_PANEL_WIDTH,
-        x: 0,
-        y: 0,
-        body: body,
-        key: `grid-item-${panelId}`,
-      });
-
-      layout.setState({ children: [newGridItem, ...layout.state.children] });
+      dashboard.addPanel(newPanel);
     }
 
     this.onClose();

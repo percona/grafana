@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom-v5-compat';
 
-import { locationService } from '@grafana/runtime';
+import { OrgRole } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { AlertRuleTemplate } from './AlertRuleTemplate';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
@@ -23,6 +23,10 @@ jest.mock('app/percona/shared/helpers/logger', () => {
 });
 
 describe('AlertRuleTemplate', () => {
+  beforeEach(() => {
+    config.bootData.user.orgRole = OrgRole.Admin;
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -33,14 +37,14 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <Router history={locationService.getHistory()}>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
-          </Router>
+          </MemoryRouter>
         )}
       </Provider>
     );
@@ -59,14 +63,14 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <Router history={locationService.getHistory()}>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
-          </Router>
+          </MemoryRouter>
         )}
       </Provider>
     );
@@ -88,14 +92,14 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <Router history={locationService.getHistory()}>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
-          </Router>
+          </MemoryRouter>
         )}
       </Provider>
     );
@@ -103,5 +107,53 @@ describe('AlertRuleTemplate', () => {
     expect(screen.queryByTestId('table-thead')).not.toBeInTheDocument();
     expect(screen.queryByTestId('table-tbody')).not.toBeInTheDocument();
     expect(screen.getByTestId('table-no-data')).toBeInTheDocument();
+  });
+
+  it('should be accessible to editor', async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: false },
+            settings: { loading: false, result: { alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AlertRuleTemplate />
+          </MemoryRouter>
+        )}
+      </Provider>
+    );
+
+    expect(screen.queryByTestId('unauthorized')).not.toBeInTheDocument();
+  });
+
+  it("shouldn't be accessible to viewer", () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Viewer;
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: false },
+            settings: { loading: false, result: { alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AlertRuleTemplate />
+          </MemoryRouter>
+        )}
+      </Provider>
+    );
+
+    expect(screen.queryByTestId('unauthorized')).toBeInTheDocument();
   });
 });

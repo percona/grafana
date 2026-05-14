@@ -3,7 +3,7 @@ package db
 import (
 	"bytes"
 
-	"github.com/grafana/grafana/pkg/services/auth/identity"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/services/dashboards/dashboardaccess"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/sqlstore/migrator"
@@ -72,7 +72,7 @@ func (sb *SQLBuilder) WriteDashboardPermissionFilter(user identity.Requester, pe
 		leftJoin     string
 	)
 
-	filterRBAC := permissions.NewAccessControlDashboardPermissionFilter(user, permission, queryType, sb.features, sb.recursiveQueriesAreSupported)
+	filterRBAC := permissions.NewAccessControlDashboardPermissionFilter(user, permission, queryType, sb.features, sb.recursiveQueriesAreSupported, sb.dialect)
 	leftJoin = filterRBAC.LeftJoin()
 	sql, params = filterRBAC.Where()
 	recQry, recQryParams = filterRBAC.With()

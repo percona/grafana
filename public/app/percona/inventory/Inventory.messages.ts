@@ -55,6 +55,9 @@ export const Messages = {
     details: {
       properties: 'Properties',
     },
+    status: {
+      done: 'Done',
+    },
   },
   nodes: {
     forceConfirmation: 'Force mode is going to delete all agents and services associated with the nodes',
@@ -67,6 +70,7 @@ export const Messages = {
       nodeType: 'Node Type',
       address: 'Address',
       services: 'Services',
+      isPmmServerNode: 'List PMM Server only nodes',
     },
     deleteConfirmation: (nrItems: number) =>
       `Are you sure that you want to permanently delete ${nrItems} node${nrItems ? 's' : ''}`,

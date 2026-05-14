@@ -16,18 +16,12 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
-	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
-	exp "github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
-	exphttpclient "github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource/httpclient"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 
-	"github.com/grafana/grafana/pkg/infra/httpclient"
-	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/infra/tracing"
 	es "github.com/grafana/grafana/pkg/tsdb/elasticsearch/client"
 )
-
-var eslog = log.New("tsdb.elasticsearch")
 
 const (
 	// headerFromExpression is used by data sources to identify expression queries
@@ -39,49 +33,45 @@ const (
 )
 
 type Service struct {
-	httpClientProvider httpclient.Provider
-	im                 instancemgmt.InstanceManager
-	tracer             tracing.Tracer
-	logger             *log.ConcreteLogger
+	im     instancemgmt.InstanceManager
+	logger log.Logger
 }
 
-func ProvideService(httpClientProvider httpclient.Provider, tracer tracing.Tracer) *Service {
+func ProvideService(httpClientProvider *httpclient.Provider) *Service {
 	return &Service{
-		im:                 datasource.NewInstanceManager(newInstanceSettings(httpClientProvider)),
-		httpClientProvider: httpClientProvider,
-		tracer:             tracer,
-		logger:             eslog,
+		im:     datasource.NewInstanceManager(newInstanceSettings(httpClientProvider)),
+		logger: backend.NewLoggerWith("logger", "tsdb.elasticsearch"),
 	}
 }
 
 func (s *Service) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	dsInfo, err := s.getDSInfo(ctx, req.PluginContext)
 	_, fromAlert := req.Headers[headerFromAlert]
-	logger := s.logger.FromContext(ctx).New("fromAlert", fromAlert)
+	logger := s.logger.FromContext(ctx).With("fromAlert", fromAlert)
 
 	if err != nil {
 		logger.Error("Failed to get data source info", "error", err)
 		return &backend.QueryDataResponse{}, err
 	}
 
-	return queryData(ctx, req, dsInfo, logger, s.tracer)
+	return queryData(ctx, req, dsInfo, logger)
 }
 
 // separate function to allow testing the whole transformation and query flow
-func queryData(ctx context.Context, req *backend.QueryDataRequest, dsInfo *es.DatasourceInfo, logger log.Logger, tracer tracing.Tracer) (*backend.QueryDataResponse, error) {
+func queryData(ctx context.Context, req *backend.QueryDataRequest, dsInfo *es.DatasourceInfo, logger log.Logger) (*backend.QueryDataResponse, error) {
 	if len(req.Queries) == 0 {
 		return &backend.QueryDataResponse{}, fmt.Errorf("query contains no queries")
 	}
 
-	client, err := es.NewClient(ctx, dsInfo, logger, tracer)
+	client, err := es.NewClient(ctx, dsInfo, logger)
 	if err != nil {
 		return &backend.QueryDataResponse{}, err
 	}
-	query := newElasticsearchDataQuery(ctx, client, req, logger, tracer)
+	query := newElasticsearchDataQuery(ctx, client, req, logger)
 	return query.execute()
 }
 
-func newInstanceSettings(httpClientProvider httpclient.Provider) datasource.InstanceFactoryFunc {
+func newInstanceSettings(httpClientProvider *httpclient.Provider) datasource.InstanceFactoryFunc {
 	return func(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 		jsonData := map[string]any{}
 		err := json.Unmarshal(settings.JSONData, &jsonData)
@@ -98,10 +88,15 @@ func newInstanceSettings(httpClientProvider httpclient.Provider) datasource.Inst
 			httpCliOpts.SigV4.Service = "es"
 		}
 
-		// set the default middlewars from the httpClientProvider
-		httpCliOpts.Middlewares = httpClientProvider.(*sdkhttpclient.Provider).Opts.Middlewares
-		// enable experimental http client to support errors with source
-		httpCli, err := exphttpclient.New(httpCliOpts)
+		apiKeyAuth, ok := jsonData["apiKeyAuth"].(bool)
+		if ok && apiKeyAuth {
+			apiKey := settings.DecryptedSecureJSONData["apiKey"]
+			if apiKey != "" {
+				httpCliOpts.Header.Add("Authorization", "ApiKey "+apiKey)
+			}
+		}
+
+		httpCli, err := httpClientProvider.New(httpCliOpts)
 		if err != nil {
 			return nil, err
 		}
@@ -110,11 +105,11 @@ func newInstanceSettings(httpClientProvider httpclient.Provider) datasource.Inst
 
 		timeField, ok := jsonData["timeField"].(string)
 		if !ok {
-			return nil, errors.New("timeField cannot be cast to string")
+			return nil, backend.DownstreamError(errors.New("timeField cannot be cast to string"))
 		}
 
 		if timeField == "" {
-			return nil, errors.New("elasticsearch time field name is required")
+			return nil, backend.DownstreamError(errors.New("elasticsearch time field name is required"))
 		}
 
 		logLevelField, ok := jsonData["logLevelField"].(string)
@@ -164,6 +159,15 @@ func newInstanceSettings(httpClientProvider httpclient.Provider) datasource.Inst
 			includeFrozen = false
 		}
 
+		clusterInfo, err := es.GetClusterInfo(httpCli, settings.URL)
+		if err != nil {
+			// Log warning but continue with default (non-serverless) behavior
+			// This handles cases where users don't have permission to access the root endpoint (403)
+			// or other connectivity issues that shouldn't prevent basic datasource functionality
+			backend.Logger.Warn("Failed to get Elasticsearch cluster info, assuming non-serverless cluster", "error", err, "url", settings.URL)
+			clusterInfo = es.ClusterInfo{}
+		}
+
 		configuredFields := es.ConfiguredFields{
 			TimeField:       timeField,
 			LogLevelField:   logLevelField,
@@ -179,6 +183,7 @@ func newInstanceSettings(httpClientProvider httpclient.Provider) datasource.Inst
 			ConfiguredFields:           configuredFields,
 			Interval:                   interval,
 			IncludeFrozen:              includeFrozen,
+			ClusterInfo:                clusterInfo,
 		}
 		return model, nil
 	}
@@ -195,14 +200,21 @@ func (s *Service) getDSInfo(ctx context.Context, pluginCtx backend.PluginContext
 	return &instance, nil
 }
 
+func isFieldCaps(url string) bool {
+	return strings.HasSuffix(url, "/_field_caps") || url == "_field_caps"
+}
+
 func (s *Service) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
-	logger := eslog.FromContext(ctx)
+	logger := s.logger.FromContext(ctx)
 	// allowed paths for resource calls:
 	// - empty string for fetching db version
 	// - /_mapping for fetching index mapping, e.g. requests going to `index/_mapping`
+	// - /_field_caps for fetching field capabilities, e.g. requests going to `index/_field_caps`
 	// - _msearch for executing getTerms queries
 	// - _mapping for fetching "root" index mappings
-	if req.Path != "" && !strings.HasSuffix(req.Path, "/_mapping") && req.Path != "_msearch" && req.Path != "_mapping" {
+	// - _field_caps for fetching "root" field capabilities
+	if req.Path != "" && !isFieldCaps(req.Path) && req.Path != "_msearch" &&
+		!strings.HasSuffix(req.Path, "/_mapping") && req.Path != "_mapping" {
 		logger.Error("Invalid resource path", "path", req.Path)
 		return fmt.Errorf("invalid resource URL: %s", req.Path)
 	}
@@ -233,9 +245,9 @@ func (s *Service) CallResource(ctx context.Context, req *backend.CallResourceReq
 			status = "cancelled"
 		}
 		lp := []any{"error", err, "status", status, "duration", time.Since(start), "stage", es.StageDatabaseRequest, "resourcePath", req.Path}
-		sourceErr := exp.Error{}
+		sourceErr := backend.ErrorWithSource{}
 		if errors.As(err, &sourceErr) {
-			lp = append(lp, "statusSource", sourceErr.Source())
+			lp = append(lp, "statusSource", sourceErr.ErrorSource())
 		}
 		if response != nil {
 			lp = append(lp, "statusCode", response.StatusCode)
@@ -279,6 +291,9 @@ func createElasticsearchURL(req *backend.CallResourceRequest, ds *es.DatasourceI
 	}
 
 	esUrl.Path = path.Join(esUrl.Path, req.Path)
+	if isFieldCaps(req.Path) {
+		esUrl.RawQuery = "fields=*"
+	}
 	esUrlString := esUrl.String()
 	// If the request path is empty and the URL does not end with a slash, add a slash to the URL.
 	// This ensures that for version checks executed to the root URL, the URL ends with a slash.

@@ -1,50 +1,68 @@
-import { render, screen, within } from '@testing-library/react';
-import React from 'react';
-import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { render, screen, within } from 'test/test-utils';
 
-import { locationService } from '@grafana/runtime';
-import { AlertManagerCortexConfig } from 'app/plugins/datasource/alertmanager/types';
-import { configureStore } from 'app/store/configureStore';
-import { AccessControlAction } from 'app/types';
+import { AppNotificationList } from 'app/core/components/AppNotifications/AppNotificationList';
+import { AccessControlAction } from 'app/types/accessControl';
 
+import { setupMswServer } from '../../mockApi';
 import { grantUserPermissions } from '../../mocks';
 import { AlertmanagerProvider } from '../../state/AlertmanagerContext';
+import { KnownProvenance } from '../../types/knownProvenance';
+import { GRAFANA_RULES_SOURCE_NAME } from '../../utils/datasource';
+import { NotificationTemplate } from '../contact-points/useNotificationTemplates';
 
 import { TemplatesTable } from './TemplatesTable';
 
-const defaultConfig: AlertManagerCortexConfig = {
-  template_files: {
-    template1: `{{ define "define1" }}`,
+const mockTemplates: Array<Partial<NotificationTemplate>> = [
+  {
+    uid: 'mimir-template',
+    title: 'mimir-template',
+    content: '{{ define "mimir-template" }}Template from Mimir{{ end }}',
+    provenance: KnownProvenance.ConvertedPrometheus,
+    kind: 'mimir',
   },
-  alertmanager_config: {
-    templates: ['template1'],
+  {
+    uid: 'file-template',
+    title: 'file-template',
+    content: '{{ define "file-template" }}File provisioned template{{ end }}',
+    provenance: KnownProvenance.File,
+    kind: 'grafana',
   },
-};
-jest.mock('app/types', () => ({
-  ...jest.requireActual('app/types'),
-  useDispatch: () => jest.fn(),
-}));
+  {
+    uid: 'api-template',
+    title: 'api-template',
+    content: '{{ define "api-template" }}API provisioned template{{ end }}',
+    provenance: KnownProvenance.API,
+    kind: 'grafana',
+  },
+  {
+    uid: 'no-provenance-template',
+    title: 'no-provenance-template',
+    content: '{{ define "no-provenance-template" }}No provenance template{{ end }}',
+    provenance: KnownProvenance.None,
+    kind: 'grafana',
+  },
+  {
+    uid: 'undefined-provenance-template',
+    title: 'undefined-provenance-template',
+    content: '{{ define "undefined-provenance-template" }}Undefined provenance template{{ end }}',
+    provenance: undefined,
+    kind: 'grafana',
+  },
+];
 
-jest.mock('app/core/services/context_srv');
-
-const renderWithProvider = () => {
-  const store = configureStore();
-
-  render(
-    <Provider store={store}>
-      <Router history={locationService.getHistory()}>
-        <AlertmanagerProvider accessType={'notification'}>
-          <TemplatesTable config={defaultConfig} alertManagerName={'potato'} />
-        </AlertmanagerProvider>
-      </Router>
-    </Provider>
+const renderWithProvider = (templates: Array<Partial<NotificationTemplate>>) => {
+  return render(
+    <AlertmanagerProvider accessType={'notification'}>
+      <TemplatesTable alertManagerName={GRAFANA_RULES_SOURCE_NAME} templates={templates as NotificationTemplate[]} />
+      <AppNotificationList />
+    </AlertmanagerProvider>
   );
 };
 
+setupMswServer();
+
 describe('TemplatesTable', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
     grantUserPermissions([
       AccessControlAction.AlertingNotificationsRead,
       AccessControlAction.AlertingNotificationsWrite,
@@ -52,24 +70,34 @@ describe('TemplatesTable', () => {
       AccessControlAction.AlertingNotificationsExternalWrite,
     ]);
   });
-  it('Should render templates table with the correct rows', () => {
-    renderWithProvider();
-    const rows = screen.getAllByRole('row', { name: /template1/i });
-    expect(within(rows[0]).getByRole('cell', { name: /template1/i })).toBeInTheDocument();
-  });
-  it('Should render duplicate template button when having permissions', () => {
-    renderWithProvider();
-    const rows = screen.getAllByRole('row', { name: /template1/i });
-    expect(within(rows[0]).getByRole('cell', { name: /Copy/i })).toBeInTheDocument();
-  });
-  it('Should not render duplicate template button when not having write permissions', () => {
-    grantUserPermissions([
-      AccessControlAction.AlertingNotificationsRead,
-      AccessControlAction.AlertingNotificationsExternalRead,
-    ]);
 
-    renderWithProvider();
-    const rows = screen.getAllByRole('row', { name: /template1/i });
-    expect(within(rows[0]).queryByRole('cell', { name: /Copy/i })).not.toBeInTheDocument();
+  it('shows "Imported" badge for templates with converted_prometheus provenance', () => {
+    const templates = [mockTemplates[0]]; // mimir-template
+    renderWithProvider(templates);
+
+    const templateRow = screen.getByRole('row', { name: /mimir-template/i });
+    const badge = within(templateRow).getByText('Imported');
+    expect(badge).toBeInTheDocument();
+  });
+
+  it('shows "Provisioned" badge for templates with other provenance', () => {
+    // api and file templates
+    [mockTemplates[1], mockTemplates[2]].forEach((template) => {
+      renderWithProvider([template]);
+
+      const templateRow = screen.getByRole('row', { name: new RegExp(template.title ?? '', 'i') });
+      const badge = within(templateRow).getByText('Provisioned');
+      expect(badge).toBeInTheDocument();
+    });
+  });
+
+  it('does not show badge for templates with KnownProvenance.None or empty string provenance', () => {
+    // no-provenance-template and undefined-provenance-template
+    [mockTemplates[3], mockTemplates[4]].forEach((template) => {
+      renderWithProvider([template]);
+
+      const templateRow = screen.getByRole('row', { name: new RegExp(template.title ?? '', 'i') });
+      expect(within(templateRow).queryByText('Provisioned')).not.toBeInTheDocument();
+    });
   });
 });

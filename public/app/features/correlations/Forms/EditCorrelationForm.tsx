@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
-import { Wizard } from '../components/Wizard';
+import { Wizard } from '../components/Wizard/Wizard';
 import { Correlation } from '../types';
 import { useCorrelations } from '../useCorrelations';
 

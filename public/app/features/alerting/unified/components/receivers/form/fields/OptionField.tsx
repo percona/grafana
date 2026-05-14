@@ -1,11 +1,28 @@
 import { css } from '@emotion/css';
-import { isEmpty } from 'lodash';
-import React, { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Controller, DeepMap, FieldError, useFormContext } from 'react-hook-form';
 
 import { GrafanaTheme2 } from '@grafana/data';
-import { Checkbox, Field, Input, RadioButtonList, Select, TextArea, useStyles2 } from '@grafana/ui';
-import { NotificationChannelOption } from 'app/types';
+import { t } from '@grafana/i18n';
+import {
+  Checkbox,
+  Field,
+  Icon,
+  Input,
+  RadioButtonList,
+  SecretInput,
+  SecretTextArea,
+  Select,
+  Stack,
+  TextArea,
+  Tooltip,
+  useStyles2,
+} from '@grafana/ui';
+import {
+  NotificationChannelOption,
+  NotificationChannelSecureFields,
+  OptionMeta,
+} from 'app/features/alerting/unified/types/alerting';
 
 import { KeyValueMapInput } from './KeyValueMapInput';
 import { StringArrayInput } from './StringArrayInput';
@@ -16,90 +33,123 @@ import { WrapWithTemplateSelection } from './TemplateSelector';
 interface Props {
   defaultValue: any;
   option: NotificationChannelOption;
+  getOptionMeta?: (option: NotificationChannelOption) => OptionMeta;
   invalid?: boolean;
   pathPrefix: string;
-  pathSuffix?: string;
   error?: FieldError | DeepMap<any, FieldError>;
   readOnly?: boolean;
   customValidator?: (value: string) => boolean | string | Promise<boolean | string>;
+  onResetSecureField?: (propertyName: string) => void;
+  onDeleteSubform?: (settingsPath: string, option: NotificationChannelOption) => void;
+  secureFields: NotificationChannelSecureFields;
 }
 
 export const OptionField: FC<Props> = ({
   option,
   invalid,
   pathPrefix,
-  pathSuffix = '',
   error,
   defaultValue,
   readOnly = false,
   customValidator,
+  onResetSecureField,
+  secureFields,
+  onDeleteSubform,
+  getOptionMeta,
 }) => {
-  const optionPath = `${pathPrefix}${pathSuffix}`;
-
   if (option.element === 'subform') {
     return (
       <SubformField
+        secureFields={secureFields}
+        onResetSecureField={onResetSecureField}
         readOnly={readOnly}
         defaultValue={defaultValue}
         option={option}
         errors={error}
-        pathPrefix={optionPath}
+        pathPrefix={pathPrefix}
+        onDelete={onDeleteSubform}
+        getOptionMeta={getOptionMeta}
       />
     );
   }
   if (option.element === 'subform_array') {
     return (
       <SubformArrayField
+        secureFields={secureFields}
         readOnly={readOnly}
         defaultValues={defaultValue}
         option={option}
-        pathPrefix={optionPath}
+        pathPrefix={pathPrefix}
         errors={error as Array<DeepMap<any, FieldError>> | undefined}
+        getOptionMeta={getOptionMeta}
       />
     );
   }
+
+  const shouldShowProtectedIndicator = option.protected && getOptionMeta?.(option).readOnly;
+
+  const labelText = option.element !== 'checkbox' && option.element !== 'radio' ? option.label : undefined;
+
+  const label = shouldShowProtectedIndicator ? (
+    <Stack direction="row" alignItems="center" gap={0.5}>
+      <Tooltip
+        content={t(
+          'alerting.receivers.protected.field.description',
+          'This field is protected and can only be edited by users with elevated permissions'
+        )}
+      >
+        <Icon size="sm" name="lock" data-testid="lock-icon" />
+      </Tooltip>
+      {labelText}
+    </Stack>
+  ) : (
+    labelText
+  );
+
   return (
     <Field
-      label={option.element !== 'checkbox' && option.element !== 'radio' ? option.label : undefined}
+      label={label}
       description={option.description || undefined}
       invalid={!!error}
       error={error?.message}
-      data-testid={`${optionPath}${option.propertyName}`}
+      data-testid={`${pathPrefix}${option.propertyName}`}
     >
       <OptionInput
-        id={`${optionPath}${option.propertyName}`}
+        id={`${pathPrefix}${option.propertyName}`}
         defaultValue={defaultValue}
         option={option}
         invalid={invalid}
-        pathPrefix={optionPath}
+        pathPrefix={pathPrefix}
         readOnly={readOnly}
-        pathIndex={pathPrefix}
         customValidator={customValidator}
+        onResetSecureField={onResetSecureField}
+        secureFields={secureFields}
+        getOptionMeta={getOptionMeta}
       />
     </Field>
   );
 };
 
-const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
+const OptionInput: FC<Props & { id: string }> = ({
   option,
   invalid,
   id,
   pathPrefix = '',
-  pathIndex = '',
   readOnly = false,
   customValidator,
+  onResetSecureField,
+  secureFields = {},
+  getOptionMeta,
 }) => {
   const styles = useStyles2(getStyles);
-  const { control, register, unregister, getValues, setValue } = useFormContext();
+  const { control, register, setValue } = useFormContext();
+
+  const optionMeta = getOptionMeta?.(option);
+
   const name = `${pathPrefix}${option.propertyName}`;
 
-  // workaround for https://github.com/react-hook-form/react-hook-form/issues/4993#issuecomment-829012506
-  useEffect(
-    () => () => {
-      unregister(name, { keepValue: false });
-    },
-    [unregister, name]
-  );
+  const secureFieldKey = option.secure && option.secureFieldKey ? option.secureFieldKey : '';
+  const isEncryptedInput = secureFieldKey && secureFields?.[secureFieldKey];
 
   const useTemplates = option.placeholder.includes('{{ template');
 
@@ -128,22 +178,26 @@ const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
           name={name}
           onSelectTemplate={onSelectTemplate}
         >
-          <Input
-            id={id}
-            readOnly={readOnly || useTemplates || determineReadOnly(option, getValues, pathIndex)}
-            invalid={invalid}
-            type={option.inputType}
-            {...register(name, {
-              required: determineRequired(option, getValues, pathIndex),
-              validate: {
-                validationRule: (v) =>
-                  option.validationRule ? validateOption(v, option.validationRule, option.required) : true,
-                customValidator: (v) => (customValidator ? customValidator(v) : true),
-              },
-              setValueAs: option.setValueAs,
-            })}
-            placeholder={option.placeholder}
-          />
+          {isEncryptedInput ? (
+            <SecretInput id={id} onReset={() => onResetSecureField?.(secureFieldKey)} isConfigured />
+          ) : (
+            <Input
+              id={id}
+              readOnly={readOnly || useTemplates || optionMeta?.readOnly}
+              invalid={invalid}
+              type={option.inputType}
+              {...register(name, {
+                required: optionMeta?.required,
+                validate: {
+                  validationRule: (v) =>
+                    option.validationRule ? validateOption(v, option.validationRule, option.required) : true,
+                  customValidator: (v) => (customValidator ? customValidator(v) : true),
+                },
+                setValueAs: option.setValueAs,
+              })}
+              placeholder={option.placeholder}
+            />
+          )}
         </WrapWithTemplateSelection>
       );
 
@@ -161,7 +215,7 @@ const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
           )}
           control={control}
           name={name}
-          defaultValue={option.defaultValue}
+          defaultValue={option.defaultValue?.value}
           rules={{
             validate: {
               customValidator: (v) => (customValidator ? customValidator(v) : true),
@@ -199,17 +253,21 @@ const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
           name={name}
           onSelectTemplate={onSelectTemplate}
         >
-          <TextArea
-            id={id}
-            readOnly={readOnly || useTemplates}
-            invalid={invalid}
-            placeholder={option.placeholder}
-            {...register(name, {
-              required: option.required ? 'Required' : false,
-              validate: (v) =>
-                option.validationRule !== '' ? validateOption(v, option.validationRule, option.required) : true,
-            })}
-          />
+          {isEncryptedInput ? (
+            <SecretTextArea id={id} onReset={() => onResetSecureField?.(secureFieldKey)} isConfigured />
+          ) : (
+            <TextArea
+              id={id}
+              readOnly={readOnly || useTemplates}
+              invalid={invalid}
+              placeholder={option.placeholder}
+              {...register(name, {
+                required: option.required ? 'Required' : false,
+                validate: (v) =>
+                  option.validationRule !== '' ? validateOption(v, option.validationRule, option.required) : true,
+              })}
+            />
+          )}
         </WrapWithTemplateSelection>
       );
     case 'string_array':
@@ -254,28 +312,4 @@ const validateOption = (value: string, validationRule: string, required: boolean
   }
 
   return RegExp(validationRule).test(value) ? true : 'Invalid format';
-};
-
-const determineRequired = (option: NotificationChannelOption, getValues: any, pathIndex: string) => {
-  if (!option.dependsOn) {
-    return option.required ? 'Required' : false;
-  }
-  if (isEmpty(getValues(`${pathIndex}secureFields`))) {
-    const dependentOn = getValues(`${pathIndex}secureSettings.${option.dependsOn}`);
-    return !Boolean(dependentOn) && option.required ? 'Required' : false;
-  } else {
-    const dependentOn: boolean = getValues(`${pathIndex}secureFields.${option.dependsOn}`);
-    return !dependentOn && option.required ? 'Required' : false;
-  }
-};
-
-const determineReadOnly = (option: NotificationChannelOption, getValues: any, pathIndex: string) => {
-  if (!option.dependsOn) {
-    return false;
-  }
-  if (isEmpty(getValues(`${pathIndex}secureFields`))) {
-    return getValues(`${pathIndex}secureSettings.${option.dependsOn}`);
-  } else {
-    return getValues(`${pathIndex}secureFields.${option.dependsOn}`);
-  }
 };

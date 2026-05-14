@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin/pluginextensionv2"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin/provider"
@@ -19,14 +22,14 @@ import (
 	"github.com/grafana/grafana/pkg/plugins/manager/registry"
 	"github.com/grafana/grafana/pkg/plugins/manager/signature"
 	"github.com/grafana/grafana/pkg/plugins/manager/sources"
+	"github.com/grafana/grafana/pkg/plugins/pluginerrs"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/pipeline"
-	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginerrs"
 	"github.com/grafana/grafana/pkg/services/rendering"
 )
 
 func ProvideService(cfg *config.PluginManagementCfg, pluginEnvProvider envvars.Provider,
-	registry registry.Service) (*Manager, error) {
-	l, err := createLoader(cfg, pluginEnvProvider, registry)
+	registry registry.Service, tracer tracing.Tracer) (*Manager, error) {
+	l, err := createLoader(cfg, pluginEnvProvider, registry, tracer)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +77,7 @@ func (p *Plugin) Start(ctx context.Context) error {
 }
 
 func (p *Plugin) Version() string {
-	return p.plugin.JSONData.Info.Version
+	return p.plugin.Info.Version
 }
 
 func (m *Manager) Renderer(ctx context.Context) (rendering.Plugin, bool) {
@@ -82,7 +85,7 @@ func (m *Manager) Renderer(ctx context.Context) (rendering.Plugin, bool) {
 		return m.renderer, true
 	}
 
-	srcs, err := sources.DirAsLocalSources(m.cfg.PluginsPath, plugins.ClassExternal)
+	srcs, err := sources.DirAsLocalSources(m.cfg, m.cfg.PluginsPath, plugins.ClassExternal)
 	if err != nil {
 		m.log.Error("Failed to get renderer plugin sources", "error", err)
 		return nil, false
@@ -105,9 +108,9 @@ func (m *Manager) Renderer(ctx context.Context) (rendering.Plugin, bool) {
 }
 
 func createLoader(cfg *config.PluginManagementCfg, pluginEnvProvider envvars.Provider,
-	pr registry.Service) (loader.Service, error) {
+	pr registry.Service, tracer trace.Tracer) (loader.Service, error) {
 	d := discovery.New(cfg, discovery.Opts{
-		FindFilterFuncs: []discovery.FindFilterFunc{
+		FilterFuncs: []discovery.FilterFunc{
 			discovery.NewPermittedPluginTypesFilterStep([]plugins.Type{plugins.TypeRenderer}),
 			func(ctx context.Context, class plugins.Class, bundles []*plugins.FoundBundle) ([]*plugins.FoundBundle, error) {
 				return pipeline.NewDuplicatePluginIDFilterStep(pr).Filter(ctx, bundles)
@@ -124,7 +127,7 @@ func createLoader(cfg *config.PluginManagementCfg, pluginEnvProvider envvars.Pro
 	})
 	i := initialization.New(cfg, initialization.Opts{
 		InitializeFuncs: []initialization.InitializeFunc{
-			initialization.BackendClientInitStep(pluginEnvProvider, provider.New(provider.RendererProvider)),
+			initialization.BackendClientInitStep(pluginEnvProvider, provider.New(provider.RendererProvider), tracer),
 			initialization.PluginRegistrationStep(pr),
 		},
 	})
@@ -139,5 +142,5 @@ func createLoader(cfg *config.PluginManagementCfg, pluginEnvProvider envvars.Pro
 
 	et := pluginerrs.ProvideErrorTracker()
 
-	return loader.New(d, b, v, i, t, et), nil
+	return loader.New(cfg, d, b, v, i, t, et), nil
 }

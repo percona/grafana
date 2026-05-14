@@ -7,33 +7,34 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/urfave/cli/v2"
 
 	"github.com/grafana/grafana/pkg/api"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/metrics"
 	"github.com/grafana/grafana/pkg/server"
+	"github.com/grafana/grafana/pkg/services/apiserver/standalone"
 	"github.com/grafana/grafana/pkg/setting"
 )
 
 func TargetCommand(version, commit, buildBranch, buildstamp string) *cli.Command {
 	return &cli.Command{
 		Name:  "target",
-		Usage: "target specific grafana dskit services",
+		Usage: "target specific grafana services",
 		Flags: commonFlags,
 		Action: func(context *cli.Context) error {
-			return RunTargetServer(ServerOptions{
+			return RunTargetServer(standalone.BuildInfo{
 				Version:     version,
 				Commit:      commit,
 				BuildBranch: buildBranch,
 				BuildStamp:  buildstamp,
-				Context:     context,
-			})
+			}, context)
 		},
 	}
 }
 
-func RunTargetServer(opts ServerOptions) error {
+func RunTargetServer(opts standalone.BuildInfo, cli *cli.Context) error {
 	if Version || VerboseVersion {
 		fmt.Printf("Version %s (commit: %s, branch: %s)\n", opts.Version, opts.Commit, opts.BuildBranch)
 		if VerboseVersion {
@@ -54,7 +55,7 @@ func RunTargetServer(opts ServerOptions) error {
 		}
 	}()
 
-	if err := setupProfiling(Profile, ProfileAddr, ProfilePort); err != nil {
+	if err := setupProfiling(Profile, ProfileAddr, ProfilePort, ProfileBlockRate, ProfileMutexFraction); err != nil {
 		return err
 	}
 	if err := setupTracing(Tracing, TracingFile, logger); err != nil {
@@ -83,7 +84,7 @@ func RunTargetServer(opts ServerOptions) error {
 		Config:   ConfigFile,
 		HomePath: HomePath,
 		// tailing arguments have precedence over the options string
-		Args: append(configOptions, opts.Context.Args().Slice()...),
+		Args: append(configOptions, cli.Args().Slice()...),
 	})
 	if err != nil {
 		return err
@@ -91,6 +92,10 @@ func RunTargetServer(opts ServerOptions) error {
 
 	metrics.SetBuildInformation(metrics.ProvideRegisterer(), opts.Version, opts.Commit, opts.BuildBranch, getBuildstamp(opts))
 
+	// Initialize the OpenFeature client with the configuration
+	if err := featuremgmt.InitOpenFeatureWithCfg(cfg); err != nil {
+		return err
+	}
 	s, err := server.InitializeModuleServer(
 		cfg,
 		server.Options{
