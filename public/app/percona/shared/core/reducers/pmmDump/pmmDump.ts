@@ -1,11 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
 import { PMMDumpServices, SendToSupportRequestBody, DumpLogs } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState, LogsActionProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import { mapDumps, mapDumpServices } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
-import { createAsyncThunk } from 'app/types';
 
 const initialState: PmmDumpState = {
   isLoading: false,

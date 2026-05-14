@@ -14,8 +14,7 @@ export const Messages = {
   ignoreLoad: 'Ignore load',
   qan: 'Export QAN',
   enableEncryption: 'Enable encryption',
-  // todo: add tooltip
-  enableEncryptionTooltip: '',
+  enableEncryptionTooltip: 'Protect the exported dataset with a password-based encryption.',
   encryptionPassword: 'Encryption password',
   encryptionPasswordPlaceholder: 'Password',
   ignoreLoadTooltip: 'Bypass the default resource limit restrictions to export faster.',
