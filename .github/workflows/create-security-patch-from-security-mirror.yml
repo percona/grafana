@@ -3,17 +3,8 @@
 name: Create security patch
 run-name: create-security-patch
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-    branches:
-      - "main"
-      - "v*.*.*"
-      - "release-*.*.*"
-
-# This is run before the pull request has been merged, so we'll run against the src branch
+  # @PERCONA - disable workflow
+  workflow_dispatch:
 jobs:
   trigger_downstream_create_security_patch:
     concurrency: create-patch-${{ github.ref_name }}

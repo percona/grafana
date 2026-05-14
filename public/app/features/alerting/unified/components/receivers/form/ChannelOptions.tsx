@@ -1,8 +1,13 @@
 import * as React from 'react';
+import type { JSX } from 'react';
 import { DeepMap, FieldError, FieldErrors, useFormContext } from 'react-hook-form';
 
 import { Field, SecretInput } from '@grafana/ui';
-import { NotificationChannelOption, NotificationChannelSecureFields, OptionMeta } from 'app/types';
+import {
+  NotificationChannelOption,
+  NotificationChannelSecureFields,
+  OptionMeta,
+} from 'app/features/alerting/unified/types/alerting';
 
 import {
   ChannelValues,
@@ -74,6 +79,7 @@ export function ChannelOptions<R extends ChannelValues>({
               label={option.label}
               description={option.description}
               htmlFor={`${settingsPath}${option.propertyName}`}
+              noMargin
             >
               <SecretInput
                 id={`${settingsPath}${option.propertyName}`}
@@ -86,10 +92,10 @@ export function ChannelOptions<R extends ChannelValues>({
 
         const errorSource = option.secure ? errors?.secureFields : errors?.settings;
         const propertyKey = option.secureFieldKey ?? option.propertyName;
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const error = (
-          errorSource as Record<string, FieldError | DeepMap<Record<string, unknown>, FieldError>> | undefined
-        )?.[propertyKey];
+        const error = // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          (errorSource as Record<string, FieldError | DeepMap<Record<string, unknown>, FieldError>> | undefined)?.[
+            propertyKey
+          ];
 
         const defaultValue = defaultValues?.settings?.[option.propertyName];
 

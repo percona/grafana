@@ -7,11 +7,11 @@ import { locationService } from '@grafana/runtime';
 import { PageToolbar, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Databases } from '../../percona/shared/core';
 import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
-import { PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 
 import { AddInstance } from './components/AddInstance/AddInstance';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
@@ -136,7 +136,7 @@ const AddInstancePanel = () => {
           {showSelection ? Messages.selectionStep.cancel : Messages.configurationStep.cancel}
         </ToolbarButton>
         {!showSelection && (
-          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary">
+          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary" type="submit">
             {submitLabel}
           </ToolbarButton>
         )}

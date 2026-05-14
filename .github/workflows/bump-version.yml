@@ -1,17 +1,7 @@
 name: Bump version
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Needs to match, exactly, the name of a milestone. The version to be released please respect: major.minor.patch, major.minor.patch-preview or major.minor.patch-preview<number> format. example: 7.4.3, 7.4.3-preview or 7.4.3-preview1'
-        required: true
-      push:
-        default: true
-        required: false
-      dry_run:
-        default: false
-        required: false
-
 permissions:
   id-token: write
   contents: read

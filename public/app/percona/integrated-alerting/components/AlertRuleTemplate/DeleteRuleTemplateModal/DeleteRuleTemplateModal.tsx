@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { logger } from 'app/percona/shared/helpers/logger';
 

@@ -8,7 +8,7 @@ import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { fetchUsersListAction } from 'app/percona/shared/core/reducers/users/users';
 import { getPerconaSettings, getAccessRoles, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from './AccessRole.messages';
 import { getStyles } from './AccessRole.styles';

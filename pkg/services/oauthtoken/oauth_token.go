@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-jose/go-jose/v3/jwt"
+	jose "github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -15,6 +16,7 @@ import (
 	"golang.org/x/oauth2"
 
 	claims "github.com/grafana/authlib/types"
+
 	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/serverlock"
@@ -122,6 +124,7 @@ func (o *Service) GetCurrentOAuthToken(ctx context.Context, usr identity.Request
 	}
 
 	// If the feature toggle is enabled, an external session is required.
+	//nolint:staticcheck // not yet migrated to OpenFeature
 	if o.features.IsEnabledGlobally(featuremgmt.FlagImprovedExternalSessionHandling) && (externalSession == nil || errors.Is(err, auth.ErrExternalSessionNotFound)) {
 		ctxLogger.Error("No external session found for user", "userID", userID)
 		return nil
@@ -156,6 +159,7 @@ func (o *Service) GetCurrentOAuthToken(ctx context.Context, usr identity.Request
 		return nil
 	}
 
+	//nolint:staticcheck // not yet migrated to OpenFeature
 	if o.features.IsEnabledGlobally(featuremgmt.FlagImprovedExternalSessionHandling) {
 		persistedToken = buildOAuthTokenFromExternalSession(externalSession)
 	} else {
@@ -284,6 +288,7 @@ func (o *Service) TryTokenRefresh(ctx context.Context, usr identity.Requester, t
 	}
 
 	lockKey := fmt.Sprintf("oauth-refresh-token-%d", userID)
+	//nolint:staticcheck // not yet migrated to OpenFeature
 	if o.features.IsEnabledGlobally(featuremgmt.FlagImprovedExternalSessionHandling) {
 		lockKey = fmt.Sprintf("oauth-refresh-token-%d-%d", userID, tokenRefreshMetadata.ExternalSessionID)
 	}
@@ -313,6 +318,7 @@ func (o *Service) TryTokenRefresh(ctx context.Context, usr identity.Requester, t
 
 		var persistedToken *oauth2.Token
 		var externalSession *auth.ExternalSession
+		//nolint:staticcheck // not yet migrated to OpenFeature
 		if o.features.IsEnabledGlobally(featuremgmt.FlagImprovedExternalSessionHandling) {
 			externalSession, err = o.sessionService.GetExternalSession(ctx, tokenRefreshMetadata.ExternalSessionID)
 			if err != nil {
@@ -369,7 +375,7 @@ func (o *Service) InvalidateOAuthTokens(ctx context.Context, usr identity.Reques
 	}
 
 	ctxLogger := logger.FromContext(ctx).New("userID", userID)
-
+	//nolint:staticcheck // not yet migrated to OpenFeature
 	if o.features.IsEnabledGlobally(featuremgmt.FlagImprovedExternalSessionHandling) {
 		err := o.sessionService.UpdateExternalSession(ctx, tokenRefreshMetadata.ExternalSessionID, &auth.UpdateExternalSessionCommand{
 			Token: &oauth2.Token{},
@@ -467,6 +473,11 @@ func (o *Service) tryGetOrRefreshOAuthToken(ctx context.Context, persistedToken 
 			)
 		}
 
+		if token.RefreshToken == "" {
+			ctxLogger.Warn("Refresh token is missing after token refresh", "authmodule", tokenRefreshMetadata.AuthModule)
+		}
+
+		//nolint:staticcheck // not yet migrated to OpenFeature
 		if !o.features.IsEnabledGlobally(featuremgmt.FlagImprovedExternalSessionHandling) {
 			updateAuthCommand := &login.UpdateAuthInfoCommand{
 				UserId:     userID,
@@ -605,7 +616,8 @@ func GetIDTokenExpiry(token *oauth2.Token) (time.Time, error) {
 		return time.Time{}, nil
 	}
 
-	parsedToken, err := jwt.ParseSigned(idToken)
+	parsedToken, err := jwt.ParseSigned(idToken, []jose.SignatureAlgorithm{jose.EdDSA, jose.HS256, jose.HS384,
+		jose.HS512, jose.RS512, jose.RS256, jose.ES256, jose.ES384, jose.ES512, jose.PS256, jose.PS384, jose.PS512})
 	if err != nil {
 		return time.Time{}, fmt.Errorf("error parsing id token: %w", err)
 	}

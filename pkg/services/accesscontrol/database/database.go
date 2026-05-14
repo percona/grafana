@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"go.opentelemetry.io/otel"
+
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
-	"go.opentelemetry.io/otel"
 )
 
 var tracer = otel.Tracer("github.com/grafana/grafana/pkg/services/accesscontrol/database")
@@ -58,7 +59,7 @@ func (s *AccessControlStore) GetUserPermissions(ctx context.Context, query acces
 			return nil
 		}
 
-		filter, params := accesscontrol.UserRolesFilter(query.OrgID, query.UserID, query.TeamIDs, query.Roles)
+		filter, params := accesscontrol.UserRolesFilter(query.OrgID, query.UserID, query.TeamIDs, query.Roles, s.sql.GetDialect())
 
 		q := `
 		SELECT
@@ -72,6 +73,10 @@ func (s *AccessControlStore) GetUserPermissions(ctx context.Context, query acces
 			rolePrefixesFilter, filterParams := accesscontrol.RolePrefixesFilter(query.RolePrefixes)
 			q += rolePrefixesFilter
 			params = append(params, filterParams...)
+		}
+
+		if query.ExcludeRedundantManagedPermissions {
+			q += accesscontrol.ManagedPermissionsActionSetsFilter()
 		}
 
 		if err := sess.SQL(q, params...).Find(&result); err != nil {
@@ -143,6 +148,10 @@ func (s *AccessControlStore) GetTeamsPermissions(ctx context.Context, query acce
 			rolePrefixesFilter, filterParams := accesscontrol.RolePrefixesFilter(rolePrefixes)
 			q += rolePrefixesFilter
 			params = append(params, filterParams...)
+		}
+
+		if query.ExcludeRedundantManagedPermissions {
+			q += accesscontrol.ManagedPermissionsActionSetsFilter()
 		}
 
 		if err := sess.SQL(q, params...).Find(&result); err != nil {

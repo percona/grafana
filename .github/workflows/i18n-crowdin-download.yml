@@ -1,10 +1,8 @@
 name: Crowdin Download Action
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *"
-
 jobs:
   download-sources-from-crowdin:
     if: github.repository == 'grafana/grafana'
