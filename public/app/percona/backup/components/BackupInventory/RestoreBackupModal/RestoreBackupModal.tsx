@@ -3,7 +3,8 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { DateTime, SelectableValue, toUtc } from '@grafana/data';
-import { Alert, Button, DateTimePicker, HorizontalGroup, useStyles2 } from '@grafana/ui';
+import { t } from '@grafana/i18n';
+import { Alert, Button, DateTimePicker, Stack, useStyles2 } from '@grafana/ui';
 import { BackupMode } from 'app/percona/backup/Backup.types';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
@@ -226,9 +227,9 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
             <Alert title="" severity="info">
               {Messages.localRestoreDisabled}
             </Alert>
-            <HorizontalGroup justify="center" spacing="md">
+            <Stack direction="column" justifyContent="center">
               <Button onClick={onClose}>{Messages.close}</Button>
-            </HorizontalGroup>
+            </Stack>
           </>
         ) : (
           <Form
@@ -261,7 +262,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   )}
                   {selectedTimerange && (
                     <div>
-                      <Label label="Timestamp" />
+                      <Label label={t('Timestamp', 'Timestamp')} />
                       <DateTimePicker
                         date={selectedTimerangeFromDatepicker}
                         onChange={setSelectedTimerangeFromDatepicker}
@@ -317,7 +318,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   {Messages.scheduledWarning}
                 </Alert>
                 {!!restoreErrors.length && <BackupErrorSection backupErrors={restoreErrors} />}
-                <HorizontalGroup justify="center" spacing="md">
+                <Stack direction="column" justifyContent="center">
                   <LoaderButton
                     data-testid="restore-button"
                     size="md"
@@ -331,7 +332,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   <Button data-testid="restore-cancel-button" variant="secondary" onClick={onClose}>
                     {Messages.close}
                   </Button>
-                </HorizontalGroup>
+                </Stack>
                 <div className={styles.errorLine} data-testid="backup-modal-error">
                   {values.serviceType === ServiceTypeSelect.SAME && noService && Messages.noService}
                 </div>

@@ -13,7 +13,7 @@ import {
 import { CorrelationData } from '@grafana/runtime';
 import { DataSourceJsonData, DataQuery } from '@grafana/schema';
 import TableModel from 'app/core/TableModel';
-import { ExplorePanelData } from 'app/types';
+import { ExplorePanelData } from 'app/types/explore';
 
 import {
   decorateWithCorrelations,
@@ -126,7 +126,6 @@ const datasource = {
 
 const datasourceInstance = {
   name: datasource.name,
-  id: 1,
   uid: datasource.uid,
   type: datasource.type,
   jsonData: {},

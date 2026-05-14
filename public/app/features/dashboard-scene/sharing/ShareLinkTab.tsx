@@ -1,10 +1,10 @@
 import { dateTime, UrlQueryMap } from '@grafana/data';
 import { selectors as e2eSelectors } from '@grafana/e2e-selectors';
+import { Trans, t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { SceneComponentProps, sceneGraph, SceneObjectBase, SceneObjectRef, VizPanel } from '@grafana/scenes';
 import { TimeZone } from '@grafana/schema';
 import { Alert, ClipboardButton, Field, FieldSet, Icon, Input, Switch } from '@grafana/ui';
-import { t, Trans } from 'app/core/internationalization';
 import { createDashboardShareUrl, createShortLink, getShareUrlParams } from 'app/core/utils/shortLinks';
 import { ThemePicker } from 'app/features/dashboard/components/ShareModal/ThemePicker';
 import { getTrackingSource, shareDashboardType } from 'app/features/dashboard/components/ShareModal/utils';
@@ -76,14 +76,18 @@ export class ShareLinkTab extends SceneObjectBase<ShareLinkTabState> implements 
     let imageQueryParams = urlParamsUpdate;
     if (panel) {
       delete imageQueryParams.viewPanel;
-      imageQueryParams.panelId = panel.state.key;
+      imageQueryParams.panelId = panel.getPathId();
       // force solo route to use scenes
-      imageQueryParams['__feature.dashboardSceneSolo'] = true;
+      imageQueryParams['__feature.dashboardScene'] = true;
     }
     // @PERCONA to support different ports
+
+    // hide Grafana logo in the rendered image
+    urlParamsUpdate.hideLogo = 'true';
+
     const imageUrl = getDashboardUrl({
       uid: dashboard.state.uid,
-      currentQueryParams: location.search,
+      currentQueryParams: window.location.search,
       updateQuery: { ...urlParamsUpdate, ...queryOptions, panelId: panel?.state.key },
       absolute: false,
       soloRoute: true,
@@ -213,13 +217,15 @@ function ShareLinkTabRenderer({ model }: SceneComponentProps<ShareLinkTab>) {
           title={t('share-modal.link.render-alert', 'Image renderer plugin not installed')}
           bottomSpacing={0}
         >
-          {/* @PERCONA */}
-          {/* We modified this text and link */}
-          To render a panel image, you must install the{' '}
-          <a href="https://per.co.na/share_png" target="_blank" rel="noopener noreferrer" className="external-link">
-            Image Renderer plugin
-          </a>
-          . Please contact your PMM administrator to install the plugin.
+          <Trans i18nKey="share-modal.link.render-instructions">
+            {/* @PERCONA */}
+            {/* We modified this text and link */}
+            To render a panel image, you must install the{' '}
+            <a href="https://per.co.na/share_png" target="_blank" rel="noopener noreferrer" className="external-link">
+              Image Renderer plugin
+            </a>
+            . Please contact your PMM administrator to install the plugin.
+          </Trans>
         </Alert>
       )}
     </>

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { FC } from 'react';
 
-import { Select } from '@grafana/ui';
-import { SelectCommonProps } from '@grafana/ui/src/components/Select/types';
+import { Select, SelectCommonProps } from '@grafana/ui';
 import { LabelCore } from 'app/percona/shared/components/Form/LabelCore';
 import { LabeledFieldProps } from 'app/percona/shared/helpers/types';
 

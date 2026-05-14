@@ -3,13 +3,8 @@
 name: Dispatch sync to mirror
 run-name: dispatch-sync-to-mirror-${{ github.ref_name }}
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
-  push:
-    branches:
-      - "main"
-      - "v*.*.*"
-      - "release-*"
-
 permissions: {}
 
 # This is run after the pull request has been merged, so we'll run against the target branch
@@ -41,7 +36,7 @@ jobs:
           app_id: ${{ vars.DELIVERY_BOT_APP_ID }}
           private_key: ${{ env.GRAFANA_DELIVERY_BOT_APP_PEM }}
 
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         if: github.repository == 'grafana/grafana'
         with:
           github-token: ${{ steps.generate_token.outputs.token }}

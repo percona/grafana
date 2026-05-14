@@ -10,15 +10,16 @@ import (
 	"time"
 
 	alertingNotify "github.com/grafana/alerting/notify"
+	"github.com/grafana/alerting/receivers/schema"
 
 	"github.com/grafana/grafana/pkg/api/response"
+	"github.com/grafana/grafana/pkg/apimachinery/errutil"
 	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
-	"github.com/grafana/grafana/pkg/services/ngalert/models"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier/legacy_storage"
 	"github.com/grafana/grafana/pkg/services/ngalert/store"
@@ -34,6 +35,8 @@ const (
 type receiversAuthz interface {
 	FilterRead(ctx context.Context, user identity.Requester, receivers ...ReceiverStatus) ([]ReceiverStatus, error)
 	AuthorizeUpdateProtected(context.Context, identity.Requester, ReceiverStatus) error
+	AuthorizeTest(context.Context, identity.Requester, ReceiverStatus) error
+	AuthorizeTestNew(ctx context.Context, user identity.Requester) error
 }
 
 type AlertmanagerSrv struct {
@@ -55,7 +58,7 @@ func (e UnknownReceiverError) Error() string {
 }
 
 func (srv AlertmanagerSrv) RouteGetAMStatus(c *contextmodel.ReqContext) response.Response {
-	am, errResp := srv.AlertmanagerFor(c.SignedInUser.GetOrgID())
+	am, errResp := srv.AlertmanagerFor(c.GetOrgID())
 	if errResp != nil {
 		return errResp
 	}
@@ -66,7 +69,7 @@ func (srv AlertmanagerSrv) RouteGetAMStatus(c *contextmodel.ReqContext) response
 		return ErrResp(http.StatusInternalServerError, err, "failed to get status for the Alertmanager")
 	}
 
-	if !c.SignedInUser.HasRole(org.RoleAdmin) {
+	if !c.HasRole(org.RoleAdmin) {
 		notifier.RemoveAutogenConfigIfExists(status.Config.Route)
 	}
 
@@ -74,7 +77,7 @@ func (srv AlertmanagerSrv) RouteGetAMStatus(c *contextmodel.ReqContext) response
 }
 
 func (srv AlertmanagerSrv) RouteDeleteAlertingConfig(c *contextmodel.ReqContext) response.Response {
-	err := srv.mam.SaveAndApplyDefaultConfig(c.Req.Context(), c.SignedInUser.GetOrgID())
+	err := srv.mam.SaveAndApplyDefaultConfig(c.Req.Context(), c.GetOrgID())
 	if err != nil {
 		srv.log.Error("Unable to save and apply default alertmanager configuration", "error", err)
 		return response.ErrOrFallback(http.StatusInternalServerError, "failed to save and apply default Alertmanager configuration", err)
@@ -84,8 +87,8 @@ func (srv AlertmanagerSrv) RouteDeleteAlertingConfig(c *contextmodel.ReqContext)
 }
 
 func (srv AlertmanagerSrv) RouteGetAlertingConfig(c *contextmodel.ReqContext) response.Response {
-	canSeeAutogen := c.SignedInUser.HasRole(org.RoleAdmin)
-	config, err := srv.mam.GetAlertmanagerConfiguration(c.Req.Context(), c.SignedInUser.GetOrgID(), canSeeAutogen)
+	canSeeAutogen := c.HasRole(org.RoleAdmin)
+	config, err := srv.mam.GetAlertmanagerConfiguration(c.Req.Context(), c.GetOrgID(), canSeeAutogen, false)
 	if err != nil {
 		if errors.Is(err, store.ErrNoAlertmanagerConfiguration) {
 			return ErrResp(http.StatusNotFound, err, "")
@@ -97,7 +100,7 @@ func (srv AlertmanagerSrv) RouteGetAlertingConfig(c *contextmodel.ReqContext) re
 
 func (srv AlertmanagerSrv) RouteGetAlertingConfigHistory(c *contextmodel.ReqContext) response.Response {
 	limit := c.QueryInt("limit")
-	configs, err := srv.mam.GetAppliedAlertmanagerConfigurations(c.Req.Context(), c.SignedInUser.GetOrgID(), limit)
+	configs, err := srv.mam.GetAppliedAlertmanagerConfigurations(c.Req.Context(), c.GetOrgID(), limit)
 	if err != nil {
 		return ErrResp(http.StatusInternalServerError, err, err.Error())
 	}
@@ -106,7 +109,7 @@ func (srv AlertmanagerSrv) RouteGetAlertingConfigHistory(c *contextmodel.ReqCont
 }
 
 func (srv AlertmanagerSrv) RouteGetAMAlertGroups(c *contextmodel.ReqContext) response.Response {
-	am, errResp := srv.AlertmanagerFor(c.SignedInUser.GetOrgID())
+	am, errResp := srv.AlertmanagerFor(c.GetOrgID())
 	if errResp != nil {
 		return errResp
 	}
@@ -131,7 +134,7 @@ func (srv AlertmanagerSrv) RouteGetAMAlertGroups(c *contextmodel.ReqContext) res
 }
 
 func (srv AlertmanagerSrv) RouteGetAMAlerts(c *contextmodel.ReqContext) response.Response {
-	am, errResp := srv.AlertmanagerFor(c.SignedInUser.GetOrgID())
+	am, errResp := srv.AlertmanagerFor(c.GetOrgID())
 	if errResp != nil {
 		return errResp
 	}
@@ -164,7 +167,7 @@ func (srv AlertmanagerSrv) RoutePostGrafanaAlertingConfigHistoryActivate(c *cont
 		return ErrResp(http.StatusBadRequest, err, "failed to parse config id")
 	}
 
-	err = srv.mam.ActivateHistoricalConfiguration(c.Req.Context(), c.SignedInUser.GetOrgID(), confId)
+	err = srv.mam.ActivateHistoricalConfiguration(c.Req.Context(), c.GetOrgID(), confId)
 	if err != nil {
 		var unknownReceiverError notifier.UnknownReceiverError
 		if errors.As(err, &unknownReceiverError) {
@@ -190,58 +193,8 @@ func (srv AlertmanagerSrv) RoutePostGrafanaAlertingConfigHistoryActivate(c *cont
 	return response.JSON(http.StatusAccepted, util.DynMap{"message": "configuration activated"})
 }
 
-func (srv AlertmanagerSrv) RoutePostAlertingConfig(c *contextmodel.ReqContext, body apimodels.PostableUserConfig) response.Response {
-	// Remove autogenerated config from the user config before checking provenance guard and eventually saving it.
-	// TODO: This and provenance guard should be moved to the notifier package.
-	notifier.RemoveAutogenConfigIfExists(body.AlertmanagerConfig.Route)
-	currentConfig, err := srv.mam.GetAlertmanagerConfiguration(c.Req.Context(), c.SignedInUser.GetOrgID(), false)
-	// If a config is present and valid we proceed with the guard, otherwise we
-	// just bypass the guard which is okay as we are anyway in an invalid state.
-	if err == nil {
-		if err := srv.provenanceGuard(currentConfig, body); err != nil {
-			return ErrResp(http.StatusBadRequest, err, "")
-		}
-	}
-	if srv.featureManager.IsEnabled(c.Req.Context(), featuremgmt.FlagAlertingApiServer) {
-		if err != nil {
-			// Unclear if returning an error here is the right thing to do, preventing the user from posting a new config
-			// when the current one is legitimately invalid is not optimal, but we need to ensure receiver
-			// permissions are maintained and prevent potential access control bypasses. The workaround is to use the
-			// various new k8s API endpoints to fix the configuration.
-			return ErrResp(http.StatusInternalServerError, err, "")
-		}
-		if err := srv.k8sApiServiceGuard(currentConfig, body); err != nil {
-			return ErrResp(http.StatusBadRequest, err, "")
-		}
-	}
-	authz := func(receiverName string, paths []models.IntegrationFieldPath) error {
-		return srv.receiverAuthz.AuthorizeUpdateProtected(c.Req.Context(), c.SignedInUser, ReceiverStatus{Name: receiverName})
-	}
-
-	err = srv.mam.SaveAndApplyAlertmanagerConfiguration(c.Req.Context(), c.SignedInUser.GetOrgID(), body, authz)
-	if err == nil {
-		return response.JSON(http.StatusAccepted, util.DynMap{"message": "configuration created"})
-	}
-	var unknownReceiverError notifier.UnknownReceiverError
-	if errors.As(err, &unknownReceiverError) {
-		return ErrResp(http.StatusBadRequest, unknownReceiverError, "")
-	}
-	var configRejectedError notifier.AlertmanagerConfigRejectedError
-	if errors.As(err, &configRejectedError) {
-		return ErrResp(http.StatusBadRequest, configRejectedError, "")
-	}
-	if errors.Is(err, notifier.ErrNoAlertmanagerForOrg) {
-		return response.Error(http.StatusNotFound, err.Error(), err)
-	}
-	if errors.Is(err, notifier.ErrAlertmanagerNotReady) {
-		return response.Error(http.StatusConflict, err.Error(), err)
-	}
-
-	return response.ErrOrFallback(http.StatusInternalServerError, err.Error(), err)
-}
-
 func (srv AlertmanagerSrv) RouteGetReceivers(c *contextmodel.ReqContext) response.Response {
-	am, errResp := srv.AlertmanagerFor(c.SignedInUser.GetOrgID())
+	am, errResp := srv.AlertmanagerFor(c.GetOrgID())
 	if errResp != nil {
 		return errResp
 	}
@@ -262,12 +215,33 @@ func (srv AlertmanagerSrv) RouteGetReceivers(c *contextmodel.ReqContext) respons
 }
 
 func (srv AlertmanagerSrv) RoutePostTestReceivers(c *contextmodel.ReqContext, body apimodels.TestReceiversConfigBodyParams) response.Response {
-	if err := srv.crypto.ProcessSecureSettings(c.Req.Context(), c.SignedInUser.GetOrgID(), body.Receivers, func(receiverName string, paths []models.IntegrationFieldPath) error {
+	// It's ok performance wise, because the 99% use-case is just a single integration.
+	for _, receiver := range body.Receivers {
+		if len(receiver.GrafanaManagedReceivers) == 0 {
+			continue
+		}
+		var err error
+		if receiver.Name == "" {
+			err = srv.receiverAuthz.AuthorizeTestNew(c.Req.Context(), c.SignedInUser)
+		} else {
+			err = srv.receiverAuthz.AuthorizeTest(c.Req.Context(), c.SignedInUser, ReceiverStatus{Name: receiver.Name})
+		}
+		if err != nil {
+			if errors.As(err, &errutil.Error{}) {
+				return response.Err(err)
+			}
+			return ErrResp(http.StatusInternalServerError, err, "failed to authorize request")
+		}
+	}
+	if err := srv.crypto.ProcessSecureSettings(c.Req.Context(), c.GetOrgID(), body.Receivers, func(receiverName string, paths []schema.IntegrationFieldPath) error {
 		return srv.receiverAuthz.AuthorizeUpdateProtected(c.Req.Context(), c.SignedInUser, ReceiverStatus{Name: receiverName})
 	}); err != nil {
 		var unknownReceiverError UnknownReceiverError
 		if errors.As(err, &unknownReceiverError) {
 			return ErrResp(http.StatusBadRequest, err, "")
+		}
+		if errors.As(err, &errutil.Error{}) {
+			return response.Err(err)
 		}
 		return ErrResp(http.StatusInternalServerError, err, "failed to post process Alertmanager configuration")
 	}
@@ -282,7 +256,7 @@ func (srv AlertmanagerSrv) RoutePostTestReceivers(c *contextmodel.ReqContext, bo
 	}
 	defer cancelFunc()
 
-	am, errResp := srv.AlertmanagerFor(c.SignedInUser.GetOrgID())
+	am, errResp := srv.AlertmanagerFor(c.GetOrgID())
 	if errResp != nil {
 		return errResp
 	}
@@ -299,7 +273,7 @@ func (srv AlertmanagerSrv) RoutePostTestReceivers(c *contextmodel.ReqContext, bo
 }
 
 func (srv AlertmanagerSrv) RoutePostTestTemplates(c *contextmodel.ReqContext, body apimodels.TestTemplatesConfigBodyParams) response.Response {
-	am, errResp := srv.AlertmanagerFor(c.SignedInUser.GetOrgID())
+	am, errResp := srv.AlertmanagerFor(c.GetOrgID())
 	if errResp != nil {
 		return errResp
 	}

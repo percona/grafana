@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { AppEvents, PageLayoutType, SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { CollapsableSection, CustomScrollbar, LinkButton, PageToolbar, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
@@ -26,7 +26,7 @@ import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api
 import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { PageSwitcherCard } from '../../../shared/components/Elements/PageSwitcherCard/PageSwitcherCard';
 import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
@@ -358,7 +358,6 @@ const AddBackupPage: FC = () => {
                             label={Messages.advanceSettings}
                             isOpen={advancedSectionOpen}
                             onToggle={onToggle}
-                            controlled
                             buttonDataTestId="add-backup-advanced-settings"
                           >
                             <RetryModeSelector retryMode={values.retryMode} />

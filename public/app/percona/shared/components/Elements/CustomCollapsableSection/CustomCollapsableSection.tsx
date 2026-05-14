@@ -30,7 +30,7 @@ export const CustomCollapsableSection = ({
       bodyCustomClass={styles.collapsableBody}
       headerCustomClass={styles.collapsableHeader}
       headerLabelCustomClass={styles.collapsableHeaderLabel}
-      disabled={disabled}
+      buttonCustomClass={styles.collapsableButton}
       isOpen={isInitOpen}
     >
       {children}

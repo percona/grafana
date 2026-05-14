@@ -1,15 +1,15 @@
 package models
 
 import (
-	"reflect"
-	"slices"
 	"testing"
 
 	alertingNotify "github.com/grafana/alerting/notify"
+	"github.com/grafana/alerting/notify/notifytest"
+	"github.com/grafana/alerting/receivers/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/grafana/grafana/pkg/services/ngalert/notifier/channels_config"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 func TestReceiver_Clone(t *testing.T) {
@@ -18,7 +18,7 @@ func TestReceiver_Clone(t *testing.T) {
 		receiver Receiver
 	}{
 		{name: "empty receiver", receiver: Receiver{}},
-		{name: "empty integration", receiver: Receiver{Integrations: []*Integration{{Config: IntegrationConfig{}}}}},
+		{name: "empty integration", receiver: Receiver{Integrations: []*Integration{{Config: schema.IntegrationSchemaVersion{}}}}},
 		{name: "random receiver", receiver: ReceiverGen()()},
 	}
 
@@ -39,25 +39,24 @@ func TestReceiver_EncryptDecrypt(t *testing.T) {
 	encryptFn := Base64Enrypt
 	decryptnFn := Base64Decrypt
 	// Test that all known integration types encrypt and decrypt their secrets.
-	for integrationType := range alertingNotify.AllKnownConfigsForTesting {
-		t.Run(integrationType, func(t *testing.T) {
+	for integrationType := range notifytest.AllKnownV1ConfigsForTesting {
+		t.Run(string(integrationType), func(t *testing.T) {
 			decrypedIntegration := IntegrationGen(IntegrationMuts.WithValidConfig(integrationType))()
-
 			encrypted := decrypedIntegration.Clone()
-			secrets, err := channels_config.GetSecretKeysForContactPointType(integrationType)
-			assert.NoError(t, err)
-			for _, key := range secrets {
-				val, ok, err := extractField(encrypted.Settings, NewIntegrationFieldPath(key))
+			typeVersion, ok := alertingNotify.GetSchemaVersionForIntegration(integrationType, schema.V1)
+			require.True(t, ok)
+			for _, key := range typeVersion.GetSecretFieldsPaths() {
+				val, ok, err := extractField(encrypted.Settings, key)
 				assert.NoError(t, err)
 				if ok {
 					encryptedVal, err := encryptFn(val)
 					assert.NoError(t, err)
-					encrypted.SecureSettings[key] = encryptedVal
+					encrypted.SecureSettings[key.String()] = encryptedVal
 				}
 			}
 
 			testIntegration := decrypedIntegration.Clone()
-			err = testIntegration.Encrypt(encryptFn)
+			err := testIntegration.Encrypt(encryptFn)
 			assert.NoError(t, err)
 			require.Equal(t, encrypted, testIntegration)
 
@@ -69,21 +68,23 @@ func TestReceiver_EncryptDecrypt(t *testing.T) {
 }
 
 func TestIntegration_Redact(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	redactFn := func(key string) string {
 		return "TESTREDACTED"
 	}
 	// Test that all known integration types redact their secrets.
-	for integrationType := range alertingNotify.AllKnownConfigsForTesting {
-		t.Run(integrationType, func(t *testing.T) {
+	for integrationType := range notifytest.AllKnownV1ConfigsForTesting {
+		t.Run(string(integrationType), func(t *testing.T) {
 			validIntegration := IntegrationGen(IntegrationMuts.WithValidConfig(integrationType))()
 
 			expected := validIntegration.Clone()
-			secrets, err := channels_config.GetSecretKeysForContactPointType(integrationType)
-			assert.NoError(t, err)
-			for _, key := range secrets {
-				err := setField(expected.Settings, NewIntegrationFieldPath(key), func(current any) any {
+			version, ok := alertingNotify.GetSchemaVersionForIntegration(integrationType, schema.V1)
+			require.True(t, ok)
+			for _, key := range version.GetSecretFieldsPaths() {
+				err := setField(expected.Settings, key, func(current any) any {
 					if s, isString := current.(string); isString && s != "" {
-						delete(expected.SecureSettings, key)
+						delete(expected.SecureSettings, key.String())
 						return redactFn(s)
 					}
 					return current
@@ -99,9 +100,11 @@ func TestIntegration_Redact(t *testing.T) {
 }
 
 func TestIntegration_Validate(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	// Test that all known integration types are valid.
-	for integrationType := range alertingNotify.AllKnownConfigsForTesting {
-		t.Run(integrationType, func(t *testing.T) {
+	for integrationType := range notifytest.AllKnownV1ConfigsForTesting {
+		t.Run(string(integrationType), func(t *testing.T) {
 			validIntegration := IntegrationGen(IntegrationMuts.WithValidConfig(integrationType))()
 			assert.NoError(t, validIntegration.Encrypt(Base64Enrypt))
 			assert.NoErrorf(t, validIntegration.Validate(Base64Decrypt), "integration should be valid")
@@ -114,6 +117,8 @@ func TestIntegration_Validate(t *testing.T) {
 }
 
 func TestIntegration_WithExistingSecureFields(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	// Test that WithExistingSecureFields will copy over the secure fields from the existing integration.
 	testCases := []struct {
 		name         string
@@ -231,42 +236,41 @@ func TestIntegration_WithExistingSecureFields(t *testing.T) {
 	}
 }
 
-func TestIntegrationConfig(t *testing.T) {
+func TestSecretsIntegrationConfig(t *testing.T) {
 	// Test that all known integration types have a config and correctly mark their secrets as secure.
-	for integrationType := range alertingNotify.AllKnownConfigsForTesting {
-		t.Run(integrationType, func(t *testing.T) {
-			config, err := IntegrationConfigFromType(integrationType)
-			assert.NoError(t, err)
+	for integrationType := range notifytest.AllKnownV1ConfigsForTesting {
+		t.Run(string(integrationType), func(t *testing.T) {
+			config, ok := alertingNotify.GetSchemaVersionForIntegration(integrationType, schema.V1)
+			require.True(t, ok)
 
-			secrets, err := channels_config.GetSecretKeysForContactPointType(integrationType)
-			assert.NoError(t, err)
+			secrets := config.GetSecretFieldsPaths()
 			allSecrets := make(map[string]struct{}, len(secrets))
 			for _, key := range secrets {
-				allSecrets[key] = struct{}{}
+				allSecrets[key.String()] = struct{}{}
 			}
 
-			for field := range config.Fields {
-				_, isSecret := allSecrets[field]
-				assert.Equalf(t, isSecret, config.IsSecureField(NewIntegrationFieldPath(field)), "field '%s' is expected to be secret", field)
+			secretFields := config.GetSecretFieldsPaths()
+			for _, path := range secretFields {
+				_, isSecret := allSecrets[path.String()]
+				assert.Equalf(t, isSecret, config.IsSecureField(path), "field '%s' is expected to be secret", path)
+				delete(allSecrets, path.String())
 			}
-			assert.False(t, config.IsSecureField(IntegrationFieldPath{"__--**unknown_field**--__"}))
+			assert.False(t, config.IsSecureField(schema.ParseIntegrationPath("__--**unknown_field**--__")))
+			assert.Empty(t, allSecrets, "mismatched secret fields for integration type %s: %v", integrationType, allSecrets)
 		})
 	}
-
-	t.Run("Unknown type returns error", func(t *testing.T) {
-		_, err := IntegrationConfigFromType("__--**unknown_type**--__")
-		assert.Error(t, err)
-	})
 }
 
 func TestIntegration_SecureFields(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	// Test that all known integration types have a config and correctly mark their secrets as secure.
-	for integrationType := range alertingNotify.AllKnownConfigsForTesting {
-		t.Run(integrationType, func(t *testing.T) {
+	for integrationType := range notifytest.AllKnownV1ConfigsForTesting {
+		t.Run(string(integrationType), func(t *testing.T) {
 			t.Run("contains SecureSettings", func(t *testing.T) {
 				validIntegration := IntegrationGen(IntegrationMuts.WithValidConfig(integrationType))()
 				expected := make(map[string]bool, len(validIntegration.SecureSettings))
-				for _, path := range validIntegration.Config.GetSecretFields() {
+				for _, path := range validIntegration.Config.GetSecretFieldsPaths() {
 					if validIntegration.Config.IsSecureField(path) {
 						expected[path.String()] = true
 						validIntegration.SecureSettings[path.String()] = "test"
@@ -281,7 +285,7 @@ func TestIntegration_SecureFields(t *testing.T) {
 			t.Run("contains secret Settings not in SecureSettings", func(t *testing.T) {
 				validIntegration := IntegrationGen(IntegrationMuts.WithValidConfig(integrationType))()
 				expected := make(map[string]bool, len(validIntegration.SecureSettings))
-				for _, path := range validIntegration.Config.GetSecretFields() {
+				for _, path := range validIntegration.Config.GetSecretFieldsPaths() {
 					if validIntegration.Config.IsSecureField(path) {
 						expected[path.String()] = true
 						assert.NoError(t, setField(validIntegration.Settings, path, func(current any) any {
@@ -303,350 +307,4 @@ type broken struct {
 
 func (b broken) MarshalJSON() ([]byte, error) {
 	return nil, assert.AnError
-}
-
-func TestReceiver_Fingerprint(t *testing.T) {
-	// Test that the fingerprint is stable.
-	im := IntegrationMuts
-	baseReceiver := ReceiverGen(ReceiverMuts.WithName("test receiver"), ReceiverMuts.WithIntegrations(
-		IntegrationGen(im.WithName("test receiver"), im.WithValidConfig("slack"))(),
-	))()
-	baseReceiver.Integrations[0].UID = "stable UID"
-	baseReceiver.Integrations[0].DisableResolveMessage = true
-	baseReceiver.Integrations[0].SecureSettings = map[string]string{"test2": "test2", "test3": "test223", "test1": "rest22"}
-	baseReceiver.Integrations[0].Settings["broken"] = broken{f1: "this"} // Add a broken type to ensure it is stable in the fingerprint.
-	baseReceiver.Integrations[0].Settings["sub-map"] = map[string]any{
-		"setting":   "value",
-		"something": 123,
-		"data":      []string{"test"},
-	} // Add a broken type to ensure it is stable in the fingerprint.
-	baseReceiver.Integrations[0].Config = IntegrationConfig{Type: baseReceiver.Integrations[0].Config.Type} // Remove all fields except Type.
-
-	completelyDifferentReceiver := ReceiverGen(ReceiverMuts.WithName("test receiver2"), ReceiverMuts.WithIntegrations(
-		IntegrationGen(im.WithName("test receiver2"), im.WithValidConfig("discord"))(),
-	))()
-	completelyDifferentReceiver.Integrations[0].UID = "stable UID2"
-	completelyDifferentReceiver.Integrations[0].DisableResolveMessage = false
-	completelyDifferentReceiver.Integrations[0].SecureSettings = map[string]string{"test": "test"}
-	completelyDifferentReceiver.Provenance = ProvenanceAPI
-	completelyDifferentReceiver.Integrations[0].Config = IntegrationConfig{Type: completelyDifferentReceiver.Integrations[0].Config.Type} // Remove all fields except Type.
-
-	t.Run("stable across code changes", func(t *testing.T) {
-		expectedFingerprint := "c0c82936be34b183" // If this is a valid fingerprint generation change, update the expected value.
-		assert.Equal(t, expectedFingerprint, baseReceiver.Fingerprint())
-	})
-	t.Run("stable across clones", func(t *testing.T) {
-		fingerprint := baseReceiver.Fingerprint()
-		receiverClone := baseReceiver.Clone()
-		assert.Equal(t, fingerprint, receiverClone.Fingerprint())
-	})
-	t.Run("stable across Version field modification", func(t *testing.T) {
-		fingerprint := baseReceiver.Fingerprint()
-		receiverClone := baseReceiver.Clone()
-		receiverClone.Version = "new version"
-		assert.Equal(t, fingerprint, receiverClone.Fingerprint())
-	})
-	t.Run("unstable across field modification", func(t *testing.T) {
-		fingerprint := baseReceiver.Fingerprint()
-		excludedFields := map[string]struct{}{
-			"Version": {},
-		}
-
-		reflectVal := reflect.ValueOf(&completelyDifferentReceiver).Elem()
-
-		receiverType := reflect.TypeOf((*Receiver)(nil)).Elem()
-		for i := 0; i < receiverType.NumField(); i++ {
-			field := receiverType.Field(i).Name
-			if _, ok := excludedFields[field]; ok {
-				continue
-			}
-			cp := baseReceiver.Clone()
-
-			// Get the current field being modified.
-			v := reflect.ValueOf(&cp).Elem()
-			vf := v.Field(i)
-
-			otherField := reflectVal.Field(i)
-			if reflect.DeepEqual(otherField.Interface(), vf.Interface()) {
-				assert.Failf(t, "filds are identical", "Receiver field %s is the same as the original, test does not ensure instability across the field", field)
-				continue
-			}
-
-			// Set the field to the value of the completelyDifferentReceiver.
-			vf.Set(otherField)
-
-			f2 := cp.Fingerprint()
-			assert.NotEqualf(t, fingerprint, f2, "Receiver field %s does not seem to be used in fingerprint", field)
-		}
-
-		excludedFields = map[string]struct{}{}
-
-		reflectVal = reflect.ValueOf(completelyDifferentReceiver.Integrations[0]).Elem()
-		integrationType := reflect.TypeOf((*Integration)(nil)).Elem()
-		for i := 0; i < integrationType.NumField(); i++ {
-			field := integrationType.Field(i).Name
-			if _, ok := excludedFields[field]; ok {
-				continue
-			}
-			cp := baseReceiver.Clone()
-			integrationCp := cp.Integrations[0]
-
-			// Get the current field being modified.
-			v := reflect.ValueOf(integrationCp).Elem()
-			vf := v.Field(i)
-
-			otherField := reflectVal.Field(i)
-			if reflect.DeepEqual(otherField.Interface(), vf.Interface()) {
-				assert.Failf(t, "filds are identical", "Integration field %s is the same as the original, test does not ensure instability across the field", field)
-				continue
-			}
-
-			// Set the field to the value of the completelyDifferentReceiver.
-			vf.Set(otherField)
-
-			f2 := cp.Fingerprint()
-			assert.NotEqualf(t, fingerprint, f2, "Integration field %s does not seem to be used in fingerprint", field)
-		}
-	})
-}
-
-func TestIntegrationDiff(t *testing.T) {
-	s := IntegrationConfig{Type: "test"}
-	a := Integration{
-		UID:                   "test-uid",
-		Name:                  "test-name",
-		Config:                s,
-		DisableResolveMessage: false,
-		Settings: map[string]any{
-			"url":  "http://localhost",
-			"name": 123,
-			"flag": true,
-			"child": map[string]any{
-				"sub-form-field": "test",
-			},
-		},
-		SecureSettings: map[string]string{
-			"password": "12345",
-			"token":    "token-12345",
-		},
-	}
-
-	t.Run("no diff if equal", func(t *testing.T) {
-		result := a.Diff(a)
-		assert.Empty(t, result)
-	})
-
-	t.Run("should deep compare settings", func(t *testing.T) {
-		b := a
-		b.Settings = map[string]any{
-			"url":  "http://localhost:123",
-			"flag": false,
-			"child": map[string]any{
-				"sub-form-field": "test123",
-				"sub-child": map[string]any{
-					"test": "test",
-				},
-			},
-		}
-
-		result := a.Diff(b)
-		assert.ElementsMatch(t,
-			[]string{"Settings[url]", "Settings[name]", "Settings[flag]", "Settings[child][sub-form-field]", "Settings[child][sub-child]"},
-			result.Paths())
-	})
-
-	t.Run("should shallow compare schemas", func(t *testing.T) {
-		b := a
-		b.Config = IntegrationConfig{Type: "test2"}
-		result := a.Diff(b)
-		assert.ElementsMatch(t,
-			[]string{"Config"},
-			result.Paths())
-	})
-
-	t.Run("should compare with zero objects", func(t *testing.T) {
-		result := a.Diff(Integration{})
-		assert.ElementsMatch(t,
-			[]string{
-				"UID",
-				"Name",
-				"Config",
-				"Settings[child]",
-				"Settings[flag]",
-				"Settings[name]",
-				"Settings[url]",
-				"SecureSettings[password]",
-				"SecureSettings[token]",
-			},
-			result.Paths())
-	})
-}
-
-func TestIntegrationDiffReport_GetSettingsPaths(t *testing.T) {
-	a := Integration{
-		UID:                   "test-uid",
-		Name:                  "test-name",
-		Config:                IntegrationConfig{},
-		DisableResolveMessage: false,
-		Settings: map[string]any{
-			"url": "http://localhost",
-			"child": map[string]any{
-				"field": "test",
-				"sub-child": map[string]any{
-					"test": "test",
-				},
-			},
-		},
-	}
-
-	testCases := []struct {
-		name  string
-		left  map[string]any
-		right map[string]any
-		paths []string
-	}{
-		{
-			name:  "empty",
-			left:  map[string]any{},
-			right: map[string]any{},
-		},
-		{
-			name: "left is empty",
-			left: map[string]any{},
-			right: map[string]any{
-				"field": "test",
-			},
-			paths: []string{"field"},
-		},
-		{
-			name: "right is empty",
-			left: map[string]any{
-				"field": "test",
-			},
-			right: map[string]any{},
-			paths: []string{"field"},
-		},
-		{
-			name: "expands nested",
-			left: map[string]any{
-				"field": map[string]any{
-					"sub-field": map[string]any{
-						"test": "test",
-					},
-				},
-			},
-			right: map[string]any{
-				"another": map[string]any{
-					"sub-field": map[string]any{
-						"test": "test",
-					},
-				},
-			},
-			paths: []string{
-				"field.sub-field.test",
-				"another.sub-field.test",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			b := a
-			b.Settings = tc.right
-			a.Settings = tc.left
-			diff := a.Diff(b)
-
-			actual := diff.GetSettingsPaths()
-			actualStrings := make([]string, 0, len(actual))
-			for _, f := range actual {
-				actualStrings = append(actualStrings, f.String())
-			}
-			assert.ElementsMatch(t, tc.paths, actualStrings)
-		})
-	}
-}
-
-func TestHasDifferentProtectedFields(t *testing.T) {
-	m := IntegrationMuts
-
-	testCase := []struct {
-		name     string
-		existing Integration
-		incoming Integration
-		expected map[string][]string
-	}{
-		{
-			name:     "different UID do not match",
-			existing: IntegrationGen(m.WithUID("existing"), m.WithValidConfig("webhook"))(),
-			incoming: IntegrationGen(
-				m.WithValidConfig("webhook"),
-				m.AddSetting("url", "http://some-other-url"),
-				m.WithUID("incoming"),
-			)(),
-			expected: nil,
-		},
-		{
-			name:     "find url protected",
-			existing: IntegrationGen(m.WithUID("1"), m.WithValidConfig("webhook"))(),
-			incoming: IntegrationGen(
-				m.WithValidConfig("webhook"),
-				m.AddSetting("url", "http://some-other-url"),
-				m.WithUID("1"),
-			)(),
-			expected: map[string][]string{
-				"1": {
-					"url",
-				},
-			},
-		},
-		{
-			name: "secure and protected", // simulate the situation when protected secured field is in secure settings but the incoming one has it in settings
-			existing: IntegrationGen(
-				m.WithUID("1"),
-				m.WithValidConfig("discord"),
-				m.RemoveSetting("url"),
-				m.WithSecureSettings(map[string]string{
-					"url": "<SECURED>",
-				}))(),
-			incoming: IntegrationGen(
-				m.WithValidConfig("discord"),
-				m.AddSetting("url", "http://some-other-url"),
-				m.WithSecureSettings(nil),
-				m.WithUID("1"),
-			)(),
-			expected: map[string][]string{
-				"1": {
-					"url",
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCase {
-		t.Run(tc.name, func(t *testing.T) {
-			existing := &Receiver{
-				Integrations: []*Integration{
-					&tc.existing,
-				},
-			}
-			incoming := &Receiver{
-				Integrations: []*Integration{
-					&tc.incoming,
-				},
-			}
-			actual := HasReceiversDifferentProtectedFields(existing, incoming)
-			if len(tc.expected) == 0 {
-				require.Empty(t, actual)
-				return
-			}
-			actualStrings := make(map[string][]string, len(actual))
-			for uid, paths := range actual {
-				for _, path := range paths {
-					actualStrings[uid] = append(actualStrings[uid], path.String())
-				}
-				slices.Sort(actualStrings[uid])
-			}
-			assert.EqualValues(t, tc.expected, actualStrings)
-		})
-	}
 }

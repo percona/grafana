@@ -1,7 +1,7 @@
 import { Store } from 'redux';
 
 import { initialKeyedVariablesState } from 'app/features/variables/state/keyedVariablesReducer';
-import { StoreState, useDispatch } from 'app/types';
+import { StoreState, useDispatch } from 'app/types/store';
 
 export let store: Store<StoreState>;
 

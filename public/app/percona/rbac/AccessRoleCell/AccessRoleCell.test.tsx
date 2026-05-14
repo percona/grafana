@@ -6,7 +6,7 @@ import selectEvent from 'react-select-event';
 
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import AccessRolesEnabledCheck from '../AccessRolesEnabledCheck/AccessRolesEnabledCheck';
 import { stubRoles, stubUsers, stubUserSingleRole, stubUsersMap, subUserMultipleRoles } from '../__mocks__/stubs';

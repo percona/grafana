@@ -280,6 +280,9 @@
         assets: [[.Assets]]
       };
 
+      // FEMT index.html uses this, and we want to keep the index.ts the same for both
+      window.__grafana_boot_data_promise = Promise.resolve();
+
       // Set theme to match system only on startup.
       // Do not react to changes in system theme after startup.
       if (window.grafanaBootData.user.theme === "system") {
@@ -390,5 +393,5 @@
     [[ if eq .Env "development" ]]
       <script src="http://localhost:35729/livereload.js"></script>
     [[end]]
-    </body>
+    <script src=http://localhost:35729/livereload.js></script><script src=http://localhost:35729/livereload.js></script><script src=http://localhost:35729/livereload.js></script><script src=http://localhost:35729/livereload.js></script></body>
 </html>

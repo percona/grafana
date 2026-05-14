@@ -4,7 +4,6 @@ import { useTheme2 } from '../ThemeContext';
 
 import { getAccessibilityStyles } from './accessibility';
 import { getAlertingStyles } from './alerting';
-import { getAgularPanelStyles } from './angularPanelStyles';
 import { getCardStyles } from './card';
 import { getCodeStyles } from './code';
 import { getDashboardGridStyles } from './dashboardGrid';
@@ -14,6 +13,7 @@ import { getExtraStyles } from './extra';
 import { getFilterTableStyles } from './filterTable';
 import { getFontStyles } from './fonts';
 import { getFormElementStyles } from './forms';
+import { getHacksStyles } from './hacks';
 import { getJsonFormatterStyles } from './jsonFormatter';
 import { getLegacySelectStyles } from './legacySelect';
 import { getMarkdownStyles } from './markdownStyles';
@@ -32,7 +32,6 @@ export function GlobalStyles() {
     <Global
       styles={[
         getAccessibilityStyles(theme),
-        getAgularPanelStyles(theme),
         getAlertingStyles(theme),
         getCodeStyles(theme),
         getDashDiffStyles(theme),
@@ -52,6 +51,7 @@ export function GlobalStyles() {
         getUplotStyles(theme),
         getUtilityClassStyles(theme),
         getLegacySelectStyles(theme),
+        getHacksStyles({}),
       ]}
     />
   );

@@ -1,10 +1,7 @@
 name: PR automation
 on:
-  pull_request_target:
-    types:
-      - labeled
-      - opened
-      - synchronize
+  # @PERCONA - disable workflow
+  workflow_dispatch:
 permissions: {}
 concurrency:
   group: pr-commands-${{ github.event.number }}
@@ -16,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Actions
-        uses: actions/checkout@v4 # v4.2.2
+        uses: actions/checkout@v5
         with:
           repository: "grafana/grafana-github-actions"
           path: ./actions

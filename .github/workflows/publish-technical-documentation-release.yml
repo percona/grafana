@@ -1,13 +1,7 @@
 name: publish-technical-documentation-release
 
 on:
-  push:
-    branches:
-      - release-[0-9]+.[0-9]+.[0-9]+
-    tags:
-      - v[0-9]+.[0-9]+.[0-9]+
-    paths:
-      - "docs/sources/**"
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   sync:
@@ -17,7 +11,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: false
