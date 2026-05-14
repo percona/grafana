@@ -74,6 +74,16 @@ export const validators = {
     return 'Must include upper and lower cases';
   },
 
+  containLetters: (value: string) => {
+    const lettersRegexp = /[A-Za-z]/;
+
+    if (lettersRegexp.test(value)) {
+      return undefined;
+    }
+
+    return 'Must include letters';
+  },
+
   containNumbers: (value: string) => {
     const numbersRegexp = new RegExp('^(?=.*[0-9])');
 
@@ -82,6 +92,16 @@ export const validators = {
     }
 
     return 'Must include numbers';
+  },
+
+  containSpecialCharacters: (value: string) => {
+    const specialRegexp = /[^A-Za-z0-9]/;
+
+    if (specialRegexp.test(value)) {
+      return undefined;
+    }
+
+    return 'Must include special characters';
   },
 
   maxLength: (numberOfCharacters: number) => (value: string) => {

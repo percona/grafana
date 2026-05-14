@@ -218,7 +218,13 @@ const ExportDataset: FC = () => {
                           name="encryptionPassword"
                           label={Messages.encryptionPassword}
                           placeholder={Messages.encryptionPasswordPlaceholder}
-                          validators={[validators.required]}
+                          validators={[
+                            validators.required,
+                            validators.minLength(8),
+                            validators.containLetters,
+                            validators.containNumbers,
+                            validators.containSpecialCharacters,
+                          ]}
                         />
                       </div>
                     )}
