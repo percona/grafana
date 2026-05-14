@@ -5,10 +5,10 @@ import { Messages } from '../Inventory.messages';
 import { QuickInstallTech } from './NodesInstallCommand.utils';
 
 export const QUICK_INSTALL_ICON_MAP: Record<QuickInstallTech, IconName> = {
-  mysql: 'database',
-  postgresql: 'database',
-  mongodb: 'cube',
-  valkey: 'bolt',
+  mysql: 'percona-database-mysql',
+  postgresql: 'percona-database-postgresql',
+  mongodb: 'percona-database-mongodb',
+  valkey: 'percona-database-valkey',
 };
 
 export const QUICK_INSTALL_OPTIONS: Array<{ tech: QuickInstallTech; label: string; icon: IconName }> = [
