@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, HorizontalGroup, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -24,7 +24,7 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { NodeType } from 'app/percona/shared/services/nodes/Nodes.types';
 import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { appEvents } from '../../../core/app_events';
 import {
@@ -74,10 +74,10 @@ export const NodesTab = () => {
     (row: Row<Node>): Action[] => [
       {
         content: (
-          <HorizontalGroup spacing="sm">
+          <Stack direction="column">
             <Icon name="trash-alt" />
             <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
-          </HorizontalGroup>
+          </Stack>
         ),
         action: () => {
           setActionItem(row.original);
@@ -366,6 +366,7 @@ export const NodesTab = () => {
             </Button>
           </div>
           <Modal
+            ariaLabel={Messages.confirmAction}
             title={
               <div className="modal-header-title">
                 <span className="p-l-1">{Messages.confirmAction}</span>
@@ -385,14 +386,14 @@ export const NodesTab = () => {
                       label={Messages.forceMode}
                       element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
                     />
-                    <HorizontalGroup justify="space-between" spacing="md">
+                    <Stack direction="column" justifyContent="space-between">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                         {Messages.cancel}
                       </Button>
                       <Button type="submit" size="md" variant="destructive">
                         {Messages.proceed}
                       </Button>
-                    </HorizontalGroup>
+                    </Stack>
                   </>
                 </form>
               )}

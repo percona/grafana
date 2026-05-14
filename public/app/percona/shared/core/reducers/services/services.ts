@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { ServicesService } from 'app/percona/shared/services/services/Services.service';
 import { Service, ServiceType } from 'app/percona/shared/services/services/Services.types';
-import { createAsyncThunk } from 'app/types';
+import { createAsyncThunk } from 'app/types/store';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
 

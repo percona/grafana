@@ -38,7 +38,7 @@ func (c aesCfbCipher) Encrypt(_ context.Context, payload []byte, secret string) 
 		return nil, err
 	}
 
-	//nolint:staticcheck // SA1019: We won't change this in old versions
+	//nolint:staticcheck
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[encryption.SaltLength+aes.BlockSize:], payload)
 

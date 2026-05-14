@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Trans } from '@grafana/i18n';
 import { useStyles2 } from '@grafana/ui';
 // @PERCONA
-import { Trans } from 'app/core/internationalization';
 import { LoginFooter } from 'app/percona/shared/components/LoginFooter';
-
 import { Branding } from '../Branding/Branding';
 import { BrandingSettings } from '../Branding/types';
 
@@ -151,11 +150,14 @@ export const getLoginStyles = (theme: GrafanaTheme2) => {
       justifyContent: 'flex-start',
       zIndex: 1,
       minHeight: 320,
-      borderRadius: theme.shape.radius.default,
+      borderRadius: theme.shape.radius.lg,
       padding: theme.spacing(2, 0),
       opacity: 0,
-      [theme.transitions.handleMotion('no-preference', 'reduce')]: {
+      [theme.transitions.handleMotion('no-preference')]: {
         transition: 'opacity 0.5s ease-in-out',
+      },
+      [theme.transitions.handleMotion('reduce')]: {
+        opacity: 1,
       },
 
       [theme.breakpoints.up('sm')]: {

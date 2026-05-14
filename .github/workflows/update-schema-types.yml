@@ -1,0 +1,16 @@
+name: Update Schema Types
+
+on:
+  # @PERCONA - disable workflow
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  bundle-schema-types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      
+      - uses: grafana/plugin-actions/bundle-schema-types@main

@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
 import { Alert, Button, Checkbox, Modal } from '@grafana/ui';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { removeServiceAction, RemoveServiceParams } from 'app/percona/shared/core/reducers/services';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';

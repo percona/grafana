@@ -1,9 +1,8 @@
 import { css, keyframes } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { useStyles2 } from '@grafana/ui';
-
-import { t } from '../../internationalization';
 
 export function BouncingLoader() {
   const styles = useStyles2(getStyles);
@@ -17,7 +16,7 @@ export function BouncingLoader() {
     >
       <div className={styles.bounce}>
         {/* @PERCONA - change to PMM logo */}
-        <img alt="" src="public/img/pmm-app-rounded-icon.svg" className={styles.logo} />
+        <img alt="" src="public/img/percona-logo.svg" className={styles.logo} />
       </div>
     </div>
   );

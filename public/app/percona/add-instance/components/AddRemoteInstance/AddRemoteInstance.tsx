@@ -3,14 +3,17 @@
 import { FormApi } from 'final-form';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { AppEvents } from '@grafana/data';
 import { useStyles } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
+import { ServiceAddedEvent } from 'app/percona/shared/core/events';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
+import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 
 import { ADD_INSTANCE_FORM_NAME } from '../../panel.constants';
 import { InstanceTypesExtra, InstanceTypes, INSTANCE_TYPES_LABELS } from '../../panel.types';
@@ -38,9 +41,6 @@ import {
 } from './FormParts';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
-import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
-import { useNavigate } from 'react-router-dom-v5-compat';
-import { ServiceAddedEvent } from 'app/percona/shared/core/events';
 
 const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
   instance: { type, credentials },

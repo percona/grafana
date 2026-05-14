@@ -1,7 +1,7 @@
 import { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { AlertLabels } from 'app/features/alerting/unified/components/AlertLabels';
+import { AlertLabels } from '@grafana/alerting/unstable';
 
 import { Messages } from './AlertDetails.messages';
 import { getStyles } from './AlertDetails.styles';

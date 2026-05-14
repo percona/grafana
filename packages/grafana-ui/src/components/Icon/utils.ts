@@ -40,7 +40,6 @@ const alwaysMonoIcons: IconName[] = [
   'percona-database-valkey',
   'percona-asterisk',
   'pmm-logo',
-  'pmm-logo-light',
   'percona-bell',
   'percona-bell-slash',
   'qan-logo',
@@ -89,10 +88,16 @@ export function getIconRoot(): string {
 
   const grafanaPublicPath = typeof window !== 'undefined' && window.__grafana_public_path__;
   if (grafanaPublicPath) {
-    iconRoot = grafanaPublicPath + 'img/icons/';
+    iconRoot = grafanaPublicPath + 'build/img/icons/';
   } else {
-    iconRoot = 'public/img/icons/';
+    iconRoot = 'public/build/img/icons/';
   }
 
   return iconRoot;
+}
+
+export function getIconPath(name: IconName, type: IconType = 'default'): string {
+  const iconRoot = getIconRoot();
+  const subDir = getIconSubDir(name, type);
+  return `${iconRoot}${subDir}/${name}.svg`;
 }

@@ -10,7 +10,7 @@ import { FailedCheckSummary } from 'app/percona/check/types';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { isPmmAdmin, isEditor } from 'app/percona/shared/helpers/permissions';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { PMM_DATABASE_CHECKS_PANEL_URL, PMM_SETTINGS_URL } from '../../CheckPanel.constants';
 import { splitSeverities } from '../../CheckPanel.utils';

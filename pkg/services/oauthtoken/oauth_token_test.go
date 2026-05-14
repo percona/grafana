@@ -25,6 +25,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/login/authinfotest"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/tests/testsuite"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 const EXPIRED_ID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuY29tIiwic3ViIjoiMTIzNDU2Nzg5MCIsImF1ZCI6InlvdXItY2xpZW50LWlkIiwiZXhwIjoxNjAwMDAwMDAwLCJpYXQiOjE2MDAwMDAwMDAsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSJ9.c2lnbmF0dXJl" // #nosec G101 not a hardcoded credential
@@ -77,9 +78,7 @@ type environment struct {
 }
 
 func TestIntegration_TryTokenRefresh(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	type testCase struct {
 		desc            string
@@ -382,9 +381,7 @@ func TestIntegration_TryTokenRefresh(t *testing.T) {
 }
 
 func TestIntegration_TryTokenRefresh_WithExternalSessions(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	userIdentity := &authn.Identity{
 		AuthenticatedBy: login.GenericOAuthModule,
@@ -689,7 +686,7 @@ func verifyUpdateExternalSessionCommand(token *oauth2.Token) func(*auth.UpdateEx
 		idToken := cmd.Token.Extra("id_token")
 		return cmd.Token.AccessToken == token.AccessToken &&
 			cmd.Token.RefreshToken == token.RefreshToken &&
-			cmd.Token.Expiry == token.Expiry &&
+			cmd.Token.Expiry.Equal(token.Expiry) &&
 			idToken == token.Extra("id_token")
 	}
 }
@@ -750,9 +747,7 @@ func TestOAuthTokenSync_needTokenRefresh(t *testing.T) {
 }
 
 func TestIntegration_GetCurrentOAuthToken(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	type testCase struct {
 		desc          string
@@ -1130,9 +1125,7 @@ func TestIntegration_GetCurrentOAuthToken(t *testing.T) {
 }
 
 func TestIntegration_GetCurrentOAuthToken_WithExternalSessions(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	type testCase struct {
 		desc          string

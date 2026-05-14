@@ -7,6 +7,7 @@ import (
 	"github.com/apache/arrow-go/v18/parquet/file"
 
 	"github.com/grafana/grafana/pkg/storage/unified/resource"
+	"github.com/grafana/grafana/pkg/storage/unified/resourcepb"
 )
 
 var (
@@ -39,7 +40,7 @@ type parquetReader struct {
 	bufferIndex int
 	rowGroupIDX int
 
-	req *resource.BulkRequest
+	req *resourcepb.BulkRequest
 	err error
 }
 
@@ -48,26 +49,24 @@ func (r *parquetReader) Next() bool {
 	r.req = nil
 	for r.err == nil && r.reader != nil {
 		if r.bufferIndex >= r.bufferSize && r.value.reader.HasNext() {
-			r.bufferIndex = 0
 			r.err = r.readBulk()
 			if r.err != nil {
 				return false
 			}
-			r.bufferIndex = r.value.count
 		}
 
 		if r.bufferSize > r.bufferIndex {
 			i := r.bufferIndex
 			r.bufferIndex++
 
-			r.req = &resource.BulkRequest{
-				Key: &resource.ResourceKey{
+			r.req = &resourcepb.BulkRequest{
+				Key: &resourcepb.ResourceKey{
 					Group:     r.group.buffer[i].String(),
 					Resource:  r.resource.buffer[i].String(),
 					Namespace: r.namespace.buffer[i].String(),
 					Name:      r.name.buffer[i].String(),
 				},
-				Action: resource.BulkRequest_Action(r.action.buffer[i]),
+				Action: resourcepb.BulkRequest_Action(r.action.buffer[i]),
 				Value:  r.value.buffer[i].Bytes(),
 				Folder: r.folder.buffer[i].String(),
 			}
@@ -88,7 +87,7 @@ func (r *parquetReader) Next() bool {
 }
 
 // Request implements resource.BulkRequestIterator.
-func (r *parquetReader) Request() *resource.BulkRequest {
+func (r *parquetReader) Request() *resourcepb.BulkRequest {
 	return r.req
 }
 
@@ -145,6 +144,7 @@ func newResourceReader(inputPath string, batchSize int64) (*parquetReader, error
 		reader.group,
 		reader.resource,
 		reader.name,
+		reader.folder,
 		reader.action,
 		reader.value,
 	}

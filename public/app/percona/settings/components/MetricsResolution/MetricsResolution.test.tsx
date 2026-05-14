@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { MetricsResolution } from './MetricsResolution';
 import { defaultResolutions } from './MetricsResolution.constants';
