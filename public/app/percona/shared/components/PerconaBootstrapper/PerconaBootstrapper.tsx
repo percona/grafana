@@ -15,7 +15,6 @@ import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
 import { isPmmAdmin, isViewer } from '../../helpers/permissions';
 import { isPmmNavEnabled } from '../../helpers/plugin';
-import appEvents from 'app/core/app_events';
 import { SettingsUpdatedEvent } from '../../core/events';
 
 import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
@@ -37,6 +36,7 @@ import {
   getPmmSettingsPage,
 } from './PerconaNavigation/PerconaNavigation.utils';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
+import { appEvents } from 'app/core/app_events';
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const dispatch = useAppDispatch();
