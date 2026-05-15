@@ -30,6 +30,7 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
         instanceID: 'Instance ID',
+        timeout: 'Connection timeout',
       },
       postgresqlDetails: {
         database: 'Database',
@@ -97,6 +98,7 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
         instanceID: 'Instance ID',
+        timeout: 'Connection timeout',
       },
       postgresqlDetails: {
         database: 'Database (default: postgres)',
@@ -140,6 +142,8 @@ export const Messages = {
         username: 'Your database user name',
         password: 'Your database password',
         instanceID: 'Instance ID to use',
+        timeout:
+          'How long PMM should wait when connecting to this service. Increase this for remote or high-latency databases. If the connection times out, PMM retries the next time it collects metrics. Leave empty to use the default of 2s.',
       },
       postgresqlDetails: {
         database: 'Database name',

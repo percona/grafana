@@ -34,6 +34,7 @@ export interface RemoteInstanceCredentials {
   tls?: boolean;
   tls_skip_verify?: boolean;
   pmm_agent_id?: string;
+  connection_timeout?: string;
 }
 
 export enum InstanceTypesExtra {

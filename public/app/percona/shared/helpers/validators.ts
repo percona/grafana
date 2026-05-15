@@ -1,4 +1,5 @@
-import { Validator, VResult } from './validator.types';
+import { durationToMs, getDurationUnit, isValidProtobufDuration } from './duration';
+import { UnitOptions, Validator, VResult } from './validator.types';
 
 export const validators = {
   validatePort: (value: any) => {
@@ -103,6 +104,67 @@ export const validators = {
   required: (value: any) => (value ? undefined : 'Required field'),
 
   requiredTrue: (value: boolean) => (value === true ? undefined : 'Required field'),
+
+  duration: (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    return isValidProtobufDuration(value) ? undefined : 'Invalid duration';
+  },
+
+  durationUnit: (options: UnitOptions) => (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    if (!isValidProtobufDuration(value)) {
+      return 'Invalid duration';
+    }
+
+    const allowed = Object.keys(options).filter((unit) => options[unit as keyof UnitOptions]);
+    const unit = getDurationUnit(value);
+
+    if (!unit) {
+      return 'Invalid duration';
+    }
+
+    if (!allowed.includes(unit)) {
+      return `Invalid unit. Allowed units: ${allowed.join(', ')}`;
+    }
+
+    return undefined;
+  },
+
+  minDuration: (minDuration: string) => (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    if (!isValidProtobufDuration(value)) {
+      return 'Invalid duration';
+    }
+
+    const min = durationToMs(minDuration);
+    const duration = durationToMs(value);
+
+    return duration >= min ? undefined : `Duration should be greater or equal to ${minDuration}`;
+  },
+
+  maxDuration: (maxDuration: string) => (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    if (!isValidProtobufDuration(value)) {
+      return 'Invalid duration';
+    }
+
+    const max = durationToMs(maxDuration);
+    const duration = durationToMs(value);
+
+    return duration <= max ? undefined : `Duration should be lower or equal to ${maxDuration}`;
+  },
 
   compose:
     (...validators: Validator[]) =>

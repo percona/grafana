@@ -256,4 +256,100 @@ describe('validators compose', () => {
 
     expect(validate(120, {})).toEqual(errorMessage);
   });
+
+  describe('validate duration', () => {
+    it('return undefined when value is valid', () => {
+      expect(validators.duration('1s')).toBeUndefined();
+      expect(validators.duration('1ms')).toBeUndefined();
+      expect(validators.duration('1.5s')).toBeUndefined();
+      expect(validators.duration('1.5ms')).toBeUndefined();
+      expect(validators.duration('1m')).toBeUndefined();
+      expect(validators.duration('0.5m')).toBeUndefined();
+      expect(validators.duration('60m')).toBeUndefined();
+    });
+
+    it('return error message when value is invalid', () => {
+      expect(validators.duration('1')).toEqual('Invalid duration');
+      expect(validators.duration('1m.1s')).toEqual('Invalid duration');
+      expect(validators.duration('1h.1m')).toEqual('Invalid duration');
+      expect(validators.duration('1d.1h')).toEqual('Invalid duration');
+      expect(validators.duration('1w.1d')).toEqual('Invalid duration');
+      expect(validators.duration('1y.1w')).toEqual('Invalid duration');
+      expect(validators.duration('1h')).toEqual('Invalid duration');
+    });
+  });
+
+  describe('validate min duration', () => {
+    it('return undefined when value is valid', () => {
+      expect(validators.minDuration('1s')('1s')).toBeUndefined();
+      expect(validators.minDuration('1ms')('1ms')).toBeUndefined();
+      expect(validators.minDuration('1m')('1m')).toBeUndefined();
+      expect(validators.minDuration('1m')('2m')).toBeUndefined();
+      expect(validators.minDuration('30s')('1m')).toBeUndefined();
+      expect(validators.minDuration('1m')('90s')).toBeUndefined();
+    });
+
+    it('return error message when value is invalid', () => {
+      expect(validators.minDuration('1s')('0s')).toEqual('Duration should be greater or equal to 1s');
+      expect(validators.minDuration('1ms')('0s')).toEqual('Duration should be greater or equal to 1ms');
+      expect(validators.minDuration('1m')('30s')).toEqual('Duration should be greater or equal to 1m');
+      expect(validators.minDuration('2m')('1m')).toEqual('Duration should be greater or equal to 2m');
+    });
+  });
+
+  describe('validate max duration', () => {
+    it('return undefined when value is valid', () => {
+      expect(validators.maxDuration('1s')('1s')).toBeUndefined();
+      expect(validators.maxDuration('1ms')('1ms')).toBeUndefined();
+      expect(validators.maxDuration('1m')('1m')).toBeUndefined();
+      expect(validators.maxDuration('2m')('1m')).toBeUndefined();
+      expect(validators.maxDuration('1m')('30s')).toBeUndefined();
+      expect(validators.maxDuration('90s')('1m')).toBeUndefined();
+    });
+
+    it('return undefined when value is empty', () => {
+      expect(validators.maxDuration('1s')('')).toBeUndefined();
+    });
+
+    it('return error message when value exceeds max', () => {
+      expect(validators.maxDuration('1s')('2s')).toEqual('Duration should be lower or equal to 1s');
+      expect(validators.maxDuration('1ms')('1s')).toEqual('Duration should be lower or equal to 1ms');
+      expect(validators.maxDuration('1m')('2m')).toEqual('Duration should be lower or equal to 1m');
+      expect(validators.maxDuration('30s')('1m')).toEqual('Duration should be lower or equal to 30s');
+    });
+  });
+
+  describe('validate duration unit', () => {
+    it('return undefined when value is valid', () => {
+      const values = {
+        ms: '1ms',
+        s: '1s',
+        m: '1m',
+      };
+
+      for (const [unit, value] of Object.entries(values)) {
+        expect(validators.durationUnit({ [unit]: true })(value)).toBeUndefined();
+
+        for (const [otherUnit, otherValue] of Object.entries(values)) {
+          if (unit !== otherUnit) {
+            expect(validators.durationUnit({ [unit]: true })(otherValue)).toEqual(
+              `Invalid unit. Allowed units: ${unit}`
+            );
+          }
+        }
+      }
+    });
+
+    it('allows only s and m when configured', () => {
+      const validator = validators.durationUnit({ s: true, m: true, ms: false });
+
+      expect(validator('1s')).toBeUndefined();
+      expect(validator('1m')).toBeUndefined();
+      expect(validator('1ms')).toEqual('Invalid unit. Allowed units: s, m');
+    });
+
+    it('returns invalid duration when format is wrong', () => {
+      expect(validators.durationUnit({ s: true, m: true })('1')).toEqual('Invalid duration');
+    });
+  });
 });
