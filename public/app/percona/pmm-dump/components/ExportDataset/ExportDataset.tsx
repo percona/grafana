@@ -7,7 +7,7 @@ import { SelectableValue, DateTime, dateTime, AppEvents, PageLayoutType } from '
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
-import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
+import { SwitchRow } from 'app/percona/shared/components/Elements/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';

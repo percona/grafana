@@ -242,8 +242,10 @@ type FrontendSettingsDTO struct {
 
 	LicenseInfo FrontendSettingsLicenseInfoDTO `json:"licenseInfo"`
 
-	FeatureToggles                      map[string]bool                `json:"featureToggles"`
-	AnonymousEnabled                    bool                           `json:"anonymousEnabled"`
+	FeatureToggles   map[string]bool `json:"featureToggles"`
+	AnonymousEnabled bool            `json:"anonymousEnabled"`
+	// @PERCONA: add anonymousOrgRole to the frontend settings
+	AnonymousOrgRole                    string                         `json:"anonymousOrgRole"`
 	AnonymousDeviceLimit                int64                          `json:"anonymousDeviceLimit"`
 	RendererAvailable                   bool                           `json:"rendererAvailable"`
 	RendererVersion                     string                         `json:"rendererVersion"`
