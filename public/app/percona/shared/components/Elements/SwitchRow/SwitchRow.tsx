@@ -1,10 +1,9 @@
 import { FC, ChangeEvent } from 'react';
 
 import { Switch, useStyles2 } from '@grafana/ui';
-import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 
-import { getStyles } from './Advanced.styles';
+import { getStyles } from './SwitchRow.styles';
 import { SwitchRowProps } from './SwitchRow.types';
 
 export const SwitchRow: FC<SwitchRowProps> = ({
@@ -18,13 +17,12 @@ export const SwitchRow: FC<SwitchRowProps> = ({
   input,
   onChange,
 }) => {
-  const settingsStyles = useStyles2(getSettingsStyles);
   const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.advancedRow} data-testid={dataTestId}>
       <div className={styles.advancedCol}>
-        <div className={settingsStyles.labelWrapper}>
+        <div className={styles.labelWrapper}>
           <span>{label}</span>
           {!!tooltip && (
             <LinkTooltip tooltipContent={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
