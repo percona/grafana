@@ -4,13 +4,13 @@ import { useStyles2 } from '@grafana/ui';
 import { NodesAgents } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
+import { Databases } from 'app/percona/shared/core';
 import Validators from 'app/percona/shared/helpers/validators';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
-import { Databases } from 'app/percona/shared/core';
 
 export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, remoteInstanceCredentials }) => {
   const styles = useStyles2(getStyles);
@@ -18,6 +18,15 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
   const tlsFlag = formValues && formValues['tls'];
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
+  const timeoutValidators = useMemo(
+    () => [
+      Validators.duration,
+      Validators.minDuration('0s'),
+      Validators.maxDuration('3600s'),
+      Validators.durationUnit({ s: true }),
+    ],
+    []
+  );
   const userPassValidators = useMemo(
     () => (tlsFlag || type === Databases.valkey ? [] : [validators.required]),
     [tlsFlag, type]
@@ -70,6 +79,17 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />
+      </div>
+      <div className={styles.group}>
+        <TextInputField
+          key="connection_timeout"
+          name="connection_timeout"
+          label={Messages.form.labels.mainDetails.timeout}
+          tooltipText={Messages.form.tooltips.mainDetails.timeout}
+          placeholder={Messages.form.placeholders.mainDetails.timeout}
+          validators={timeoutValidators}
+        />
+        <div />
       </div>
     </div>
   );

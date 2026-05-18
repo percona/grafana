@@ -19,6 +19,15 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
   const maxQueryLengthValidators = useMemo(() => [Validators.min(-1)], []);
+  const timeoutValidators = useMemo(
+    () => [
+      Validators.duration,
+      Validators.minDuration('0s'),
+      Validators.maxDuration('3600s'),
+      Validators.durationUnit({ s: true }),
+    ],
+    []
+  );
 
   return (
     <div className={styles.groupWrapper}>
@@ -93,6 +102,17 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           label={Messages.form.labels.postgresqlDetails.maxQueryLength}
           tooltipText={Messages.form.tooltips.postgresqlDetails.maxQueryLength}
         />
+      </div>
+      <div className={styles.group}>
+        <TextInputField
+          key="connection_timeout"
+          name="connection_timeout"
+          label={Messages.form.labels.mainDetails.timeout}
+          tooltipText={Messages.form.tooltips.mainDetails.timeout}
+          placeholder={Messages.form.placeholders.mainDetails.timeout}
+          validators={timeoutValidators}
+        />
+        <div />
       </div>
     </div>
   );
