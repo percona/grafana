@@ -1,16 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
-import {
-  PMMDumpServices,
-  SendToSupportRequestBody,
-  ExportDatasetService,
-  DumpLogs,
-} from 'app/percona/pmm-dump/PmmDump.types';
+import { PMMDumpServices, SendToSupportRequestBody, DumpLogs } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState, LogsActionProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
-import { mapDumps, mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
-import { createAsyncThunk } from 'app/types/store';
+import { mapDumps, mapDumpServices } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
 
 const initialState: PmmDumpState = {
   isLoading: false,
@@ -80,10 +74,10 @@ export const deletePmmDumpAction = createAsyncThunk(
 
 export const downloadPmmDumpAction = createAsyncThunk(
   'percona/downloadPmmDump',
-  async (dumpIds: string[]): Promise<void> =>
+  async (dumps: PMMDumpServices[]): Promise<void> =>
     withAppEvents(
       (async () => {
-        await PMMDumpService.downloadAll(dumpIds);
+        await PMMDumpService.downloadAll(mapDumpServices(dumps));
       })(),
       {
         successMessage: 'Download successfully',
@@ -102,16 +96,6 @@ export const sendToSupportAction = createAsyncThunk(
       {
         successMessage: 'The message was send successfully!',
       }
-    )
-);
-
-export const triggerDumpAction = createAsyncThunk(
-  'percona/triggerDump',
-  async (body: ExportDatasetService): Promise<void> =>
-    withSerializedError(
-      (async () => {
-        await PMMDumpService.trigger(mapExportData(body));
-      })()
     )
 );
 

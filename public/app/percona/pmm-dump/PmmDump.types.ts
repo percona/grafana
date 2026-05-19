@@ -22,6 +22,7 @@ export interface PMMDumpServices {
   endTime: string;
   serviceNames: string[];
   timeRange?: string;
+  encrypted: boolean;
 }
 
 export const DumpStatusColor = {
@@ -111,4 +112,6 @@ export interface ExportDatasetService {
   endTime: string;
   ignoreLoad: boolean;
   exportQan: boolean;
+  enableEncryption: boolean;
+  encryptionPassword?: string;
 }
