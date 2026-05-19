@@ -17,6 +17,8 @@ import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/comp
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import { nodeFromDbMapper } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
@@ -33,13 +35,11 @@ import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TO
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
+import { AGENT_TYPE_OPTIONS } from './Agents.constants';
 import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentModel } from './Agents.utils';
 import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
-import { AGENT_TYPE_OPTIONS } from './Agents.constants';
 
-import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
-import { DATA_INTERVAL } from 'app/percona/shared/core';
 
 export const Agents: FC = () => {
   const [agentsLoading, setLoading] = useState(false);
@@ -230,7 +230,7 @@ export const Agents: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <FeatureLoader>
-          <Stack direction="column" height="auto">
+          <Stack direction="row" height="auto">
             <Link href={`${service ? '/inventory/services' : '/inventory/nodes'}`}>
               <Icon name="arrow-left" size="lg" />
               <span className={styles.goBack}>
@@ -250,7 +250,7 @@ export const Agents: FC = () => {
               <span>{Messages.agents.breadcrumbRight}</span>
             </h5>
           )}
-          <Stack direction={'column'} height={40} justifyContent="flex-end" alignItems="flex-start">
+          <Stack direction={'row'} height={5} justifyContent="flex-end" alignItems="flex-start">
             <Button
               size="md"
               disabled={selected.length === 0}
@@ -287,7 +287,7 @@ export const Agents: FC = () => {
                       element={<CheckboxField name="force" label={Messages.agents.forceConfirmation} />}
                     />
 
-                    <Stack justifyContent="space-between" direction="column">
+                    <Stack direction="row" justifyContent="space-between">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                         {Messages.cancel}
                       </Button>
