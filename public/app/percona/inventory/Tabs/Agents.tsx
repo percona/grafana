@@ -40,7 +40,6 @@ import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentMode
 import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
-
 export const Agents: FC = () => {
   const [agentsLoading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);

@@ -49,7 +49,6 @@ import {
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
-
 export const NodesTab = () => {
   const { nodes } = useSelector(getNodes);
   const [isLoading, setIsLoading] = useState(true);
