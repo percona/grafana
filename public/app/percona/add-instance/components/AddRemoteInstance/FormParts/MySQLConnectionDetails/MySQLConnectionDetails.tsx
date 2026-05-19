@@ -19,6 +19,15 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
   const maxQueryLengthValidators = useMemo(() => [Validators.min(-1)], []);
+  const timeoutValidators = useMemo(
+    () => [
+      Validators.duration,
+      Validators.minDuration('0s'),
+      Validators.maxDuration('3600s'),
+      Validators.durationUnit({ s: true }),
+    ],
+    []
+  );
 
   return (
     <div className={styles.groupWrapper}>
@@ -87,7 +96,14 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           placeholder={Messages.form.placeholders.mysqlDetails.maxQueryLength}
           validators={maxQueryLengthValidators}
         />
-        <div />
+        <TextInputField
+          key="connection_timeout"
+          name="connection_timeout"
+          label={Messages.form.labels.mainDetails.timeout}
+          tooltipText={Messages.form.tooltips.mainDetails.timeout}
+          placeholder={Messages.form.placeholders.mainDetails.timeout}
+          validators={timeoutValidators}
+        />
       </div>
     </div>
   );
