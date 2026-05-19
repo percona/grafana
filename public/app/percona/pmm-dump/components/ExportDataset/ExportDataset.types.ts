@@ -3,6 +3,8 @@ export interface ExportDatasetProps {
   service: Service[];
   load: boolean;
   QAN: boolean;
+  enableEncryption: boolean;
+  encryptionPassword: string;
 }
 
 export interface Timeranges {
