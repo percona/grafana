@@ -720,7 +720,7 @@ function getReducersFromLegend(obj: Record<string, unknown>): string[] {
 }
 
 /** Maps legacy graph legend sort keys to table column titles (fieldReducer.name). */
-function mapLegendSortKey(sortKey: string): string | undefined {
+function mapLegendSortKey(sortKey: string): string {
   const reducer = fieldReducers.getIfExists(sortKey);
   if (reducer) {
     return reducer.name;
