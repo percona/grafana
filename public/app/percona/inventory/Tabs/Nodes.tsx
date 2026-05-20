@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
@@ -8,7 +9,6 @@ import {
   Badge,
   Button,
   Dropdown,
-  HorizontalGroup,
   Icon,
   Link,
   Menu,
@@ -77,6 +77,7 @@ export const NodesTab = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { nodes: highAvailabilityNodes, isEnabled: isHighAvailabilityEnabled } = useSelector(getHighAvailability);
+  const navigate = useNavigate();
 
   const mappedNodes = useMemo(
     () =>
@@ -384,17 +385,25 @@ export const NodesTab = () => {
     }
   }, []);
 
-  const addNodeAdvancedHref =
-    typeof window !== 'undefined' ? `${window.location.origin}/pmm-ui/install-client` : '/pmm-ui/install-client';
-
   return (
     <TabbedPage navModel={navModel} isLoading={isLoading}>
       <TabbedPageContents>
         <FeatureLoader>
-          <div className={styles.actionPanel}>
-            <HorizontalGroup spacing="md" wrap>
+          <Stack direction="column">
+            <Stack direction="row" justifyContent="flex-end" alignItems="center">
+              <Button
+                size="md"
+                disabled={selected.length === 0}
+                onClick={() => {
+                  setModalVisible(!modalVisible);
+                }}
+                icon="trash-alt"
+                variant="destructive"
+              >
+                {Messages.delete}
+              </Button>
               <Dropdown
-                overlay={() => (
+                overlay={
                   <Menu>
                     {QUICK_INSTALL_OPTIONS.map(({ tech, label, icon }) => (
                       <Menu.Item
@@ -407,81 +416,75 @@ export const NodesTab = () => {
                         }}
                       />
                     ))}
+                    <Menu.Divider />
+                    <Menu.Item
+                      key="more-options"
+                      onClick={() => navigate('/pmm-ui/install-client')}
+                      label={Messages.nodes.addNodeMoreOptions}
+                    />
                   </Menu>
-                )}
+                }
                 placement="bottom-start"
               >
                 <Button variant="primary" size="md" icon="angle-down" disabled={installTokenLoading}>
                   {Messages.nodes.addNodeButton}
                 </Button>
               </Dropdown>
-              <Link href={addNodeAdvancedHref}>{Messages.nodes.addNodeMoreOptions}</Link>
-            </HorizontalGroup>
-            <Button
-              size="md"
-              disabled={selected.length === 0}
-              onClick={() => {
-                setModalVisible(!modalVisible);
-              }}
-              icon="trash-alt"
-              variant="destructive"
+            </Stack>
+            <Modal
+              ariaLabel={Messages.confirmAction}
+              title={
+                <div className="modal-header-title">
+                  <span className="p-l-1">{Messages.confirmAction}</span>
+                </div>
+              }
+              isOpen={modalVisible}
+              onDismiss={() => setModalVisible(false)}
             >
-              {Messages.delete}
-            </Button>
-          </div>
-          <Modal
-            ariaLabel={Messages.confirmAction}
-            title={
-              <div className="modal-header-title">
-                <span className="p-l-1">{Messages.confirmAction}</span>
-              </div>
-            }
-            isOpen={modalVisible}
-            onDismiss={() => setModalVisible(false)}
-          >
-            <Form
-              onSubmit={proceed}
-              render={({ handleSubmit }) => (
-                <form onSubmit={handleSubmit}>
-                  <>
-                    <h4 className={styles.confirmationText}>{deletionMsg}</h4>
-                    <FormElement
-                      dataTestId="form-field-force"
-                      label={Messages.forceMode}
-                      element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
-                    />
-                    <Stack direction="column" justifyContent="space-between">
-                      <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                        {Messages.cancel}
-                      </Button>
-                      <Button type="submit" size="md" variant="destructive">
-                        {Messages.proceed}
-                      </Button>
-                    </Stack>
-                  </>
-                </form>
-              )}
+              <Form
+                onSubmit={proceed}
+                render={({ handleSubmit }) => (
+                  <form onSubmit={handleSubmit}>
+                    <>
+                      <h4 className={styles.confirmationText}>{deletionMsg}</h4>
+                      <FormElement
+                        dataTestId="form-field-force"
+                        label={Messages.forceMode}
+                        element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
+                      />
+                      <Stack direction="column" justifyContent="space-between">
+                        <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                          {Messages.cancel}
+                        </Button>
+                        <Button type="submit" size="md" variant="destructive">
+                          {Messages.proceed}
+                        </Button>
+                      </Stack>
+                    </>
+                  </form>
+                )}
+              />
+            </Modal>
+            <Table
+              columns={columns}
+              data={mappedNodes}
+              totalItems={mappedNodes.length}
+              rowSelection
+              autoResetSelectedRows={false}
+              autoResetExpanded={false}
+              autoResetPage={false}
+              onRowSelection={handleSelectionChange}
+              showPagination
+              pageSize={25}
+              allRowsSelectionMode="page"
+              emptyMessage={Messages.nodes.emptyTable}
+              pendingRequest={isLoading}
+              overlayClassName={styles.overlay}
+              renderExpandedRow={renderSelectedSubRow}
+              getRowId={useCallback((row: FlattenNode) => row.nodeId, [])}
+              showFilter
             />
-          </Modal>
-          <Table
-            columns={columns}
-            data={mappedNodes}
-            totalItems={mappedNodes.length}
-            rowSelection
-            autoResetSelectedRows={false}
-            autoResetExpanded={false}
-            autoResetPage={false}
-            onRowSelection={handleSelectionChange}
-            showPagination
-            pageSize={25}
-            allRowsSelectionMode="page"
-            emptyMessage={Messages.nodes.emptyTable}
-            pendingRequest={isLoading}
-            overlayClassName={styles.overlay}
-            renderExpandedRow={renderSelectedSubRow}
-            getRowId={useCallback((row: FlattenNode) => row.nodeId, [])}
-            showFilter
-          />
+          </Stack>
         </FeatureLoader>
       </TabbedPageContents>
     </TabbedPage>

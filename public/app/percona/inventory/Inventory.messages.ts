@@ -86,7 +86,7 @@ export const Messages = {
     addNodePostgreSQL: 'PostgreSQL',
     addNodeMongoDB: 'MongoDB',
     addNodeValkey: 'Valkey',
-    addNodeMoreOptions: 'More options…',
+    addNodeMoreOptions: 'More options',
     addNodeCommandCopied: 'Command copied to clipboard — run it on the host you want to add',
     addNodeCommandCopyFailed: 'Could not copy command to clipboard',
     addNodeTokenFailed: 'Could not create install token',
