@@ -415,7 +415,13 @@ export const NodesTab = () => {
                 }
                 placement="bottom-start"
               >
-                <Button variant="primary" size="md" icon="angle-down" disabled={installTokenLoading}>
+                <Button
+                  data-testid="add-node-button"
+                  variant="primary"
+                  size="md"
+                  icon="angle-down"
+                  disabled={installTokenLoading}
+                >
                   {Messages.nodes.addNodeButton}
                 </Button>
               </Dropdown>
