@@ -14,6 +14,8 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
@@ -36,7 +38,6 @@ import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
-import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 
 import { InventoryNode } from './Nodes.types';
 import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
@@ -47,7 +48,6 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
-import { DATA_INTERVAL } from 'app/percona/shared/core';
 
 export const NodesTab = () => {
   const { nodes } = useSelector(getNodes);
@@ -74,7 +74,7 @@ export const NodesTab = () => {
     (row: Row<Node>): Action[] => [
       {
         content: (
-          <Stack direction="column">
+          <Stack direction="row">
             <Icon name="trash-alt" />
             <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
           </Stack>
@@ -118,7 +118,7 @@ export const NodesTab = () => {
         accessor: 'nodeName',
         Cell: ({ value, row }) =>
           isHighAvailabilityEnabled ? (
-            <Stack>
+            <Stack direction="row">
               <span>{value}</span>
               {row.original.haRole && <Badge text={getHaRoleBadgeText(row.original.haRole)} color="darkgrey" />}
             </Stack>
@@ -386,7 +386,7 @@ export const NodesTab = () => {
                       label={Messages.forceMode}
                       element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
                     />
-                    <Stack direction="column" justifyContent="space-between">
+                    <Stack direction="row" justifyContent="space-between">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                         {Messages.cancel}
                       </Button>
