@@ -4,6 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import { OrgRole } from '@grafana/data';
+import { Trans } from '@grafana/i18n';
 import { locationService } from '@grafana/runtime';
 import { Button, Stack, Spinner, useStyles2 } from '@grafana/ui';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
@@ -23,7 +24,6 @@ import { TemplateForm } from '../TemplateForm/TemplateForm';
 import { formatCreateAPIPayload } from '../TemplateForm/TemplateForm.utils';
 
 import { getStyles } from './AlertRuleFromTemplate.styles';
-import { Trans } from '@grafana/i18n';
 
 export const AlertRuleFromTemplate: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,7 +74,7 @@ export const AlertRuleFromTemplate: FC = () => {
   };
 
   const actionButtons = (
-    <Stack>
+    <Stack direction="row">
       <Button
         variant="primary"
         type="button"

@@ -5,18 +5,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import {
-  Badge,
-  Button,
-  Dropdown,
-  Icon,
-  Link,
-  Menu,
-  Modal,
-  Stack,
-  TagList,
-  useStyles2,
-} from '@grafana/ui';
+import { Badge, Button, Dropdown, Icon, Link, Menu, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -91,7 +80,7 @@ export const NodesTab = () => {
     (row: Row<Node>): Action[] => [
       {
         content: (
-          <Stack direction="column">
+          <Stack direction="row">
             <Icon name="trash-alt" />
             <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
           </Stack>
@@ -135,7 +124,7 @@ export const NodesTab = () => {
         accessor: 'nodeName',
         Cell: ({ value, row }) =>
           isHighAvailabilityEnabled ? (
-            <Stack>
+            <Stack direction="row">
               <span>{value}</span>
               {row.original.haRole && <Badge text={getHaRoleBadgeText(row.original.haRole)} color="darkgrey" />}
             </Stack>
@@ -452,7 +441,7 @@ export const NodesTab = () => {
                         label={Messages.forceMode}
                         element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
                       />
-                      <Stack direction="column" justifyContent="space-between">
+                      <Stack direction="row" justifyContent="space-between">
                         <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                           {Messages.cancel}
                         </Button>
