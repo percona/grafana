@@ -1,3 +1,34 @@
+<!-- 12.4.3+security-02 START -->
+
+# 12.4.3+security-02 (2026-05-12)
+
+- **Security**: CVE-2026-28374
+- **Security**: CVE-2026-28376
+- **Security**: CVE-2026-28383
+- **Security**: CVE-2026-28380
+- **Security**: CVE-2026-33376
+- **Security**: CVE-2026-28379
+- **Security**: CVE-2026-33377
+- **Security**: CVE-2026-33378
+- **Security**: CVE-2026-33381
+- **Security**: CVE-2026-33380
+
+<!-- 12.4.3+security-02 END -->
+<!-- 12.4.3 START -->
+
+# 12.4.3 (2026-04-14)
+
+### Features and enhancements
+
+- **Analytics:** Keep internal dashboard id [#121417](https://github.com/grafana/grafana/pull/121417), [@ryantxu](https://github.com/ryantxu)
+- **Go:** Update to 1.25.9 [#122095](https://github.com/grafana/grafana/pull/122095), [@macabu](https://github.com/macabu)
+- **Reporting:** Correctly apply appSubURL to report settings requests (Enterprise)
+
+### Bug fixes
+
+- **Alerting:** Document Grafana HA Alertmanager cluster metrics prefix change in Grafana 12.4 [#121481](https://github.com/grafana/grafana/pull/121481), [@alexander-akhmetov](https://github.com/alexander-akhmetov)
+
+<!-- 12.4.3 END -->
 <!-- 12.4.2 START -->
 
 # 12.4.2 (2026-03-25)
@@ -21,7 +52,6 @@
 - **Security:** Fixes CVE-2026-27879
 - **Security:** Fixes CVE-2026-27880
 - **Security:** Fixes CVE-2026-27876
-- **Security:** Fixes CVE-2026-33375
 
 <!-- 12.4.2 END -->
 <!-- 12.4.1 START -->

@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
 permissions: {}
 
+permissions: {}
+
 jobs:
   codeowners-validator:
     runs-on: ubuntu-latest

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"reflect"
 	"testing"
 
 	alertingNotify "github.com/grafana/alerting/notify"
@@ -307,4 +308,108 @@ type broken struct {
 
 func (b broken) MarshalJSON() ([]byte, error) {
 	return nil, assert.AnError
+}
+
+func TestReceiver_Fingerprint(t *testing.T) {
+	// Test that the fingerprint is stable.
+	im := IntegrationMuts
+	baseReceiver := ReceiverGen(ReceiverMuts.WithName("test receiver"), ReceiverMuts.WithIntegrations(
+		IntegrationGen(im.WithName("test receiver"), im.WithValidConfig("slack"))(),
+	))()
+	baseReceiver.Integrations[0].UID = "stable UID"
+	baseReceiver.Integrations[0].DisableResolveMessage = true
+	baseReceiver.Integrations[0].SecureSettings = map[string]string{"test2": "test2", "test3": "test223", "test1": "rest22"}
+	baseReceiver.Integrations[0].Settings["broken"] = broken{f1: "this"} // Add a broken type to ensure it is stable in the fingerprint.
+	baseReceiver.Integrations[0].Settings["sub-map"] = map[string]any{
+		"setting":   "value",
+		"something": 123,
+		"data":      []string{"test"},
+	}
+
+	completelyDifferentReceiver := ReceiverGen(ReceiverMuts.WithName("test receiver2"), ReceiverMuts.WithIntegrations(
+		IntegrationGen(im.WithName("test receiver2"), im.WithValidConfig("discord"))(),
+	))()
+	completelyDifferentReceiver.Integrations[0].UID = "stable UID2"
+	completelyDifferentReceiver.Integrations[0].DisableResolveMessage = false
+	completelyDifferentReceiver.Integrations[0].SecureSettings = map[string]string{"test": "test"}
+	completelyDifferentReceiver.Provenance = ProvenanceAPI
+
+	t.Run("stable across code changes", func(t *testing.T) {
+		expectedFingerprint := "c0c82936be34b183" // If this is a valid fingerprint generation change, update the expected value.
+		assert.Equal(t, expectedFingerprint, baseReceiver.Fingerprint())
+	})
+	t.Run("stable across clones", func(t *testing.T) {
+		fingerprint := baseReceiver.Fingerprint()
+		receiverClone := baseReceiver.Clone()
+		assert.Equal(t, fingerprint, receiverClone.Fingerprint())
+	})
+	t.Run("stable across Version field modification", func(t *testing.T) {
+		fingerprint := baseReceiver.Fingerprint()
+		receiverClone := baseReceiver.Clone()
+		receiverClone.Version = "new version"
+		assert.Equal(t, fingerprint, receiverClone.Fingerprint())
+	})
+	t.Run("unstable across field modification", func(t *testing.T) {
+		fingerprint := baseReceiver.Fingerprint()
+		excludedFields := map[string]struct{}{
+			"Version": {},
+			"Origin":  {},
+		}
+
+		reflectVal := reflect.ValueOf(&completelyDifferentReceiver).Elem()
+
+		receiverType := reflect.TypeOf((*Receiver)(nil)).Elem()
+		for i := 0; i < receiverType.NumField(); i++ {
+			field := receiverType.Field(i).Name
+			if _, ok := excludedFields[field]; ok {
+				continue
+			}
+			cp := baseReceiver.Clone()
+
+			// Get the current field being modified.
+			v := reflect.ValueOf(&cp).Elem()
+			vf := v.Field(i)
+
+			otherField := reflectVal.Field(i)
+			if reflect.DeepEqual(otherField.Interface(), vf.Interface()) {
+				assert.Failf(t, "filds are identical", "Receiver field %s is the same as the original, test does not ensure instability across the field", field)
+				continue
+			}
+
+			// Set the field to the value of the completelyDifferentReceiver.
+			vf.Set(otherField)
+
+			f2 := cp.Fingerprint()
+			assert.NotEqualf(t, fingerprint, f2, "Receiver field %s does not seem to be used in fingerprint", field)
+		}
+
+		excludedFields = map[string]struct{}{}
+
+		reflectVal = reflect.ValueOf(completelyDifferentReceiver.Integrations[0]).Elem()
+		integrationType := reflect.TypeOf((*Integration)(nil)).Elem()
+		for i := 0; i < integrationType.NumField(); i++ {
+			field := integrationType.Field(i).Name
+			if _, ok := excludedFields[field]; ok {
+				continue
+			}
+			cp := baseReceiver.Clone()
+			integrationCp := cp.Integrations[0]
+
+			// Get the current field being modified.
+			v := reflect.ValueOf(integrationCp).Elem()
+			vf := v.Field(i)
+
+			otherField := reflectVal.Field(i)
+			if reflect.DeepEqual(otherField.Interface(), vf.Interface()) {
+				assert.Failf(t, "filds are identical", "Integration field %s is the same as the original, test does not ensure instability across the field", field)
+				continue
+			}
+
+			// Set the field to the value of the completelyDifferentReceiver.
+			vf.Set(otherField)
+
+			f2 := cp.Fingerprint()
+			assert.NotEqualf(t, fingerprint, f2, "Integration field %s does not seem to be used in fingerprint", field)
+		}
+	})
 }

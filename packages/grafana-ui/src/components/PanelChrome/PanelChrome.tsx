@@ -383,6 +383,7 @@ export function PanelChrome({
                 menu={menu}
                 title={typeof title === 'string' ? title : undefined}
                 dragClass={dragClass}
+                onDragStart={onDragStart}
                 offset={hoverHeaderOffset}
                 onOpenMenu={onOpenMenu}
               >

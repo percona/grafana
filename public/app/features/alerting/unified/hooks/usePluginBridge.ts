@@ -1,5 +1,4 @@
 import { PluginMeta } from '@grafana/data';
-import { isFetchError } from '@grafana/runtime';
 
 import { useGetPluginSettingsQuery } from '../api/pluginsApi';
 import { PluginID } from '../components/PluginBridge';
@@ -20,10 +19,6 @@ export function usePluginBridge(plugin: PluginID): PluginBridgeHookResponse {
   }
 
   if (error) {
-    // 404 means the plugin is not installed
-    if (isFetchError(error) && error.status === 404) {
-      return { loading: false, installed: false };
-    }
     return { loading: isLoading, error: error instanceof Error ? error : new Error(String(error)) };
   }
 

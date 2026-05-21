@@ -76,6 +76,7 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   perconaReadyCallback = () => this.setState({ perconaReady: true });
+
   removePreloader() {
     const preloader = document.querySelector('.preloader');
     if (preloader) {
