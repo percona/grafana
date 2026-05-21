@@ -44,7 +44,12 @@ export function NewsWrapper({ feedUrl }: NewsWrapperProps) {
       )}
       <div className={styles.grot}>
         {/* @PERCONA */}
-        <a href="https://www.percona.com/blog/" target="_blank" rel="noreferrer" title={t('news.go-to-percona-blog', 'Go to Percona blog')}>
+        <a
+          href="https://www.percona.com/blog/"
+          target="_blank"
+          rel="noreferrer"
+          title={t('news.go-to-percona-blog', 'Go to Percona blog')}
+        >
           <img src={perconaLogo} alt="Percona logo" />
         </a>
       </div>
