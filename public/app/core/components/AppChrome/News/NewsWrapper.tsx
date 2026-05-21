@@ -7,8 +7,7 @@ import { t } from '@grafana/i18n';
 import { useStyles2 } from '@grafana/ui';
 import { News } from 'app/plugins/panel/news/component/News';
 import { useNewsFeed } from 'app/plugins/panel/news/useNewsFeed';
-import grotNewsSvg from 'img/grot-news.svg';
-
+import perconaLogo from 'img/percona-logo.svg';
 interface NewsWrapperProps {
   feedUrl: string;
 }
@@ -45,8 +44,8 @@ export function NewsWrapper({ feedUrl }: NewsWrapperProps) {
       )}
       <div className={styles.grot}>
         {/* @PERCONA */}
-        <a href="https://www.percona.com/blog/" target="_blank" rel="noreferrer" title="Go to Percona blog">
-          <img src="public/img/percona-logo.svg" alt="Percona logo" />
+        <a href="https://www.percona.com/blog/" target="_blank" rel="noreferrer" title={t('news.go-to-percona-blog', 'Go to Percona blog')}>
+          <img src={perconaLogo} alt="Percona logo" />
         </a>
       </div>
     </div>

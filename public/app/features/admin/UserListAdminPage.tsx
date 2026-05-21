@@ -12,7 +12,6 @@ import { AccessControlAction } from 'app/types/accessControl';
 import { StoreState } from 'app/types/store';
 import { UserFilter } from 'app/types/user';
 
-import { EnterpriseAuthFeaturesCard } from './EnterpriseAuthFeaturesCard';
 import { UsersTable } from './Users/UsersTable';
 import { changeFilter, changePage, changeQuery, changeSort, fetchUsers } from './state/actions';
 
