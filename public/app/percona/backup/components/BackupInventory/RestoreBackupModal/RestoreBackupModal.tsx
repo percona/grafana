@@ -227,7 +227,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
             <Alert title="" severity="info">
               {Messages.localRestoreDisabled}
             </Alert>
-            <Stack direction="column" justifyContent="center">
+            <Stack direction="row" justifyContent="center">
               <Button onClick={onClose}>{Messages.close}</Button>
             </Stack>
           </>
@@ -318,7 +318,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   {Messages.scheduledWarning}
                 </Alert>
                 {!!restoreErrors.length && <BackupErrorSection backupErrors={restoreErrors} />}
-                <Stack direction="column" justifyContent="center">
+                <Stack direction="row" justifyContent="center">
                   <LoaderButton
                     data-testid="restore-button"
                     size="md"
