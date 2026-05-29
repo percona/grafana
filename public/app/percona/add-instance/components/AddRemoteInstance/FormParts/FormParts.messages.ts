@@ -81,6 +81,7 @@ export const Messages = {
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
         disableCommentsParsing: 'Disable comments parsing',
         disableQueryExamples: 'Disable query examples',
+        disableCollectors: 'Disable collectors',
       },
     },
     placeholders: {
@@ -121,7 +122,9 @@ export const Messages = {
         customLabels: 'key1:value1\nkey2:value2',
         extraDsnParams: 'key1:value1\nkey2:value2',
       },
-      additionalOptions: {},
+      additionalOptions: {
+        disableCollectors: 'collector_1, collector_2, collector_3',
+      },
     },
     tooltips: {
       externalService: {
@@ -166,6 +169,10 @@ export const Messages = {
       labels: {
         region: 'Region',
         az: 'Availability Zone',
+      },
+      additionalOptions: {
+        disableCollectors:
+          'Comma-separated list of collector names to disable for this exporter (e.g. "collector_1, collector_2"). Leave empty to keep all collectors enabled.',
       },
     },
     titles: {

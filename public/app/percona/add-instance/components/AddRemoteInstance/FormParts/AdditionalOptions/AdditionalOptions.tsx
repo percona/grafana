@@ -10,6 +10,7 @@ import {
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { Databases } from 'app/percona/shared/core';
 import Validators from 'app/percona/shared/helpers/validators';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
@@ -216,6 +217,15 @@ export const getAdditionalOptions = (
               label={Messages.form.labels.additionalOptions.disableCommentsParsing}
               name="disable_comments_parsing"
             />
+            {!remoteInstanceCredentials.isAzure && (
+              <TextInputField
+                name={remoteInstanceCredentials.isRDS ? 'postgresql_disable_collectors' : 'disable_collectors'}
+                label={Messages.form.labels.additionalOptions.disableCollectors}
+                placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
+                tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
+                validators={[platformCoreValidators.disableCollectors]}
+              />
+            )}
           </>
           <PostgreSQLAdditionalOptions
             form={form}
@@ -261,6 +271,15 @@ export const getAdditionalOptions = (
             name="qan_mysql_perfschema"
           />
           <MySQLOptions form={form} />
+          {!remoteInstanceCredentials.isAzure && (
+            <TextInputField
+              name={remoteInstanceCredentials.isRDS ? 'mysql_disable_collectors' : 'disable_collectors'}
+              label={Messages.form.labels.additionalOptions.disableCollectors}
+              placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
+              tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
+              validators={[platformCoreValidators.disableCollectors]}
+            />
+          )}
           {remoteInstanceCredentials.isRDS ? (
             <>
               <CheckboxField
@@ -291,6 +310,27 @@ export const getAdditionalOptions = (
             name="qan_mongodb_profiler"
             data-testid="qan-mongodb-profiler-checkbox"
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
+          />
+          <TextInputField
+            name="disable_collectors"
+            label={Messages.form.labels.additionalOptions.disableCollectors}
+            placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
+            tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
+            validators={[platformCoreValidators.disableCollectors]}
+          />
+        </>
+      );
+    case Databases.proxysql:
+      return (
+        <>
+          <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
+          <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
+          <TextInputField
+            name="disable_collectors"
+            label={Messages.form.labels.additionalOptions.disableCollectors}
+            placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
+            tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
+            validators={[platformCoreValidators.disableCollectors]}
           />
         </>
       );
