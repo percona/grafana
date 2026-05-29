@@ -10,7 +10,6 @@ import {
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
-import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { Databases } from 'app/percona/shared/core';
 import Validators from 'app/percona/shared/helpers/validators';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
@@ -31,6 +30,7 @@ import MysqlExtraDSNParams from './MysqlExtraDSNParams';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 import { ValkeyTLSCertificate } from './ValkeyTLSCertificate';
+import DisableCollectorsField from './DisableCollectorsField';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -157,7 +157,7 @@ const getTablestatValues = (type: TablestatOptionsInterface) => {
   }
 };
 
-const MySQLOptions = ({ form }: { form: FormApi }) => {
+const MySQLOptions = ({ form, isRDS, isAzure }: { form: FormApi; isRDS?: boolean; isAzure?: boolean }) => {
   const selectedOption = form.getState().values && form.getState().values.tablestatOptions;
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || TablestatOptionsInterface.disabled);
   const styles = useStyles2(getStyles);
@@ -173,6 +173,7 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
       <div className={styles.extraDsnOptions}>
         <MysqlExtraDSNParams />
       </div>
+      {!isAzure && <DisableCollectorsField name={isRDS ? 'mysql_disable_collectors' : 'disable_collectors'} />}
       <h4>{Messages.form.labels.additionalOptions.tablestatOptions}</h4>
       <div className={styles.group}>
         <RadioButtonGroupField
@@ -218,12 +219,8 @@ export const getAdditionalOptions = (
               name="disable_comments_parsing"
             />
             {!remoteInstanceCredentials.isAzure && (
-              <TextInputField
+              <DisableCollectorsField
                 name={remoteInstanceCredentials.isRDS ? 'postgresql_disable_collectors' : 'disable_collectors'}
-                label={Messages.form.labels.additionalOptions.disableCollectors}
-                placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
-                tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
-                validators={[platformCoreValidators.disableCollectors]}
               />
             )}
           </>
@@ -270,16 +267,11 @@ export const getAdditionalOptions = (
             label={Messages.form.labels.additionalOptions.qanMysqlPerfschema}
             name="qan_mysql_perfschema"
           />
-          <MySQLOptions form={form} />
-          {!remoteInstanceCredentials.isAzure && (
-            <TextInputField
-              name={remoteInstanceCredentials.isRDS ? 'mysql_disable_collectors' : 'disable_collectors'}
-              label={Messages.form.labels.additionalOptions.disableCollectors}
-              placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
-              tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
-              validators={[platformCoreValidators.disableCollectors]}
-            />
-          )}
+          <MySQLOptions
+            form={form}
+            isRDS={remoteInstanceCredentials.isRDS}
+            isAzure={remoteInstanceCredentials.isAzure}
+          />
           {remoteInstanceCredentials.isRDS ? (
             <>
               <CheckboxField
@@ -311,13 +303,7 @@ export const getAdditionalOptions = (
             data-testid="qan-mongodb-profiler-checkbox"
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
           />
-          <TextInputField
-            name="disable_collectors"
-            label={Messages.form.labels.additionalOptions.disableCollectors}
-            placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
-            tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
-            validators={[platformCoreValidators.disableCollectors]}
-          />
+          <DisableCollectorsField name="disable_collectors" />
         </>
       );
     case Databases.proxysql:
@@ -325,13 +311,7 @@ export const getAdditionalOptions = (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
-          <TextInputField
-            name="disable_collectors"
-            label={Messages.form.labels.additionalOptions.disableCollectors}
-            placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
-            tooltipText={Messages.form.tooltips.additionalOptions.disableCollectors}
-            validators={[platformCoreValidators.disableCollectors]}
-          />
+          <DisableCollectorsField name="disable_collectors" />
         </>
       );
     case Databases.valkey:

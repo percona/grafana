@@ -1,6 +1,6 @@
 import { Validator } from './validator.types';
 
-export const disableCollectors: Validator = (value: string) => {
+export const disableCollectors: Validator<string | undefined> = (value) => {
   if (!value) {
     return undefined;
   }

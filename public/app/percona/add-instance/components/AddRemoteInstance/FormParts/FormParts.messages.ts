@@ -123,7 +123,7 @@ export const Messages = {
         extraDsnParams: 'key1:value1\nkey2:value2',
       },
       additionalOptions: {
-        disableCollectors: 'collector_1, collector_2, collector_3',
+        disableCollectors: 'collector1, collector2, collector3',
       },
     },
     tooltips: {
@@ -170,10 +170,6 @@ export const Messages = {
         region: 'Region',
         az: 'Availability Zone',
       },
-      additionalOptions: {
-        disableCollectors:
-          'Comma-separated list of collector names to disable for this exporter (e.g. "collector_1, collector_2"). Leave empty to keep all collectors enabled.',
-      },
     },
     titles: {
       mainDetails: 'Main details',
@@ -191,6 +187,8 @@ export const Messages = {
       labelsExisting: 'Editing existing labels may affect your inventory and its data.',
       customLabels: 'Follow the format as exemplified below, one label per line.',
       extraDsnParams: 'Follow the format as exemplified below, one parameter per line.',
+      disableCollectors:
+        'Comma-separated list of collector names to disable for this exporter. Leave empty to keep all collectors enabled.',
     },
   },
 };

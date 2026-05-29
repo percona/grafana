@@ -208,8 +208,8 @@ export interface RDSPayload extends CommonRDSAzurePayload {
   qan_postgresql_pgstatements: boolean;
   agent_password: string;
   max_postgresql_exporter_connections: number;
-  mysql_disable_collectors: string[];
-  postgresql_disable_collectors: string[];
+  mysql_disable_collectors?: string[];
+  postgresql_disable_collectors?: string[];
 }
 
 export interface MSAzurePayload extends CommonRDSAzurePayload {

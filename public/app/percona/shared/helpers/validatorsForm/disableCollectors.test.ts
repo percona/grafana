@@ -3,8 +3,7 @@ import { disableCollectors } from './disableCollectors';
 describe('disableCollectors validator', () => {
   it('passes for empty or undefined value (optional field)', () => {
     expect(disableCollectors('')).toBeUndefined();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(disableCollectors(undefined as any)).toBeUndefined();
+    expect(disableCollectors(undefined)).toBeUndefined();
   });
 
   it('passes for a single valid token', () => {

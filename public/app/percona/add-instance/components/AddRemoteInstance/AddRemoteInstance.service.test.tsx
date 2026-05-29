@@ -1,5 +1,6 @@
 import { MetricsMode } from 'app/percona/inventory/Inventory.types';
 import { toExternalServicePayload, toPayload } from './AddRemoteInstance.service';
+import { MySQLPayload } from './AddRemoteInstance.types';
 
 describe('AddRemoteInstanceService:: ', () => {
   it('should properly convert remote external service form to a payload', () => {
@@ -99,5 +100,16 @@ describe('AddRemoteInstanceService:: ', () => {
       node_id: 'node1',
     };
     expect(toPayload(data)).toStrictEqual(payload);
+  });
+
+  it('should parse disable_collectors string into a trimmed, filtered array', () => {
+    const data = {
+      address: 'localhost',
+      pmm_agent_id: { value: 'pmm-server' },
+      node: { value: 'node1', label: 'node1' },
+      disable_collectors: 'collector_1, collector2,  collector3,',
+    };
+
+    expect((toPayload(data) as MySQLPayload).disable_collectors).toEqual(['collector_1', 'collector2', 'collector3']);
   });
 });
