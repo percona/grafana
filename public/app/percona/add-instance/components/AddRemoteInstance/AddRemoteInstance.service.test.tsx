@@ -1,6 +1,6 @@
 import { MetricsMode } from 'app/percona/inventory/Inventory.types';
 import { toExternalServicePayload, toPayload } from './AddRemoteInstance.service';
-import { MySQLPayload } from './AddRemoteInstance.types';
+import { MySQLPayload, RDSPayload } from './AddRemoteInstance.types';
 
 describe('AddRemoteInstanceService:: ', () => {
   it('should properly convert remote external service form to a payload', () => {
@@ -102,7 +102,7 @@ describe('AddRemoteInstanceService:: ', () => {
     expect(toPayload(data)).toStrictEqual(payload);
   });
 
-  it('should parse disable_collectors string into a trimmed, filtered array', () => {
+  it('should parse disable_collectors string into a trimmed, filtered array (mysql)', () => {
     const data = {
       address: 'localhost',
       pmm_agent_id: { value: 'pmm-server' },
@@ -111,5 +111,35 @@ describe('AddRemoteInstanceService:: ', () => {
     };
 
     expect((toPayload(data) as MySQLPayload).disable_collectors).toEqual(['collector_1', 'collector2', 'collector3']);
+  });
+
+  it('should parse disable_collectors string into a trimmed, filtered array for rds (mysql)', () => {
+    const data = {
+      address: 'localhost',
+      pmm_agent_id: { value: 'pmm-server' },
+      node: { value: 'node1', label: 'node1' },
+      mysql_disable_collectors: 'collector_1, collector2,  collector3,',
+    };
+
+    expect((toPayload(data) as RDSPayload).mysql_disable_collectors).toEqual([
+      'collector_1',
+      'collector2',
+      'collector3',
+    ]);
+  });
+
+  it('should parse disable_collectors string into a trimmed, filtered array for rds (postgresql)', () => {
+    const data = {
+      address: 'localhost',
+      pmm_agent_id: { value: 'pmm-server' },
+      node: { value: 'node1', label: 'node1' },
+      postgresql_disable_collectors: 'collector_1, collector2,  collector3,',
+    };
+
+    expect((toPayload(data) as RDSPayload).postgresql_disable_collectors).toEqual([
+      'collector_1',
+      'collector2',
+      'collector3',
+    ]);
   });
 });

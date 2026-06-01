@@ -170,7 +170,7 @@ const MySQLOptions = ({ form, isRDS, isAzure }: { form: FormApi; isRDS?: boolean
 
   return (
     <>
-      <div className={styles.extraDsnOptions}>
+      <div className={styles.fieldWrapper}>
         <MysqlExtraDSNParams />
       </div>
       {!isAzure && <DisableCollectorsField name={isRDS ? 'mysql_disable_collectors' : 'disable_collectors'} />}

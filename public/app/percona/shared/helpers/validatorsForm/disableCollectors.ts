@@ -1,5 +1,7 @@
 import { Validator } from './validator.types';
 
+const collectorNameRe = /^[a-zA-Z0-9_.-]+$/;
+
 export const disableCollectors: Validator<string | undefined> = (value) => {
   if (!value) {
     return undefined;
@@ -9,9 +11,8 @@ export const disableCollectors: Validator<string | undefined> = (value) => {
     .split(',')
     .map((token) => token.trim())
     .filter(Boolean);
-  const validToken = /^[a-zA-Z0-9_.-]+$/;
 
-  return tokens.every((token) => validToken.test(token))
+  return tokens.every((token) => collectorNameRe.test(token))
     ? undefined
     : 'Each collector name may contain only letters, numbers, "_", ".", "-", separated by commas';
 };

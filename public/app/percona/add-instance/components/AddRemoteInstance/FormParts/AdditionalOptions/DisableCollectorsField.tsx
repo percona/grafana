@@ -15,17 +15,19 @@ const DisableCollectorsField: FC<Props> = ({ name }) => {
   const styles = useStyles2(getStyles);
 
   return (
-    <TextInputField
-      name={name}
-      label={
-        <div>
-          <label htmlFor={`input-${name}-id`}>{Messages.form.labels.additionalOptions.disableCollectors}</label>
-          <p className={styles.description}>{Messages.form.descriptions.disableCollectors}</p>
-        </div>
-      }
-      placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
-      validators={[platformCoreValidators.disableCollectors]}
-    />
+    <div className={styles.fieldWrapper}>
+      <TextInputField
+        name={name}
+        label={
+          <div>
+            <span>{Messages.form.labels.additionalOptions.disableCollectors}</span>
+            <p className={styles.description}>{Messages.form.descriptions.disableCollectors}</p>
+          </div>
+        }
+        placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
+        validators={[platformCoreValidators.disableCollectors]}
+      />
+    </div>
   );
 };
 
