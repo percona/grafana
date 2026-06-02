@@ -1,8 +1,9 @@
 import { comboboxTestSetup } from 'test/helpers/comboboxTestSetup';
 import { getSelectParent, selectOptionInTest } from 'test/helpers/selectOptionInTest';
-import { render, screen, userEvent, waitFor, within } from 'test/test-utils';
+import { act, cleanup, render, screen, userEvent, waitFor, within } from 'test/test-utils';
 
 import { setBackendSrv } from '@grafana/runtime';
+import { PreferencesSpec as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
 import { setupMockServer } from '@grafana/test-utils/server';
 import { getFolderFixtures } from '@grafana/test-utils/unstable';
 import { backendSrv } from 'app/core/services/backend_srv';
@@ -44,25 +45,6 @@ const getPrefsUpdateRequest = async (requests: Request[]) => {
 
   return prefsUpdate!.clone().json();
 };
-
-const [_, { dashbdD, dashbdE }] = getFolderFixtures();
-
-const selectComboboxOptionInTest = async (input: HTMLElement, optionOrOptions: string | RegExp) => {
-  const user = userEvent.setup();
-  await user.click(input);
-  const option = await screen.findByRole('option', { name: optionOrOptions });
-  await user.click(option);
-};
-
-const setup = async () => {
-  const view = render(<SharedPreferences resourceUri="user" preferenceType="user" />);
-  const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
-  await waitFor(() => expect(themeSelect).not.toBeDisabled());
-  return view;
-};
-
-const original = window.location;
-const mockReload = jest.fn();
 
 beforeAll(() => {
   Object.defineProperty(window, 'location', {

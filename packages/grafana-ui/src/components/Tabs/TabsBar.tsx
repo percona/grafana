@@ -33,7 +33,7 @@ export const TabsBar = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
-    const styles = useStyles2(getStyles);
+    const styles = useStyles2(getStyles, vertical);
 
     return (
       <div className={cx(styles.tabsWrapper, hideBorder && styles.noBorder, className)} ref={ref}>
