@@ -408,7 +408,7 @@ export function PanelChrome({
             <div
               className={cx(styles.headerContainer, dragClass)}
               style={headerStyles}
-              data-testid={selectors.components.Panels.Panel.headerContainer}
+              data-testid="header-container"
               onPointerDown={onPointerDown}
               onMouseEnter={isSelectable ? onHeaderEnter : undefined}
               onMouseLeave={isSelectable ? onHeaderLeave : undefined}
