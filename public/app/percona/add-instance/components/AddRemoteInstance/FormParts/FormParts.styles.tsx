@@ -65,6 +65,7 @@ export const getStyles = ({ breakpoints, spacing, colors }: GrafanaTheme2) => ({
     color: ${colors.text.secondary};
     font-weight: normal;
     margin-bottom: 0;
+    text-wrap: auto;
   `,
   additionalOptions: css`
     & > div:not(:last-child) {

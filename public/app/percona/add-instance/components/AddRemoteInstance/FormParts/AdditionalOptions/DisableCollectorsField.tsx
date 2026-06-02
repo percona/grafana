@@ -19,10 +19,11 @@ const DisableCollectorsField: FC<Props> = ({ name }) => {
       <TextInputField
         name={name}
         label={
-          <div>
+          <>
             <span>{Messages.form.labels.additionalOptions.disableCollectors}</span>
-            <p className={styles.description}>{Messages.form.descriptions.disableCollectors}</p>
-          </div>
+            <br />
+            <span className={styles.description}>{Messages.form.descriptions.disableCollectors}</span>
+          </>
         }
         placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
         validators={[platformCoreValidators.disableCollectors]}

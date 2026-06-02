@@ -188,7 +188,7 @@ export const Messages = {
       customLabels: 'Follow the format as exemplified below, one label per line.',
       extraDsnParams: 'Follow the format as exemplified below, one parameter per line.',
       disableCollectors:
-        'Comma-separated list of collector names to disable for this exporter. Leave empty to keep all collectors enabled.',
+        'Exclude specific collectors from metric collection to reduce monitoring overhead or suppress metrics not relevant to your environment. Leave empty to keep all collectors enabled.',
     },
   },
 };
