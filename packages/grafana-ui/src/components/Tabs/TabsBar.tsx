@@ -16,19 +16,17 @@ export interface Props {
   dataTestId?: string;
 }
 
-export const TabsBar = forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      children,
-      className,
-      hideBorder = false,
-      // @PERCONA
+/**
+ * A composition component for rendering a TabBar with Tabs for navigation.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/navigation-tabs--docs
+ */
+export const TabsBar = forwardRef<HTMLDivElement, Props>(({ children, className, hideBorder = false,
+        // @PERCONA
       vertical = false,
       dataTestId = '',
-    },
-    ref
-  ) => {
-    const styles = useStyles2((theme) => getStyles(theme, vertical));
+ }, ref) => {
+  const styles = useStyles2(getStyles);
 
     return (
       <div className={cx(styles.tabsWrapper, hideBorder && styles.noBorder, className)} ref={ref}>

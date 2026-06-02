@@ -383,6 +383,7 @@ export function PanelChrome({
                 menu={menu}
                 title={typeof title === 'string' ? title : undefined}
                 dragClass={dragClass}
+                onDragStart={onDragStart}
                 offset={hoverHeaderOffset}
                 onOpenMenu={onOpenMenu}
               >
@@ -407,7 +408,7 @@ export function PanelChrome({
             <div
               className={cx(styles.headerContainer, dragClass)}
               style={headerStyles}
-              data-testid="header-container"
+              data-testid={selectors.components.Panels.Panel.headerContainer}
               onPointerDown={onPointerDown}
               onMouseEnter={isSelectable ? onHeaderEnter : undefined}
               onMouseLeave={isSelectable ? onHeaderLeave : undefined}

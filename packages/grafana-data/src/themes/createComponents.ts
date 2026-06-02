@@ -116,6 +116,7 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
     sidemenu: {
       width: 57,
     },
+    // @ts-expect-error (added here to not crash plugins that might use it)
     menuTabs: {
       height: 5,
     },

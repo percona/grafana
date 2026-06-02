@@ -172,6 +172,12 @@ const getStyles = (theme: GrafanaTheme2) => {
       wordBreak: 'break-word',
       overflow: 'hidden',
     }),
+    linkTruncate: css({
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      wordBreak: 'break-word',
+      overflow: 'hidden',
+    }),
     notActive: css({
       'a:hover, &:hover, &:focus': {
         color: theme.colors.text.primary,
