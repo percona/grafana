@@ -152,8 +152,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   }, [dispatch, isSignedIn, onReady, user]);
 
   return (
-    <>
-      {!isPmmNavEnabled() && updateAvailable && showUpdateModal && !isLoadingUpdates && <PerconaUpdateVersion />}
-    </>
+    <>{!isPmmNavEnabled() && updateAvailable && showUpdateModal && !isLoadingUpdates && <PerconaUpdateVersion />}</>
   );
 };
