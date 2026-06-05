@@ -49,10 +49,8 @@ export const toLabelValue = (original?: string, current?: string): string | unde
   return current;
 };
 
-export const areCustomLabelsEqual = (
-  current?: Record<string, string>,
-  next?: Record<string, string>
-): boolean => isShallowEqual(current ?? {}, next ?? {});
+export const areCustomLabelsEqual = (current?: Record<string, string>, next?: Record<string, string>): boolean =>
+  isShallowEqual(current ?? {}, next ?? {});
 
 export const toUpdateServiceBody = ({
   serviceId,
@@ -64,9 +62,7 @@ export const toUpdateServiceBody = ({
   environment: toLabelValue(current.enviroment, labels.environment),
   cluster: toLabelValue(current.cluster, labels.cluster),
   replication_set: toLabelValue(current.replication_set, labels.replication_set),
-  custom_labels: areCustomLabelsEqual(current.custom_labels, custom_labels)
-    ? undefined
-    : { values: custom_labels },
+  custom_labels: areCustomLabelsEqual(current.custom_labels, custom_labels) ? undefined : { values: custom_labels },
 });
 
 export const didStandardLabelsChange = ({ current, labels, custom_labels }: UpdateServiceParams): boolean =>
