@@ -79,6 +79,7 @@ const EditInstancePage: FC = () => {
         Messages.success.title(service.service_name),
         Messages.success.description,
       ]);
+      return;
       locationService.push('/inventory/services');
     } catch (error) {
       logger.error(error);

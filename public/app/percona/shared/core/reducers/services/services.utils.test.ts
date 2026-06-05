@@ -3,7 +3,38 @@ import { Service, ServiceListPayload, ServiceStatus } from 'app/percona/shared/s
 
 import { Databases } from '../../types';
 
-import { toDbServicesModel } from './services.utils';
+import { UpdateServiceParams } from './services.types';
+import { didStandardLabelsChange, toDbServicesModel, toUpdateServiceBody } from './services.utils';
+
+const baseUpdateParams = (): UpdateServiceParams => ({
+  serviceId: 'service_id',
+  labels: {
+    environment: 'prod',
+    cluster: 'cluster-a',
+    replication_set: 'repl-1',
+  },
+  custom_labels: { label: 'value' },
+  current: {
+    service_type: Databases.mysql,
+    service_id: 'service_id',
+    service_name: 'mysql',
+    node_id: 'node_id',
+    node_name: 'node',
+    enviroment: 'prod',
+    cluster: 'cluster-a',
+    replication_set: 'repl-1',
+    custom_labels: { label: 'value' },
+  },
+});
+
+const withLabelChange = (
+  property: 'environment' | 'cluster' | 'replication_set',
+  value: string
+): UpdateServiceParams => {
+  const params = baseUpdateParams();
+  params.labels[property] = value;
+  return params;
+};
 
 describe('toDbServicesModel', () => {
   it('should correctly convert payload', () => {
@@ -137,5 +168,82 @@ describe('toDbServicesModel', () => {
         },
       },
     ]);
+  });
+});
+
+describe('toUpdateServiceBody', () => {
+  it('omits custom_labels when unchanged', () => {
+    expect(toUpdateServiceBody(baseUpdateParams())).toEqual({
+      service_id: 'service_id',
+      environment: undefined,
+      cluster: undefined,
+      replication_set: undefined,
+      custom_labels: undefined,
+    });
+  });
+
+  it('includes custom_labels when changed', () => {
+    const params = baseUpdateParams();
+    params.custom_labels = { label: 'new-value' };
+
+    expect(toUpdateServiceBody(params)).toEqual({
+      service_id: 'service_id',
+      environment: undefined,
+      cluster: undefined,
+      replication_set: undefined,
+      custom_labels: { values: { label: 'new-value' } },
+    });
+  });
+
+  it('omits custom_labels when current is undefined and next is empty', () => {
+    const params = baseUpdateParams();
+    params.current.custom_labels = undefined;
+    params.custom_labels = {};
+
+    expect(toUpdateServiceBody(params).custom_labels).toBeUndefined();
+  });
+
+  it.each([
+    ['environment', 'staging', { environment: 'staging' }],
+    ['cluster', 'cluster-b', { cluster: 'cluster-b' }],
+    ['replication_set', 'repl-2', { replication_set: 'repl-2' }],
+  ] as const)('includes %s when changed', (property, value, expectedField) => {
+    expect(toUpdateServiceBody(withLabelChange(property, value))).toEqual({
+      service_id: 'service_id',
+      environment: undefined,
+      cluster: undefined,
+      replication_set: undefined,
+      custom_labels: undefined,
+      ...expectedField,
+    });
+  });
+});
+
+describe('didStandardLabelsChange', () => {
+  it('returns false when nothing changed', () => {
+    expect(didStandardLabelsChange(baseUpdateParams())).toBe(false);
+  });
+
+  it('returns true when only custom labels changed', () => {
+    const params = baseUpdateParams();
+    params.custom_labels = { label: 'new-value' };
+
+    expect(didStandardLabelsChange(params)).toBe(true);
+  });
+
+  it.each([
+    ['environment', 'staging'],
+    ['cluster', 'cluster-b'],
+    ['replication_set', 'repl-2'],
+  ] as const)('returns true when only %s changed', (property, value) => {
+    expect(didStandardLabelsChange(withLabelChange(property, value))).toBe(true);
+  });
+
+  it('returns false when current custom_labels is undefined and next is empty', () => {
+    const params = baseUpdateParams();
+    params.current.custom_labels = undefined;
+    params.custom_labels = {};
+
+    expect(didStandardLabelsChange(params)).toBe(false);
   });
 });

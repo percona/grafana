@@ -1,3 +1,4 @@
+import { isShallowEqual } from 'app/core/utils/isShallowEqual';
 import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 import {
@@ -48,17 +49,31 @@ export const toLabelValue = (original?: string, current?: string): string | unde
   return current;
 };
 
-export const toUpdateServiceBody = ({ serviceId, labels, current }: UpdateServiceParams): UpdateServiceBody => ({
+export const areCustomLabelsEqual = (
+  current?: Record<string, string>,
+  next?: Record<string, string>
+): boolean => isShallowEqual(current ?? {}, next ?? {});
+
+export const toUpdateServiceBody = ({
+  serviceId,
+  labels,
+  custom_labels,
+  current,
+}: UpdateServiceParams): UpdateServiceBody => ({
   service_id: serviceId,
   environment: toLabelValue(current.enviroment, labels.environment),
   cluster: toLabelValue(current.cluster, labels.cluster),
   replication_set: toLabelValue(current.replication_set, labels.replication_set),
+  custom_labels: areCustomLabelsEqual(current.custom_labels, custom_labels)
+    ? undefined
+    : { values: custom_labels },
 });
 
-export const didStandardLabelsChange = ({ current, labels }: UpdateServiceParams): boolean =>
+export const didStandardLabelsChange = ({ current, labels, custom_labels }: UpdateServiceParams): boolean =>
   current.enviroment !== labels.environment ||
   current.cluster !== labels.cluster ||
-  current.replication_set !== labels.replication_set;
+  current.replication_set !== labels.replication_set ||
+  !areCustomLabelsEqual(current.custom_labels, custom_labels);
 
 export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] => {
   const result: Service[] = [];
