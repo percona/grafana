@@ -9552,6 +9552,12 @@
         "$ref": "#/definitions/ErrorResponseBody"
       }
     },
+    "notAcceptableError": {
+      "description": "NotAcceptableError is returned when the server cannot produce a response matching the accepted formats.",
+      "schema": {
+        "$ref": "#/definitions/ErrorResponseBody"
+      }
+    },
     "notFoundError": {
       "description": "NotFoundError is returned when the requested resource was not found.",
       "schema": {

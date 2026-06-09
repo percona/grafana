@@ -1,6 +1,6 @@
 import { comboboxTestSetup } from 'test/helpers/comboboxTestSetup';
 import { getSelectParent, selectOptionInTest } from 'test/helpers/selectOptionInTest';
-import { render, screen, userEvent, waitFor, within, cleanup, act } from 'test/test-utils';
+import { act, cleanup, render, screen, userEvent, waitFor, within } from 'test/test-utils';
 
 import { setBackendSrv } from '@grafana/runtime';
 import { PreferencesSpec as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
@@ -45,6 +45,24 @@ const getPrefsUpdateRequest = async (requests: Request[]) => {
 
   return prefsUpdate!.clone().json();
 };
+
+beforeAll(() => {
+  Object.defineProperty(window, 'location', {
+    writable: true,
+    value: {
+      ...original,
+      reload: mockReload,
+    },
+  });
+  comboboxTestSetup();
+});
+
+afterAll(() => {
+  Object.defineProperty(window, 'location', {
+    writable: true,
+    value: original,
+  });
+});
 
 const [_, { dashbdD, dashbdE }] = getFolderFixtures();
 
