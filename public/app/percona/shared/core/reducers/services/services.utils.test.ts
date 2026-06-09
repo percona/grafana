@@ -4,7 +4,7 @@ import { Service, ServiceListPayload, ServiceStatus } from 'app/percona/shared/s
 import { Databases } from '../../types';
 
 import { UpdateServiceParams } from './services.types';
-import { didStandardLabelsChange, toDbServicesModel, toUpdateServiceBody } from './services.utils';
+import { didLabelsChange, toDbServicesModel, toUpdateServiceBody } from './services.utils';
 
 const baseUpdateParams = (): UpdateServiceParams => ({
   serviceId: 'service_id',
@@ -219,16 +219,16 @@ describe('toUpdateServiceBody', () => {
   });
 });
 
-describe('didStandardLabelsChange', () => {
+describe('didLabelsChange', () => {
   it('returns false when nothing changed', () => {
-    expect(didStandardLabelsChange(baseUpdateParams())).toBe(false);
+    expect(didLabelsChange(baseUpdateParams())).toBe(false);
   });
 
   it('returns true when only custom labels changed', () => {
     const params = baseUpdateParams();
     params.custom_labels = { label: 'new-value' };
 
-    expect(didStandardLabelsChange(params)).toBe(true);
+    expect(didLabelsChange(params)).toBe(true);
   });
 
   it.each([
@@ -236,7 +236,7 @@ describe('didStandardLabelsChange', () => {
     ['cluster', 'cluster-b'],
     ['replication_set', 'repl-2'],
   ] as const)('returns true when only %s changed', (property, value) => {
-    expect(didStandardLabelsChange(withLabelChange(property, value))).toBe(true);
+    expect(didLabelsChange(withLabelChange(property, value))).toBe(true);
   });
 
   it('returns false when current custom_labels is undefined and next is empty', () => {
@@ -244,6 +244,6 @@ describe('didStandardLabelsChange', () => {
     params.current.custom_labels = undefined;
     params.custom_labels = {};
 
-    expect(didStandardLabelsChange(params)).toBe(false);
+    expect(didLabelsChange(params)).toBe(false);
   });
 });

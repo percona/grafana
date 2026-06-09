@@ -65,7 +65,7 @@ export const toUpdateServiceBody = ({
   custom_labels: areCustomLabelsEqual(current.custom_labels, custom_labels) ? undefined : { values: custom_labels },
 });
 
-export const didStandardLabelsChange = ({ current, labels, custom_labels }: UpdateServiceParams): boolean =>
+export const didLabelsChange = ({ current, labels, custom_labels }: UpdateServiceParams): boolean =>
   current.enviroment !== labels.environment ||
   current.cluster !== labels.cluster ||
   current.replication_set !== labels.replication_set ||
