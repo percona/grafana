@@ -127,6 +127,7 @@ require (
 	github.com/influxdata/influxdb-client-go/v2 v2.13.0 // @grafana/partner-datasources
 	github.com/influxdata/influxql v1.4.0 // @grafana/partner-datasources
 	github.com/influxdata/line-protocol v0.0.0-20210922203350-b1ad95c89adf // @grafana/grafana-app-platform-squad
+	github.com/jackc/pgx/v5 v5.8.0 // @grafana/grafana-search-and-storage
 	github.com/jmespath-community/go-jmespath v1.1.1 // @grafana/identity-access-team
 	github.com/jmespath/go-jmespath v0.4.0 // indirect; // @grafana/grafana-backend-group
 	github.com/jmoiron/sqlx v1.4.0 // @grafana/grafana-backend-group
@@ -486,7 +487,6 @@ require (
 	github.com/invopop/jsonschema v0.13.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.9.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jaegertracing/jaeger v1.67.0 // indirect
 	github.com/jaegertracing/jaeger-idl v0.6.0 // indirect
@@ -541,7 +541,7 @@ require (
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.1.0 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
-	github.com/moby/spdystream v0.5.1 // indirect
+	github.com/moby/spdystream v0.5.0 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
 	github.com/moby/sys/user v0.4.0 // indirect
 	github.com/moby/sys/userns v0.1.0 // indirect
@@ -750,44 +750,3 @@ exclude (
 	// otherwise pulled in as a transitive dependency.
 	k8s.io/client-go v12.0.0+incompatible
 )
-
-require (
-	cloud.google.com/go/trace v1.11.5 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
-	github.com/RoaringBitmap/roaring/v2 v2.4.5 // indirect
-	github.com/bluele/gcache v0.0.2 // indirect
-	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
-	github.com/envoyproxy/go-control-plane/envoy v1.36.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
-	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
-	github.com/onsi/ginkgo/v2 v2.22.2 // indirect
-	github.com/open-feature/go-sdk-contrib/providers/ofrep v0.1.5 // indirect
-	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.36.0 // indirect
-	golang.org/x/telemetry v0.0.0-20251111182119-bc8e575c7b54 // indirect
-	golang.org/x/tools/godoc v0.1.0-deprecated // indirect
-)
-
-// Use fork of crewjam/saml with fixes for some issues until changes get merged into upstream
-replace github.com/crewjam/saml => github.com/grafana/saml v0.4.15-0.20240917091248-ae3bbdad8a56
-
-exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
-
-// Use our fork xorm. go.work currently overrides this and points to the local ./pkg/util/xorm directory.
-replace xorm.io/xorm => github.com/grafana/grafana/pkg/util/xorm v0.0.1
-
-// lock for mysql tsdb compat
-replace github.com/go-sql-driver/mysql => github.com/go-sql-driver/mysql v1.7.1
-
-// v1.* versions were retracted, we need to stick with v0.*. This should work
-// without the exclude, but this otherwise gets pulled in as a transitive
-// dependency.
-exclude github.com/prometheus/prometheus v1.8.2-0.20221021121301-51a44e6657c3
-
-// This was retracted, but seems to be known by the Go module proxy, and is
-// otherwise pulled in as a transitive dependency.
-exclude k8s.io/client-go v12.0.0+incompatible
-
-// k8s.io/apiserver fails due to incompatibility with cel-go 0.23, can be removed once apiserver v0.32.3 is released.
-replace github.com/google/cel-go => github.com/google/cel-go v0.22.1
