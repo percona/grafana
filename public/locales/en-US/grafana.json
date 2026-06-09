@@ -344,14 +344,6 @@
       "tooltip-assigned-role": "A licensed role will be assigned when this user signs in"
     }
   },
-  "alert-labels": {
-    "button": {
-      "hide": "Hide common labels",
-      "show": {
-        "tooltip": "Show common labels"
-      }
-    }
-  },
   "alerting": {
     "active-timing-fields": {
       "am-active-timing-select-label-active-timings": "Active timings"
@@ -7662,10 +7654,95 @@
       "dragging-a-sub-region": "Dragging a sub-region",
       "value": "Value: {{ dividerPos }}"
     },
-    "drilldownInfo": {
-      "action": "Go to Grafana Drilldown",
-      "description": "Looking for the Grafana Explore apps? They are now called the Grafana Drilldown apps and can be found under <1>Menu > Drilldown</1>",
-      "title": "Explore Metrics, Logs, Traces and Profiles have moved!"
+    "drop-down-menu": {
+      "aria-label-links": "Links",
+      "links": "Links"
+    },
+    "explore": {
+      "title-flame-graph": "Flame graph",
+      "title-graph": "Graph",
+      "title-logs": "Logs",
+      "title-logs-sample": "Logs sample",
+      "title-node-graph": "Node graph",
+      "title-queries": "Queries",
+      "title-raw-prometheus": "Raw Prometheus",
+      "title-table": "Table",
+      "title-traces": "Traces"
+    },
+    "explore-query-inspector": {
+      "data-tab": {
+        "label": {
+          "data": "Data"
+        }
+      },
+      "error-tab": {
+        "label": {
+          "error": "Error"
+        }
+      },
+      "json-tab": {
+        "label": {
+          "json": "JSON"
+        }
+      },
+      "query-tab": {
+        "label": {
+          "query": "Query"
+        }
+      },
+      "stats-tab": {
+        "label": {
+          "stats": "Stats"
+        }
+      }
+    },
+    "explore-run-query-button": {
+      "run-button": {
+        "aria-label-run-query-options": "Run query options"
+      }
+    },
+    "explore-toolbar": {
+      "outline": "Outline",
+      "tooltip-content-outline": "Content outline"
+    },
+    "feature-toggle-page": {
+      "description-explore-disabled": "To enable Explore, enable it in the Grafana config:",
+      "title-explore-disabled": "Explore is disabled"
+    },
+    "get-field-links-for-explore": {
+      "text": {
+        "data": "Data",
+        "raw-value": "Raw value"
+      }
+    },
+    "get-matches-metadata": {
+      "matches": "0 matches"
+    },
+    "legacy-create-span-link-factory": {
+      "text": {
+        "tags": "Tags"
+      },
+      "title": {
+        "related-logs": "Related logs",
+        "session-for-this-span": "Session for this span"
+      },
+      "title-explore-metrics-for-this-span": "Explore metrics for this span",
+      "title-explore-split": "Explore the logs for this in split view",
+      "title-session-for-this-span": "Session for this span"
+    },
+    "live-logs": {
+      "clear-logs": "Clear logs",
+      "exit-live-mode": "Exit live mode",
+      "last-line-received": "Last line received: <elapsedTime /> ago",
+      "pause": "Pause",
+      "resume": "Resume"
+    },
+    "live-tail-button": {
+      "live": "Live",
+      "pause-the-live-stream": "Pause the live stream",
+      "paused": "Paused",
+      "start-live-stream-your-logs": "Start live stream your logs",
+      "stop-and-exit-the-live-stream": "Stop and exit the live stream"
     },
     "drop-down-menu": {
       "aria-label-links": "Links",
@@ -11378,6 +11455,7 @@
     "category-news": "News",
     "description-show-image": "Controls if the news item social (og:image) image is shown above text content",
     "description-url": "Supports RSS and Atom feeds",
+    "link-title": "Go to Grafana labs blog",
     "name-show-image": "Show image",
     "name-url": "URL",
     "news-panel": {
@@ -14285,7 +14363,6 @@
       "tooltip-remove-timezone": "Remove timezone"
     }
   },
-  "Timestamp": "",
   "traces": {
     "adhocFilters": {
       "customValue": "Type a value",
