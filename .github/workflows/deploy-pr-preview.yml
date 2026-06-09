@@ -13,6 +13,8 @@ on:
 
 permissions: {}
 
+permissions: {}
+
 jobs:
   deploy-pr-preview:
     permissions:
