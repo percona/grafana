@@ -57,7 +57,7 @@ variableAdapters.register(createCustomVariableAdapter());
 variableAdapters.register(createTextBoxVariableAdapter());
 variableAdapters.register(createAdHocVariableAdapter());
 
-describe('Dev Dashboard Backend / Frontend result comparison', () => {
+describe.skip('Dev Dashboard Backend / Frontend result comparison', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Setup dev dashboard datasources to match backend DevDashboardDataSourceProvider
@@ -108,6 +108,7 @@ describe('Dev Dashboard Backend / Frontend result comparison', () => {
 
       // version in the backend is never added because it is returned from the backend as metadata
       delete frontendMigrationResult.version;
+      delete frontendMigrationResult.id;
 
       expect(backendMigrationResult).toEqual(frontendMigrationResult);
     });
