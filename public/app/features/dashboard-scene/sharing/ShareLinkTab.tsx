@@ -80,15 +80,17 @@ export class ShareLinkTab extends SceneObjectBase<ShareLinkTabState> implements 
       // force solo route to use scenes
       imageQueryParams['__feature.dashboardScene'] = true;
     }
-    // @PERCONA to support different ports
+    // hide Grafana logo in the rendered image
+    urlParamsUpdate.hideLogo = 'true';
 
     // hide Grafana logo in the rendered image
     urlParamsUpdate.hideLogo = 'true';
 
+    // @PERCONA to support different ports
     const imageUrl = getDashboardUrl({
       uid: dashboard.state.uid,
       currentQueryParams: window.location.search,
-      updateQuery: { ...urlParamsUpdate, ...queryOptions, panelId: panel?.state.key },
+      updateQuery: { ...urlParamsUpdate, ...queryOptions, panelId: panel?.getPathId() },
       absolute: false,
       soloRoute: true,
       render: true,
