@@ -11,7 +11,6 @@ import { useGrafana } from 'app/core/context/GrafanaContext';
 
 import { Indent } from '../../Indent/Indent';
 
-import { FeatureHighlight } from './FeatureHighlight';
 import { MegaMenuItemText } from './MegaMenuItemText';
 import { hasChildMatch } from './utils';
 
@@ -31,7 +30,6 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
   const state = chrome.useState();
   const menuIsDocked = state.megaMenuDocked;
   const location = useLocation();
-  const FeatureHighlightWrapper = link.highlightText ? FeatureHighlight : React.Fragment;
   const hasActiveChild = hasChildMatch(link, activeItem);
   const isActive = link === activeItem || (level === MAX_DEPTH && hasActiveChild);
   const [sectionExpanded, setSectionExpanded] = useLocalStorage(
@@ -102,8 +100,10 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
                 [styles.labelWrapperWithIcon]: Boolean(level === 0 && iconElement),
               })}
             >
-              {level === 0 && iconElement && <FeatureHighlightWrapper>{iconElement}</FeatureHighlightWrapper>}
-              <Text truncate>{link.text}</Text>
+              {level === 0 && iconElement}
+              <Text truncate element="p">
+                {link.text}
+              </Text>
               {link.isNew && <FeatureBadge featureState={FeatureState.new} />}
             </div>
           </MegaMenuItemText>

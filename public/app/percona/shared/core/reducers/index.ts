@@ -9,8 +9,6 @@ import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/compon
 import { TemplatesList } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Settings.types';
-import { uiEventsReducer } from 'app/percona/ui-events/reducer';
-
 import { isPmmAdmin } from '../../helpers/permissions';
 import { SettingsUpdatedEvent } from '../events';
 
@@ -150,7 +148,6 @@ export default {
     services: servicesReducer,
     nodes: nodesReducer,
     backupLocations: perconaBackupLocations,
-    telemetry: uiEventsReducer,
     roles: rolesReducers,
     users: usersReducers,
     advisors: advisorsReducers,

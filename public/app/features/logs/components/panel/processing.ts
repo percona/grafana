@@ -145,9 +145,6 @@ export class LogListModel implements LogRowModel {
         if (reStringified) {
           this.raw = reStringified;
         }
-        if (this._escapeUnescapedString) {
-          this.raw = escapeUnescapedString(this.raw);
-        }
       } catch (error) {}
 
       // always escape for literal \n, \t, \r sequences so "Escape newlines" works for all log types.
