@@ -110,4 +110,7 @@ export interface UpdateServiceBody {
   cluster?: string;
   replication_set?: string;
   external_group?: string;
+  custom_labels?: {
+    values: Record<string, string>;
+  };
 }

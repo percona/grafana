@@ -15,7 +15,7 @@ import {
   UpdateServiceParams,
 } from './services.types';
 import {
-  didStandardLabelsChange,
+  didLabelsChange,
   toDbServicesModel,
   toListServicesBody,
   toRemoveServiceBody,
@@ -111,7 +111,7 @@ export const updateServiceAction = createAsyncThunk('percona/updateService', (pa
     (async (): Promise<void> => {
       const updateBody = toUpdateServiceBody(params);
 
-      if (didStandardLabelsChange(params)) {
+      if (didLabelsChange(params)) {
         await ServicesService.updateService(updateBody);
       }
 
