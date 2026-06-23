@@ -251,6 +251,7 @@ export const BackupInventory: FC = () => {
         status={row.original.status}
         dataModel={row.original.dataModel}
         folder={row.original.folder}
+        compression={row.original.compression}
       />
     ),
     []
