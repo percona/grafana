@@ -196,7 +196,7 @@ describe('Filter', () => {
 
   it('should show apply button when backend filtering is enabled', async () => {
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={true} />);
-    expect(screen.queryByTestId('submit-button'));
+    expect(screen.getByTestId('submit-button')).toBeInTheDocument();
   });
 
   it('should treat url values and select objects as the same query state', () => {
