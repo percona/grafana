@@ -172,6 +172,28 @@ describe('Filter', () => {
     expect(screen.getByTestId('enabled-radio-state')).toBeInTheDocument();
   });
 
+  it('should open search fields when only search text is set in url', async () => {
+    jest
+      .spyOn(filterUtils, 'getQueryParams')
+      .mockImplementation(() => ({ [SEARCH_INPUT_FIELD_NAME]: 'data' }));
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
+
+    expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
+    expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toHaveValue('data');
+    expect(screen.queryByTestId('enabled-radio-state')).not.toBeInTheDocument();
+  });
+
+  it('should open both search and advanced filters when both are set in url', async () => {
+    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({
+      [SEARCH_INPUT_FIELD_NAME]: 'data',
+      enabled: 'false',
+    }));
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
+
+    expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
+    expect(screen.getByTestId('enabled-radio-state')).toBeInTheDocument();
+  });
+
   it('should show apply button when backend filtering is enabled', async () => {
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={true} />);
     expect(screen.queryByTestId('submit-button'));
@@ -272,5 +294,31 @@ describe('Filter', () => {
 
     expect(filtered).toHaveLength(1);
     expect(filtered[0].serviceName).toBe('PMM Server');
+  });
+
+  describe('getFilterPanelStateFromUrl', () => {
+    it('should open search fields when only search text is present', () => {
+      expect(
+        filterUtils.getFilterPanelStateFromUrl(columns, {
+          [SEARCH_INPUT_FIELD_NAME]: 'hello',
+        })
+      ).toEqual({ openSearchFields: true, openCollapse: false });
+    });
+
+    it('should open advanced filters when only advanced params are present', () => {
+      expect(filterUtils.getFilterPanelStateFromUrl(columns, { enabled: 'false' })).toEqual({
+        openSearchFields: false,
+        openCollapse: true,
+      });
+    });
+
+    it('should open both panels when search and advanced filters are present', () => {
+      expect(
+        filterUtils.getFilterPanelStateFromUrl(columns, {
+          [SEARCH_INPUT_FIELD_NAME]: 'hello',
+          interval: 'Rare',
+        })
+      ).toEqual({ openSearchFields: true, openCollapse: true });
+    });
   });
 });

@@ -20,6 +20,32 @@ export const getQueryParams = <T extends object>(columns: Array<ExtendedColumn<T
   return params ?? {};
 };
 
+export const getFilterPanelStateFromUrl = <T extends object>(
+  columns: Array<ExtendedColumn<T>>,
+  queryParams: UrlQueryMap
+): { openSearchFields: boolean; openCollapse: boolean } => {
+  const urlParams = getQueryParams(columns, queryParams);
+  const hasSearchFilter =
+    !!urlParams[SEARCH_INPUT_FIELD_NAME] || !!urlParams[SEARCH_SELECT_FIELD_NAME];
+
+  const hasAdvancedFilter = columns.some((column) => {
+    if (
+      column.type !== FilterFieldTypes.DROPDOWN &&
+      column.type !== FilterFieldTypes.RADIO_BUTTON &&
+      column.type !== FilterFieldTypes.BOOLEAN
+    ) {
+      return false;
+    }
+
+    return !!urlParams[column.accessor as string];
+  });
+
+  return {
+    openSearchFields: hasSearchFilter,
+    openCollapse: hasAdvancedFilter,
+  };
+};
+
 export const buildObjForQueryParams = <T extends object>(
   columns: Array<ExtendedColumn<T>>,
   values: FilterFormValues

@@ -10,7 +10,7 @@ import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
 import { FilterFieldTypes } from '..';
 
-import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
+import { DEBOUNCE_DELAY } from './Filter.constants';
 import { Messages } from './Filter.messages';
 import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
@@ -19,6 +19,7 @@ import {
   buildParamsFromKey,
   buildSearchOptions,
   getFilteredData,
+  getFilterPanelStateFromUrl,
   getFormValuesFromUrl,
   getQueryParams,
   isOtherThanTextType,
@@ -37,8 +38,6 @@ export const Filter = <T,>({
   hasBackendFiltering = false,
   tableKey,
 }: FilterProps<T>) => {
-  const [openCollapse, setOpenCollapse] = useState(false);
-  const [openSearchFields, setOpenSearchFields] = useState(false);
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
 
@@ -56,6 +55,13 @@ export const Filter = <T,>({
     }
     return queryParams;
   }, [queryParams, tableKey]);
+
+  const [openCollapse, setOpenCollapse] = useState(
+    () => getFilterPanelStateFromUrl(columns, queryParamsByKey).openCollapse
+  );
+  const [openSearchFields, setOpenSearchFields] = useState(
+    () => getFilterPanelStateFromUrl(columns, queryParamsByKey).openSearchFields
+  );
 
   const searchColumnsOptions = useMemo(() => buildSearchOptions(columns), [columns]);
 
@@ -98,21 +104,15 @@ export const Filter = <T,>({
   };
 
   useEffect(() => {
-    const urlParams = getQueryParams(columns, queryParamsByKey);
-    const numberOfParams = Object.keys(urlParams).length;
-    if (
-      numberOfParams > 0 &&
-      numberOfParams <= 2 &&
-      !urlParams[SEARCH_INPUT_FIELD_NAME] &&
-      !urlParams[SEARCH_SELECT_FIELD_NAME]
-    ) {
+    const { openCollapse: openAdvanced, openSearchFields: openSearch } = getFilterPanelStateFromUrl(
+      columns,
+      queryParamsByKey
+    );
+
+    if (openAdvanced) {
       setOpenCollapse(true);
     }
-    if (numberOfParams > 2) {
-      setOpenCollapse(true);
-      setOpenSearchFields(true);
-    }
-    if (numberOfParams === 2 && urlParams[SEARCH_INPUT_FIELD_NAME] && urlParams[SEARCH_SELECT_FIELD_NAME]) {
+    if (openSearch) {
       setOpenSearchFields(true);
     }
   }, [columns, queryParamsByKey]);
