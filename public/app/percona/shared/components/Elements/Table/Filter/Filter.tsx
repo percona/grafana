@@ -5,6 +5,7 @@ import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form, FormSpy } from 'react-final-form';
 
+import { t } from '@grafana/i18n';
 import { IconButton, useStyles2 } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
@@ -30,6 +31,7 @@ import { RadioButtonField } from './components/fields/RadioButtonField';
 import { SearchTextField } from './components/fields/SearchTextField';
 import { SelectColumnField } from './components/fields/SelectColumnField';
 import { SelectDropdownField } from './components/fields/SelectDropdownField';
+
 
 export const Filter = <T,>({
   columns,
@@ -154,7 +156,7 @@ export const Filter = <T,>({
                 size="xl"
                 onClick={() => setOpenSearchFields((value) => !value)}
                 data-testid="open-search-fields"
-                aria-label="Open search fields"
+                aria-label={t('grafana.search-field-input.open-search-fields', 'Open search fields')}
               />
               {openSearchFields && (
                 <div className={styles.searchFields}>
@@ -164,7 +166,7 @@ export const Filter = <T,>({
               )}
               {showAdvanceFilter && (
                 <IconButton
-                  aria-label="Toggle advanced filter"
+                  aria-label={t('grafana.search-field-input.toggle-advanced-filter', 'Toggle advanced filter')}
                   className={styles.icon}
                   name="filter"
                   size="xl"
@@ -173,7 +175,7 @@ export const Filter = <T,>({
                 />
               )}
               <IconButton
-                aria-label="Clear filter"
+                aria-label={t('grafana.search-field-input.clear-filter', 'Clear filter')}
                 className={styles.icon}
                 name="times"
                 size="xl"
