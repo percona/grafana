@@ -32,12 +32,12 @@ export const getFilterPanelStateFromUrl = <T extends object>(
 
   const hasAdvancedFilter = columns.some((column) => {
     if (
-      column.type !== FilterFieldTypes.DROPDOWN &&
-      column.type !== FilterFieldTypes.RADIO_BUTTON &&
-      column.type !== FilterFieldTypes.BOOLEAN
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      ![FilterFieldTypes.DROPDOWN, FilterFieldTypes.RADIO_BUTTON, FilterFieldTypes.BOOLEAN].includes(column.type as FilterFieldTypes)
     ) {
       return false;
     }
+
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const paramValue = urlParams[column.accessor as string];
     if (column.type === FilterFieldTypes.BOOLEAN) {
