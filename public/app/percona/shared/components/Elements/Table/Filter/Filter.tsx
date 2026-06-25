@@ -23,8 +23,8 @@ import {
   getFilterPanelStateFromUrl,
   getFormValuesFromUrl,
   getQueryParams,
+  isSameFilterQueryState,
   isOtherThanTextType,
-  serializeFilterQueryState,
 } from './Filter.utils';
 import BooleanField from './components/fields/BooleanField';
 import { RadioButtonField } from './components/fields/RadioButtonField';
@@ -69,7 +69,7 @@ export const Filter = <T,>({
   const updateQueryParams = useCallback(
     (values: Record<string, any>, replace = true) => {
       const currentUrlValues = getFormValuesFromUrl(columns, queryParamsByKey);
-      if (serializeFilterQueryState(columns, values) === serializeFilterQueryState(columns, currentUrlValues)) {
+      if (isSameFilterQueryState(columns, values, currentUrlValues)) {
         return;
       }
 

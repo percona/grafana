@@ -1,3 +1,5 @@
+import { isEqual } from 'lodash';
+
 import { UrlQueryMap, UrlQueryValue } from '@grafana/data';
 import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
 
@@ -13,6 +15,7 @@ export const getQueryParams = <T extends object>(columns: Array<ExtendedColumn<T
     }
     return undefined;
   };
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const queryKeys = columns.map((column) => ({ key: column.accessor as string, transform: customTransform }));
   queryKeys.push({ key: SEARCH_INPUT_FIELD_NAME, transform: customTransform });
   queryKeys.push({ key: SEARCH_SELECT_FIELD_NAME, transform: customTransform });
@@ -35,6 +38,7 @@ export const getFilterPanelStateFromUrl = <T extends object>(
     ) {
       return false;
     }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const paramValue = urlParams[column.accessor as string];
     if (column.type === FilterFieldTypes.BOOLEAN) {
       return paramValue === 'true';
@@ -75,6 +79,7 @@ export const buildObjForQueryParams = <T extends object>(
   }
 
   columns.forEach((column) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const accessor = column.accessor as string;
     const value = resolveFieldValue(values[accessor]);
 
@@ -116,10 +121,10 @@ export const getFormValuesFromUrl = <T extends object>(
   ...getQueryParams(columns, queryParams),
 });
 
-export const serializeFilterQueryState = <T extends object>(
+export const normalizeFilterQueryState = <T extends object>(
   columns: Array<ExtendedColumn<T>>,
   values: FilterFormValues
-): string => {
+): Record<string, string> => {
   const params = buildObjForQueryParams(columns, values);
   const normalized: Record<string, string> = {};
 
@@ -132,8 +137,14 @@ export const serializeFilterQueryState = <T extends object>(
       }
     });
 
-  return JSON.stringify(normalized);
+  return normalized;
 };
+
+export const isSameFilterQueryState = <T extends object>(
+  columns: Array<ExtendedColumn<T>>,
+  left: FilterFormValues,
+  right: FilterFormValues
+): boolean => isEqual(normalizeFilterQueryState(columns, left), normalizeFilterQueryState(columns, right));
 
 export const buildSearchOptions = <T extends object>(columns: Array<ExtendedColumn<T>>) => {
   const searchOptions = columns
@@ -153,8 +164,10 @@ export const buildEmptyValues = <T extends object>(columns: Array<ExtendedColumn
   };
   columns.map((column) => {
     if (column.type === FilterFieldTypes.DROPDOWN || column.type === FilterFieldTypes.RADIO_BUTTON) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       obj = { ...obj, [column.accessor as string]: ALL_VALUE };
     } else if (column.type === FilterFieldTypes.BOOLEAN) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       obj = { ...obj, [column.accessor as string]: undefined };
     }
   });
@@ -175,6 +188,7 @@ export const isValueInTextColumn = <T extends object>(
       if (searchInputValue) {
         if (
           (column.accessor === selectColumnValue || searchAllColumns) &&
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           isTextIncluded(searchInputValue, filterValue[column.accessor as keyof T] as string | number)
         ) {
           result = true;
@@ -200,7 +214,9 @@ export const isInOptions = <T extends object>(
 
   columns.forEach((column) => {
     const accessor = column.accessor;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const queryParamValueAccessor = queryParamsObj[accessor as string];
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const filterValueAccessor = filterValue[accessor as keyof T];
     if (column.type === filterFieldType) {
       if (queryParamValueAccessor) {
@@ -226,7 +242,9 @@ export const isBooleanMatch = <T extends object>(
 
   columns.forEach((column) => {
     const accessor = column.accessor;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const queryParamValueAccessor = queryParamsObj[accessor as string];
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const filterValueAccessor = filterValue[accessor as keyof T];
 
     if (column.type === FilterFieldTypes.BOOLEAN) {

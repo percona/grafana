@@ -215,9 +215,7 @@ describe('Filter', () => {
       interval: 'All',
     };
 
-    expect(filterUtils.serializeFilterQueryState(columns, urlValues)).toBe(
-      filterUtils.serializeFilterQueryState(columns, formValues)
-    );
+    expect(filterUtils.isSameFilterQueryState(columns, urlValues, formValues)).toBe(true);
   });
 
   it('should not create duplicate debouncers when rawData changes during typing', async () => {
@@ -249,9 +247,7 @@ describe('Filter', () => {
       [SEARCH_SELECT_FIELD_NAME]: { value: 'summary', label: 'Name' },
     };
 
-    expect(filterUtils.serializeFilterQueryState(columns, stringValues)).toBe(
-      filterUtils.serializeFilterQueryState(columns, objectValues)
-    );
+    expect(filterUtils.isSameFilterQueryState(columns, stringValues, objectValues)).toBe(true);
   });
 
   it('should not write search-select when searching all columns', () => {
@@ -260,9 +256,9 @@ describe('Filter', () => {
       [SEARCH_SELECT_FIELD_NAME]: 'All',
     };
 
-    expect(filterUtils.serializeFilterQueryState(columns, values)).toBe(
-      JSON.stringify({ [SEARCH_INPUT_FIELD_NAME]: 'hello' })
-    );
+    expect(filterUtils.normalizeFilterQueryState(columns, values)).toEqual({
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+    });
   });
 
   it('should not treat string false as an enabled boolean filter', () => {
@@ -278,9 +274,9 @@ describe('Filter', () => {
       monitored: 'false',
     };
 
-    expect(filterUtils.serializeFilterQueryState(booleanColumns, values)).toBe(
-      JSON.stringify({ [SEARCH_INPUT_FIELD_NAME]: 'hello' })
-    );
+    expect(filterUtils.normalizeFilterQueryState(booleanColumns, values)).toEqual({
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+    });
   });
 
   it('should filter across all text columns when search-select is omitted from url', () => {

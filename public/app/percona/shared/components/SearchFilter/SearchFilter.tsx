@@ -11,7 +11,7 @@ import {
   getFilteredData,
   getFormValuesFromUrl,
   getQueryParams,
-  serializeFilterQueryState,
+  isSameFilterQueryState,
 } from '../Elements/Table/Filter/Filter.utils';
 import { SelectDropdownField } from '../Elements/Table/Filter/components/fields/SelectDropdownField';
 import { TextInputField } from '../Form/TextInput';
@@ -59,7 +59,7 @@ const SearchFilter = <T extends object>({
   const updateQueryParams = useCallback(
     (values: QueryParamsValues, replace = true) => {
       const currentUrlValues = getFormValuesFromUrl(columns, queryParamsByKey);
-      if (serializeFilterQueryState(columns, values) === serializeFilterQueryState(columns, currentUrlValues)) {
+      if (isSameFilterQueryState(columns, values, currentUrlValues)) {
         return;
       }
 
