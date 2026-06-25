@@ -35,8 +35,11 @@ export const getFilterPanelStateFromUrl = <T extends object>(
     ) {
       return false;
     }
-
-    return !!urlParams[column.accessor as string];
+    const paramValue = urlParams[column.accessor as string];
+    if (column.type === FilterFieldTypes.BOOLEAN) {
+      return paramValue === 'true';
+    }
+    return !!paramValue;
   });
 
   return {
