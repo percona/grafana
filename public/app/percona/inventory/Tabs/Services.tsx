@@ -29,7 +29,7 @@ import DeleteServicesModal from '../components/DeleteServicesModal';
 
 import Clusters from './Services/Clusters';
 import ServicesTable from './Services/ServicesTable';
-import { getAgentsMonitoringStatus } from './Services.utils';
+import { getAgentsMonitoringStatus, getFlattenServicesSignature } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Services = () => {
@@ -60,7 +60,7 @@ export const Services = () => {
     }));
 
     const prev = flattenServicesRef.current;
-    if (prev.length === next.length && JSON.stringify(prev) === JSON.stringify(next)) {
+    if (prev.length === next.length && getFlattenServicesSignature(prev) === getFlattenServicesSignature(next)) {
       return prev;
     }
 

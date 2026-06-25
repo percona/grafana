@@ -76,8 +76,9 @@ export const buildObjForQueryParams = <T extends object>(
     const value = resolveFieldValue(values[accessor]);
 
     if (column.type === FilterFieldTypes.BOOLEAN) {
-      // Omit from query params if value is false
-      obj[accessor] = value ? 'true' : undefined;
+      // Omit from query params unless explicitly enabled
+      const isEnabled = value === true || value === 'true';
+      obj[accessor] = isEnabled ? 'true' : undefined;
     } else if (value) {
       if (column.type === FilterFieldTypes.RADIO_BUTTON || column.type === FilterFieldTypes.DROPDOWN) {
         obj[accessor] = value === ALL_VALUE ? undefined : value.toString();

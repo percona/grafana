@@ -265,6 +265,24 @@ describe('Filter', () => {
     );
   });
 
+  it('should not treat string false as an enabled boolean filter', () => {
+    const booleanColumns: Array<ExtendedColumn<{ monitored: boolean }>> = [
+      {
+        Header: 'Monitored',
+        accessor: 'monitored',
+        type: FilterFieldTypes.BOOLEAN,
+      },
+    ];
+    const values = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      monitored: 'false',
+    };
+
+    expect(filterUtils.serializeFilterQueryState(booleanColumns, values)).toBe(
+      JSON.stringify({ [SEARCH_INPUT_FIELD_NAME]: 'hello' })
+    );
+  });
+
   it('should filter across all text columns when search-select is omitted from url', () => {
     const filtered = filterUtils.getFilteredData(data, columns, {
       [SEARCH_INPUT_FIELD_NAME]: 'summary 2',
