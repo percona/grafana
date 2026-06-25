@@ -7,7 +7,12 @@ import { useStyles2 } from '@grafana/ui';
 
 import { ExtendedColumn } from '../Elements/Table';
 import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME } from '../Elements/Table/Filter/Filter.constants';
-import { getFilteredData, getQueryParams } from '../Elements/Table/Filter/Filter.utils';
+import {
+  getFilteredData,
+  getFormValuesFromUrl,
+  getQueryParams,
+  serializeFilterQueryState,
+} from '../Elements/Table/Filter/Filter.utils';
 import { SelectDropdownField } from '../Elements/Table/Filter/components/fields/SelectDropdownField';
 import { TextInputField } from '../Form/TextInput';
 
@@ -35,7 +40,7 @@ const SearchFilter = <T extends object>({
   const styles = useStyles2(getStyles);
   const [queryParamsByKey, setQueryParamsByKey] = useQueryParamsByKey(tableKey);
   const initialValues = useMemo<QueryParamsValues>(
-    () => getQueryParams(columns, queryParamsByKey),
+    () => getFormValuesFromUrl(columns, queryParamsByKey),
     [columns, queryParamsByKey]
   );
 
@@ -51,16 +56,33 @@ const SearchFilter = <T extends object>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParamsByKey, rawData]);
 
-  const onSubmit = useCallback(
+  const updateQueryParams = useCallback(
     (values: QueryParamsValues) => {
-      setQueryParamsByKey(columns, values);
+      const currentUrlValues = getFormValuesFromUrl(columns, queryParamsByKey);
+      if (serializeFilterQueryState(columns, values) === serializeFilterQueryState(columns, currentUrlValues)) {
+        return;
+      }
+
+      setQueryParamsByKey(columns, values, true);
     },
-    [columns, setQueryParamsByKey]
+    [columns, queryParamsByKey, setQueryParamsByKey]
   );
 
-  const handleFormValuesChange = debounce((state: FormState<QueryParamsValues>) => {
-    onSubmit(state.values);
-  }, DEBOUNCE_DELAY);
+  const onSubmit = useCallback(
+    (values: QueryParamsValues) => {
+      updateQueryParams(values);
+    },
+    [updateQueryParams]
+  );
+
+  const handleFormValuesChange = useMemo(
+    () => debounce((state: FormState<QueryParamsValues>) => onSubmit(state.values), DEBOUNCE_DELAY),
+    [onSubmit]
+  );
+
+  useEffect(() => {
+    return () => handleFormValuesChange.cancel();
+  }, [handleFormValuesChange]);
 
   return (
     <Form

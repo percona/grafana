@@ -49,19 +49,24 @@ export const Services = () => {
   // after component unmounts, causing memory leaks and unwanted API calls on other pages.
   // Solution: Use ref to track mount state and check it before making requests in loadData.
   const isMountedRef = useRef(true);
+  const flattenServicesRef = useRef<FlattenService[]>([]);
 
-  const flattenServices = useMemo(
-    () =>
-      fetchedServices.map((value) => {
-        return {
-          type: value.type,
-          ...value.params,
-          cluster: value.params.cluster || value.params.customLabels?.cluster || '',
-          agentsStatus: getAgentsMonitoringStatus(value.params.agents ?? []),
-        };
-      }),
-    [fetchedServices]
-  );
+  const flattenServices = useMemo(() => {
+    const next = fetchedServices.map((value) => ({
+      type: value.type,
+      ...value.params,
+      cluster: value.params.cluster || value.params.customLabels?.cluster || '',
+      agentsStatus: getAgentsMonitoringStatus(value.params.agents ?? []),
+    }));
+
+    const prev = flattenServicesRef.current;
+    if (prev.length === next.length && JSON.stringify(prev) === JSON.stringify(next)) {
+      return prev;
+    }
+
+    flattenServicesRef.current = next;
+    return next;
+  }, [fetchedServices]);
   const [showClusters, setShowClusters] = useLocalStorage(CLUSTERS_SWITCH_KEY, false);
 
   const loadData = useCallback(async () => {

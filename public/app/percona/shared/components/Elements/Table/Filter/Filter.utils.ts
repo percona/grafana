@@ -24,22 +24,31 @@ export const buildObjForQueryParams = <T extends object>(
   columns: Array<ExtendedColumn<T>>,
   values: FilterFormValues
 ) => {
-  let obj: FilterFormValues = {
-    [SEARCH_INPUT_FIELD_NAME]: values[SEARCH_INPUT_FIELD_NAME],
-    [SEARCH_SELECT_FIELD_NAME]: values[SEARCH_SELECT_FIELD_NAME]?.value ?? values[SEARCH_SELECT_FIELD_NAME],
+  const resolveFieldValue = (value: FilterFormValues[string]) => {
+    if (value !== null && typeof value === 'object' && 'value' in value) {
+      return value.value;
+    }
+    return value;
   };
-  const searchSelectValue = obj[SEARCH_SELECT_FIELD_NAME];
-  const searchInputValue = obj[SEARCH_INPUT_FIELD_NAME];
+
+  const searchInputValue = values[SEARCH_INPUT_FIELD_NAME];
+  const searchSelectValue = resolveFieldValue(values[SEARCH_SELECT_FIELD_NAME]);
+
+  let obj: FilterFormValues = {
+    [SEARCH_INPUT_FIELD_NAME]: searchInputValue || undefined,
+    [SEARCH_SELECT_FIELD_NAME]: undefined,
+  };
 
   if (searchInputValue) {
-    obj[SEARCH_SELECT_FIELD_NAME] = searchSelectValue ?? ALL_VALUE;
-  } else if (searchSelectValue) {
-    obj[SEARCH_SELECT_FIELD_NAME] = undefined;
+    const resolvedSelectValue = searchSelectValue ?? ALL_VALUE;
+    if (resolvedSelectValue !== ALL_VALUE) {
+      obj[SEARCH_SELECT_FIELD_NAME] = resolvedSelectValue.toString();
+    }
   }
 
   columns.forEach((column) => {
     const accessor = column.accessor as string;
-    const value = values[accessor]?.value ?? values[accessor];
+    const value = resolveFieldValue(values[accessor]);
 
     if (column.type === FilterFieldTypes.BOOLEAN) {
       // Omit from query params if value is false
@@ -68,6 +77,33 @@ export const buildParamsFromKey = <T extends object>(
     return { [tableKey]: undefined };
   }
   return params;
+};
+
+export const getFormValuesFromUrl = <T extends object>(
+  columns: Array<ExtendedColumn<T>>,
+  queryParams: UrlQueryMap
+): FilterFormValues => ({
+  ...buildEmptyValues(columns),
+  ...getQueryParams(columns, queryParams),
+});
+
+export const serializeFilterQueryState = <T extends object>(
+  columns: Array<ExtendedColumn<T>>,
+  values: FilterFormValues
+): string => {
+  const params = buildObjForQueryParams(columns, values);
+  const normalized: Record<string, string> = {};
+
+  Object.keys(params)
+    .sort()
+    .forEach((key) => {
+      const value = params[key];
+      if (value !== undefined && value !== null && value !== '') {
+        normalized[key] = value.toString();
+      }
+    });
+
+  return JSON.stringify(normalized);
 };
 
 export const buildSearchOptions = <T extends object>(columns: Array<ExtendedColumn<T>>) => {
@@ -103,12 +139,13 @@ export const isValueInTextColumn = <T extends object>(
 ) => {
   const searchInputValue = queryParamsObj[SEARCH_INPUT_FIELD_NAME];
   const selectColumnValue = queryParamsObj[SEARCH_SELECT_FIELD_NAME];
+  const searchAllColumns = !selectColumnValue || selectColumnValue === ALL_VALUE;
   let result = false;
   columns.forEach((column) => {
     if (column.type === FilterFieldTypes.TEXT) {
       if (searchInputValue) {
         if (
-          (column.accessor === selectColumnValue || selectColumnValue === ALL_VALUE) &&
+          (column.accessor === selectColumnValue || searchAllColumns) &&
           isTextIncluded(searchInputValue, filterValue[column.accessor as keyof T] as string | number)
         ) {
           result = true;
@@ -121,8 +158,8 @@ export const isValueInTextColumn = <T extends object>(
   return result;
 };
 
-export const isTextIncluded = (needle: string, haystack: string | number): boolean =>
-  haystack?.toString().toLowerCase().includes(needle.toLowerCase());
+export const isTextIncluded = (needle: string, haystack: string | number | undefined | null): boolean =>
+  haystack != null && haystack.toString().toLowerCase().includes(needle.toLowerCase());
 
 export const isInOptions = <T extends object>(
   columns: Array<ExtendedColumn<T>>,

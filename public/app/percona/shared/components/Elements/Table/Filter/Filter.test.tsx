@@ -1,12 +1,18 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { CheckDetails } from 'app/percona/check/types';
 
 import { ExtendedColumn, FilterFieldTypes } from '..';
 
 import { Filter } from './Filter';
-import { SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
+import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import * as filterUtils from './Filter.utils';
+
+const mockSetQueryParams = jest.fn();
+
+jest.mock('app/core/hooks/useQueryParams', () => ({
+  useQueryParams: () => [{}, mockSetQueryParams],
+}));
 
 const Messages = {
   name: 'Name',
@@ -98,8 +104,15 @@ const setFilteredData = jest.fn();
 
 describe('Filter', () => {
   beforeEach(() => {
+    mockSetQueryParams.mockClear();
+    jest.useFakeTimers();
     // There's a warning about keys coming from within ReactFinalForm
     jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   it('should render the filter', async () => {
@@ -162,5 +175,102 @@ describe('Filter', () => {
   it('should show apply button when backend filtering is enabled', async () => {
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={true} />);
     expect(screen.queryByTestId('submit-button'));
+  });
+
+  it('should treat url values and select objects as the same query state', () => {
+    const urlValues = filterUtils.getFormValuesFromUrl(columns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+    });
+    const formValues = {
+      ...filterUtils.buildEmptyValues(columns),
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: { value: 'All', label: 'All' },
+      enabled: 'All',
+      interval: 'All',
+    };
+
+    expect(filterUtils.serializeFilterQueryState(columns, urlValues)).toBe(
+      filterUtils.serializeFilterQueryState(columns, formValues)
+    );
+  });
+
+  it('should not create duplicate debouncers when rawData changes during typing', async () => {
+    const { rerender } = render(
+      <Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />
+    );
+
+    fireEvent.click(screen.getByTestId('open-search-fields'));
+    fireEvent.change(screen.getByTestId(SEARCH_INPUT_FIELD_NAME), { target: { value: 'test' } });
+
+    rerender(<Filter columns={columns} rawData={[...data]} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
+
+    await act(async () => {
+      jest.advanceTimersByTime(DEBOUNCE_DELAY);
+    });
+
+    expect(mockSetQueryParams.mock.calls.length).toBeLessThanOrEqual(1);
+  });
+
+  it('should serialize select object and string values consistently', () => {
+    const stringValues = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: 'summary',
+    };
+    const objectValues = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: { value: 'summary', label: 'Name' },
+    };
+
+    expect(filterUtils.serializeFilterQueryState(columns, stringValues)).toBe(
+      filterUtils.serializeFilterQueryState(columns, objectValues)
+    );
+  });
+
+  it('should not write search-select when searching all columns', () => {
+    const values = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: 'All',
+    };
+
+    expect(filterUtils.serializeFilterQueryState(columns, values)).toBe(
+      JSON.stringify({ [SEARCH_INPUT_FIELD_NAME]: 'hello' })
+    );
+  });
+
+  it('should filter across all text columns when search-select is omitted from url', () => {
+    const filtered = filterUtils.getFilteredData(data, columns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'summary 2',
+    });
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].summary).toBe('Test summary 2');
+  });
+
+  it('should filter across all text columns when search-select is All', () => {
+    const filtered = filterUtils.getFilteredData(data, columns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'desctiption 3',
+      [SEARCH_SELECT_FIELD_NAME]: 'All',
+    });
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].summary).toBe('Test summary 3');
+  });
+
+  it('should match text in any column when searching all, including hidden columns', () => {
+    const serviceColumns: Array<ExtendedColumn<{ serviceId: string; serviceName: string }>> = [
+      { Header: 'Service ID', accessor: 'serviceId', type: FilterFieldTypes.TEXT, hidden: true },
+      { Header: 'Service Name', accessor: 'serviceName', type: FilterFieldTypes.TEXT },
+    ];
+    const services = [
+      { serviceId: '/inventory/service/node/mysql-1', serviceName: 'mysql-1' },
+      { serviceId: '/inventory/service/node/pmm-server', serviceName: 'PMM Server' },
+    ];
+
+    const filtered = filterUtils.getFilteredData(services, serviceColumns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'pmm',
+    });
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].serviceName).toBe('PMM Server');
   });
 });
