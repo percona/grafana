@@ -93,10 +93,7 @@ export const Filter = <T,>({
     [updateQueryParams]
   );
 
-  const initialValues = useMemo(
-    () => getFormValuesFromUrl(columns, queryParamsByKey),
-    [columns, queryParamsByKey]
-  );
+  const initialValues = useMemo(() => getFormValuesFromUrl(columns, queryParamsByKey), [columns, queryParamsByKey]);
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);

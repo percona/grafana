@@ -173,9 +173,7 @@ describe('Filter', () => {
   });
 
   it('should open search fields when only search text is set in url', async () => {
-    jest
-      .spyOn(filterUtils, 'getQueryParams')
-      .mockImplementation(() => ({ [SEARCH_INPUT_FIELD_NAME]: 'data' }));
+    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ [SEARCH_INPUT_FIELD_NAME]: 'data' }));
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
 
     expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
@@ -224,7 +222,9 @@ describe('Filter', () => {
     fireEvent.click(screen.getByTestId('open-search-fields'));
     fireEvent.change(screen.getByTestId(SEARCH_INPUT_FIELD_NAME), { target: { value: 'test' } });
 
-    rerender(<Filter columns={columns} rawData={[...data]} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
+    rerender(
+      <Filter columns={columns} rawData={[...data]} setFilteredData={setFilteredData} hasBackendFiltering={false} />
+    );
 
     await act(async () => {
       jest.advanceTimersByTime(DEBOUNCE_DELAY);

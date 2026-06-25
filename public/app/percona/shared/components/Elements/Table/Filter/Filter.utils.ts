@@ -25,8 +25,7 @@ export const getFilterPanelStateFromUrl = <T extends object>(
   queryParams: UrlQueryMap
 ): { openSearchFields: boolean; openCollapse: boolean } => {
   const urlParams = getQueryParams(columns, queryParams);
-  const hasSearchFilter =
-    !!urlParams[SEARCH_INPUT_FIELD_NAME] || !!urlParams[SEARCH_SELECT_FIELD_NAME];
+  const hasSearchFilter = !!urlParams[SEARCH_INPUT_FIELD_NAME] || !!urlParams[SEARCH_SELECT_FIELD_NAME];
 
   const hasAdvancedFilter = columns.some((column) => {
     if (
