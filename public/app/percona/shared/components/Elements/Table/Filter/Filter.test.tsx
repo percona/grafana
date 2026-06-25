@@ -1,12 +1,18 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 
-import { CheckDetails } from 'app/percona/check/types';
-
 import { ExtendedColumn, FilterFieldTypes } from '..';
 
 import { Filter } from './Filter';
 import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import * as filterUtils from './Filter.utils';
+
+type FilterTestRow = {
+  name: string;
+  description: string;
+  summary: string;
+  interval: string;
+  enabled: boolean;
+};
 
 const mockSetQueryParams = jest.fn();
 
@@ -21,7 +27,7 @@ const Messages = {
   interval: 'Interval',
 };
 
-const columns: Array<ExtendedColumn<CheckDetails>> = [
+const columns: Array<ExtendedColumn<FilterTestRow>> = [
   {
     Header: Messages.name,
     accessor: 'summary',
@@ -69,7 +75,7 @@ const columns: Array<ExtendedColumn<CheckDetails>> = [
   },
 ];
 
-const data = [
+const data: FilterTestRow[] = [
   {
     name: 'test1',
     description: 'Test desctiption 1',
