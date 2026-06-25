@@ -57,27 +57,27 @@ const SearchFilter = <T extends object>({
   }, [queryParamsByKey, rawData]);
 
   const updateQueryParams = useCallback(
-    (values: QueryParamsValues) => {
+    (values: QueryParamsValues, replace = true) => {
       const currentUrlValues = getFormValuesFromUrl(columns, queryParamsByKey);
       if (serializeFilterQueryState(columns, values) === serializeFilterQueryState(columns, currentUrlValues)) {
         return;
       }
 
-      setQueryParamsByKey(columns, values, true);
+      setQueryParamsByKey(columns, values, replace);
     },
     [columns, queryParamsByKey, setQueryParamsByKey]
   );
 
   const onSubmit = useCallback(
     (values: QueryParamsValues) => {
-      updateQueryParams(values);
+      updateQueryParams(values, false);
     },
     [updateQueryParams]
   );
 
   const handleFormValuesChange = useMemo(
-    () => debounce((state: FormState<QueryParamsValues>) => onSubmit(state.values), DEBOUNCE_DELAY),
-    [onSubmit]
+    () => debounce((state: FormState<QueryParamsValues>) => updateQueryParams(state.values, true), DEBOUNCE_DELAY),
+    [updateQueryParams]
   );
 
   useEffect(() => {

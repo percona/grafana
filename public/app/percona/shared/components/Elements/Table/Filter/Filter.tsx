@@ -66,19 +66,19 @@ export const Filter = <T,>({
   const searchColumnsOptions = useMemo(() => buildSearchOptions(columns), [columns]);
 
   const updateQueryParams = useCallback(
-    (values: Record<string, any>) => {
+    (values: Record<string, any>, replace = true) => {
       const currentUrlValues = getFormValuesFromUrl(columns, queryParamsByKey);
       if (serializeFilterQueryState(columns, values) === serializeFilterQueryState(columns, currentUrlValues)) {
         return;
       }
 
-      setQueryParams(buildParamsFromKey(tableKey, columns, values), true);
+      setQueryParams(buildParamsFromKey(tableKey, columns, values), replace);
     },
     [setQueryParams, tableKey, columns, queryParamsByKey]
   );
 
   const onFormChange = useMemo(
-    () => debounce((values: Record<string, any>) => updateQueryParams(values), DEBOUNCE_DELAY),
+    () => debounce((values: Record<string, any>) => updateQueryParams(values, true), DEBOUNCE_DELAY),
     [updateQueryParams]
   );
 
@@ -88,7 +88,7 @@ export const Filter = <T,>({
 
   const onSubmit = useCallback(
     (values: Record<string, any>) => {
-      updateQueryParams(values);
+      updateQueryParams(values, false);
     },
     [updateQueryParams]
   );
