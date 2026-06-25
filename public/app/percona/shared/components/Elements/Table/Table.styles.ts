@@ -25,6 +25,7 @@ export const getStyles = (theme: GrafanaTheme) => {
       table {
         /* Make sure the inner table is always as wide as needed */
         width: 100%;
+        table-layout: fixed;
         border-spacing: 0;
 
         thead {
