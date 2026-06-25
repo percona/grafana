@@ -32,8 +32,10 @@ export const getFilterPanelStateFromUrl = <T extends object>(
 
   const hasAdvancedFilter = columns.some((column) => {
     if (
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      ![FilterFieldTypes.DROPDOWN, FilterFieldTypes.RADIO_BUTTON, FilterFieldTypes.BOOLEAN].includes(column.type as FilterFieldTypes)
+      ![FilterFieldTypes.DROPDOWN, FilterFieldTypes.RADIO_BUTTON, FilterFieldTypes.BOOLEAN].includes(
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        column.type as FilterFieldTypes
+      )
     ) {
       return false;
     }
