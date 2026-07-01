@@ -79,5 +79,13 @@ export const getNodeLink = (service: FlattenService) => {
   return `/inventory/nodes?search-text-input=${nodeId}&search-select=nodeId`;
 };
 
+export const getFlattenServicesSignature = (services: FlattenService[]): string =>
+  services
+    .map(
+      (service) =>
+        `${service.serviceId}|${service.serviceName}|${service.status}|${service.nodeName}|${service.address}|${service.port}|${service.agentsStatus}|${service.cluster}`
+    )
+    .join(';');
+
 export const getTagsFromLabels = (labelKeys: string[], labels: Record<string, string>) =>
   labelKeys.filter((label) => labels[label] !== '').map((label) => `${label}=${labels![label]}`);

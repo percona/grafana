@@ -136,6 +136,17 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
     data.extra_dsn_params = CustomLabelsUtils.toPayload(data.extra_dsn_params);
   }
 
+  // The disable collectors fields are entered as a comma-delimited string but the API expects an
+  // array. Only one of these keys is ever set by the form depending on the instance type / RDS flag.
+  ['disable_collectors', 'mysql_disable_collectors', 'postgresql_disable_collectors'].forEach((key) => {
+    if (typeof data[key] === 'string') {
+      data[key] = data[key]
+        .split(',')
+        .map((collector: string) => collector.trim())
+        .filter(Boolean);
+    }
+  });
+
   if (!values.isAzure) {
     if (data.isRDS && data.tracking === TrackingOptions.pgStatements) {
       data.qan_postgresql_pgstatements = true;

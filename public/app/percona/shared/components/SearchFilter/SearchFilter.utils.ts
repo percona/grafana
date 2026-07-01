@@ -33,9 +33,9 @@ export const useQueryParamsByKey = (tableKey?: string) => {
   }, [queryParams, tableKey]);
 
   const setQueryParamsByKey = useCallback(
-    <T extends object>(columns: Array<ExtendedColumn<T>>, values: QueryParamsValues) => {
+    <T extends object>(columns: Array<ExtendedColumn<T>>, values: QueryParamsValues, replace = true) => {
       const params = buildParamsFromKey(tableKey, columns, values);
-      setQueryParams(params);
+      setQueryParams(params, replace);
     },
     [setQueryParams, tableKey]
   );

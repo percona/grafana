@@ -26,12 +26,9 @@ export const getExpandAndActionsCol = <T extends object>(
           text-align: right;
         }
       `,
-      !children &&
-        css`
-          width: 70px;
-        `,
       className
     ),
+    width: children ? undefined : '70px',
     ...options,
   };
 };
