@@ -30,6 +30,7 @@ import MysqlExtraDSNParams from './MysqlExtraDSNParams';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 import { ValkeyTLSCertificate } from './ValkeyTLSCertificate';
+import DisableCollectorsField from './DisableCollectorsField';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -156,7 +157,7 @@ const getTablestatValues = (type: TablestatOptionsInterface) => {
   }
 };
 
-const MySQLOptions = ({ form }: { form: FormApi }) => {
+const MySQLOptions = ({ form, isRDS, isAzure }: { form: FormApi; isRDS?: boolean; isAzure?: boolean }) => {
   const selectedOption = form.getState().values && form.getState().values.tablestatOptions;
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || TablestatOptionsInterface.disabled);
   const styles = useStyles2(getStyles);
@@ -169,9 +170,10 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
 
   return (
     <>
-      <div className={styles.extraDsnOptions}>
+      <div className={styles.fieldWrapper}>
         <MysqlExtraDSNParams />
       </div>
+      {!isAzure && <DisableCollectorsField name={isRDS ? 'mysql_disable_collectors' : 'disable_collectors'} />}
       <h4>{Messages.form.labels.additionalOptions.tablestatOptions}</h4>
       <div className={styles.group}>
         <RadioButtonGroupField
@@ -216,6 +218,11 @@ export const getAdditionalOptions = (
               label={Messages.form.labels.additionalOptions.disableCommentsParsing}
               name="disable_comments_parsing"
             />
+            {!remoteInstanceCredentials.isAzure && (
+              <DisableCollectorsField
+                name={remoteInstanceCredentials.isRDS ? 'postgresql_disable_collectors' : 'disable_collectors'}
+              />
+            )}
           </>
           <PostgreSQLAdditionalOptions
             form={form}
@@ -260,7 +267,11 @@ export const getAdditionalOptions = (
             label={Messages.form.labels.additionalOptions.qanMysqlPerfschema}
             name="qan_mysql_perfschema"
           />
-          <MySQLOptions form={form} />
+          <MySQLOptions
+            form={form}
+            isRDS={remoteInstanceCredentials.isRDS}
+            isAzure={remoteInstanceCredentials.isAzure}
+          />
           {remoteInstanceCredentials.isRDS ? (
             <>
               <CheckboxField
@@ -292,6 +303,15 @@ export const getAdditionalOptions = (
             data-testid="qan-mongodb-profiler-checkbox"
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
           />
+          <DisableCollectorsField name="disable_collectors" />
+        </>
+      );
+    case Databases.proxysql:
+      return (
+        <>
+          <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
+          <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
+          <DisableCollectorsField name="disable_collectors" />
         </>
       );
     case Databases.valkey:

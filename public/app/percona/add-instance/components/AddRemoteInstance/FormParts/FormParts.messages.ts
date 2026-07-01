@@ -81,6 +81,7 @@ export const Messages = {
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
         disableCommentsParsing: 'Disable comments parsing',
         disableQueryExamples: 'Disable query examples',
+        disableCollectors: 'Disable collectors',
       },
     },
     placeholders: {
@@ -121,7 +122,9 @@ export const Messages = {
         customLabels: 'key1:value1\nkey2:value2',
         extraDsnParams: 'key1:value1\nkey2:value2',
       },
-      additionalOptions: {},
+      additionalOptions: {
+        disableCollectors: 'collector1, collector2, collector3',
+      },
     },
     tooltips: {
       externalService: {
@@ -184,6 +187,8 @@ export const Messages = {
       labelsExisting: 'Editing existing labels may affect your inventory and its data.',
       customLabels: 'Follow the format as exemplified below, one label per line.',
       extraDsnParams: 'Follow the format as exemplified below, one parameter per line.',
+      disableCollectors:
+        'Exclude specific collectors from metric collection to reduce monitoring overhead or suppress metrics not relevant to your environment. Leave empty to keep all collectors enabled.',
     },
   },
 };
