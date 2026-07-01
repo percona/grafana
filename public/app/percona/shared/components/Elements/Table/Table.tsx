@@ -58,7 +58,7 @@ export const Table: FC<TableProps> = ({
   getRowId,
   tableKey,
 }) => {
-  const [filterData, setFilteredData] = useState<Object[]>([]);
+  const [filterData, setFilteredData] = useState<Object[]>(rawData);
   const data = useMemo(() => (showFilter ? filterData : rawData), [showFilter, filterData, rawData]);
   const style = useStyles(getStyles);
   const manualPagination = !!(totalPages && totalPages >= 0);
@@ -176,6 +176,11 @@ export const Table: FC<TableProps> = ({
               emptyMessageClassName={emptyMessageClassName}
             >
               <table {...getTableProps()} data-testid="table">
+                <colgroup>
+                  {visibleColumns.map((column) => (
+                    <col key={column.id} style={column.width ? { width: column.width } : undefined} />
+                  ))}
+                </colgroup>
                 <thead data-testid="table-thead">
                   {headerGroups.map((headerGroup) => {
                     const { key: headerGroupKey, ...headerGroupProps } = headerGroup.getHeaderGroupProps();

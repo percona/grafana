@@ -9,4 +9,4 @@ export const TRUE_VALUE = 'true';
 export const FALSE_LABEL = 'No';
 export const FALSE_VALUE = 'false';
 
-export const DEBOUNCE_DELAY = 600;
+export const DEBOUNCE_DELAY = 400;
