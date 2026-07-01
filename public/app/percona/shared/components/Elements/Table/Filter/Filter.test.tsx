@@ -1,12 +1,24 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { CheckDetails } from 'app/percona/check/types';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { ExtendedColumn, FilterFieldTypes } from '..';
 
 import { Filter } from './Filter';
-import { SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
+import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import * as filterUtils from './Filter.utils';
+
+type FilterTestRow = {
+  name: string;
+  description: string;
+  summary: string;
+  interval: string;
+  enabled: boolean;
+};
+
+const mockSetQueryParams = jest.fn();
+
+jest.mock('app/core/hooks/useQueryParams', () => ({
+  useQueryParams: () => [{}, mockSetQueryParams],
+}));
 
 const Messages = {
   name: 'Name',
@@ -15,7 +27,7 @@ const Messages = {
   interval: 'Interval',
 };
 
-const columns: Array<ExtendedColumn<CheckDetails>> = [
+const columns: Array<ExtendedColumn<FilterTestRow>> = [
   {
     Header: Messages.name,
     accessor: 'summary',
@@ -63,7 +75,7 @@ const columns: Array<ExtendedColumn<CheckDetails>> = [
   },
 ];
 
-const data = [
+const data: FilterTestRow[] = [
   {
     name: 'test1',
     description: 'Test desctiption 1',
@@ -98,8 +110,15 @@ const setFilteredData = jest.fn();
 
 describe('Filter', () => {
   beforeEach(() => {
+    mockSetQueryParams.mockClear();
+    jest.useFakeTimers();
     // There's a warning about keys coming from within ReactFinalForm
     jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   it('should render the filter', async () => {
@@ -159,8 +178,167 @@ describe('Filter', () => {
     expect(screen.getByTestId('enabled-radio-state')).toBeInTheDocument();
   });
 
+  it('should open search fields when only search text is set in url', async () => {
+    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ [SEARCH_INPUT_FIELD_NAME]: 'data' }));
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
+
+    expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
+    expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toHaveValue('data');
+    expect(screen.queryByTestId('enabled-radio-state')).not.toBeInTheDocument();
+  });
+
+  it('should open both search and advanced filters when both are set in url', async () => {
+    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({
+      [SEARCH_INPUT_FIELD_NAME]: 'data',
+      enabled: 'false',
+    }));
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
+
+    expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
+    expect(screen.getByTestId('enabled-radio-state')).toBeInTheDocument();
+  });
+
   it('should show apply button when backend filtering is enabled', async () => {
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={true} />);
-    expect(screen.queryByTestId('submit-button'));
+    expect(screen.getByTestId('submit-button')).toBeInTheDocument();
+  });
+
+  it('should treat url values and select objects as the same query state', () => {
+    const urlValues = filterUtils.getFormValuesFromUrl(columns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+    });
+    const formValues = {
+      ...filterUtils.buildEmptyValues(columns),
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: { value: 'All', label: 'All' },
+      enabled: 'All',
+      interval: 'All',
+    };
+
+    expect(filterUtils.isSameFilterQueryState(columns, urlValues, formValues)).toBe(true);
+  });
+
+  it('should not create duplicate debouncers when rawData changes during typing', async () => {
+    const { rerender } = render(
+      <Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />
+    );
+
+    fireEvent.click(screen.getByTestId('open-search-fields'));
+    fireEvent.change(screen.getByTestId(SEARCH_INPUT_FIELD_NAME), { target: { value: 'test' } });
+
+    rerender(
+      <Filter columns={columns} rawData={[...data]} setFilteredData={setFilteredData} hasBackendFiltering={false} />
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(DEBOUNCE_DELAY);
+    });
+
+    expect(mockSetQueryParams.mock.calls.length).toBeLessThanOrEqual(1);
+  });
+
+  it('should serialize select object and string values consistently', () => {
+    const stringValues = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: 'summary',
+    };
+    const objectValues = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: { value: 'summary', label: 'Name' },
+    };
+
+    expect(filterUtils.isSameFilterQueryState(columns, stringValues, objectValues)).toBe(true);
+  });
+
+  it('should not write search-select when searching all columns', () => {
+    const values = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      [SEARCH_SELECT_FIELD_NAME]: 'All',
+    };
+
+    expect(filterUtils.normalizeFilterQueryState(columns, values)).toEqual({
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+    });
+  });
+
+  it('should not treat string false as an enabled boolean filter', () => {
+    const booleanColumns: Array<ExtendedColumn<{ monitored: boolean }>> = [
+      {
+        Header: 'Monitored',
+        accessor: 'monitored',
+        type: FilterFieldTypes.BOOLEAN,
+      },
+    ];
+    const values = {
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+      monitored: 'false',
+    };
+
+    expect(filterUtils.normalizeFilterQueryState(booleanColumns, values)).toEqual({
+      [SEARCH_INPUT_FIELD_NAME]: 'hello',
+    });
+  });
+
+  it('should filter across all text columns when search-select is omitted from url', () => {
+    const filtered = filterUtils.getFilteredData(data, columns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'summary 2',
+    });
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].summary).toBe('Test summary 2');
+  });
+
+  it('should filter across all text columns when search-select is All', () => {
+    const filtered = filterUtils.getFilteredData(data, columns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'desctiption 3',
+      [SEARCH_SELECT_FIELD_NAME]: 'All',
+    });
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].summary).toBe('Test summary 3');
+  });
+
+  it('should match text in any column when searching all, including hidden columns', () => {
+    const serviceColumns: Array<ExtendedColumn<{ serviceId: string; serviceName: string }>> = [
+      { Header: 'Service ID', accessor: 'serviceId', type: FilterFieldTypes.TEXT, hidden: true },
+      { Header: 'Service Name', accessor: 'serviceName', type: FilterFieldTypes.TEXT },
+    ];
+    const services = [
+      { serviceId: '/inventory/service/node/mysql-1', serviceName: 'mysql-1' },
+      { serviceId: '/inventory/service/node/pmm-server', serviceName: 'PMM Server' },
+    ];
+
+    const filtered = filterUtils.getFilteredData(services, serviceColumns, {
+      [SEARCH_INPUT_FIELD_NAME]: 'pmm',
+    });
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].serviceName).toBe('PMM Server');
+  });
+
+  describe('getFilterPanelStateFromUrl', () => {
+    it('should open search fields when only search text is present', () => {
+      expect(
+        filterUtils.getFilterPanelStateFromUrl(columns, {
+          [SEARCH_INPUT_FIELD_NAME]: 'hello',
+        })
+      ).toEqual({ openSearchFields: true, openCollapse: false });
+    });
+
+    it('should open advanced filters when only advanced params are present', () => {
+      expect(filterUtils.getFilterPanelStateFromUrl(columns, { enabled: 'false' })).toEqual({
+        openSearchFields: false,
+        openCollapse: true,
+      });
+    });
+
+    it('should open both panels when search and advanced filters are present', () => {
+      expect(
+        filterUtils.getFilterPanelStateFromUrl(columns, {
+          [SEARCH_INPUT_FIELD_NAME]: 'hello',
+          interval: 'Rare',
+        })
+      ).toEqual({ openSearchFields: true, openCollapse: true });
+    });
   });
 });

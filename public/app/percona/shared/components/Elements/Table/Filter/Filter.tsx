@@ -2,15 +2,16 @@
 import { cx } from '@emotion/css';
 import { FormApi } from 'final-form';
 import { debounce } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form, FormSpy } from 'react-final-form';
 
+import { t } from '@grafana/i18n';
 import { IconButton, useStyles2 } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
 import { FilterFieldTypes } from '..';
 
-import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
+import { DEBOUNCE_DELAY } from './Filter.constants';
 import { Messages } from './Filter.messages';
 import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
@@ -19,7 +20,10 @@ import {
   buildParamsFromKey,
   buildSearchOptions,
   getFilteredData,
+  getFilterPanelStateFromUrl,
+  getFormValuesFromUrl,
   getQueryParams,
+  isSameFilterQueryState,
   isOtherThanTextType,
 } from './Filter.utils';
 import BooleanField from './components/fields/BooleanField';
@@ -35,8 +39,6 @@ export const Filter = <T,>({
   hasBackendFiltering = false,
   tableKey,
 }: FilterProps<T>) => {
-  const [openCollapse, setOpenCollapse] = useState(false);
-  const [openSearchFields, setOpenSearchFields] = useState(false);
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
 
@@ -55,17 +57,44 @@ export const Filter = <T,>({
     return queryParams;
   }, [queryParams, tableKey]);
 
+  const [openCollapse, setOpenCollapse] = useState(
+    () => getFilterPanelStateFromUrl(columns, queryParamsByKey).openCollapse
+  );
+  const [openSearchFields, setOpenSearchFields] = useState(
+    () => getFilterPanelStateFromUrl(columns, queryParamsByKey).openSearchFields
+  );
+
   const searchColumnsOptions = useMemo(() => buildSearchOptions(columns), [columns]);
 
-  const onFormChange = debounce(
-    (values: Record<string, any>) => setQueryParams(buildParamsFromKey(tableKey, columns, values)),
-    DEBOUNCE_DELAY
-  );
-  const onSubmit = (values: Record<string, any>) => {
-    setQueryParams(buildParamsFromKey(tableKey, columns, values));
-  };
+  const updateQueryParams = useCallback(
+    (values: Record<string, any>, replace = true) => {
+      const currentUrlValues = getFormValuesFromUrl(columns, queryParamsByKey);
+      if (isSameFilterQueryState(columns, values, currentUrlValues)) {
+        return;
+      }
 
-  const initialValues = useMemo(() => getQueryParams(columns, queryParamsByKey), [columns, queryParamsByKey]);
+      setQueryParams(buildParamsFromKey(tableKey, columns, values), replace);
+    },
+    [setQueryParams, tableKey, columns, queryParamsByKey]
+  );
+
+  const onFormChange = useMemo(
+    () => debounce((values: Record<string, any>) => updateQueryParams(values, true), DEBOUNCE_DELAY),
+    [updateQueryParams]
+  );
+
+  useEffect(() => {
+    return () => onFormChange.cancel();
+  }, [onFormChange]);
+
+  const onSubmit = useCallback(
+    (values: Record<string, any>) => {
+      updateQueryParams(values, false);
+    },
+    [updateQueryParams]
+  );
+
+  const initialValues = useMemo(() => getFormValuesFromUrl(columns, queryParamsByKey), [columns, queryParamsByKey]);
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
@@ -73,23 +102,18 @@ export const Filter = <T,>({
   };
 
   useEffect(() => {
-    const numberOfParams = Object.keys(initialValues).length;
-    if (
-      numberOfParams > 0 &&
-      numberOfParams <= 2 &&
-      !initialValues[SEARCH_INPUT_FIELD_NAME] &&
-      !initialValues[SEARCH_SELECT_FIELD_NAME]
-    ) {
+    const { openCollapse: openAdvanced, openSearchFields: openSearch } = getFilterPanelStateFromUrl(
+      columns,
+      queryParamsByKey
+    );
+
+    if (openAdvanced) {
       setOpenCollapse(true);
     }
-    if (numberOfParams > 2) {
-      setOpenCollapse(true);
+    if (openSearch) {
       setOpenSearchFields(true);
     }
-    if (numberOfParams === 2 && initialValues[SEARCH_INPUT_FIELD_NAME] && initialValues[SEARCH_SELECT_FIELD_NAME]) {
-      setOpenSearchFields(true);
-    }
-  }, [initialValues]);
+  }, [columns, queryParamsByKey]);
 
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParamsByKey);
@@ -131,7 +155,7 @@ export const Filter = <T,>({
                 size="xl"
                 onClick={() => setOpenSearchFields((value) => !value)}
                 data-testid="open-search-fields"
-                aria-label="Open search fields"
+                aria-label={t('percona.table-filter.open-search-fields', 'Open search fields')}
               />
               {openSearchFields && (
                 <div className={styles.searchFields}>
@@ -141,7 +165,7 @@ export const Filter = <T,>({
               )}
               {showAdvanceFilter && (
                 <IconButton
-                  aria-label="Toggle advanced filter"
+                  aria-label={t('percona.table-filter.toggle-advanced-filter', 'Toggle advanced filter')}
                   className={styles.icon}
                   name="filter"
                   size="xl"
@@ -150,7 +174,7 @@ export const Filter = <T,>({
                 />
               )}
               <IconButton
-                aria-label="Clear filter"
+                aria-label={t('percona.table-filter.clear-filter', 'Clear filter')}
                 className={styles.icon}
                 name="times"
                 size="xl"
