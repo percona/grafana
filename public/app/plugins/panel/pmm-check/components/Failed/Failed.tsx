@@ -5,15 +5,15 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import { PanelProps } from '@grafana/data';
 import { config, RefreshEvent } from '@grafana/runtime';
 import { Spinner, Tooltip, useStyles2 } from '@grafana/ui';
-import { CheckService } from 'app/percona/check/Check.service';
-import { FailedCheckSummary } from 'app/percona/check/types';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { isPmmAdmin, isEditor } from 'app/percona/shared/helpers/permissions';
 import { useSelector } from 'app/types/store';
 
+import { CheckService } from '../../Check.service';
 import { PMM_DATABASE_CHECKS_PANEL_URL, PMM_SETTINGS_URL } from '../../CheckPanel.constants';
 import { splitSeverities } from '../../CheckPanel.utils';
+import { FailedCheckSummary } from '../../types';
 
 import { Messages } from './Failed.messages';
 import { getStyles } from './Failed.styles';

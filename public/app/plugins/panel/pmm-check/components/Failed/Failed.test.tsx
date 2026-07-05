@@ -3,14 +3,15 @@ import { Provider } from 'react-redux';
 
 import { PanelProps, dateTime, LoadingState } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { CheckService } from 'app/percona/check/Check.service';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types/store';
 import { OrgRole } from '@grafana/data';
 
+import { CheckService } from '../../Check.service';
+
 import { Failed } from './Failed';
 
-jest.mock('app/percona/check/Check.service');
+jest.mock('../../Check.service');
 
 const spyGetAllFailedChecks = jest.spyOn(CheckService, 'getAllFailedChecks');
 

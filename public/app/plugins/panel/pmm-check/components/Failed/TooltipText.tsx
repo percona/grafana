@@ -1,7 +1,8 @@
 import { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { FailedChecksCounts } from 'app/percona/check/types';
+
+import { FailedChecksCounts } from '../../types';
 
 import { getStyles } from './Failed.styles';
 import { Messages } from './TooltipText.messages';

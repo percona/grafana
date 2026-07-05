@@ -1,4 +1,4 @@
-import { FailedChecksCounts, FailedCheckSummary } from 'app/percona/check/types';
+import { FailedChecksCounts, FailedCheckSummary } from './types';
 
 export const splitSeverities = (checks: FailedCheckSummary[] = []): FailedChecksCounts => {
   const result: FailedChecksCounts = {

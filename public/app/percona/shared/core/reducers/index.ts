@@ -12,7 +12,6 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { isPmmAdmin } from '../../helpers/permissions';
 import { SettingsUpdatedEvent } from '../events';
 
-import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
 import highAvailabilityReducer from './highAvailability/highAvailability';
 import navigationReducer from './navigation';
@@ -150,7 +149,6 @@ export default {
     backupLocations: perconaBackupLocations,
     roles: rolesReducers,
     users: usersReducers,
-    advisors: advisorsReducers,
     pmmDumps: pmmDumpsReducers,
     updates: updatesReducers,
     highAvailability: highAvailabilityReducer,
