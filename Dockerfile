@@ -196,9 +196,6 @@ COPY --from=go-src /tmp/grafana/data/plugins-bundled ./data/plugins-bundled
 RUN grafana server -v | sed -e 's/Version //' > /.grafana-version
 RUN chmod 644 /.grafana-version
 
-RUN grafana server -v | sed -e 's/Version //' > /.grafana-version
-RUN chmod 644 /.grafana-version
-
 EXPOSE 3000
 
 ARG RUN_SH=./packaging/docker/run.sh
