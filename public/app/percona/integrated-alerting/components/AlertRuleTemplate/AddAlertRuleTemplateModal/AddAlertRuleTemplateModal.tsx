@@ -3,7 +3,7 @@ import { ChangeEvent, FC, useCallback, useRef } from 'react';
 import { Form } from 'react-final-form';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Icon, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, Link, Stack, TextLink, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.messages';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
@@ -58,7 +58,21 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
               <input type="file" accept=".yml, .yaml" ref={inputRef} onChange={onUploadFile(change)} hidden />
               <TextareaInputField
                 name="yaml"
-                label={Messages.alertRuleTemplate.addModal.fields.alertRuleTemplate}
+                label={
+                  <>
+                    {Messages.alertRuleTemplate.addModal.fields.alertRuleTemplate}
+                    {' ('}
+                    <TextLink
+                      inline
+                      external
+                      // todo: use shortlink
+                      href="https://docs.percona.com/percona-monitoring-and-management/3/alert/alert_rules.html?h=create#configure-alert-templates"
+                    >
+                      {Messages.alertRuleTemplate.addModal.fields.alertRuleTemplateDocumentation}
+                    </TextLink>
+                    {')'}
+                  </>
+                }
                 validators={[required]}
                 className={styles.alertRuleTemplate}
               />
