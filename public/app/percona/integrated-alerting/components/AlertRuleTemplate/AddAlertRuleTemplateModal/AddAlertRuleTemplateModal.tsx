@@ -62,12 +62,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
                   <>
                     {Messages.alertRuleTemplate.addModal.fields.alertRuleTemplate}
                     {' ('}
-                    <TextLink
-                      inline
-                      external
-                      // todo: use shortlink
-                      href="https://docs.percona.com/percona-monitoring-and-management/3/alert/alert_rules.html?h=create#configure-alert-templates"
-                    >
+                    <TextLink inline external href="https://per.co.na/alert_templates">
                       {Messages.alertRuleTemplate.addModal.fields.alertRuleTemplateDocumentation}
                     </TextLink>
                     {')'}
