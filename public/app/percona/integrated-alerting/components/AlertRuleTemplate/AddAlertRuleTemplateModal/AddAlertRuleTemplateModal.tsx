@@ -3,7 +3,7 @@ import { ChangeEvent, FC, useCallback, useRef } from 'react';
 import { Form } from 'react-final-form';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Icon, Link, Stack, TextLink, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, TextLink, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.messages';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
