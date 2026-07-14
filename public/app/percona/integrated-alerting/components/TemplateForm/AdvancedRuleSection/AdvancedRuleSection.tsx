@@ -11,8 +11,8 @@ import { AdvancedRuleSectionProps } from './AdvancedRuleSection.types';
 export const AdvancedRuleSection: FC<AdvancedRuleSectionProps> = ({
   expression,
   summary,
-  queries,
-  expressions,
+  queries = [],
+  expressions = [],
   condition,
 }) => {
   const styles = useStyles(getStyles);
@@ -26,22 +26,30 @@ export const AdvancedRuleSection: FC<AdvancedRuleSectionProps> = ({
         isOpen={isAdvancedSectionOpen}
         onToggle={() => setIsAdvancedSectionOpen((open) => !open)}
       >
-        {queries.length && (
+        {queries.length > 0 && (
           <div data-testid="template-queries" className={styles.templateParsedField}>
             <Label label={Messages.templateQueries} />
             {queries.map((query) => (
-              <div data-testid={'template-query-' + query.ref_id} className={styles.templateParsedField}>
+              <div
+                key={query.ref_id}
+                data-testid={'template-query-' + query.ref_id}
+                className={styles.templateParsedField}
+              >
                 <Label label={query.ref_id + ':'} />
                 <pre>{query.expr}</pre>
               </div>
             ))}
           </div>
         )}
-        {expressions.length && (
+        {expressions.length > 0 && (
           <div data-testid="template-expressions" className={styles.templateParsedField}>
             <Label label={Messages.templateExpressions} />
             {expressions.map((expression) => (
-              <div data-testid={'template-expression-' + expression.ref_id} className={styles.templateParsedField}>
+              <div
+                key={expression.ref_id}
+                data-testid={'template-expression-' + expression.ref_id}
+                className={styles.templateParsedField}
+              >
                 <Label label={expression.ref_id + ':'} />
                 <pre>{expression.expression}</pre>
               </div>
