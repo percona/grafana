@@ -1,0 +1,176 @@
+name: PR build Docker image
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+permissions: {}
+
+jobs:
+  detect-changes:
+    # Gate the whole workflow behind this check
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
+    name: Detect whether code changed
+    runs-on: ubuntu-x64-small
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.detect-changes.outputs.frontend == 'true' || steps.detect-changes.outputs.backend == 'true' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true # required to get more history in the changed-files action
+          fetch-depth: 2
+      - name: Detect changes
+        id: detect-changes
+        uses: ./.github/actions/change-detection
+        with:
+          self: .github/workflows/pr-build-grafana.yml
+
+  setup:
+    name: setup
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.changed == 'true'
+    runs-on: ubuntu-x64-small
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.output.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up version
+        run: jq -r .version package.json | sed -s "s/pre/${BUILD_ID}/g" > VERSION
+        env:
+          BUILD_ID: ${{ github.run_id }}
+      - id: output
+        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
+  build-frontend:
+    name: build frontend
+    runs-on: ubuntu-x64-large
+    needs: [setup]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node
+      - name: Install JS dependencies
+        run: yarn install --immutable
+      - name: Build frontend
+        run: yarn build
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: pr-frontend
+          path: public
+          retention-days: 1
+
+  build-backend:
+    name: build backend
+    runs-on: ubuntu-x64-large
+    needs: [setup]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-go
+      - name: Build Go
+        env:
+          CGO_ENABLED: '0'
+          BUILD_VERSION: ${{ needs.setup.outputs.version }}
+          GOOS: linux
+          GOARCH: amd64
+        run: make build-go BUILD_VERSION="${BUILD_VERSION}"
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: pr-backend
+          path: bin/linux/amd64
+          retention-days: 1
+
+  build-targz:
+    name: build targz
+    runs-on: ubuntu-x64-large-io
+    needs:
+      - setup
+      - build-frontend
+      - build-backend
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: pr-frontend
+          path: public
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: pr-backend
+          path: bin/linux/amd64
+      - name: Fix backend binary permissions
+        run: chmod +x bin/linux/amd64/grafana*
+      - name: Build tar.gz
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          BUILD_NUMBER: ${{ github.run_id }}
+          BUILD_VERSION: ${{ needs.setup.outputs.version }}
+        run: make build-targz BUILD_VERSION="$BUILD_VERSION" BUILD_NUMBER="$BUILD_NUMBER"
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: pr-targz
+          path: dist
+          retention-days: 1
+
+  build-docker:
+    name: build docker
+    runs-on: ubuntu-x64-large
+    needs:
+      - setup
+      - build-targz
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: grafana/shared-workflows/actions/dockerhub-login@dockerhub-login/v1.0.2
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: pr-targz
+          path: dist
+      - name: Set up Docker Buildx
+        run: docker buildx create --use
+      - name: Build docker image
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          BUILD_NUMBER: ${{ github.run_id }}
+          BUILD_VERSION: ${{ needs.setup.outputs.version }}
+        run: |
+          for TARGZ in dist/*.tar.gz; do break; done
+          TAG_VERSION="${BUILD_VERSION//+/-}"
+          make build-docker \
+            -o "$TARGZ" \
+            BUILD_VERSION="$BUILD_VERSION" \
+            BUILD_NUMBER="$BUILD_NUMBER" \
+            DOCKER_TAG="grafana/grafana-image-tags:${TAG_VERSION}-amd64"
+      - name: Stage docker artifact
+        run: |
+          mkdir -p upload
+          cp dist/*.docker.tar.gz upload/
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: pr-docker
+          path: upload
+          retention-days: 1

@@ -8,7 +8,10 @@ const RedirectPage = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.location.replace('/pmm-ui' + pathname);
+    // if location contains pmm-ui it should be picked up by pmm-compat plugin
+    if (!pathname.includes('/pmm-ui')) {
+      window.location.replace('/pmm-ui' + pathname);
+    }
   }, [pathname]);
 
   return (
