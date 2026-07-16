@@ -74,6 +74,7 @@ export const getStyles = (theme: GrafanaTheme2) => {
 
       &:hover {
         cursor: not-allowed;
+        border: 1px solid ${v2Colors.action.disabledBackground};
       }
     `,
     checkmarkLabel: css`
