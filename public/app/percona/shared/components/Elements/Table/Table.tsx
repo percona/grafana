@@ -137,11 +137,21 @@ export const Table: FC<TableProps> = ({
               </div>
             );
           },
-          Cell: ({ row }: { row: UseRowSelectRowProps<any> & Row<any> }) => (
-            <div data-testid="select-row">
-              <TableCheckbox id={row.id} {...row.getToggleRowSelectedProps()} disabled={!isRowSelectable(row)} />
-            </div>
-          ),
+          Cell: ({ row }: { row: UseRowSelectRowProps<any> & Row<any> }) => {
+            const selectable = isRowSelectable(row);
+            const toggleProps = row.getToggleRowSelectedProps();
+
+            return (
+              <div data-testid="select-row">
+                <TableCheckbox
+                  id={row.id}
+                  {...toggleProps}
+                  onChange={selectable ? toggleProps.onChange : undefined}
+                  disabled={!selectable}
+                />
+              </div>
+            );
+          },
         },
         ...cols,
       ]);
