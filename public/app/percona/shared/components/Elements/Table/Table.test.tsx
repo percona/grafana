@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
+import { Row } from 'react-table';
 
 import { Table } from './Table';
 
@@ -141,5 +143,71 @@ describe('Table', () => {
     expect(screen.getByTestId('table-tbody').querySelectorAll('tr')).toHaveLength(5);
     expect(screen.getAllByTestId('page-button')).toHaveLength(19);
     expect(screen.getAllByTestId('page-button-active')).toHaveLength(1);
+  });
+
+  it('should select all rows when rowSelection is enabled', () => {
+    const onRowSelection = jest.fn();
+
+    render(
+      <Table
+        totalItems={data.length}
+        data={data}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        rowSelection
+        onRowSelection={onRowSelection}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('table-select-all-checkbox-input'));
+
+    const selectedRows: Array<Row<{ value: string }>> = onRowSelection.mock.lastCall[0];
+    expect(selectedRows).toHaveLength(2);
+  });
+
+  it('should disable selection of rows not matching the rowSelection predicate', () => {
+    const onRowSelection = jest.fn();
+
+    render(
+      <Table
+        totalItems={data.length}
+        data={data}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        rowSelection={(row: Row<{ value: string }>) => row.original.value !== 'test value 1'}
+        onRowSelection={onRowSelection}
+      />
+    );
+
+    const firstRowCheckbox = screen.getByTestId('table-select-0-checkbox-input');
+    expect(firstRowCheckbox).toBeDisabled();
+    expect(screen.getByTestId('table-select-1-checkbox-input')).toBeEnabled();
+
+    fireEvent.click(firstRowCheckbox);
+    expect(onRowSelection.mock.lastCall[0]).toHaveLength(0);
+  });
+
+  it('should skip non-selectable rows when selecting all', () => {
+    const onRowSelection = jest.fn();
+
+    render(
+      <Table
+        totalItems={data.length}
+        data={data}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        rowSelection={(row: Row<{ value: string }>) => row.original.value !== 'test value 1'}
+        onRowSelection={onRowSelection}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('table-select-all-checkbox-input'));
+
+    const selectedRows: Array<Row<{ value: string }>> = onRowSelection.mock.lastCall[0];
+    expect(selectedRows).toHaveLength(1);
+    expect(selectedRows[0].original.value).toBe('test value 2');
+
+    fireEvent.click(screen.getByTestId('table-select-all-checkbox-input'));
+    expect(onRowSelection.mock.lastCall[0]).toHaveLength(0);
   });
 });

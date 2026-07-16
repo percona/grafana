@@ -65,7 +65,7 @@ export interface TableProps {
   emptyMessageClassName?: string;
   overlayClassName?: string;
   autoResetSelectedRows?: boolean;
-  rowSelection?: boolean;
+  rowSelection?: boolean | ((row: Row<any>) => boolean);
   allRowsSelectionMode?: 'all' | 'page';
   onRowSelection?: (rows: Array<Row<any>>) => void;
   onPaginationChanged?: (pageSize: number, pageIndex: number) => void;

@@ -68,6 +68,14 @@ export const getStyles = (theme: GrafanaTheme2) => {
         border-color: ${colors.formInputBorderHover};
       }
     `,
+    checkmarkDisabled: css`
+      background-color: ${v2Colors.action.disabledBackground};
+      border: 1px solid ${v2Colors.action.disabledBackground};
+
+      &:hover {
+        cursor: not-allowed;
+      }
+    `,
     checkmarkLabel: css`
       margin-left: ${spacing.sm};
     `,
