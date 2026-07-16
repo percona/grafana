@@ -109,12 +109,13 @@ export const Table: FC<TableProps> = ({
             page: Array<UseRowSelectRowProps<any> & Row<any>>;
           }) => {
             const getProps = () => {
+              const baseProps =
+                allRowsSelectionMode === 'all' || !showPagination
+                  ? getToggleAllRowsSelectedProps()
+                  : getToggleAllPageRowsSelectedProps();
+
               if (typeof rowSelection !== 'function') {
-                return {
-                  ...(allRowsSelectionMode === 'all' || !showPagination
-                    ? getToggleAllRowsSelectedProps()
-                    : getToggleAllPageRowsSelectedProps()),
-                };
+                return baseProps;
               }
 
               const targetRows = (allRowsSelectionMode === 'all' || !showPagination ? rows : page).filter(
@@ -123,6 +124,7 @@ export const Table: FC<TableProps> = ({
               const allSelected = targetRows.length > 0 && targetRows.every((r) => r.isSelected);
 
               return {
+                ...baseProps,
                 checked: allSelected,
                 disabled: targetRows.length === 0,
                 onChange: () => targetRows.forEach((r) => toggleRowSelected(r.id, !allSelected)),
