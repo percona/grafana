@@ -526,10 +526,7 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/alerting/alerts',
       component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "AlertsRedirectPage" */ 'app/percona/redirect/RedirectPage'
-          )
+        () => import(/* webpackChunkName: "AlertsRedirectPage" */ 'app/percona/redirect/RedirectPage')
       ),
     },
     {
