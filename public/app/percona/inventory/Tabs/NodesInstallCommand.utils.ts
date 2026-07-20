@@ -31,6 +31,7 @@ export function buildQuickInstallCommand(tech: QuickInstallTech, token?: string)
     `--pmm-server-url ${shellEscape(serverUrl)}`,
     `--tech ${shellEscape(tech)}`,
     '--pmm-server-insecure-tls',
+    '--force-new-agent-token',
   ];
 
   return [curl, `sudo -E bash ${shellEscape(DOWNLOADED_SCRIPT_PATH)} \\`, `  ${flags.join(' \\\n  ')}`].join('\n');

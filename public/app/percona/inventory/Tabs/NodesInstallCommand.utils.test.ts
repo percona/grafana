@@ -16,6 +16,11 @@ describe('buildQuickInstallCommand', () => {
     expect(cmd).toContain('service_token:<TOKEN>@');
   });
 
+  it('forces replacing the short-lived install token', () => {
+    const cmd = buildQuickInstallCommand('mysql', 'install-token');
+    expect(cmd).toContain('--force-new-agent-token');
+  });
+
   it.each<QuickInstallTech>(['mysql', 'postgresql', 'mongodb', 'valkey'])(
     'includes the selected tech in the --tech flag (%s)',
     (tech) => {
