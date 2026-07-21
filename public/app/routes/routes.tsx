@@ -651,13 +651,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/pmm-ui/*',
-      // eslint-disable-next-line react/display-name
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
-      ),
-    },
-    {
       path: '/settings/*',
       // eslint-disable-next-line react/display-name
       component: SafeDynamicImport(
