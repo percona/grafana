@@ -13,9 +13,9 @@ ARG JS_SRC=js-builder
 
 # Dependabot cannot update dependencies listed in ARGs
 # By using FROM instructions we can delegate dependency updates to dependabot
-FROM alpine:3.23.3 AS alpine-base
+FROM alpine:3.24.1 AS alpine-base
 FROM ubuntu:24.04 AS ubuntu-base
-FROM golang:1.25.9-alpine AS go-builder-base
+FROM golang:1.26.4-alpine AS go-builder-base
 FROM --platform=${JS_PLATFORM} node:24-alpine AS js-builder-base
 # Javascript build stage
 FROM --platform=${JS_PLATFORM} ${JS_IMAGE} AS js-builder
@@ -192,9 +192,6 @@ COPY --from=go-src /tmp/grafana/bin/grafana* /tmp/grafana/bin/*/grafana* ./bin/
 COPY --from=js-src /tmp/grafana/public ./public
 COPY --from=js-src /tmp/grafana/LICENSE ./
 COPY --from=go-src /tmp/grafana/data/plugins-bundled ./data/plugins-bundled
-
-RUN grafana server -v | sed -e 's/Version //' > /.grafana-version
-RUN chmod 644 /.grafana-version
 
 RUN grafana server -v | sed -e 's/Version //' > /.grafana-version
 RUN chmod 644 /.grafana-version

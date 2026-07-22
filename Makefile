@@ -8,7 +8,7 @@ WIRE_TAGS = "oss"
 include .citools/Variables.mk
 
 GO = go
-GO_VERSION = 1.25.9
+GO_VERSION = 1.26.4
 GO_HOST_OS := $(shell $(GO) env GOHOSTOS)
 GO_HOST_ARCH := $(shell $(GO) env GOHOSTARCH)
 GO_LINT_FILES ?= $(shell ./scripts/go-workspace/golangci-lint-includes.sh)
@@ -112,6 +112,7 @@ swagger-oss-gen: ## Generate API Swagger specification
 	-x "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options" \
 	-x "github.com/prometheus/alertmanager" \
 	-x "github.com/docker/docker" \
+	-x "github.com/moby/moby" \
 	-i pkg/api/swagger_tags.json \
 	--exclude-tag=alpha \
 	--exclude-tag=enterprise
@@ -131,6 +132,7 @@ swagger-enterprise-gen: ## Generate API Swagger specification
 	-x "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options" \
 	-x "github.com/prometheus/alertmanager" \
 	-x "github.com/docker/docker" \
+	-x "github.com/moby/moby" \
 	-i pkg/api/swagger_tags.json \
 	-t enterprise \
 	--exclude-tag=alpha \
@@ -315,8 +317,18 @@ gen-themes:
 pkg/services/preference/themes_generated.go:
 	$(MAKE) gen-themes
 
+.PHONY: generate-enterprise-imports
+ifeq ("$(wildcard $(ENTERPRISE_EXT_FILE))","") ## if enterprise is not enabled
+generate-enterprise-imports:
+	@echo "skipping generating enterprise imports file"
+else
+generate-enterprise-imports: ## Generate Enterprise imports file
+	@echo "re-generating enterprise imports file"
+	$(GO) run ./scripts/ci/generate-enterprise-imports/main.go
+endif
+
 .PHONY: update-workspace
-update-workspace: gen-go
+update-workspace: gen-go generate-enterprise-imports
 	@echo "updating workspace"
 	bash scripts/go-workspace/update-workspace.sh
 
@@ -449,6 +461,18 @@ $(DOCKER_UBUNTU_FILE): $(TARGZ_FILE)
 	--tag $(DOCKER_TAG) \
 	--output type=docker,dest=$@ \
 	.
+
+MSI_FILE := dist/$(TARGZ_PACKAGE_NAME)_$(BUILD_VERSION)_$(BUILD_NUMBER)_$(OS)_$(ARCH_LABEL).msi
+
+.PHONY: build-msi
+build-msi: $(MSI_FILE) ## Build a Windows MSI installer from a tar.gz (requires Docker + Wine)
+
+$(MSI_FILE): $(TARGZ_FILE)
+	TARGZ_PACKAGE_NAME="$(TARGZ_PACKAGE_NAME)" \
+	BUILD_VERSION="$(BUILD_VERSION)" \
+	BUILD_NUMBER="$(BUILD_NUMBER)" \
+	ENTERPRISE="$(if $(filter grafana-enterprise,$(TARGZ_PACKAGE_NAME)),true,false)" \
+	bash scripts/build-msi.sh
 
 .PHONY: run
 run: ## Build and run backend, and watch for changes. See .air.toml for configuration.

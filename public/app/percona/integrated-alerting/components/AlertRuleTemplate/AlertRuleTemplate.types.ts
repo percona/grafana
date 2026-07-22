@@ -79,6 +79,17 @@ export interface TemplateAnnotation {
   summary?: string;
 }
 
+export interface TemplateQuery {
+  ref_id: string;
+  expr: string;
+}
+
+export interface TemplateExpression {
+  ref_id: string;
+  type: string;
+  expression: string;
+}
+
 export interface TemplateAPI {
   summary: string;
   name: string;
@@ -90,6 +101,9 @@ export interface TemplateAPI {
   annotations?: TemplateAnnotation;
   severity: keyof typeof Severity;
   for: string;
+  queries: TemplateQuery[];
+  expressions: TemplateExpression[];
+  condition: string;
 }
 
 export interface Template extends Omit<TemplateAPI, 'params'> {
