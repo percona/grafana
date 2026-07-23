@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Row } from 'react-table';
 
 import { Table } from './Table';
