@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { useNavigate } from 'react-router-dom-v5-compat';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, Dropdown, Icon, Link, Menu, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -39,12 +38,9 @@ import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
-import { createNodeInstallToken } from '../installToken';
 
-import { QUICK_INSTALL_OPTIONS } from './Nodes.constants';
 import { InventoryNode } from './Nodes.types';
 import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
-import { buildQuickInstallCommand, QuickInstallTech } from './NodesInstallCommand.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -62,11 +58,9 @@ export const NodesTab = () => {
   const navModel = usePerconaNavModel('inventory-nodes');
   const [triggerTimeout, , stopTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
-  const [installTokenLoading, setInstallTokenLoading] = useState(false);
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { nodes: highAvailabilityNodes, isEnabled: isHighAvailabilityEnabled } = useSelector(getHighAvailability);
-  const navigate = useNavigate();
 
   const mappedNodes = useMemo(
     () =>
@@ -357,132 +351,76 @@ export const NodesTab = () => {
     setSelectedRows(rows);
   }, []);
 
-  const copyQuickInstallWithToken = useCallback(async (tech: QuickInstallTech) => {
-    setInstallTokenLoading(true);
-    try {
-      const res = await createNodeInstallToken(tech);
-      const cmd = buildQuickInstallCommand(tech, res.token);
-      try {
-        await navigator.clipboard.writeText(cmd);
-        appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.addNodeCommandCopied]);
-      } catch (clipErr) {
-        logger.error(clipErr);
-        appEvents.emit(AppEvents.alertError, [Messages.nodes.addNodeCommandCopyFailed]);
-      }
-    } catch (e) {
-      logger.error(e);
-      appEvents.emit(AppEvents.alertError, [Messages.nodes.addNodeTokenFailed]);
-    } finally {
-      setInstallTokenLoading(false);
-    }
-  }, []);
-
   return (
     <TabbedPage navModel={navModel} isLoading={isLoading}>
       <TabbedPageContents>
         <FeatureLoader>
-          <Stack direction="column">
-            <Stack direction="row" justifyContent="flex-end" alignItems="center">
-              <Button
-                size="md"
-                disabled={selected.length === 0}
-                onClick={() => {
-                  setModalVisible(!modalVisible);
-                }}
-                icon="trash-alt"
-                variant="destructive"
-              >
-                {Messages.delete}
-              </Button>
-              <Dropdown
-                overlay={
-                  <Menu>
-                    {QUICK_INSTALL_OPTIONS.map(({ tech, label, icon }) => (
-                      <Menu.Item
-                        key={tech}
-                        label={label}
-                        icon={icon}
-                        disabled={installTokenLoading}
-                        onClick={() => {
-                          copyQuickInstallWithToken(tech);
-                        }}
-                      />
-                    ))}
-                    <Menu.Divider />
-                    <Menu.Item
-                      key="more-options"
-                      onClick={() => navigate('/pmm-ui/install-client')}
-                      label={Messages.nodes.addNodeMoreOptions}
-                    />
-                  </Menu>
-                }
-                placement="bottom-start"
-              >
-                <Button
-                  data-testid="add-node-button"
-                  variant="primary"
-                  size="md"
-                  icon="angle-down"
-                  disabled={installTokenLoading}
-                >
-                  {Messages.nodes.addNodeButton}
-                </Button>
-              </Dropdown>
-            </Stack>
-            <Modal
-              ariaLabel={Messages.confirmAction}
-              title={
-                <div className="modal-header-title">
-                  <span className="p-l-1">{Messages.confirmAction}</span>
-                </div>
-              }
-              isOpen={modalVisible}
-              onDismiss={() => setModalVisible(false)}
+          <div className={styles.actionPanel}>
+            <Button
+              size="md"
+              disabled={selected.length === 0}
+              onClick={() => {
+                setModalVisible(!modalVisible);
+              }}
+              icon="trash-alt"
+              variant="destructive"
             >
-              <Form
-                onSubmit={proceed}
-                render={({ handleSubmit }) => (
-                  <form onSubmit={handleSubmit}>
-                    <>
-                      <h4 className={styles.confirmationText}>{deletionMsg}</h4>
-                      <FormElement
-                        dataTestId="form-field-force"
-                        label={Messages.forceMode}
-                        element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
-                      />
-                      <Stack direction="row" justifyContent="space-between">
-                        <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                          {Messages.cancel}
-                        </Button>
-                        <Button type="submit" size="md" variant="destructive">
-                          {Messages.proceed}
-                        </Button>
-                      </Stack>
-                    </>
-                  </form>
-                )}
-              />
-            </Modal>
-            <Table
-              columns={columns}
-              data={mappedNodes}
-              totalItems={mappedNodes.length}
-              rowSelection={(row) => !row.original.isPmmServerNode}
-              autoResetSelectedRows={false}
-              autoResetExpanded={false}
-              autoResetPage={false}
-              onRowSelection={handleSelectionChange}
-              showPagination
-              pageSize={25}
-              allRowsSelectionMode="page"
-              emptyMessage={Messages.nodes.emptyTable}
-              pendingRequest={isLoading}
-              overlayClassName={styles.overlay}
-              renderExpandedRow={renderSelectedSubRow}
-              getRowId={useCallback((row: FlattenNode) => row.nodeId, [])}
-              showFilter
+              {Messages.delete}
+            </Button>
+          </div>
+          <Modal
+            ariaLabel={Messages.confirmAction}
+            title={
+              <div className="modal-header-title">
+                <span className="p-l-1">{Messages.confirmAction}</span>
+              </div>
+            }
+            isOpen={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+          >
+            <Form
+              onSubmit={proceed}
+              render={({ handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                  <>
+                    <h4 className={styles.confirmationText}>{deletionMsg}</h4>
+                    <FormElement
+                      dataTestId="form-field-force"
+                      label={Messages.forceMode}
+                      element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
+                    />
+                    <Stack direction="row" justifyContent="space-between">
+                      <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                        {Messages.cancel}
+                      </Button>
+                      <Button type="submit" size="md" variant="destructive">
+                        {Messages.proceed}
+                      </Button>
+                    </Stack>
+                  </>
+                </form>
+              )}
             />
-          </Stack>
+          </Modal>
+          <Table
+            columns={columns}
+            data={mappedNodes}
+            totalItems={mappedNodes.length}
+            rowSelection={(row) => !row.original.isPmmServerNode}
+            autoResetSelectedRows={false}
+            autoResetExpanded={false}
+            autoResetPage={false}
+            onRowSelection={handleSelectionChange}
+            showPagination
+            pageSize={25}
+            allRowsSelectionMode="page"
+            emptyMessage={Messages.nodes.emptyTable}
+            pendingRequest={isLoading}
+            overlayClassName={styles.overlay}
+            renderExpandedRow={renderSelectedSubRow}
+            getRowId={useCallback((row: FlattenNode) => row.nodeId, [])}
+            showFilter
+          />
         </FeatureLoader>
       </TabbedPageContents>
     </TabbedPage>
