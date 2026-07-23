@@ -45,7 +45,7 @@ export const BaseCheckbox: FC<BaseCheckboxProps> = ({
           data-testid={`${name}-checkbox-input`}
           className={styles.input}
         />
-        <span className={styles.checkmark} />
+        <span className={cx(styles.checkmark, props.disabled && styles.checkmarkDisabled)} />
         <LabelCore
           name={name}
           label={label}

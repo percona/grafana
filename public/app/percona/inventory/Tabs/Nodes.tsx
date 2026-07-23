@@ -71,20 +71,23 @@ export const NodesTab = () => {
   );
 
   const getActions = useCallback(
-    (row: Row<Node>): Action[] => [
-      {
-        content: (
-          <Stack direction="row">
-            <Icon name="trash-alt" />
-            <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
-          </Stack>
-        ),
-        action: () => {
-          setActionItem(row.original);
-          setModalVisible(true);
-        },
-      },
-    ],
+    (row: Row<Node>): Action[] =>
+      row.original.isPmmServerNode
+        ? []
+        : [
+            {
+              content: (
+                <Stack direction="row">
+                  <Icon name="trash-alt" />
+                  <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
+                </Stack>
+              ),
+              action: () => {
+                setActionItem(row.original);
+                setModalVisible(true);
+              },
+            },
+          ],
     [styles.actionItemTxtSpan]
   );
 
@@ -403,7 +406,7 @@ export const NodesTab = () => {
             columns={columns}
             data={mappedNodes}
             totalItems={mappedNodes.length}
-            rowSelection
+            rowSelection={(row) => !row.original.isPmmServerNode}
             autoResetSelectedRows={false}
             autoResetExpanded={false}
             autoResetPage={false}
