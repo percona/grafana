@@ -17,10 +17,7 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
   `,
   actionPanel: css`
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: ${spacing(1)};
+    justify-content: flex-end;
     margin-bottom: 5px;
   `,
   confirmationText: css`

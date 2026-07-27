@@ -222,7 +222,13 @@ export const TemplateForm: FC = () => {
       <TemplateFiltersField />
 
       {currentTemplate && (
-        <AdvancedRuleSection expression={currentTemplate.expr} summary={currentTemplate.annotations?.summary} />
+        <AdvancedRuleSection
+          expression={currentTemplate.expr}
+          summary={currentTemplate.annotations?.summary}
+          queries={currentTemplate.queries}
+          expressions={currentTemplate.expressions}
+          condition={currentTemplate.condition}
+        />
       )}
     </>
   );

@@ -51,6 +51,7 @@ export const Messages = {
       upload: 'Upload',
       fields: {
         alertRuleTemplate: 'Alert rule template',
+        alertRuleTemplateDocumentation: 'documentation',
       },
     },
     table: {

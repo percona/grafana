@@ -526,10 +526,7 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/alerting/alerts',
       component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "IntegratedAlertingAlerts" */ 'app/percona/integrated-alerting/components/Alerts/Alerts'
-          )
+        () => import(/* webpackChunkName: "AlertsRedirectPage" */ 'app/percona/redirect/RedirectPage')
       ),
     },
     {
@@ -651,13 +648,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       // eslint-disable-next-line react/display-name
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AllChecksPage" */ 'app/percona/check/components/AllChecksTab/AllChecksTab')
-      ),
-    },
-    {
-      path: '/pmm-ui/*',
-      // eslint-disable-next-line react/display-name
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
       ),
     },
     {
