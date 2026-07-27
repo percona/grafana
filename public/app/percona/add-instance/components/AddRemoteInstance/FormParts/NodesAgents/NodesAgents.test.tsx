@@ -7,6 +7,7 @@ import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import {
   nodesMockMultipleAgentsNoPMMServer,
   nodesMock,
+  nodesMockHA,
   nodesMockOneAgentNoPMMServer,
 } from 'app/percona/inventory/__mocks__/Inventory.service';
 import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes';
@@ -53,6 +54,29 @@ describe('Nodes Agents:: ', () => {
     await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
 
     await waitFor(() => expect(screen.getByTestId('node')).toHaveTextContent(nodesMock[0].node_id));
+  });
+
+  it('should not offer nodes internal to the PMM deployment', async () => {
+    jest.spyOn(InventoryService, 'getNodes').mockReturnValue(Promise.resolve({ nodes: nodesMockHA }));
+
+    setup();
+
+    await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
+
+    selectEvent.openMenu(screen.getByLabelText('Nodes'));
+
+    expect(screen.queryByText('pmm-pmm-ha-pg-db-instance1-qjjl-0')).not.toBeInTheDocument();
+    expect(screen.getByText('pmm-ha-0')).toBeInTheDocument();
+  });
+
+  it('should prefer a node other than a PMM Server one in an HA deployment', async () => {
+    jest.spyOn(InventoryService, 'getNodes').mockReturnValue(Promise.resolve({ nodes: nodesMockHA }));
+
+    setup();
+
+    await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
+
+    await waitFor(() => expect(screen.getByTestId('node')).toHaveTextContent('external-client-id'));
   });
 
   it('should not pick any agent when the selected node is not pmm-server', async () => {

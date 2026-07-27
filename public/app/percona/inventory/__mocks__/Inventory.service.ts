@@ -72,6 +72,45 @@ export const nodesMock = [
   },
 ];
 
+const haNodeMock = (nodeId: string, nodeName: string, isPMMServerNode: boolean, isInternalNode = false) => ({
+  node_id: nodeId,
+  node_type: 'generic',
+  node_name: nodeName,
+  is_pmm_server_node: isPMMServerNode,
+  is_pmm_internal_node: isInternalNode,
+  machine_id: '',
+  distro: '',
+  node_model: '',
+  container_id: '',
+  container_name: '',
+  address: '10.1.2.3',
+  region: '',
+  az: '',
+  custom_labels: {},
+  created_at: '2026-07-27T08:05:31.079300Z',
+  updated_at: '2026-07-27T08:05:31.079300Z',
+  status: ServiceStatus.UP,
+  agents: [
+    {
+      agent_id: `${nodeId}-pmm-agent`,
+      agent_type: AgentType.pmmAgent,
+      status: ServiceAgentStatus.RUNNING,
+      is_connected: true,
+    },
+  ],
+  services: [],
+});
+
+// Mimics a PMM HA deployment: three PMM Server Nodes, an external PMM Client and the Nodes of
+// PMM's own PostgreSQL cluster, which PMM Server reports as internal.
+export const nodesMockHA = [
+  haNodeMock('pmm-ha-0-id', 'pmm-ha-0', true),
+  haNodeMock('pmm-ha-1-id', 'pmm-ha-1', true),
+  haNodeMock('pmm-ha-2-id', 'pmm-ha-2', true),
+  haNodeMock('external-client-id', 'external-client', false),
+  haNodeMock('pg-db-instance1-id', 'pmm-pmm-ha-pg-db-instance1-qjjl-0', false, true),
+];
+
 export const nodesMockMultipleAgentsNoPMMServer = [
   {
     node_id: '324234234',
