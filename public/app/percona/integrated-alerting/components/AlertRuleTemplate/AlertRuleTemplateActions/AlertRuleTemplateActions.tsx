@@ -1,7 +1,7 @@
 import { cx } from '@emotion/css';
 import { FC, useState, useMemo } from 'react';
 
-import { IconButton, LinkButton, Tooltip, useStyles2 } from '@grafana/ui';
+import { Button, IconButton, LinkButton, Tooltip, useStyles2 } from '@grafana/ui';
 
 import { SourceDescription } from '../AlertRuleTemplate.types';
 import { DeleteRuleTemplateModal } from '../DeleteRuleTemplateModal/DeleteRuleTemplateModal';
@@ -9,6 +9,7 @@ import { EditAlertRuleTemplateModal } from '../EditAlertRuleTemplateModal/EditAl
 
 import { getStyles } from './AlertRuleTemplateActions.styles';
 import { AlertRuleTemplateActionsProps } from './AlertRuleTemplateActions.types';
+import ViewAlertRuleTemplateModal from '../ViewAlertRuleTemplateModal/ViewAlertRuleTemplateModal';
 
 const nonActionableSources = [SourceDescription.BUILT_IN, SourceDescription.USER_FILE];
 
@@ -16,11 +17,20 @@ export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ te
   const styles = useStyles2(getStyles);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
   const { source, yaml, name, summary } = template;
   const isActionDisabled = useMemo(() => nonActionableSources.includes(source), [source]);
 
   return (
     <div className={styles.actionsWrapper}>
+      <ViewAlertRuleTemplateModal
+        visible={viewModalVisible}
+        template={template}
+        onClose={() => setViewModalVisible(false)}
+      />
+      <Button icon="eye" fill="text" onClick={() => setViewModalVisible(true)}>
+        View
+      </Button>
       <Tooltip placement="top" content="Create alert rule from this template">
         <LinkButton
           icon="plus"
