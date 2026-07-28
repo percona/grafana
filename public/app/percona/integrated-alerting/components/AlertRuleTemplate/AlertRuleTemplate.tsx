@@ -5,7 +5,7 @@ import { Column } from 'react-table';
 
 import { OrgRole } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { Button, useStyles2 } from '@grafana/ui';
+import { Badge, Button, Stack, useStyles2 } from '@grafana/ui';
 import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 import { Page } from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
@@ -74,6 +74,12 @@ export const AlertRuleTemplate: FC = () => {
       {
         Header: nameColumn,
         accessor: 'summary',
+        Cell: ({ value, row }) => (
+          <Stack>
+            <span>{value}</span>
+            {row.original.yaml.includes('overridable: true') && <Badge color="blue" text="Dynamic" />}
+          </Stack>
+        ),
       },
       {
         Header: sourceColumn,
