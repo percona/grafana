@@ -17,6 +17,11 @@ export const getStyles = ({ breakpoints, spacing }: GrafanaTheme) => {
     `,
     fieldsWrapper: css`
       display: flex;
+      flex-direction: column;
+      width: 100%;
+    `,
+    credentialsRow: css`
+      display: flex;
       width: 100%;
       div {
         width: 100%;
@@ -33,6 +38,9 @@ export const getStyles = ({ breakpoints, spacing }: GrafanaTheme) => {
     `,
     credentialsField: css`
       width: 48%;
+    `,
+    roleArnField: css`
+      width: 100%;
     `,
     credentialsSubmit: css`
       margin-left: ${spacing.md};

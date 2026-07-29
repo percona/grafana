@@ -65,6 +65,7 @@ const getRDSCredentials = (credentials: any, instanceType: InstanceAvailableType
       region: credentials.region,
       aws_access_key: credentials.aws_access_key,
       aws_secret_key: credentials.aws_secret_key,
+      aws_role_arn: credentials.aws_role_arn,
       instance_id: credentials.instance_id,
       az: credentials.az,
     },

@@ -40,6 +40,7 @@ describe('Get instance data:: ', () => {
       region: 'us-west1',
       aws_access_key: 'aws-secret-key-example',
       aws_secret_key: 'aws-secret-key-example',
+      aws_role_arn: 'arn:aws:iam::123456789012:role/PmmRdsReadOnlyRole',
       az: 'test az',
     };
     const testInstance = {
@@ -54,6 +55,7 @@ describe('Get instance data:: ', () => {
         region: 'us-west1',
         aws_access_key: 'aws-secret-key-example',
         aws_secret_key: 'aws-secret-key-example',
+        aws_role_arn: 'arn:aws:iam::123456789012:role/PmmRdsReadOnlyRole',
         az: 'test az',
       },
     };

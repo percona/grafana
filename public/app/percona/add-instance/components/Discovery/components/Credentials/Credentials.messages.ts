@@ -11,6 +11,12 @@ export const Messages = {
         name: 'aws_secret_key',
         label: 'Amazon RDS secret key',
       },
+      awsRoleArn: {
+        placeholder: 'arn:aws:iam::123456789012:role/PmmRdsReadOnlyRole',
+        name: 'aws_role_arn',
+        label: 'AWS IAM role ARN',
+        tooltipText: 'Optional. PMM Server assumes this role before discovering RDS instances.',
+      },
     },
     submitButton: 'Discover',
     toMenuButton: 'Return to menu',
