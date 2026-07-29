@@ -76,13 +76,17 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     if (nodesOptions.length === 0) {
       loadData();
     } else if (!selectedNode) {
-      // preselect pmm-server node
-      const pmmServerNode =
-        nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID) ||
+      // A deployment with more than one PMM Server node runs in HA mode, where the PMM Server
+      // pods are meant to stay free of monitoring workloads. Prefer any other node there,
+      // otherwise preselect the pmm-server node as usual.
+      const isHighlyAvailable = nodesOptions.filter((node) => node.isPMMServerNode).length > 1;
+      const preselectedNode =
+        (isHighlyAvailable ? nodesOptions.find((node) => !node.isPMMServerNode) : undefined) ??
+        nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID) ??
         nodesOptions.find((node) => node.isPMMServerNode);
 
-      if (pmmServerNode) {
-        setNodeAndAgent(pmmServerNode);
+      if (preselectedNode) {
+        setNodeAndAgent(preselectedNode);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
