@@ -22,7 +22,8 @@ const paginationStyles = {
  * @param frames DataFrames to paginate
  * @param perPage number of series per page
  * @returns the current frames rendered, the pagination element to render, the height of the pagination element,
- *    and a paginationRev which GraphNG uses to trigger re-renders.
+ *    and a paginationRev which GraphNG uses to trigger re-renders. The pagination element renders nothing while
+ *    every series fits on a single page, so setting perPage costs no vertical space until it is needed.
  */
 export function usePagination(frames?: DataFrame[], perPage?: number) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,6 +62,7 @@ export function usePagination(frames?: DataFrame[], perPage?: number) {
         className={paginationStyles.paginationElement}
         currentPage={currentPageCapped}
         numberOfPages={numberOfPages}
+        hideWhenSinglePage
         showSmallVersion={showSmallVersion}
         onNavigate={setCurrentPage}
       />
