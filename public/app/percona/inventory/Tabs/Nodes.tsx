@@ -72,34 +72,41 @@ export const NodesTab = () => {
   );
 
   const getActions = useCallback(
-    (row: Row<Node>): Action[] => [
-      {
-        content: (
-          <Stack direction="row">
-            <span className={styles.actionItemTxtSpan}>{Messages.overrideThresholds}</span>
-          </Stack>
-        ),
-        action: () => {
-          const event = new OpenAlertThresholdsModalEvent({
-            nodeId: row.original.nodeId,
-            nodeName: row.original.nodeName,
-          });
-          appEvents.publish(event);
+    (row: Row<Node>): Action[] => {
+      const actions = [
+        {
+          content: (
+            <Stack direction="row">
+              <span className={styles.actionItemTxtSpan}>{Messages.overrideThresholds}</span>
+            </Stack>
+          ),
+          action: () => {
+            const event = new OpenAlertThresholdsModalEvent({
+              nodeId: row.original.nodeId,
+              nodeName: row.original.nodeName,
+            });
+            appEvents.publish(event);
+          },
         },
-      },
-      {
-        content: (
-          <Stack direction="row">
-            <Icon name="trash-alt" />
-            <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
-          </Stack>
-        ),
-        action: () => {
-          setActionItem(row.original);
-          setModalVisible(true);
-        },
-      },
-    ],
+      ];
+
+      if (!row.original.isPmmServerNode) {
+        actions.push({
+          content: (
+            <Stack direction="row">
+              <Icon name="trash-alt" />
+              <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
+            </Stack>
+          ),
+          action: () => {
+            setActionItem(row.original);
+            setModalVisible(true);
+          },
+        });
+      }
+
+      return actions;
+    },
     [styles.actionItemTxtSpan]
   );
 
@@ -418,7 +425,7 @@ export const NodesTab = () => {
             columns={columns}
             data={mappedNodes}
             totalItems={mappedNodes.length}
-            rowSelection
+            rowSelection={(row) => !row.original.isPmmServerNode}
             autoResetSelectedRows={false}
             autoResetExpanded={false}
             autoResetPage={false}
