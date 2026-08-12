@@ -43,6 +43,7 @@ describe('StateTimelinePanel hooks', () => {
       expect(result.current.paginatedFrames?.length).toBe(2);
     });
 
+    // @PERCONA
     describe('single page', () => {
       const buildFrame = (numberOfSeries: number) =>
         createDataFrame({
