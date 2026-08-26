@@ -11,7 +11,11 @@ export const LoginFooter: FC = React.memo(() => {
   return (
     <footer className={styles.footer}>
       <div className="text-center">
-        <div>Percona Monitoring and Management proudly powered by open source projects</div>
+        <div>
+          <a href="https://per.co.na/pmm_footer" target="_blank" rel="noopener noreferrer">
+            Percona Monitoring and Management proudly powered by open source projects
+          </a>
+        </div>
         <ul>
           {FOOTER_LINKS.map((link) => (
             <li key={link.text}>
