@@ -3,4 +3,5 @@ export const Messages = {
   testResuts: 'Test results',
   dataModel: 'Data model',
   folder: 'Folder',
+  compression: 'Compression',
 };
