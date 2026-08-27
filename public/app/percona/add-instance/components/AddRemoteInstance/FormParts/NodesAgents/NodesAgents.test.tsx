@@ -65,18 +65,20 @@ describe('Nodes Agents:: ', () => {
 
     selectEvent.openMenu(screen.getByLabelText('Nodes'));
 
+    // the PostgreSQL cluster backing PMM and the PMM Server nodes themselves
     expect(screen.queryByText('pmm-pmm-ha-pg-db-instance1-qjjl-0')).not.toBeInTheDocument();
-    expect(screen.getByText('pmm-ha-0')).toBeInTheDocument();
+    expect(screen.queryByText('pmm-ha-0')).not.toBeInTheDocument();
+    expect(screen.getByText('pmm-pmm-ha-client-0')).toBeInTheDocument();
   });
 
-  it('should prefer a node other than a PMM Server one in an HA deployment', async () => {
+  it('should preselect the pre-provisioned client in an HA deployment', async () => {
     jest.spyOn(InventoryService, 'getNodes').mockReturnValue(Promise.resolve({ nodes: nodesMockHA }));
 
     setup();
 
     await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
 
-    await waitFor(() => expect(screen.getByTestId('node')).toHaveTextContent('external-client-id'));
+    await waitFor(() => expect(screen.getByTestId('node')).toHaveTextContent('pmm-ha-client-0-id'));
   });
 
   it('should not pick any agent when the selected node is not pmm-server', async () => {

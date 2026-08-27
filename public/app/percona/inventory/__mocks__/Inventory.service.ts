@@ -101,13 +101,13 @@ const haNodeMock = (nodeId: string, nodeName: string, isPMMServerNode: boolean, 
   services: [],
 });
 
-// Mimics a PMM HA deployment: three PMM Server Nodes, an external PMM Client and the Nodes of
-// PMM's own PostgreSQL cluster, which PMM Server reports as internal.
+// Mimics a PMM HA deployment as PMM Server reports it: the PMM Server Nodes and the Nodes of PMM's
+// own PostgreSQL cluster are internal, leaving the pre-provisioned PMM Client to be monitored with.
 export const nodesMockHA = [
-  haNodeMock('pmm-ha-0-id', 'pmm-ha-0', true),
-  haNodeMock('pmm-ha-1-id', 'pmm-ha-1', true),
-  haNodeMock('pmm-ha-2-id', 'pmm-ha-2', true),
-  haNodeMock('external-client-id', 'external-client', false),
+  haNodeMock('pmm-ha-0-id', 'pmm-ha-0', true, true),
+  haNodeMock('pmm-ha-1-id', 'pmm-ha-1', true, true),
+  haNodeMock('pmm-ha-2-id', 'pmm-ha-2', true, true),
+  haNodeMock('pmm-ha-client-0-id', 'pmm-pmm-ha-client-0', false),
   haNodeMock('pg-db-instance1-id', 'pmm-pmm-ha-pg-db-instance1-qjjl-0', false, true),
 ];
 
