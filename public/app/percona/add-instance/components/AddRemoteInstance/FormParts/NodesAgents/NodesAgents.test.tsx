@@ -68,7 +68,9 @@ describe('Nodes Agents:: ', () => {
     // the PostgreSQL cluster backing PMM and the PMM Server nodes themselves
     expect(screen.queryByText('pmm-pmm-ha-pg-db-instance1-qjjl-0')).not.toBeInTheDocument();
     expect(screen.queryByText('pmm-ha-0')).not.toBeInTheDocument();
-    expect(screen.getByText('pmm-pmm-ha-client-0')).toBeInTheDocument();
+    // the client is both the selected value and an option, which also proves the menu is open and
+    // the assertions above are not passing vacuously
+    expect(screen.getAllByText('pmm-pmm-ha-client-0').length).toBeGreaterThan(1);
   });
 
   it('should preselect the pre-provisioned client in an HA deployment', async () => {
