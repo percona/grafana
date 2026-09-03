@@ -160,6 +160,7 @@ export interface NodeDB {
   status: ServiceStatus;
   services?: ServiceNodeListDB[];
   is_pmm_server_node: boolean;
+  is_pmm_internal_node?: boolean;
 }
 
 export interface NodeListDBPayload {

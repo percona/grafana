@@ -70,9 +70,11 @@ describe('AddRemoteInstanceService:: ', () => {
       pmm_agent_id: {
         value: 'pmm-server',
       },
+      // the exporter runs on the PMM Server node, which is what makes the metrics mode PULL
       node: {
         value: 'node1',
         label: 'node1',
+        isPMMServerNode: true,
       },
     };
 
