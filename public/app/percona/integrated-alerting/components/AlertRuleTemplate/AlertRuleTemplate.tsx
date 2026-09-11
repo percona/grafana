@@ -25,7 +25,7 @@ import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_TEMPLATES_CANCEL_TOKEN } from './Ale
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
 import { getStyles } from './AlertRuleTemplate.styles';
 import { FormattedTemplate } from './AlertRuleTemplate.types';
-import { formatSource, formatTemplates } from './AlertRuleTemplate.utils';
+import { formatSource, formatTemplates, isDynamicTemplate } from './AlertRuleTemplate.utils';
 import { AlertRuleTemplateActions } from './AlertRuleTemplateActions/AlertRuleTemplateActions';
 
 const { columns } = Messages.alertRuleTemplate.table;
@@ -77,7 +77,7 @@ export const AlertRuleTemplate: FC = () => {
         Cell: ({ value, row }) => (
           <Stack>
             <span>{value}</span>
-            {row.original.yaml.includes('overridable: true') && <Badge color="blue" text="Dynamic" />}
+            {isDynamicTemplate(row.original) && <Badge color="blue" text="Dynamic" />}
           </Stack>
         ),
       },
