@@ -13,6 +13,7 @@ export interface RemoteInstanceCredentials {
   region?: string;
   aws_access_key?: string;
   aws_secret_key?: string;
+  aws_role_arn?: string;
   azure_client_id?: string;
   azure_client_secret?: string;
   azure_tenant_id?: string;
