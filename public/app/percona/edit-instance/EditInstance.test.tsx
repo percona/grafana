@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes } from 'react-router-dom-v5-compat';
 
@@ -52,12 +52,17 @@ const renderWithDefaults = () =>
   );
 
 // The Save button lives in the app chrome, which is not rendered in isolation, so the form is
-// submitted directly - the same path the keyboard takes. Saving then goes through a confirmation
-// modal, so it takes a second click.
+// submitted directly - the same path the keyboard takes, through the same validation gate. Saving
+// then goes through a confirmation modal, so it takes a second click.
+const submitForm = () => fireEvent.submit(screen.getByTestId('edit-instance-form'));
+
 const save = async () => {
-  fireEvent.submit(screen.getByTestId('edit-instance-form'));
+  submitForm();
   await waitFor(() => expect(screen.getByText('Confirm and save changes')).toBeInTheDocument());
-  fireEvent.click(screen.getByText('Confirm and save changes'));
+  // Saving settles over several promise ticks, so let them flush inside act().
+  await act(async () => {
+    fireEvent.click(screen.getByText('Confirm and save changes'));
+  });
 };
 
 describe('EditInstance::', () => {
@@ -111,6 +116,23 @@ describe('EditInstance::', () => {
     );
   });
 
+  it('does not open the confirmation modal while the form is invalid', async () => {
+    mockAgents(rdsExporterAgent, mysqldExporterAgent);
+    renderWithDefaults();
+
+    await waitFor(() => expect(screen.getByTestId('rds-credentials')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('IAM role'));
+    fireEvent.change(screen.getByTestId('aws_role_arn-text-input'), {
+      target: { value: 'arn:aws:iam::123456789012:instance-profile/pmm-ec2-role' },
+    });
+    submitForm();
+
+    await waitFor(() => expect(screen.getByTestId('aws_role_arn-text-input').classList.contains('invalid')).toBe(true));
+    expect(screen.queryByText('Confirm and save changes')).not.toBeInTheDocument();
+    expect(InventoryService.updateAgent).not.toHaveBeenCalled();
+    expect(ServicesService.updateService).not.toHaveBeenCalled();
+  });
+
   it('does not touch the exporter when only labels change', async () => {
     mockAgents(rdsExporterAgent, mysqldExporterAgent);
     renderWithDefaults();
@@ -138,7 +160,10 @@ describe('EditInstance::', () => {
     fireEvent.change(screen.getByTestId('aws_role_arn-text-input'), { target: { value: ROLE_ARN } });
     await save();
 
-    await waitFor(() => expect(InventoryService.updateAgent).toHaveBeenCalled());
+    // The modal closes on rejection so the values can be corrected, which is also the last state
+    // update of the failed save - waiting on it keeps the assertions inside act().
+    await waitFor(() => expect(screen.queryByText('Confirm and save changes')).not.toBeInTheDocument());
+    expect(InventoryService.updateAgent).toHaveBeenCalled();
     expect(ServicesService.updateService).not.toHaveBeenCalled();
     loggerError.mockRestore();
   });

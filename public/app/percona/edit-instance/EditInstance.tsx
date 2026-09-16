@@ -1,4 +1,4 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useParams } from 'react-router-dom-v5-compat';
 
@@ -41,6 +41,7 @@ const EditInstancePage: FC = () => {
   const [rdsExporter, setRdsExporter] = useState<RdsExporter>();
   const [generateToken] = useCancelToken();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
@@ -86,11 +87,18 @@ const EditInstancePage: FC = () => {
     locationService.push('/inventory/services');
   };
 
-  const handleSubmit = async (values: EditInstanceFormValues) => {
+  // Runs as the form's onSubmit, so react-final-form has already validated and, on failure, marked
+  // every field touched to surface its error. Confirming in the modal is what actually saves.
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const saveChanges = async (values: EditInstanceFormValues) => {
     if (!service) {
       return;
     }
 
+    setIsSaving(true);
     const credentials = toRdsCredentialsPayload(values, rdsExporter);
 
     // Credentials go first: the server can reject them on their own merits, and doing them before
@@ -101,6 +109,9 @@ const EditInstancePage: FC = () => {
         await InventoryService.updateAgent(rdsExporter.agentId, { rds_exporter: credentials });
       } catch (error) {
         logger.error(error);
+        // Nothing was saved, so drop back to the form where the rejected values can be corrected.
+        setIsSaving(false);
+        setIsModalOpen(false);
         return;
       }
     }
@@ -129,24 +140,22 @@ const EditInstancePage: FC = () => {
       if (credentials) {
         appEvents.emit(AppEvents.alertWarning, [Messages.partial.title, Messages.partial.description]);
       }
+
+      setIsModalOpen(false);
     }
+
+    setIsSaving(false);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenModal = (e?: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
-    setIsModalOpen(true);
-    e?.preventDefault();
-    e?.stopPropagation();
-  };
-
   return (
     <Form
       initialValues={getInitialValues(service, rdsExporter)}
-      onSubmit={handleSubmit}
-      render={({ handleSubmit, submitting, values }) => (
+      onSubmit={handleOpenModal}
+      render={({ handleSubmit, values }) => (
         <>
           <AppChromeUpdate
             actions={
@@ -163,10 +172,10 @@ const EditInstancePage: FC = () => {
                 <Button
                   data-testid="edit-instance-submit"
                   size="sm"
-                  type="submit"
+                  type="button"
                   variant="primary"
-                  onClick={handleOpenModal}
-                  disabled={submitting}
+                  onClick={handleSubmit}
+                  disabled={isSaving}
                 >
                   {Messages.saveChanges}
                 </Button>
@@ -207,7 +216,9 @@ const EditInstancePage: FC = () => {
                 </Alert>
               )}
             <Modal.ButtonRow>
-              <Button onClick={handleSubmit}>{Messages.modal.confirm}</Button>
+              <Button onClick={() => saveChanges(values)} disabled={isSaving}>
+                {Messages.modal.confirm}
+              </Button>
               <Button variant="secondary" onClick={handleCloseModal}>
                 {Messages.modal.cancel}
               </Button>
@@ -219,7 +230,7 @@ const EditInstancePage: FC = () => {
             renderTitle={() => <h1>{Messages.formTitle(service?.service_name || '')}</h1>}
           >
             <Page.Contents isLoading={isLoading}>
-              <form onSubmit={handleOpenModal} data-testid="edit-instance-form">
+              <form onSubmit={handleSubmit} data-testid="edit-instance-form">
                 <Labels showNodeFields={false} />
                 {rdsExporter && <RdsCredentials exporter={rdsExporter} mode={values?.rds_auth_mode} />}
                 {/* enable submit by keyboard */}
