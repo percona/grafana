@@ -22,17 +22,23 @@ import { CustomLabelsUtils } from '../shared/helpers/customLabels';
 import { logger } from '../shared/helpers/logger';
 import { DbServicePayload } from '../shared/services/services/Services.types';
 
-import { EDIT_INSTANCE_DOCS_LINK, FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
+import {
+  EDIT_INSTANCE_DOCS_LINK,
+  FETCH_AGENTS_CANCEL_TOKEN,
+  FETCH_SERVICE_CANCEL_TOKEN,
+} from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
 import { getStyles } from './EditInstance.styles';
-import { EditInstanceFormValues } from './EditInstance.types';
-import { getInitialValues, getService } from './EditInstance.utils';
+import { EditInstanceFormValues, RdsAuthMode, RdsExporter } from './EditInstance.types';
+import { getInitialValues, getRdsExporter, getService, toRdsCredentialsPayload } from './EditInstance.utils';
+import { RdsCredentials } from './components/RdsCredentials/RdsCredentials';
 
 const EditInstancePage: FC = () => {
   const dispatch = useAppDispatch();
   const { serviceId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [service, setService] = useState<DbServicePayload>();
+  const [rdsExporter, setRdsExporter] = useState<RdsExporter>();
   const [generateToken] = useCancelToken();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const styles = useStyles2(getStyles);
@@ -50,7 +56,30 @@ const EditInstancePage: FC = () => {
     const service = getService(result);
 
     setService(service);
+    setRdsExporter(await fetchRdsExporter(service));
     setIsLoading(false);
+  };
+
+  // The rds_exporter belongs to the node, not to the service, so it takes a second lookup. Only
+  // remote RDS nodes have one; anything else leaves the credentials section out of the form.
+  const fetchRdsExporter = async (service?: DbServicePayload): Promise<RdsExporter | undefined> => {
+    if (!service?.node_id) {
+      return undefined;
+    }
+
+    try {
+      const agents = await InventoryService.getAgents(
+        undefined,
+        service.node_id,
+        generateToken(FETCH_AGENTS_CANCEL_TOKEN)
+      );
+
+      return getRdsExporter(agents);
+    } catch (error) {
+      // A service that cannot be checked for an exporter is still editable for its labels.
+      logger.error(error);
+      return undefined;
+    }
   };
 
   const handleCancel = () => {
@@ -60,6 +89,20 @@ const EditInstancePage: FC = () => {
   const handleSubmit = async (values: EditInstanceFormValues) => {
     if (!service) {
       return;
+    }
+
+    const credentials = toRdsCredentialsPayload(values, rdsExporter);
+
+    // Credentials go first: the server can reject them on their own merits, and doing them before
+    // the labels keeps a rejection from leaving half the form saved. api.put surfaces the server's
+    // message itself, so there is nothing to add here beyond stopping.
+    if (credentials && rdsExporter) {
+      try {
+        await InventoryService.updateAgent(rdsExporter.agentId, { rds_exporter: credentials });
+      } catch (error) {
+        logger.error(error);
+        return;
+      }
     }
 
     try {
@@ -82,6 +125,10 @@ const EditInstancePage: FC = () => {
       locationService.push('/inventory/services');
     } catch (error) {
       logger.error(error);
+
+      if (credentials) {
+        appEvents.emit(AppEvents.alertWarning, [Messages.partial.title, Messages.partial.description]);
+      }
     }
   };
 
@@ -97,7 +144,7 @@ const EditInstancePage: FC = () => {
 
   return (
     <Form
-      initialValues={getInitialValues(service)}
+      initialValues={getInitialValues(service, rdsExporter)}
       onSubmit={handleSubmit}
       render={({ handleSubmit, submitting, values }) => (
         <>
@@ -148,6 +195,17 @@ const EditInstancePage: FC = () => {
                 {Messages.modal.cluster.dot}
               </Alert>
             )}
+            {!!toRdsCredentialsPayload(values, rdsExporter) && (
+              <Alert title={Messages.modal.credentials.title} severity="info">
+                {Messages.modal.credentials.description}
+              </Alert>
+            )}
+            {values?.rds_auth_mode === RdsAuthMode.hostCredentials &&
+              !!toRdsCredentialsPayload(values, rdsExporter) && (
+                <Alert title={Messages.modal.hostCredentials.title} severity="warning">
+                  {Messages.modal.hostCredentials.description}
+                </Alert>
+              )}
             <Modal.ButtonRow>
               <Button onClick={handleSubmit}>{Messages.modal.confirm}</Button>
               <Button variant="secondary" onClick={handleCloseModal}>
@@ -161,8 +219,9 @@ const EditInstancePage: FC = () => {
             renderTitle={() => <h1>{Messages.formTitle(service?.service_name || '')}</h1>}
           >
             <Page.Contents isLoading={isLoading}>
-              <form onSubmit={handleOpenModal}>
+              <form onSubmit={handleOpenModal} data-testid="edit-instance-form">
                 <Labels showNodeFields={false} />
+                {rdsExporter && <RdsCredentials exporter={rdsExporter} mode={values?.rds_auth_mode} />}
                 {/* enable submit by keyboard */}
                 <input type="submit" className={styles.hidden} />
               </form>

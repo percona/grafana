@@ -197,6 +197,12 @@ export interface UpdateAgentItem {
   custom_labels?: Record<string, string>;
   enable_push_metrics?: boolean;
   metrics_resolutions?: MetricsResolutions;
+  // AWS credentials, currently only meaningful for rds_exporter. ChangeAgent applies only the
+  // fields that are sent, and a role ARN cannot coexist with an access key, so switching from one
+  // to the other means sending the abandoned fields as empty strings rather than omitting them.
+  aws_access_key?: string;
+  aws_secret_key?: string;
+  aws_role_arn?: string;
 }
 
 export interface UpdateAgentBody {
