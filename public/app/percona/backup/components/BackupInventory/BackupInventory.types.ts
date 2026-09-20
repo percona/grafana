@@ -1,6 +1,6 @@
 import { Databases } from 'app/percona/shared/core';
 
-import { DataModel, BackupStatus, BackupMode } from '../../Backup.types';
+import { DataModel, BackupStatus, BackupMode, Compression } from '../../Backup.types';
 import { StorageLocation } from '../StorageLocations/StorageLocations.types';
 
 export interface Backup {
@@ -17,6 +17,7 @@ export interface Backup {
   mode: BackupMode;
   folder: string;
   type?: Databases | 'external';
+  compression: Compression;
 }
 
 export interface BackupRow extends Backup {
@@ -36,6 +37,7 @@ export interface RawBackup {
   vendor: Databases;
   mode: BackupMode;
   folder: string;
+  compression: Compression;
 }
 
 export interface BackupResponse {
@@ -54,4 +56,8 @@ export interface Timeranges {
 
 export interface TimerangesResponse {
   timeranges: RawTimeranges[];
+}
+
+export interface CompressionResponse {
+  compression_methods: Compression[];
 }
