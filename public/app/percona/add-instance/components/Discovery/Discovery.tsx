@@ -18,7 +18,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ onSubmit, selectInstance }) 
   const styles = useStyles(getStyles);
 
   const [instances, setInstances] = useState<Instance[]>([]);
-  const [credentials, setCredentials] = useState(INITIAL_CREDENTIALS);
+  const [credentials, setCredentials] = useState<RDSCredentialsForm>(INITIAL_CREDENTIALS);
   const [loading, startLoading] = useState(false);
   const [generateToken] = useCancelToken();
 

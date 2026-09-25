@@ -22,5 +22,19 @@ export const Messages = {
       descriptionLink: 'Editing Labels',
       dot: '.',
     },
+    credentials: {
+      title: 'AWS credentials changed',
+      description:
+        'The RDS exporter restarts to pick up the new credentials, so expect a short gap in CloudWatch metrics for this service.',
+    },
+    hostCredentials: {
+      title: 'PMM will stop storing AWS credentials',
+      description:
+        'The exporter will fall back to whatever credentials the pmm-agent host provides. If that host has none, monitoring for this service stops.',
+    },
+  },
+  partial: {
+    title: 'AWS credentials were changed, labels were not',
+    description: 'Review the error above and save the label changes again.',
   },
 };
