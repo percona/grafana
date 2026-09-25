@@ -155,91 +155,94 @@ const EditInstancePage: FC = () => {
     <Form
       initialValues={getInitialValues(service, rdsExporter)}
       onSubmit={handleOpenModal}
-      render={({ handleSubmit, values }) => (
-        <>
-          <AppChromeUpdate
-            actions={
-              <Stack direction="row" height="auto" justifyContent="flex-end">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  data-testid="edit-instance-cancel"
-                  type="button"
-                  onClick={handleCancel}
-                >
-                  {Messages.cancel}
-                </Button>
-                <Button
-                  data-testid="edit-instance-submit"
-                  size="sm"
-                  type="button"
-                  variant="primary"
-                  onClick={handleSubmit}
-                  disabled={isSaving}
-                >
-                  {Messages.saveChanges}
-                </Button>
-              </Stack>
-            }
-          />
-          <Modal
-            isOpen={isModalOpen}
-            title={Messages.formTitle(service?.service_name || '')}
-            onDismiss={handleCloseModal}
-          >
-            <p>
-              {Messages.modal.description}
-              {Messages.modal.details}
-              <a target="_blank" rel="noopener noreferrer" className={styles.link} href={EDIT_INSTANCE_DOCS_LINK}>
-                {Messages.modal.detailsLink}
-              </a>
-              {Messages.modal.dot}
-            </p>
-            {service?.cluster !== values?.cluster && (
-              <Alert title={Messages.modal.cluster.title} severity="warning">
-                {Messages.modal.cluster.description}
-                <a target="_blank" rel="noopener noreferrer" href={EDIT_INSTANCE_DOCS_LINK} className={styles.link}>
-                  {Messages.modal.cluster.descriptionLink}
+      render={({ handleSubmit, values }) => {
+        const credentialsChanged = !!toRdsCredentialsPayload(values, rdsExporter);
+
+        return (
+          <>
+            <AppChromeUpdate
+              actions={
+                <Stack direction="row" height="auto" justifyContent="flex-end">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    data-testid="edit-instance-cancel"
+                    type="button"
+                    onClick={handleCancel}
+                  >
+                    {Messages.cancel}
+                  </Button>
+                  <Button
+                    data-testid="edit-instance-submit"
+                    size="sm"
+                    type="button"
+                    variant="primary"
+                    onClick={handleSubmit}
+                    disabled={isSaving}
+                  >
+                    {Messages.saveChanges}
+                  </Button>
+                </Stack>
+              }
+            />
+            <Modal
+              isOpen={isModalOpen}
+              title={Messages.formTitle(service?.service_name || '')}
+              onDismiss={handleCloseModal}
+            >
+              <p>
+                {Messages.modal.description}
+                {Messages.modal.details}
+                <a target="_blank" rel="noopener noreferrer" className={styles.link} href={EDIT_INSTANCE_DOCS_LINK}>
+                  {Messages.modal.detailsLink}
                 </a>
-                {Messages.modal.cluster.dot}
-              </Alert>
-            )}
-            {!!toRdsCredentialsPayload(values, rdsExporter) && (
-              <Alert title={Messages.modal.credentials.title} severity="info">
-                {Messages.modal.credentials.description}
-              </Alert>
-            )}
-            {values?.rds_auth_mode === RdsAuthMode.hostCredentials &&
-              !!toRdsCredentialsPayload(values, rdsExporter) && (
+                {Messages.modal.dot}
+              </p>
+              {service?.cluster !== values?.cluster && (
+                <Alert title={Messages.modal.cluster.title} severity="warning">
+                  {Messages.modal.cluster.description}
+                  <a target="_blank" rel="noopener noreferrer" href={EDIT_INSTANCE_DOCS_LINK} className={styles.link}>
+                    {Messages.modal.cluster.descriptionLink}
+                  </a>
+                  {Messages.modal.cluster.dot}
+                </Alert>
+              )}
+              {credentialsChanged && (
+                <Alert title={Messages.modal.credentials.title} severity="info">
+                  {Messages.modal.credentials.description}
+                </Alert>
+              )}
+              {values?.rds_auth_mode === RdsAuthMode.hostCredentials && credentialsChanged && (
                 <Alert title={Messages.modal.hostCredentials.title} severity="warning">
                   {Messages.modal.hostCredentials.description}
                 </Alert>
               )}
-            <Modal.ButtonRow>
-              <Button onClick={() => saveChanges(values)} disabled={isSaving}>
-                {Messages.modal.confirm}
-              </Button>
-              <Button variant="secondary" onClick={handleCloseModal}>
-                {Messages.modal.cancel}
-              </Button>
-            </Modal.ButtonRow>
-          </Modal>
-          <Page
-            navId={PMM_SERVICES_PAGE.id}
-            pageNav={PMM_EDIT_INSTANCE_PAGE}
-            renderTitle={() => <h1>{Messages.formTitle(service?.service_name || '')}</h1>}
-          >
-            <Page.Contents isLoading={isLoading}>
-              <form onSubmit={handleSubmit} data-testid="edit-instance-form">
-                <Labels showNodeFields={false} />
-                {rdsExporter && <RdsCredentials exporter={rdsExporter} mode={values?.rds_auth_mode} />}
-                {/* enable submit by keyboard */}
-                <input type="submit" className={styles.hidden} />
-              </form>
-            </Page.Contents>
-          </Page>
-        </>
-      )}
+              <Modal.ButtonRow>
+                <Button onClick={() => saveChanges(values)} disabled={isSaving}>
+                  {Messages.modal.confirm}
+                </Button>
+                <Button variant="secondary" onClick={handleCloseModal}>
+                  {Messages.modal.cancel}
+                </Button>
+              </Modal.ButtonRow>
+            </Modal>
+            <Page
+              navId={PMM_SERVICES_PAGE.id}
+              pageNav={PMM_EDIT_INSTANCE_PAGE}
+              renderTitle={() => <h1>{Messages.formTitle(service?.service_name || '')}</h1>}
+            >
+              <Page.Contents isLoading={isLoading}>
+                <form onSubmit={handleSubmit} data-testid="edit-instance-form">
+                  <Labels showNodeFields={false} />
+                  {rdsExporter && <RdsCredentials exporter={rdsExporter} mode={values?.rds_auth_mode} />}
+                  {/* enable submit by keyboard */}
+                  <input type="submit" className={styles.hidden} />
+                </form>
+              </Page.Contents>
+            </Page>
+          </>
+        );
+      }}
     />
   );
 };
