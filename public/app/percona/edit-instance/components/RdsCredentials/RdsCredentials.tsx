@@ -5,29 +5,16 @@ import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
-import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { RdsAuthMode } from '../../EditInstance.types';
 
+import { ACCESS_KEY_VALIDATORS, AUTH_MODE_OPTIONS, ROLE_ARN_VALIDATORS } from './RdsCredentials.constants';
 import { Messages } from './RdsCredentials.messages';
 import { RdsCredentialsProps } from './RdsCredentials.types';
 import { requiredAwsSecretKey } from './RdsCredentials.validators';
 
 const { fields, authMode } = Messages;
 
-const AUTH_MODE_OPTIONS = [
-  { value: RdsAuthMode.accessKey, label: authMode.options.accessKey },
-  { value: RdsAuthMode.iamRole, label: authMode.options.iamRole },
-  { value: RdsAuthMode.hostCredentials, label: authMode.options.hostCredentials },
-];
-
-const roleArnValidators = [validators.required, validators.awsRoleArn];
-const accessKeyValidators = [validators.required];
-
-// Only the inputs belonging to the selected mode are rendered, which is what makes the modes
-// mutually exclusive without a cross-field validator: whatever the other modes left behind in
-// form state is ignored when the payload is built. The parent form does not set
-// destroyOnUnregister, so switching back and forth keeps what was typed.
 export const RdsCredentials: FC<RdsCredentialsProps> = ({ exporter, mode }) => {
   const styles = useStyles2(getStyles);
   const secretKeyValidators = useMemo(
@@ -51,7 +38,7 @@ export const RdsCredentials: FC<RdsCredentialsProps> = ({ exporter, mode }) => {
             name="aws_access_key"
             label={fields.awsAccessKey.label}
             placeholder={fields.awsAccessKey.placeholder}
-            validators={accessKeyValidators}
+            validators={ACCESS_KEY_VALIDATORS}
           />
           <PasswordInputField
             name="aws_secret_key"
@@ -70,7 +57,7 @@ export const RdsCredentials: FC<RdsCredentialsProps> = ({ exporter, mode }) => {
             label={fields.awsRoleArn.label}
             placeholder={fields.awsRoleArn.placeholder}
             tooltipText={fields.awsRoleArn.tooltipText}
-            validators={roleArnValidators}
+            validators={ROLE_ARN_VALIDATORS}
           />
         </div>
       )}
