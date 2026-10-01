@@ -1,9 +1,10 @@
-import { usePerconaAlertingEnabled } from 'app/percona/integrated-alerting/hooks';
 import { css } from '@emotion/css';
+
 import { GrafanaTheme2 } from '@grafana/data';
 import { Trans, t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { Dropdown, EmptyState, LinkButton, Menu, MenuItem, Stack, Text, TextLink, useStyles2 } from '@grafana/ui';
+import { NewAlertRuleFromTemplateButton } from 'app/percona/integrated-alerting/components/NewAlertRuleFromTemplateButton/NewAlertRuleFromTemplateButton';
 
 import { RuleFormType, RuleFormValues } from '../../types/rule-form';
 import { useRulesAccess } from '../../utils/accessControlHooks';
@@ -67,8 +68,6 @@ const RecordingRulesButtons = () => {
 };
 
 export const NoRulesSplash = () => {
-  // @PERCONA
-  const perconaAlertingEnabled = usePerconaAlertingEnabled();
   const { canCreateGrafanaRules, canCreateCloudRules } = useRulesAccess();
   const canCreateAnything = canCreateGrafanaRules || canCreateCloudRules;
 
@@ -80,11 +79,8 @@ export const NoRulesSplash = () => {
         button={
           canCreateAnything ? (
             <Stack direction="row" alignItems="center" justifyContent="center">
-              {perconaAlertingEnabled && (
-                <LinkButton variant="primary" icon="plus" size="lg" href="alerting/new-from-template">
-                  <Trans i18nKey="">New alert rule from template</Trans>
-                </LinkButton>
-              )}
+              {/* @PERCONA */}
+              <NewAlertRuleFromTemplateButton size="lg" />
               {canCreateAnything && (
                 <LinkButton variant="primary" icon="plus" size="lg" href="alerting/new/alerting">
                   <Trans i18nKey="alerting.list-view.empty.new-alert-rule">New alert rule</Trans>
