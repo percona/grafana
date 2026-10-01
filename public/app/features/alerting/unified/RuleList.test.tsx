@@ -11,6 +11,7 @@ import { setupMswServer } from 'app/features/alerting/unified/mockApi';
 import { setAlertmanagerChoices } from 'app/features/alerting/unified/mocks/server/configure';
 import * as actions from 'app/features/alerting/unified/state/actions';
 import { setupDataSources } from 'app/features/alerting/unified/testSetup/datasources';
+import { usePerconaAlertingEnabled } from 'app/percona/integrated-alerting/hooks';
 import { AlertmanagerChoice } from 'app/plugins/datasource/alertmanager/types';
 import { AccessControlAction } from 'app/types/accessControl';
 import { PromAlertingRuleState, PromApplication } from 'app/types/unified-alerting-dto';
@@ -42,6 +43,9 @@ jest.mock('@grafana/runtime', () => ({
   usePluginLinks: jest.fn(),
   useReturnToPrevious: jest.fn(),
 }));
+jest.mock('app/percona/integrated-alerting/hooks', () => ({
+  usePerconaAlertingEnabled: jest.fn(),
+}));
 jest.mock('./api/buildInfo');
 jest.mock('./api/prometheus');
 jest.mock('./api/ruler');
@@ -57,6 +61,7 @@ setupPluginsExtensionsHook();
 
 const mocks = {
   usePluginLinksMock: jest.mocked(usePluginLinks),
+  usePerconaAlertingEnabledMock: jest.mocked(usePerconaAlertingEnabled),
   rulesInSameGroupHaveInvalidForMock: jest.mocked(actions.rulesInSameGroupHaveInvalidFor),
 
   api: {
@@ -113,6 +118,7 @@ const ui = {
   moreErrorsButton: byRole('button', { name: /more errors/ }),
   editCloudGroupIcon: byTestId('edit-group'),
   newRuleButton: byRole('link', { name: 'New alert rule' }),
+  newRuleFromTemplateButton: byRole('link', { name: 'New alert rule from template' }),
   exportButton: byText(/export rules/i),
   editGroupModal: {
     dialog: byRole('dialog'),
@@ -807,6 +813,45 @@ describe('RuleList', () => {
 
         await waitFor(() => expect(mocks.api.fetchRules).toHaveBeenCalledTimes(1));
         expect(ui.newRuleButton.get()).toBeInTheDocument();
+      });
+
+      it('New alert rule from template button should be visible when Percona alerting is enabled and rules already exist', async () => {
+        mocks.usePerconaAlertingEnabledMock.mockReturnValue(true);
+        grantUserPermissions([
+          AccessControlAction.FoldersRead,
+          AccessControlAction.AlertingRuleCreate,
+          AccessControlAction.AlertingRuleRead,
+        ]);
+
+        mocks.api.fetchRules.mockResolvedValue(somePromRules('grafana'));
+        mocks.api.fetchRulerRules.mockResolvedValue(someRulerRules);
+
+        renderRuleList();
+
+        await waitFor(() => expect(mocks.api.fetchRules).toHaveBeenCalledTimes(1));
+        expect(await ui.newRuleFromTemplateButton.find()).toHaveAttribute(
+          'href',
+          expect.stringContaining('/alerting/new-from-template?returnTo=')
+        );
+        expect(ui.newRuleButton.get()).toBeInTheDocument();
+      });
+
+      it('New alert rule from template button should not be visible when Percona alerting is disabled', async () => {
+        mocks.usePerconaAlertingEnabledMock.mockReturnValue(false);
+        grantUserPermissions([
+          AccessControlAction.FoldersRead,
+          AccessControlAction.AlertingRuleCreate,
+          AccessControlAction.AlertingRuleRead,
+        ]);
+
+        mocks.api.fetchRules.mockResolvedValue(somePromRules('grafana'));
+        mocks.api.fetchRulerRules.mockResolvedValue(someRulerRules);
+
+        renderRuleList();
+
+        await waitFor(() => expect(mocks.api.fetchRules).toHaveBeenCalledTimes(1));
+        expect(ui.newRuleButton.get()).toBeInTheDocument();
+        expect(ui.newRuleFromTemplateButton.query()).not.toBeInTheDocument();
       });
     });
 
