@@ -799,6 +799,23 @@ describe('RuleList', () => {
         expect(ui.newRuleButton.get()).toBeInTheDocument();
       });
 
+      it('New alert rule from template button should be visible in the empty state when Percona alerting is enabled', async () => {
+        mocks.usePerconaAlertingEnabledMock.mockReturnValue(true);
+        grantUserPermissions([
+          AccessControlAction.FoldersRead,
+          AccessControlAction.AlertingRuleCreate,
+          AccessControlAction.AlertingRuleRead,
+        ]);
+
+        mocks.api.fetchRules.mockResolvedValue([]);
+        mocks.api.fetchRulerRules.mockResolvedValue({});
+
+        renderRuleList();
+
+        await waitFor(() => expect(mocks.api.fetchRules).toHaveBeenCalledTimes(1));
+        expect(await ui.newRuleFromTemplateButton.find()).toBeInTheDocument();
+      });
+
       it('New alert button should be visible when the user has alert rule create and folder read permissions and rules already exists', async () => {
         grantUserPermissions([
           AccessControlAction.FoldersRead,
@@ -878,6 +895,31 @@ describe('RuleList', () => {
 
         await waitFor(() => expect(mocks.api.fetchRules).toHaveBeenCalled());
         expect(ui.newRuleButton.get()).toBeInTheDocument();
+      });
+
+      it('New alert rule from template button should not be visible in the empty state when the user can only create cloud rules', async () => {
+        mocks.usePerconaAlertingEnabledMock.mockReturnValue(true);
+        grantUserPermissions([
+          AccessControlAction.DataSourcesRead,
+          AccessControlAction.AlertingRuleExternalRead,
+          AccessControlAction.AlertingRuleExternalWrite,
+        ]);
+
+        mocks.api.discoverFeaturesByUid.mockResolvedValue({
+          application: PromApplication.Cortex,
+          features: {
+            rulerApiEnabled: true,
+          },
+        });
+
+        mocks.api.fetchRules.mockResolvedValue([]);
+        mocks.api.fetchRulerRules.mockResolvedValue({});
+
+        renderRuleList();
+
+        await waitFor(() => expect(mocks.api.fetchRules).toHaveBeenCalled());
+        expect(ui.newRuleButton.get()).toBeInTheDocument();
+        expect(ui.newRuleFromTemplateButton.query()).not.toBeInTheDocument();
       });
 
       it('New alert button should be visible when the user has the alert rule external write and data source read permissions and rules already exists', async () => {
