@@ -13,7 +13,7 @@ export interface RestoreResponse {
   items: RawRestore[];
 }
 
-export interface Restore extends Omit<Backup, 'created' | 'status' | 'mode' | 'folder'> {
+export interface Restore extends Omit<Backup, 'created' | 'status' | 'mode' | 'folder' | 'compression'> {
   id: string;
   artifactId: string;
   started: number;

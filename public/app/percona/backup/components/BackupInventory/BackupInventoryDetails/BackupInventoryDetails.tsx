@@ -7,7 +7,7 @@ import { Messages } from './BackupInventoryDetails.messages';
 import { getStyles } from './BackupInventoryDetails.styles';
 import { BackupInventoryDetailsProps } from './BackupInventoryDetails.types';
 
-export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, folder, dataModel }) => {
+export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, folder, dataModel, compression }) => {
   const styles = useStyles(getStyles);
   const dataModelMsg = formatDataModel(dataModel);
 
@@ -22,6 +22,11 @@ export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, 
       {folder && (
         <span data-testid="backup-artifact-details-folder">
           <span className={styles.detailLabel}>{Messages.folder}</span> <span>{folder}</span>
+        </span>
+      )}
+      {compression && (
+        <span data-testid="backup-artifact-details-compression">
+          <span className={styles.detailLabel}>{Messages.compression}</span> <span>{compression}</span>
         </span>
       )}
     </div>
