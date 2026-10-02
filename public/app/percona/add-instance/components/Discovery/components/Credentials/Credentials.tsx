@@ -15,7 +15,7 @@ const Credentials: FC<CredentialsProps> = ({ discover }) => {
 
   const onSubmit = useCallback(
     (values: RDSCredentialsForm) => {
-      discover(values);
+      discover({ aws_access_key: '', aws_secret_key: '', aws_role_arn: '', ...values });
     },
     [discover]
   );
@@ -31,17 +31,26 @@ const Credentials: FC<CredentialsProps> = ({ discover }) => {
           data-testid="credentials-form"
         >
           <div className={styles.fieldsWrapper}>
+            <div className={styles.credentialsRow}>
+              <TextInputField
+                name={Messages.form.fields.awsAccessKey.name}
+                placeholder={Messages.form.fields.awsAccessKey.placeholder}
+                label={Messages.form.fields.awsAccessKey.label}
+                fieldClassName={styles.credentialsField}
+              />
+              <PasswordInputField
+                name={Messages.form.fields.awsSecretKey.name}
+                placeholder={Messages.form.fields.awsSecretKey.placeholder}
+                label={Messages.form.fields.awsSecretKey.label}
+                fieldClassName={styles.credentialsField}
+              />
+            </div>
             <TextInputField
-              name={Messages.form.fields.awsAccessKey.name}
-              placeholder={Messages.form.fields.awsAccessKey.placeholder}
-              label={Messages.form.fields.awsAccessKey.label}
-              fieldClassName={styles.credentialsField}
-            />
-            <PasswordInputField
-              name={Messages.form.fields.awsSecretKey.name}
-              placeholder={Messages.form.fields.awsSecretKey.placeholder}
-              label={Messages.form.fields.awsSecretKey.label}
-              fieldClassName={styles.credentialsField}
+              name={Messages.form.fields.awsRoleArn.name}
+              placeholder={Messages.form.fields.awsRoleArn.placeholder}
+              label={Messages.form.fields.awsRoleArn.label}
+              tooltipText={Messages.form.fields.awsRoleArn.tooltipText}
+              fieldClassName={styles.roleArnField}
             />
           </div>
         </form>

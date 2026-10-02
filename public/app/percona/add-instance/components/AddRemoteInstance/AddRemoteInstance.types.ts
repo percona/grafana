@@ -199,6 +199,7 @@ export interface RDSPayload extends CommonRDSAzurePayload {
   replication_set: string;
   aws_access_key: string;
   aws_secret_key: string;
+  aws_role_arn: string;
   rds_exporter: boolean;
   qan_mysql_perfschema: boolean;
   disable_parsing_comments: boolean;
