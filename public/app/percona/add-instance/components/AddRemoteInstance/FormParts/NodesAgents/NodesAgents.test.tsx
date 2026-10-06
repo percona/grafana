@@ -7,6 +7,7 @@ import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import {
   nodesMockMultipleAgentsNoPMMServer,
   nodesMock,
+  nodesMockHA,
   nodesMockOneAgentNoPMMServer,
 } from 'app/percona/inventory/__mocks__/Inventory.service';
 import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes';
@@ -53,6 +54,33 @@ describe('Nodes Agents:: ', () => {
     await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
 
     await waitFor(() => expect(screen.getByTestId('node')).toHaveTextContent(nodesMock[0].node_id));
+  });
+
+  it('should not offer nodes internal to the PMM deployment', async () => {
+    jest.spyOn(InventoryService, 'getNodes').mockReturnValue(Promise.resolve({ nodes: nodesMockHA }));
+
+    setup();
+
+    await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
+
+    selectEvent.openMenu(screen.getByLabelText('Nodes'));
+
+    // the PostgreSQL cluster backing PMM and the PMM Server nodes themselves
+    expect(screen.queryByText('pmm-pmm-ha-pg-db-instance1-qjjl-0')).not.toBeInTheDocument();
+    expect(screen.queryByText('pmm-ha-0')).not.toBeInTheDocument();
+    // the client is both the selected value and an option, which also proves the menu is open and
+    // the assertions above are not passing vacuously
+    expect(screen.getAllByText('pmm-pmm-ha-client-0').length).toBeGreaterThan(1);
+  });
+
+  it('should preselect the pre-provisioned client in an HA deployment', async () => {
+    jest.spyOn(InventoryService, 'getNodes').mockReturnValue(Promise.resolve({ nodes: nodesMockHA }));
+
+    setup();
+
+    await waitFor(() => expect(fetchNodesActionActionSpy).toHaveBeenCalled());
+
+    await waitFor(() => expect(screen.getByTestId('node')).toHaveTextContent('pmm-ha-client-0-id'));
   });
 
   it('should not pick any agent when the selected node is not pmm-server', async () => {

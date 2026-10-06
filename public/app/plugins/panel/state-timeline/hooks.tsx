@@ -61,6 +61,9 @@ export function usePagination(frames?: DataFrame[], perPage?: number) {
         className={paginationStyles.paginationElement}
         currentPage={currentPageCapped}
         numberOfPages={numberOfPages}
+        // @PERCONA: hide the control while every series fits on a single page, so the panel
+        // keeps its vertical space instead of losing it to buttons that cannot navigate anywhere
+        hideWhenSinglePage
         showSmallVersion={showSmallVersion}
         onNavigate={setCurrentPage}
       />

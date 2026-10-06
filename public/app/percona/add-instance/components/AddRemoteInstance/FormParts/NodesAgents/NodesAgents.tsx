@@ -4,13 +4,9 @@ import { useField } from 'react-final-form';
 import { useStyles2 } from '@grafana/ui';
 import { Messages } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.messages';
 import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
-import {
-  PMM_SERVER_NODE_AGENT_ID,
-  PMM_SERVER_NODE_ID,
-} from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
-import { AgentsOption, NodesOption } from 'app/percona/inventory/Inventory.types';
+import { NodesOption } from 'app/percona/inventory/Inventory.types';
 import { SelectField } from 'app/percona/shared/components/Form/SelectFieldCore';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { nodesOptionsMapper } from 'app/percona/shared/core/reducers/nodes';
@@ -45,28 +41,23 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const changeAgentValue = (value: AgentsOption) => {
-    if (!form?.getState().values?.address) {
-      if (value.label !== PMM_SERVER_NODE_AGENT_ID) {
-        form?.change('address', 'localhost');
-      } else {
-        form?.change('address', '');
-      }
+  // A service monitored by the PMM Server node itself is a remote one, so its address is left for
+  // the user to fill in. Any other node runs next to what it monitors, hence the localhost default.
+  const prefillAddress = (node?: NodesOption) => {
+    if (node && !form?.getState().values?.address) {
+      form?.change('address', node.isPMMServerNode ? '' : 'localhost');
     }
   };
 
   const setNodeAndAgent = (value: NodesOption) => {
     form?.change('node', value);
 
-    let selectedAgent: AgentsOption | undefined;
-    if (value.agents && value.agents?.length > 1) {
-      selectedAgent = value.agents.find((item) => item.value === PMM_SERVER_NODE_AGENT_ID);
-    } else if (value.agents && value.agents?.length === 1) {
-      selectedAgent = value.agents[0];
-    }
+    // A node running several pmm-agents is ambiguous, so the agent is left for the user to pick.
+    const selectedAgent = value.agents?.length === 1 ? value.agents[0] : undefined;
+
     if (selectedAgent) {
       form?.change('pmm_agent_id', selectedAgent);
-      changeAgentValue(selectedAgent);
+      prefillAddress(value);
     } else {
       form?.change('pmm_agent_id', undefined);
     }
@@ -76,13 +67,13 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     if (nodesOptions.length === 0) {
       loadData();
     } else if (!selectedNode) {
-      // preselect pmm-server node
-      const pmmServerNode =
-        nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID) ||
-        nodesOptions.find((node) => node.isPMMServerNode);
+      // PMM Server reports the nodes it does not want monitoring delegated to, and they are already
+      // filtered out. Whatever is left is eligible, the PMM Server node being the natural default
+      // where it is still offered - a single-node deployment has no other node to pick.
+      const preselectedNode = nodesOptions.find((node) => node.isPMMServerNode) ?? nodesOptions[0];
 
-      if (pmmServerNode) {
-        setNodeAndAgent(pmmServerNode);
+      if (preselectedNode) {
+        setNodeAndAgent(preselectedNode);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +103,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           options={selectedNode?.agents || []}
           name="pmm_agent_id"
           data-testid="agents-selectbox"
-          onChange={(event) => changeAgentValue(event as AgentsOption)}
+          onChange={() => prefillAddress(selectedNode)}
           className={styles.selectField}
           aria-label={Messages.form.labels.nodesAgents.agents}
           validators={selectedNode ? [validators.required] : undefined}

@@ -58,6 +58,9 @@ export const nodeFromDbMapper = (nodeFromDb: NodeDB[]): Node[] => {
 
 export const nodesOptionsMapper = (nodeFromDb: NodeDB[]): NodesOption[] =>
   nodeFromDb
+    // Nodes belonging to a PMM deployment's own infrastructure (e.g. the HA persistence layer)
+    // are dedicated and must not be delegated any monitoring workloads.
+    .filter((node) => !node.is_pmm_internal_node)
     .map((node) => {
       const agents = (node.agents || [])
         .filter((agent) => agent.agent_type === AgentType.pmmAgent)

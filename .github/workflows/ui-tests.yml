@@ -93,3 +93,28 @@ jobs:
         with:
           name: ui-tests-output
           path:  ./pmm-qa/codeceptjs-e2e/tests/output
+
+      - name: Install Playwright dependencies for UI tests
+        if: ${{ !cancelled() }}
+        working-directory: ./pmm-qa/e2e_tests
+        run: npm install
+
+      - name: install playwright (e2e_tests)
+        if: ${{ !cancelled() }}
+        working-directory: ./pmm-qa/e2e_tests
+        run: npx playwright install
+
+      - name: Run Playwright UI tests
+        if: ${{ !cancelled() }}
+        working-directory: ./pmm-qa/e2e_tests
+        run: npx playwright test --grep @grafana-pr --pass-with-no-tests
+
+      - name: Attaching Playwright artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-ui-tests-output
+          path: |
+            ./pmm-qa/e2e_tests/playwright-report
+            ./pmm-qa/e2e_tests/output
+            ./pmm-qa/e2e_tests/test-results

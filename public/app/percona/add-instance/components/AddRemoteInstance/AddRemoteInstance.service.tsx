@@ -1,6 +1,5 @@
 import { CancelToken } from 'axios';
 
-import { PMM_SERVER_NODE_AGENT_ID } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
 import { MetricsMode } from 'app/percona/inventory/Inventory.types';
 import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
@@ -207,7 +206,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
 
   data.pmm_agent_id = values.pmm_agent_id.value;
 
-  if (data.pmm_agent_id === PMM_SERVER_NODE_AGENT_ID || data.node.isPMMServerNode) {
+  if (data.node.isPMMServerNode) {
     data.metrics_mode = MetricsMode.PULL;
   } else {
     data.metrics_mode = MetricsMode.PUSH;
