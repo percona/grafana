@@ -5,6 +5,8 @@ import { Trans, t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { Button, Dropdown, Icon, LinkButton, Menu, Stack } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
+import { NewAlertRuleFromTemplateButton } from 'app/percona/integrated-alerting/components/NewAlertRuleFromTemplateButton/NewAlertRuleFromTemplateButton';
+import { usePerconaAlertingEnabled } from 'app/percona/integrated-alerting/hooks';
 import { AccessControlAction } from 'app/types/accessControl';
 
 import { AlertingPageWrapper } from '../components/AlertingPageWrapper';
@@ -43,6 +45,8 @@ export function RuleListActions() {
   const [createGrafanaRuleSupported, createGrafanaRuleAllowed] = useAlertingAbility(AlertingAction.CreateAlertRule);
   const [createCloudRuleSupported, createCloudRuleAllowed] = useAlertingAbility(AlertingAction.CreateExternalAlertRule);
   const [exportRulesSupported, exportRulesAllowed] = useAlertingAbility(AlertingAction.ExportGrafanaManagedRules);
+  // @PERCONA
+  const perconaAlertingEnabled = usePerconaAlertingEnabled();
 
   // Check if there are any data sources with manageAlerts enabled
   const hasAlertEnabledDataSources = useMemo(() => getRulesDataSources().length > 0, []);
@@ -125,8 +129,14 @@ export function RuleListActions() {
 
   return (
     <Stack direction="row" gap={1}>
+      {/* @PERCONA */}
+      {canCreateGrafanaRules && <NewAlertRuleFromTemplateButton />}
       {canCreateRules && (
-        <LinkButton variant="primary" icon="plus" href="/alerting/new/alerting">
+        <LinkButton
+          variant={canCreateGrafanaRules && perconaAlertingEnabled ? 'secondary' : 'primary'}
+          icon="plus"
+          href="/alerting/new/alerting"
+        >
           <Trans i18nKey="alerting.rule-list.new-alert-rule">New alert rule</Trans>
         </LinkButton>
       )}
