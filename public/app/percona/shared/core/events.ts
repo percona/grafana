@@ -4,7 +4,7 @@
  * NEEDS TO BE UPDATED WHEN PMM EVENTS ARE UPDATED
  */
 
-import { BusEventBase } from '@grafana/data';
+import { BusEventBase, BusEventWithPayload } from '@grafana/data';
 
 export class SettingsUpdatedEvent extends BusEventBase {
   static type = 'settings-updated-event';
@@ -20,4 +20,8 @@ export class ServiceDeletedEvent extends BusEventBase {
 
 export class FrontendSettingsUpdatedEvent extends BusEventBase {
   static type = 'frontend-settings-updated-event';
+}
+
+export class OpenAlertThresholdsModalEvent extends BusEventWithPayload<{ nodeId: string; nodeName: string }> {
+  static type = 'open-alert-thresholds-modal-event';
 }

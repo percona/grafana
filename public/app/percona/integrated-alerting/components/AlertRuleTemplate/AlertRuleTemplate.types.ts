@@ -69,6 +69,7 @@ export interface TemplateParamAPI {
   unit: TemplateParamUnit;
   summary: string;
   float?: TemplateFloatParamAPI;
+  overridable?: boolean;
 }
 
 export interface TemplateParam extends Omit<TemplateParamAPI, 'float'> {
@@ -116,6 +117,7 @@ export interface FormattedTemplate {
   source: SourceDescription;
   created_at?: string;
   yaml: string;
+  params?: TemplateParam[];
 }
 
 export interface AlertRuleTemplatesTableProps {

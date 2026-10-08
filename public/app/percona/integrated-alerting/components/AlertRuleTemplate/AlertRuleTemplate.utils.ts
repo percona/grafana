@@ -21,3 +21,6 @@ export const beautifyUnit = (unit: TemplateParamUnit) => UNIT_MAP[unit];
 export const formatSource = (source: SourceDescription) => SOURCE_MAP[source];
 
 export const formatDate = (date: string | undefined) => date && moment(date).format('YYYY-MM-DD');
+
+export const isDynamicTemplate = (template: Template | FormattedTemplate) =>
+  template.params?.some((p) => p.overridable);

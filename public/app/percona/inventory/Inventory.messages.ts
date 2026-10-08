@@ -82,6 +82,7 @@ export const Messages = {
       serviceNames: 'Service Names',
     },
   },
+  overrideThresholds: 'Override alert thresholds',
   delete: 'Delete',
   edit: 'Edit',
   cancel: 'Cancel',

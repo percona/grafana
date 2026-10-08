@@ -48,6 +48,7 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { OpenAlertThresholdsModalEvent } from 'app/percona/shared/core/events';
 
 export const NodesTab = () => {
   const { nodes } = useSelector(getNodes);
@@ -71,23 +72,41 @@ export const NodesTab = () => {
   );
 
   const getActions = useCallback(
-    (row: Row<Node>): Action[] =>
-      row.original.isPmmServerNode
-        ? []
-        : [
-            {
-              content: (
-                <Stack direction="row">
-                  <Icon name="trash-alt" />
-                  <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
-                </Stack>
-              ),
-              action: () => {
-                setActionItem(row.original);
-                setModalVisible(true);
-              },
-            },
-          ],
+    (row: Row<Node>): Action[] => {
+      const actions = [
+        {
+          content: (
+            <Stack direction="row">
+              <span className={styles.actionItemTxtSpan}>{Messages.overrideThresholds}</span>
+            </Stack>
+          ),
+          action: () => {
+            const event = new OpenAlertThresholdsModalEvent({
+              nodeId: row.original.nodeId,
+              nodeName: row.original.nodeName,
+            });
+            appEvents.publish(event);
+          },
+        },
+      ];
+
+      if (!row.original.isPmmServerNode) {
+        actions.push({
+          content: (
+            <Stack direction="row">
+              <Icon name="trash-alt" />
+              <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
+            </Stack>
+          ),
+          action: () => {
+            setActionItem(row.original);
+            setModalVisible(true);
+          },
+        });
+      }
+
+      return actions;
+    },
     [styles.actionItemTxtSpan]
   );
 
