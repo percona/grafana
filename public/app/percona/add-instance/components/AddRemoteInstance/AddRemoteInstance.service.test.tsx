@@ -1,4 +1,5 @@
 import { MetricsMode } from 'app/percona/inventory/Inventory.types';
+
 import { toExternalServicePayload, toPayload } from './AddRemoteInstance.service';
 import { MySQLPayload, RDSPayload } from './AddRemoteInstance.types';
 
@@ -113,6 +114,18 @@ describe('AddRemoteInstanceService:: ', () => {
     };
 
     expect((toPayload(data) as MySQLPayload).disable_collectors).toEqual(['collector_1', 'collector2', 'collector3']);
+  });
+
+  it('should pass aws_role_arn through to the rds payload', () => {
+    const data = {
+      address: 'localhost',
+      pmm_agent_id: { value: 'pmm-server' },
+      node: { value: 'node1', label: 'node1' },
+      isRDS: true,
+      aws_role_arn: 'arn:aws:iam::123456789012:role/PmmRdsMonitoring',
+    };
+
+    expect((toPayload(data) as RDSPayload).aws_role_arn).toEqual('arn:aws:iam::123456789012:role/PmmRdsMonitoring');
   });
 
   it('should parse disable_collectors string into a trimmed, filtered array for rds (mysql)', () => {
