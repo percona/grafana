@@ -139,6 +139,7 @@ export interface Node {
   properties?: Record<string, string>;
   agentsStatus?: string;
   isPmmServerNode: boolean;
+  isPmmProtectedNode?: boolean;
 }
 
 export interface NodeDB {
@@ -161,6 +162,7 @@ export interface NodeDB {
   services?: ServiceNodeListDB[];
   is_pmm_server_node: boolean;
   is_pmm_internal_node?: boolean;
+  is_pmm_protected_node?: boolean;
 }
 
 export interface NodeListDBPayload {

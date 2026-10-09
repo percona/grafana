@@ -40,7 +40,7 @@ import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
 import { InventoryNode } from './Nodes.types';
-import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
+import { canRemoveNode, getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -72,9 +72,8 @@ export const NodesTab = () => {
 
   const getActions = useCallback(
     (row: Row<Node>): Action[] =>
-      row.original.isPmmServerNode
-        ? []
-        : [
+      canRemoveNode(row.original)
+        ? [
             {
               content: (
                 <Stack direction="row">
@@ -87,7 +86,8 @@ export const NodesTab = () => {
                 setModalVisible(true);
               },
             },
-          ],
+          ]
+        : [],
     [styles.actionItemTxtSpan]
   );
 
@@ -406,7 +406,7 @@ export const NodesTab = () => {
             columns={columns}
             data={mappedNodes}
             totalItems={mappedNodes.length}
-            rowSelection={(row) => !row.original.isPmmServerNode}
+            rowSelection={(row) => canRemoveNode(row.original)}
             autoResetSelectedRows={false}
             autoResetExpanded={false}
             autoResetPage={false}
