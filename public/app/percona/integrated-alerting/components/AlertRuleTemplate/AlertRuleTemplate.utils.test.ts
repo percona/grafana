@@ -1,6 +1,12 @@
 import { SOURCE_MAP } from './AlertRuleTemplate.constants';
 import { SourceDescription, Template, TemplateParamUnit } from './AlertRuleTemplate.types';
-import { formatTemplate, formatTemplates, beautifyUnit, formatSource } from './AlertRuleTemplate.utils';
+import {
+  formatTemplate,
+  formatTemplates,
+  beautifyUnit,
+  formatSource,
+  isDynamicTemplate,
+} from './AlertRuleTemplate.utils';
 
 const moment = jest.requireActual('moment-timezone');
 moment.tz.setDefault('UTC');
@@ -51,5 +57,25 @@ describe('AlertRuleTemplatesTable utils', () => {
 
   test('formatSource', () => {
     expect(formatSource(SourceDescription.BUILT_IN)).toBe(SOURCE_MAP.TEMPLATE_SOURCE_BUILT_IN);
+  });
+
+  test('isDynamicTemplate', () => {
+    const dynamicTemplate = {
+      params: [
+        {
+          overridable: true,
+        },
+      ],
+    } as Template;
+    const staticTemplate = {
+      params: [
+        {
+          overridable: false,
+        },
+      ],
+    } as Template;
+
+    expect(isDynamicTemplate(dynamicTemplate)).toBe(true);
+    expect(isDynamicTemplate(staticTemplate)).toBe(false);
   });
 });
