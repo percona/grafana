@@ -4,9 +4,9 @@ import { SelectableValue } from '@grafana/data';
 import { DBServiceList, CompatibleServiceListPayload } from 'app/percona/inventory/Inventory.types';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
+import { BackupLogResponse, BackupLogs, Compression, DataModel } from '../../Backup.types';
 
-import { Backup, BackupResponse, Timeranges, TimerangesResponse } from './BackupInventory.types';
+import { Backup, BackupResponse, CompressionResponse, Timeranges, TimerangesResponse } from './BackupInventory.types';
 import { formatDate } from './BackupInventory.utils';
 
 const BASE_URL = '/v1/backups';
@@ -28,6 +28,7 @@ export const BackupInventoryService = {
         vendor,
         mode,
         folder,
+        compression,
       }): Backup => ({
         id: artifact_id,
         name,
@@ -41,6 +42,7 @@ export const BackupInventoryService = {
         vendor,
         mode,
         folder,
+        compression,
       })
     );
   },
@@ -121,5 +123,11 @@ export const BackupInventoryService = {
     };
 
     return result;
+  },
+  async listServiceCompressions(serviceId: string): Promise<Compression[]> {
+    const { compression_methods = [] } = await api.get<CompressionResponse, void>(
+      `${BASE_URL}/services/${serviceId}/compression`
+    );
+    return compression_methods;
   },
 };
