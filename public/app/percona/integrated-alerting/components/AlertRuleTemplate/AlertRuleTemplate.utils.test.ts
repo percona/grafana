@@ -1,11 +1,13 @@
 import { SOURCE_MAP } from './AlertRuleTemplate.constants';
-import { SourceDescription, Template, TemplateParamUnit } from './AlertRuleTemplate.types';
+import { SourceDescription, Template, TemplateDatasourceType, TemplateParamUnit } from './AlertRuleTemplate.types';
 import {
   formatTemplate,
   formatTemplates,
   beautifyUnit,
   formatSource,
+  formatDatasource,
   isDynamicTemplate,
+  usesClickHouse,
 } from './AlertRuleTemplate.utils';
 
 const moment = jest.requireActual('moment-timezone');
@@ -59,6 +61,13 @@ describe('AlertRuleTemplatesTable utils', () => {
     expect(formatSource(SourceDescription.BUILT_IN)).toBe(SOURCE_MAP.TEMPLATE_SOURCE_BUILT_IN);
   });
 
+  test('formatDatasource', () => {
+    expect(formatDatasource(TemplateDatasourceType.METRICS)).toBe('Metrics');
+    expect(formatDatasource(TemplateDatasourceType.CLICKHOUSE)).toBe('ClickHouse');
+    expect(formatDatasource(TemplateDatasourceType.UNSPECIFIED)).toBe('Metrics');
+    expect(formatDatasource(undefined)).toBe('Metrics');
+  });
+
   test('isDynamicTemplate', () => {
     const dynamicTemplate = {
       params: [
@@ -77,5 +86,23 @@ describe('AlertRuleTemplatesTable utils', () => {
 
     expect(isDynamicTemplate(dynamicTemplate)).toBe(true);
     expect(isDynamicTemplate(staticTemplate)).toBe(false);
+  });
+
+  test('usesClickHouse', () => {
+    const clickHouseTemplate = {
+      queries: [{ ref_id: 'A', expr: 'SELECT 1', datasource: TemplateDatasourceType.CLICKHOUSE }],
+    } as Template;
+    const metricsTemplate = {
+      queries: [{ ref_id: 'A', expr: 'up', datasource: TemplateDatasourceType.METRICS }],
+    } as Template;
+    const missingDatasourceTemplate = {
+      queries: [{ ref_id: 'A', expr: 'up' }],
+    } as Template;
+    const noQueriesTemplate = {} as Template;
+
+    expect(usesClickHouse(clickHouseTemplate)).toBe(true);
+    expect(usesClickHouse(metricsTemplate)).toBe(false);
+    expect(usesClickHouse(missingDatasourceTemplate)).toBe(false);
+    expect(usesClickHouse(noQueriesTemplate)).toBe(false);
   });
 });

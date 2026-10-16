@@ -1,7 +1,13 @@
 import moment from 'moment/moment';
 
-import { UNIT_MAP, SOURCE_MAP } from './AlertRuleTemplate.constants';
-import { FormattedTemplate, SourceDescription, Template, TemplateParamUnit } from './AlertRuleTemplate.types';
+import { DATASOURCE_MAP, UNIT_MAP, SOURCE_MAP } from './AlertRuleTemplate.constants';
+import {
+  FormattedTemplate,
+  SourceDescription,
+  Template,
+  TemplateDatasourceType,
+  TemplateParamUnit,
+} from './AlertRuleTemplate.types';
 
 export const formatTemplate = (template: Template): FormattedTemplate => {
   const { summary, source, created_at, ...restProps } = template;
@@ -20,7 +26,13 @@ export const beautifyUnit = (unit: TemplateParamUnit) => UNIT_MAP[unit];
 
 export const formatSource = (source: SourceDescription) => SOURCE_MAP[source];
 
+// Older servers don't send a datasource; their queries are all Metrics.
+export const formatDatasource = (datasource = TemplateDatasourceType.METRICS) => DATASOURCE_MAP[datasource];
+
 export const formatDate = (date: string | undefined) => date && moment(date).format('YYYY-MM-DD');
 
 export const isDynamicTemplate = (template: Template | FormattedTemplate) =>
   template.params?.some((p) => p.overridable);
+
+export const usesClickHouse = (template: Template) =>
+  template.queries?.some((query) => query.datasource === TemplateDatasourceType.CLICKHOUSE) ?? false;
