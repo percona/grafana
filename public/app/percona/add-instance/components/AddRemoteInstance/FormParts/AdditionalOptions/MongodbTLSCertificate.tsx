@@ -14,7 +14,7 @@ export const MongodbTLSCertificate: FC<FormPartProps> = ({ form }) => {
       {tlsFlag ? (
         <>
           <PasswordInputField
-            name="tls_certificate_file_password"
+            name="tls_certificate_key_file_password"
             label={Messages.form.labels.additionalOptions.tlsCertificateFilePassword}
             tooltipText={Messages.form.labels.tooltips.tlsCertificateFilePassword}
           />
