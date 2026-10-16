@@ -29,6 +29,7 @@ export const Messages = {
         port: 'Port',
         username: 'Username',
         password: 'Password',
+        vaultPath: 'Vault path',
         instanceID: 'Instance ID',
         timeout: 'Connection timeout',
       },
@@ -58,10 +59,14 @@ export const Messages = {
         customLabels: 'Custom labels',
       },
       tooltips: {
-        tlsCA: 'Content of the trusted certificate authority (CA) file used to sign client certificates',
-        tlsCertificateKey: 'Content of the client private key file',
+        tlsCA:
+          'Content of the trusted certificate authority (CA) file used to sign client certificates, or a vault:<path>#<key> reference to it in HashiCorp Vault',
+        tlsCertificateKey:
+          'Content of the client private key file, or a vault:<path>#<key> reference to it in HashiCorp Vault',
         tlsCertificate:
-          'Content of the client certificate file signed by one of the trusted certificate authorities (CAs)',
+          'Content of the client certificate file signed by one of the trusted certificate authorities (CAs), or a vault:<path>#<key> reference to it in HashiCorp Vault',
+        tlsCertificateFilePassword:
+          'Password of the client private key file, or a vault:<path>#<key> reference to it in HashiCorp Vault',
       },
       additionalOptions: {
         skipConnectionCheck: 'Skip connection check',
@@ -98,6 +103,7 @@ export const Messages = {
         serviceName: 'Service name (default: Hostname)',
         username: 'Username',
         password: 'Password',
+        vaultPath: 'secret/data/pmm/my-service',
         instanceID: 'Instance ID',
         timeout: 'Connection timeout',
       },
@@ -136,14 +142,16 @@ export const Messages = {
         serviceName: 'Service name to use',
         port: 'Port your external service is listening on',
         username: 'Your external service username',
-        password: 'Your external service password',
+        password: 'Your external service password, or a vault:<path>#<key> reference to it in HashiCorp Vault',
       },
       mainDetails: {
         address: 'Public DNS hostname of your instance',
         serviceName: 'Service name to use',
         port: 'Port your service is listening on',
         username: 'Your database user name',
-        password: 'Your database password',
+        password: 'Your database password, or a vault:<path>#<key> reference to it in HashiCorp Vault',
+        vaultPath:
+          'Path of the HashiCorp Vault secret that holds the password and, optionally, the username, such as secret/data/pmm/my-service. PMM Client reads them from Vault, and PMM Server does not store them. A password or TLS files you give as well are stored in that secret.',
         instanceID: 'Instance ID to use',
         timeout:
           'How long PMM should wait when connecting to this service. Increase this for remote or high-latency databases. If the connection times out, PMM retries the next time it collects metrics. Leave empty to use the default of 2s.',
@@ -164,7 +172,8 @@ export const Messages = {
       haproxy: {
         port: 'HAProxy prometheus exporter port',
         username: 'username for HAProxy prometheus exporter',
-        password: 'password for HAProxy prometheus exporter',
+        password:
+          'password for HAProxy prometheus exporter, or a vault:<path>#<key> reference to it in HashiCorp Vault',
       },
       labels: {
         region: 'Region',
@@ -177,6 +186,9 @@ export const Messages = {
       additionalOptions: 'Additional options',
       parseURL: 'Parse URL',
       connectionDetails: 'External service connection details',
+    },
+    validation: {
+      vaultPath: "Vault path must not contain whitespace, '?', '#', or empty or relative segments",
     },
     descriptions: {
       dot: '. ',

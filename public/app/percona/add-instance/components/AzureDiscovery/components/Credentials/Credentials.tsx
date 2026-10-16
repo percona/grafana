@@ -36,6 +36,7 @@ const Credentials: FC<CredentialsProps> = ({ onSetCredentials, selectInstance })
               name={Messages.form.fields.clientSecret.name}
               placeholder={Messages.form.fields.clientSecret.placeholder}
               label={Messages.form.fields.clientSecret.label}
+              tooltipText={Messages.form.fields.clientSecret.tooltipText}
               validators={[validators.required]}
               fieldClassName={styles.credentialsField}
             />
