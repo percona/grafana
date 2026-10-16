@@ -1,3 +1,5 @@
+export { awsCredentialsExclusive } from './awsCredentialsExclusive';
+export { awsRoleArn } from './awsRoleArn';
 export { compose } from './compose';
 export { containsLowercase } from './containsLowercase';
 export { containsNumber } from './containsNumber';

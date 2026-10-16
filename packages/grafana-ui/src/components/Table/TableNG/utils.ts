@@ -3,7 +3,6 @@ import memoize from 'micro-memoize';
 import WKT from 'ol/format/WKT';
 import Geometry from 'ol/geom/Geometry';
 import { CSSProperties } from 'react';
-import { SortColumn } from 'react-data-grid';
 import tinycolor from 'tinycolor2';
 import { Count, varPreLine } from 'uwrap';
 
@@ -21,6 +20,7 @@ import {
   FieldSparkline,
   DecimalCount,
 } from '@grafana/data';
+import { SortColumn } from '@grafana/react-data-grid';
 import {
   BarGaugeDisplayMode,
   FieldTextAlignment,
@@ -676,10 +676,11 @@ export function applySort(
  * @internal
  */
 export const frameToRecords = (frame: DataFrame, nestedFramesFieldName?: string): TableRow[] => {
+  const hasNestedFrames = (nestedFramesFieldName ?? '').length > 0;
   const fnBody = `
     const rows = Array(frame.length);
     const values = frame.fields.map(f => f.values);
-    const hasNestedFrames = '${nestedFramesFieldName ?? ''}'.length > 0;
+    const hasNestedFrames = ${hasNestedFrames};
 
     let rowCount = 0;
     for (let i = 0; i < frame.length; i++) {

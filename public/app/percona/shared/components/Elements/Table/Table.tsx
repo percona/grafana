@@ -91,6 +91,7 @@ export const Table: FC<TableProps> = ({
   }
 
   if (rowSelection) {
+    const isRowSelectable = typeof rowSelection === 'function' ? rowSelection : () => true;
     plugins.push(useRowSelect);
     plugins.push((hooks: any) => {
       hooks.visibleColumns.push((cols: Array<ColumnInstance<any>>) => [
@@ -98,23 +99,59 @@ export const Table: FC<TableProps> = ({
           id: 'selection',
           width: '50px',
           Header: ({
+            rows,
+            page,
+            toggleRowSelected,
             getToggleAllRowsSelectedProps,
             getToggleAllPageRowsSelectedProps,
-          }: UseRowSelectInstanceProps<any>) => (
-            <div data-testid="select-all">
-              <TableCheckbox
-                id="all"
-                {...(allRowsSelectionMode === 'all' || !showPagination
+          }: UseRowSelectInstanceProps<any> & {
+            rows: Array<UseRowSelectRowProps<any> & Row<any>>;
+            page: Array<UseRowSelectRowProps<any> & Row<any>>;
+          }) => {
+            const getProps = () => {
+              const baseProps =
+                allRowsSelectionMode === 'all' || !showPagination
                   ? getToggleAllRowsSelectedProps()
-                  : getToggleAllPageRowsSelectedProps())}
-              />
-            </div>
-          ),
-          Cell: ({ row }: { row: UseRowSelectRowProps<any> & Row<any> }) => (
-            <div data-testid="select-row">
-              <TableCheckbox id={row.id} {...row.getToggleRowSelectedProps()} />
-            </div>
-          ),
+                  : getToggleAllPageRowsSelectedProps();
+
+              if (typeof rowSelection !== 'function') {
+                return baseProps;
+              }
+
+              const targetRows = (allRowsSelectionMode === 'all' || !showPagination ? rows : page).filter(
+                isRowSelectable
+              );
+              const allSelected = targetRows.length > 0 && targetRows.every((r) => r.isSelected);
+
+              return {
+                ...baseProps,
+                checked: allSelected,
+                disabled: targetRows.length === 0,
+                onChange: () => targetRows.forEach((r) => toggleRowSelected(r.id, !allSelected)),
+              };
+            };
+
+            return (
+              <div data-testid="select-all">
+                <TableCheckbox id="all" {...getProps()} />
+              </div>
+            );
+          },
+          Cell: ({ row }: { row: UseRowSelectRowProps<any> & Row<any> }) => {
+            const selectable = isRowSelectable(row);
+            const toggleProps = row.getToggleRowSelectedProps();
+
+            return (
+              <div data-testid="select-row">
+                <TableCheckbox
+                  id={row.id}
+                  {...toggleProps}
+                  onChange={selectable ? toggleProps.onChange : undefined}
+                  disabled={!selectable}
+                />
+              </div>
+            );
+          },
         },
         ...cols,
       ]);

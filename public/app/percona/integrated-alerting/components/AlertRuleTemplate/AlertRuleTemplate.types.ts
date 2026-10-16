@@ -69,6 +69,7 @@ export interface TemplateParamAPI {
   unit: TemplateParamUnit;
   summary: string;
   float?: TemplateFloatParamAPI;
+  overridable?: boolean;
 }
 
 export interface TemplateParam extends Omit<TemplateParamAPI, 'float'> {
@@ -77,6 +78,17 @@ export interface TemplateParam extends Omit<TemplateParamAPI, 'float'> {
 
 export interface TemplateAnnotation {
   summary?: string;
+}
+
+export interface TemplateQuery {
+  ref_id: string;
+  expr: string;
+}
+
+export interface TemplateExpression {
+  ref_id: string;
+  type: string;
+  expression: string;
 }
 
 export interface TemplateAPI {
@@ -90,6 +102,9 @@ export interface TemplateAPI {
   annotations?: TemplateAnnotation;
   severity: keyof typeof Severity;
   for: string;
+  queries: TemplateQuery[];
+  expressions: TemplateExpression[];
+  condition: string;
 }
 
 export interface Template extends Omit<TemplateAPI, 'params'> {
@@ -102,6 +117,7 @@ export interface FormattedTemplate {
   source: SourceDescription;
   created_at?: string;
   yaml: string;
+  params?: TemplateParam[];
 }
 
 export interface AlertRuleTemplatesTableProps {

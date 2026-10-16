@@ -296,12 +296,3 @@ type GetUserAuthTokensResponse struct {
 	// in:body
 	Body []*auth.UserToken `json:"body"`
 }
-
-// @PERCONA
-func (hs *HTTPServer) GetUserOAuthToken(c *contextmodel.ReqContext) response.Response {
-	if token := hs.DataProxy.OAuthTokenService.GetCurrentOAuthToken(hs.context, c.SignedInUser, c.UserToken); token != nil {
-		return response.JSON(200, token)
-	}
-
-	return response.Error(500, "Failed to get token", nil)
-}

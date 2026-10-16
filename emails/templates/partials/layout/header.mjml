@@ -1,4 +1,10 @@
 <mj-column background-color="transparent">
   <!-- @PERCONA -->
-  <mj-image padding="0" width="200px" src="https://www.percona.com/wp-content/uploads/product-logos/PMM-logo-horizontal-400-dark-text.png" align="left" />
+  <!--
+    The logo is hosted by the PMM docs site; its source of truth is
+    documentation/docs/assets/pmm-logo-email.png in percona/pmm. Do not remove it
+    there, or the logo disappears from every PMM email. The asset is 432x193 and is
+    rendered at half that width for 2x retina displays.
+  -->
+  <mj-image padding="0" width="216px" src="https://docs.percona.com/percona-monitoring-and-management/assets/pmm-logo-email.png" align="left" />
 </mj-column>

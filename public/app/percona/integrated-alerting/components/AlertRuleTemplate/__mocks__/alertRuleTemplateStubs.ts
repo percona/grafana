@@ -7,8 +7,15 @@ import {
 } from '../AlertRuleTemplate.types';
 import { formatTemplates } from '../AlertRuleTemplate.utils';
 
+const defaultAdvancedRuleFields = {
+  queries: [],
+  expressions: [],
+  condition: '',
+};
+
 export const templateStubs: Template[] = [
   {
+    ...defaultAdvancedRuleFields,
     name: 'template_1',
     created_at: '2020-11-25T16:53:39.366Z',
     source: SourceDescription.BUILT_IN,
@@ -36,6 +43,7 @@ export const templateStubs: Template[] = [
     },
   },
   {
+    ...defaultAdvancedRuleFields,
     name: 'template_2',
     created_at: '2020-11-25T16:53:39.366Z',
     source: SourceDescription.BUILT_IN,
@@ -47,6 +55,7 @@ export const templateStubs: Template[] = [
     for: '300s',
   },
   {
+    ...defaultAdvancedRuleFields,
     name: 'template_3',
     created_at: '2020-11-25T16:53:39.366Z',
     source: SourceDescription.USER_FILE,
@@ -58,6 +67,7 @@ export const templateStubs: Template[] = [
     for: '15s',
   },
   {
+    ...defaultAdvancedRuleFields,
     name: 'template_4',
     created_at: '2020-11-25T16:53:39.366Z',
     source: SourceDescription.USER_FILE,
@@ -94,6 +104,7 @@ export const templateStubs: Template[] = [
     expr: '',
   },
   {
+    ...defaultAdvancedRuleFields,
     name: 'template_5',
     created_at: '2020-12-25T16:53:39.366Z',
     source: SourceDescription.BUILT_IN,
@@ -130,6 +141,7 @@ export const templateStubs: Template[] = [
     expr: '',
   },
   {
+    ...defaultAdvancedRuleFields,
     name: 'template_6',
     created_at: '2020-11-25T16:53:39.366Z',
     source: SourceDescription.USER_API,

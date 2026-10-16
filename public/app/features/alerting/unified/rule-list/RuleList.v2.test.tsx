@@ -4,6 +4,7 @@ import { byRole, byTestId } from 'testing-library-selector';
 
 import { OrgRole } from '@grafana/data';
 import { setPluginComponentsHook, setPluginLinksHook } from '@grafana/runtime';
+import { usePerconaAlertingEnabled } from 'app/percona/integrated-alerting/hooks';
 import { AccessControlAction } from 'app/types/accessControl';
 
 import { setupMswServer } from '../mockApi';
@@ -24,6 +25,10 @@ jest.mock('./FilterView', () => ({
 
 jest.mock('./GroupedView', () => ({
   GroupedView: () => <div data-testid="grouped-view">Grouped View</div>,
+}));
+
+jest.mock('app/percona/integrated-alerting/hooks', () => ({
+  usePerconaAlertingEnabled: jest.fn(),
 }));
 
 jest.mock('./filter/useSavedSearches', () => ({
@@ -184,6 +189,7 @@ describe('RuleListPage v2', () => {
 describe('RuleListActions', () => {
   const ui = {
     newRuleButton: byRole('link', { name: /^new alert rule$/i }),
+    newRuleFromTemplateButton: byRole('link', { name: /^new alert rule from template$/i }),
     moreButton: byRole('button', { name: /more/i }),
     moreMenu: byRole('menu'),
     menuOptions: {
@@ -199,8 +205,36 @@ describe('RuleListActions', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(usePerconaAlertingEnabled).mockReturnValue(false);
     // Default to Viewer role (non-admin)
     grantUserRole(OrgRole.Viewer);
+  });
+
+  it('should show "New alert rule from template" button when Percona alerting is enabled', () => {
+    jest.mocked(usePerconaAlertingEnabled).mockReturnValue(true);
+    grantUserPermissions([AccessControlAction.AlertingRuleCreate]);
+
+    render(<RuleListActions />);
+
+    expect(ui.newRuleFromTemplateButton.get()).toBeInTheDocument();
+    expect(ui.newRuleButton.get()).toBeInTheDocument();
+  });
+
+  it('should not show "New alert rule from template" button when Percona alerting is disabled', () => {
+    grantUserPermissions([AccessControlAction.AlertingRuleCreate]);
+
+    render(<RuleListActions />);
+
+    expect(ui.newRuleFromTemplateButton.query()).not.toBeInTheDocument();
+  });
+
+  it('should not show "New alert rule from template" button without permission to create Grafana rules', () => {
+    jest.mocked(usePerconaAlertingEnabled).mockReturnValue(true);
+    grantUserPermissions([AccessControlAction.AlertingRuleExternalWrite]);
+
+    render(<RuleListActions />);
+
+    expect(ui.newRuleFromTemplateButton.query()).not.toBeInTheDocument();
   });
 
   it.each([
