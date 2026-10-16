@@ -6,6 +6,8 @@ import {
   beautifyUnit,
   formatSource,
   formatDatasource,
+  formatExpression,
+  getDatasourceBadgeColor,
   isDynamicTemplate,
   usesClickHouse,
 } from './AlertRuleTemplate.utils';
@@ -66,6 +68,22 @@ describe('AlertRuleTemplatesTable utils', () => {
     expect(formatDatasource(TemplateDatasourceType.CLICKHOUSE)).toBe('ClickHouse');
     expect(formatDatasource(TemplateDatasourceType.UNSPECIFIED)).toBe('Metrics');
     expect(formatDatasource(undefined)).toBe('Metrics');
+  });
+
+  test('getDatasourceBadgeColor', () => {
+    expect(getDatasourceBadgeColor(TemplateDatasourceType.METRICS)).toBe('blue');
+    expect(getDatasourceBadgeColor(TemplateDatasourceType.CLICKHOUSE)).toBe('purple');
+    expect(getDatasourceBadgeColor(TemplateDatasourceType.UNSPECIFIED)).toBe('blue');
+    expect(getDatasourceBadgeColor(undefined)).toBe('blue');
+  });
+
+  test('formatExpression', () => {
+    expect(formatExpression({ ref_id: 'B', type: 'reduce', reducer: 'max', expression: '$A' })).toBe('reduce(max): $A');
+    expect(formatExpression({ ref_id: 'C', type: 'math', expression: '$B > 0' })).toBe('$B > 0');
+  });
+
+  test('formatExpression with missing reducer', () => {
+    expect(formatExpression({ ref_id: 'B', type: 'reduce', expression: '$A' })).toBe('$A');
   });
 
   test('isDynamicTemplate', () => {
