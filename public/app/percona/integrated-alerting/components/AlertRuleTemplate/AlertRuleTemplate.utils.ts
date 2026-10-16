@@ -38,8 +38,8 @@ export const formatDate = (date: string | undefined) => date && moment(date).for
 export const isDynamicTemplate = (template: Template | FormattedTemplate) =>
   template.params?.some((p) => p.overridable);
 
-export const usesClickHouse = (template: Template) =>
-  template.queries?.some((query) => query.datasource === TemplateDatasourceType.CLICKHOUSE) ?? false;
+export const usesClickHouse = (template?: Template) =>
+  template?.queries?.some((query) => query.datasource === TemplateDatasourceType.CLICKHOUSE) ?? false;
 
 export const formatExpression = (expression: TemplateExpression) =>
   expression.type === 'reduce' && expression.reducer

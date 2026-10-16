@@ -122,5 +122,6 @@ describe('AlertRuleTemplatesTable utils', () => {
     expect(usesClickHouse(metricsTemplate)).toBe(false);
     expect(usesClickHouse(missingDatasourceTemplate)).toBe(false);
     expect(usesClickHouse(noQueriesTemplate)).toBe(false);
+    expect(usesClickHouse(undefined)).toBe(false);
   });
 });
