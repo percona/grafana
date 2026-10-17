@@ -19,24 +19,6 @@ export interface AlertingSettings {
   slack: SlackSettings;
 }
 
-export enum AdvisorRunIntervals {
-  rareInterval = 'rareInterval',
-  standardInterval = 'standardInterval',
-  frequentInterval = 'frequentInterval',
-}
-
-export interface AdvisorRunIntervalsSettings {
-  [AdvisorRunIntervals.rareInterval]: string;
-  [AdvisorRunIntervals.standardInterval]: string;
-  [AdvisorRunIntervals.frequentInterval]: string;
-}
-
-export interface AdvisorRunIntervalsPayload {
-  rare_interval: string;
-  standard_interval: string;
-  frequent_interval: string;
-}
-
 export interface AlertManagerPayload {
   alert_manager_url: string;
   alert_manager_rules: string;
@@ -57,8 +39,6 @@ export interface AdvancedPayload {
 export interface AdvancedChangePayload extends AdvancedPayload {
   enable_telemetry: boolean;
   enable_alerting?: boolean;
-  enable_advisor: boolean;
-  advisor_run_intervals?: AdvisorRunIntervalsPayload;
   enable_backup_management: boolean;
   enable_azurediscover?: boolean;
   enable_updates?: boolean;
@@ -93,7 +73,6 @@ export interface SettingsAPIResponse {
 export interface ReadonlySettingsPayload {
   updates_enabled: boolean;
   telemetry_enabled: boolean;
-  advisor_enabled: boolean;
   alerting_enabled: boolean;
   pmm_public_address: string;
   backup_management_enabled: boolean;
@@ -113,11 +92,9 @@ export interface SettingsPayload
   };
   updates_enabled: boolean;
   telemetry_enabled: boolean;
-  advisor_enabled: boolean;
   alerting_enabled: boolean;
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
-  advisor_run_intervals: AdvisorRunIntervalsPayload;
   telemetry_summaries: string[];
   default_role_id: number;
   enable_access_control: boolean;
@@ -136,11 +113,9 @@ export interface SettingsPayload
   };
   updates_enabled: boolean;
   telemetry_enabled: boolean;
-  advisor_enabled: boolean;
   alerting_enabled: boolean;
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
-  advisor_run_intervals: AdvisorRunIntervalsPayload;
   telemetry_summaries: string[];
   default_role_id: number;
   enable_access_control: boolean;
@@ -155,7 +130,6 @@ export type SettingsAPIChangePayload =
   | SSHPayload;
 
 export interface ReadonlySettings {
-  advisorEnabled: boolean;
   alertingEnabled: boolean;
   azureDiscoverEnabled?: boolean;
   backupEnabled: boolean;
@@ -166,7 +140,6 @@ export interface ReadonlySettings {
 }
 
 export interface Settings extends ReadonlySettings {
-  advisorRunIntervals: AdvisorRunIntervalsSettings;
   metricsResolutions: MetricsResolutions;
   dataRetention: string;
   sshKey: string;

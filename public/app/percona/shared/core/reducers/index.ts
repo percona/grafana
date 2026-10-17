@@ -38,7 +38,6 @@ const initialSettingsState: Settings = {
   awsPartitions: [],
   alertManagerUrl: '',
   alertManagerRules: '',
-  advisorEnabled: false,
   alertingEnabled: false,
   alertingSettings: {
     email: {
@@ -50,11 +49,6 @@ const initialSettingsState: Settings = {
     slack: {
       url: '',
     },
-  },
-  advisorRunIntervals: {
-    rareInterval: '10s',
-    standardInterval: '10s',
-    frequentInterval: '10s',
   },
   defaultRoleId: 1,
   enableAccessControl: false,

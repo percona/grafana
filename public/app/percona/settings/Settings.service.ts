@@ -60,7 +60,6 @@ const toModel = (response: SettingsPayload): Settings => ({
   sshKey: response.ssh_key,
   alertManagerUrl: response.alert_manager_url,
   alertManagerRules: response.alert_manager_rules,
-  advisorEnabled: response.advisor_enabled,
   azureDiscoverEnabled: response.azurediscover_enabled,
   alertingEnabled: response.alerting_enabled,
   alertingSettings: {
@@ -68,11 +67,6 @@ const toModel = (response: SettingsPayload): Settings => ({
     slack: response.slack_alerting_settings || {},
   },
   publicAddress: response.pmm_public_address,
-  advisorRunIntervals: {
-    rareInterval: response.advisor_run_intervals.rare_interval,
-    standardInterval: response.advisor_run_intervals.standard_interval,
-    frequentInterval: response.advisor_run_intervals.frequent_interval,
-  },
   backupEnabled: response.backup_management_enabled,
   defaultRoleId: response.default_role_id,
   enableAccessControl: response.enable_access_control,
@@ -93,7 +87,6 @@ const toReadonlyModel = (response: ReadonlySettingsPayload): Settings => ({
   sshKey: '',
   alertManagerUrl: '',
   alertManagerRules: '',
-  advisorEnabled: response.advisor_enabled,
   azureDiscoverEnabled: response.azurediscover_enabled,
   alertingEnabled: response.alerting_enabled,
   alertingSettings: {
@@ -105,11 +98,6 @@ const toReadonlyModel = (response: ReadonlySettingsPayload): Settings => ({
     slack: {},
   },
   publicAddress: response.pmm_public_address,
-  advisorRunIntervals: {
-    rareInterval: '',
-    standardInterval: '',
-    frequentInterval: '',
-  },
   backupEnabled: response.backup_management_enabled,
   defaultRoleId: -1,
   enableAccessControl: response.enable_access_control,
