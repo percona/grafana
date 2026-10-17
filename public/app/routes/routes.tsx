@@ -645,7 +645,7 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/pmm-database-checks/all-checks',
       // eslint-disable-next-line react/display-name
-      component: () => <Navigate replace to="/advisors/insights" />,
+      component: () => <Navigate replace to="/advisors" />,
     },
     {
       path: '/settings/*',
