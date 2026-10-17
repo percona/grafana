@@ -606,10 +606,31 @@ export function getAppRoutes(): RouteDescriptor[] {
           )
       ),
     },
+    // The Advisors UI lives in PMM; RedirectPage forwards /graph/advisors[/insights] to /pmm-ui.
+    // Legacy paths are first normalized with an internal redirect.
     {
       path: '/advisors',
       // eslint-disable-next-line react/display-name
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
+      ),
+    },
+    {
+      path: '/advisors/insights',
+      // eslint-disable-next-line react/display-name
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
+      ),
+    },
+    {
+      path: '/advisors/insights/:service',
+      // eslint-disable-next-line react/display-name
       component: () => <Navigate replace to="/advisors/insights" />,
+    },
+    {
+      path: '/advisors/:category',
+      // eslint-disable-next-line react/display-name
+      component: () => <Navigate replace to="/advisors" />,
     },
     {
       path: '/pmm-database-checks',
@@ -624,31 +645,7 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/pmm-database-checks/all-checks',
       // eslint-disable-next-line react/display-name
-      component: () => <Navigate replace to="/advisors/insights" />,
-    },
-    {
-      path: '/advisors/insights',
-      // eslint-disable-next-line react/display-name
-      component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/FailedChecksTab/FailedChecksTab'
-          )
-      ),
-    },
-    {
-      path: '/advisors/insights/:service',
-      component: SafeDynamicImport(
-        () =>
-          import(/* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/ServiceChecks/ServiceChecks')
-      ),
-    },
-    {
-      path: '/advisors/:category',
-      // eslint-disable-next-line react/display-name
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AllChecksPage" */ 'app/percona/check/components/AllChecksTab/AllChecksTab')
-      ),
+      component: () => <Navigate replace to="/advisors" />,
     },
     {
       path: '/settings/*',

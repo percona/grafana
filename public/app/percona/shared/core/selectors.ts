@@ -1,9 +1,5 @@
-import { createSelector } from '@reduxjs/toolkit';
-
 import { Settings } from 'app/percona/settings/Settings.types';
 import { StoreState } from 'app/types/store';
-
-import { groupAdvisorsIntoCategories } from '../services/advisors/Advisors.utils';
 
 export const getPerconaSettings = (state: StoreState) => state.percona.settings;
 export const getPerconaSettingFlag = (setting: keyof Settings) => (state: StoreState) =>
@@ -18,10 +14,6 @@ export const getUsers = (state: StoreState) => state.users;
 export const getUsersInfo = (state: StoreState) => state.percona.users;
 export const getDefaultRole = (state: StoreState) =>
   state.percona.roles.roles.find((r) => r.roleId === state.percona.settings.result?.defaultRoleId);
-export const getAdvisors = (state: StoreState) => state.percona.advisors;
-export const getCategorizedAdvisors = createSelector([getAdvisors], (advisors) =>
-  groupAdvisorsIntoCategories(advisors.result || [])
-);
 export const getDumps = (state: StoreState) => state.percona.pmmDumps;
 export const getUpdatesInfo = (state: StoreState) => state.percona.updates;
 export const getHighAvailability = (state: StoreState) => state.percona.highAvailability;
