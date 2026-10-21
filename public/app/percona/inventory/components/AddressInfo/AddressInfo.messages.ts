@@ -1,6 +1,6 @@
 export const Messages = {
   description:
-    'The address pmm-agent uses to connect to this database, as seen from the node it runs on. 127.0.0.1 or localhost means the database is local to that node, not to PMM Server.',
+    'The address pmm-agent uses to connect to this database, as seen from the host where that pmm-agent runs. 127.0.0.1 or localhost means the database runs on that same host, not necessarily on PMM Server.',
   learnMore: 'Learn more',
 };
 
