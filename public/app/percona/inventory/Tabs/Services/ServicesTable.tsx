@@ -13,6 +13,7 @@ import { ServiceStatus } from 'app/percona/shared/services/services/Services.typ
 
 import { Messages } from '../../Inventory.messages';
 import { FlattenService, MonitoringStatus } from '../../Inventory.types';
+import { AddressInfo } from '../../components/AddressInfo/AddressInfo';
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
 import { StatusInfo } from '../../components/StatusInfo/StatusInfo';
 import { StatusLink } from '../../components/StatusLink/StatusLink';
@@ -165,6 +166,7 @@ const ServicesTable: FC<ServicesTableProps> = ({
       {
         Header: Messages.services.columns.address,
         accessor: 'address',
+        tooltipInfo: <AddressInfo />,
         type: FilterFieldTypes.TEXT,
       },
       {
