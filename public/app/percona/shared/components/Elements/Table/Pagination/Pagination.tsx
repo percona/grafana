@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-import { FC, useState, useMemo } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 import { t } from '@grafana/i18n';
 import { useStyles, IconName, Button, Select } from '@grafana/ui';
 
@@ -20,6 +20,10 @@ export const Pagination: FC<PaginationProps> = ({
   onPageSizeChange = () => 0,
 }) => {
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
+
+  useEffect(() => {
+    setActivePageIndex(initialPageIndex);
+  }, [initialPageIndex]);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
   // We want to center our selected page, thus we need to know how many should be on the left
   const shownPages = getShownPages(pageArray, activePageIndex, pagesPerView);
