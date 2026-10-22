@@ -49,10 +49,8 @@ export const AlertRuleTemplate: FC = () => {
     try {
       const { templates, total_items, total_pages } = await AlertRuleTemplateService.list(
         {
-          page_params: {
-            index: pageIndex,
-            page_size: pageSize,
-          },
+          page_size: pageSize,
+          page_index: pageIndex,
         },
         generateToken(GET_TEMPLATES_CANCEL_TOKEN)
       );

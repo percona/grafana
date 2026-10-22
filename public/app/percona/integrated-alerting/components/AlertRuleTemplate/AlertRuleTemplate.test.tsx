@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom-v5-compat';
 
@@ -10,6 +10,7 @@ import { StoreState } from 'app/types/store';
 
 import { AlertRuleTemplate } from './AlertRuleTemplate';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
+import { templateStubs } from './__mocks__/alertRuleTemplateStubs';
 
 jest.mock('./AlertRuleTemplate.service');
 jest.mock('app/percona/shared/helpers/logger', () => {
@@ -80,6 +81,59 @@ describe('AlertRuleTemplate', () => {
     expect(screen.getByTestId('table-thead').querySelectorAll('tr')).toHaveLength(1);
     expect(screen.getByTestId('table-tbody').querySelectorAll('tr')).toHaveLength(6);
     expect(screen.queryByTestId('table-no-data')).not.toBeInTheDocument();
+  });
+
+  it('should request the first page with the selected page size', async () => {
+    const listSpy = jest.spyOn(AlertRuleTemplateService, 'list');
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AlertRuleTemplate />
+          </MemoryRouter>
+        )}
+      </Provider>
+    );
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+
+    expect(listSpy).toHaveBeenCalledWith({ page_size: 25, page_index: 0 }, expect.anything());
+  });
+
+  it('should request the next page', async () => {
+    const listSpy = jest
+      .spyOn(AlertRuleTemplateService, 'list')
+      .mockResolvedValue({ templates: templateStubs, total_items: 30, total_pages: 2 });
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AlertRuleTemplate />
+          </MemoryRouter>
+        )}
+      </Provider>
+    );
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    fireEvent.click(screen.getByTestId('next-page-button'));
+
+    await waitFor(() => expect(listSpy).toHaveBeenLastCalledWith({ page_size: 25, page_index: 1 }, expect.anything()));
   });
 
   it('should render correctly without data', async () => {
