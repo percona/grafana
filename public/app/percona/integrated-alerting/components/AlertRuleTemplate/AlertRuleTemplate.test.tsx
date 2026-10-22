@@ -136,6 +136,41 @@ describe('AlertRuleTemplate', () => {
     await waitFor(() => expect(listSpy).toHaveBeenLastCalledWith({ page_size: 25, page_index: 1 }, expect.anything()));
   });
 
+  it('should go back to the last page when the current one comes back empty', async () => {
+    const listSpy = jest
+      .spyOn(AlertRuleTemplateService, 'list')
+      .mockImplementation(async ({ page_index }) =>
+        page_index === 1
+          ? { templates: [], total_items: 25, total_pages: 1 }
+          : { templates: templateStubs, total_items: 26, total_pages: 2 }
+      );
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AlertRuleTemplate />
+          </MemoryRouter>
+        )}
+      </Provider>
+    );
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    fireEvent.click(screen.getByTestId('next-page-button'));
+
+    await waitFor(() => expect(listSpy).toHaveBeenLastCalledWith({ page_size: 25, page_index: 0 }, expect.anything()));
+    expect(await screen.findByTestId('page-button-active')).toHaveTextContent('1');
+    expect(screen.getByTestId('table-tbody').querySelectorAll('tr')).toHaveLength(6);
+    expect(screen.queryByTestId('table-no-data')).not.toBeInTheDocument();
+  });
+
   it('should render correctly without data', async () => {
     jest.spyOn(AlertRuleTemplateService, 'list').mockImplementation(() => {
       throw Error('test error');

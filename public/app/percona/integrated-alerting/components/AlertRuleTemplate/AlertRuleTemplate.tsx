@@ -54,6 +54,11 @@ export const AlertRuleTemplate: FC = () => {
         },
         generateToken(GET_TEMPLATES_CANCEL_TOKEN)
       );
+      // Deleting the only template on the last page leaves pageIndex past the end.
+      if (!templates.length && pageIndex > 0 && total_pages) {
+        setPageindex(total_pages - 1);
+        return;
+      }
       setData(formatTemplates(templates));
       setTotalItems(total_items || 0);
       setTotalPages(total_pages || 0);
