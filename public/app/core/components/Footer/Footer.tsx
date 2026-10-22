@@ -21,12 +21,6 @@ export let getFooterLinks = (): FooterLink[] => {
   if (isPmmAdmin(config.bootData.user)) {
     return [
       {
-        id: 'pmm-dump',
-        text: 'PMM Dump',
-        icon: 'brain',
-        url: '/graph/pmm-dump',
-      },
-      {
         id: 'pmm-logs',
         text: 'PMM Logs',
         icon: 'download-alt',
