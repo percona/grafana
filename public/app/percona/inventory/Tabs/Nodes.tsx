@@ -48,6 +48,7 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { OpenAlertThresholdsModalEvent } from 'app/percona/shared/core/events';
 
 export const NodesTab = () => {
   const { nodes } = useSelector(getNodes);
@@ -84,6 +85,20 @@ export const NodesTab = () => {
               action: () => {
                 setActionItem(row.original);
                 setModalVisible(true);
+              },
+            },
+            {
+              content: (
+                <Stack direction="row">
+                  <span className={styles.actionItemTxtSpan}>{Messages.overrideThresholds}</span>
+                </Stack>
+              ),
+              action: () => {
+                const event = new OpenAlertThresholdsModalEvent({
+                  nodeId: row.original.nodeId,
+                  nodeName: row.original.nodeName,
+                });
+                appEvents.publish(event);
               },
             },
           ]

@@ -3,6 +3,8 @@ import { memo } from 'react';
 import { Trans, t } from '@grafana/i18n';
 import { logInfo } from '@grafana/runtime';
 import { LinkButton, Stack } from '@grafana/ui';
+import { NewAlertRuleFromTemplateButton } from 'app/percona/integrated-alerting/components/NewAlertRuleFromTemplateButton/NewAlertRuleFromTemplateButton';
+import { usePerconaAlertingEnabled } from 'app/percona/integrated-alerting/hooks';
 
 import { LogMessages } from '../../Analytics';
 import { AIAlertRuleButtonComponent } from '../../enterprise-components/AI/AIGenAlertRuleButton/addAIAlertRuleButton';
@@ -32,6 +34,8 @@ RuleListActionButtons.displayName = 'RuleListActionButtons';
 function CreateAlertButtons() {
   const [createRuleSupported, createRuleAllowed] = useAlertingAbility(AlertingAction.CreateAlertRule);
   const [createCloudRuleSupported, createCloudRuleAllowed] = useAlertingAbility(AlertingAction.CreateExternalAlertRule);
+  // @PERCONA
+  const perconaAlertingEnabled = usePerconaAlertingEnabled();
 
   const returnTo = createReturnTo();
 
@@ -42,7 +46,10 @@ function CreateAlertButtons() {
     return (
       <Stack direction="row" gap={1}>
         {canCreateGrafanaRules && <AIAlertRuleButtonComponent />}
+        {/* @PERCONA */}
+        {canCreateGrafanaRules && <NewAlertRuleFromTemplateButton />}
         <LinkButton
+          variant={canCreateGrafanaRules && perconaAlertingEnabled ? 'secondary' : 'primary'}
           href={createRelativeUrl('/alerting/new/alerting', { returnTo })}
           icon="plus"
           onClick={() => logInfo(LogMessages.alertRuleFromScratch)}

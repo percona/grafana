@@ -12,7 +12,7 @@ const { awsNoCredentialsError, noCredentialsError } = Messages;
 
 class DiscoveryService {
   static async discoveryRDS(
-    { aws_access_key, aws_secret_key }: RDSCredentialsForm,
+    { aws_access_key, aws_secret_key, aws_role_arn }: RDSCredentialsForm,
     token?: CancelToken,
     disableNotifications = false
   ) {
@@ -22,6 +22,7 @@ class DiscoveryService {
         {
           aws_access_key,
           aws_secret_key,
+          aws_role_arn,
         },
         true,
         token
