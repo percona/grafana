@@ -30,6 +30,7 @@ import {
   ValkeyPayload,
   AddValkeyResponse,
 } from './AddRemoteInstance.types';
+import { sealSecrets } from './sealSecrets';
 
 const BASE_URL = '/services';
 
@@ -100,20 +101,33 @@ class AddRemoteInstanceService {
     return apiManagement.post<AddExternalResponse, AddServicePayload>(BASE_URL, { external: body }, false, token);
   }
 
-  static addRemote(type: InstanceAvailableType, data: RemoteInstancePayload, token?: CancelToken) {
+  static async addRemote(type: InstanceAvailableType, data: RemoteInstancePayload, token?: CancelToken) {
+    // The secrets to store in Vault are sealed to the key of the pmm-agent, which PMM Server passes them on to unread.
     switch (type) {
       case Databases.mongodb:
-        return AddRemoteInstanceService.addMongodb(toPayload(data, '', type) as MongoDBPayload, token);
+        return AddRemoteInstanceService.addMongodb(
+          (await sealSecrets(toPayload(data, '', type))) as MongoDBPayload,
+          token
+        );
       case Databases.mysql:
-        return AddRemoteInstanceService.addMysql(toPayload(data, '', type) as MySQLPayload, token);
+        return AddRemoteInstanceService.addMysql((await sealSecrets(toPayload(data, '', type))) as MySQLPayload, token);
       case Databases.postgresql:
-        return AddRemoteInstanceService.addPostgresql(toPayload(data, '', type) as PostgreSQLPayload, token);
+        return AddRemoteInstanceService.addPostgresql(
+          (await sealSecrets(toPayload(data, '', type))) as PostgreSQLPayload,
+          token
+        );
       case Databases.proxysql:
-        return AddRemoteInstanceService.addProxysql(toPayload(data, '', type) as ProxySQLPayload, token);
+        return AddRemoteInstanceService.addProxysql(
+          (await sealSecrets(toPayload(data, '', type))) as ProxySQLPayload,
+          token
+        );
       case Databases.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data), token);
       case Databases.valkey:
-        return AddRemoteInstanceService.addValkey(toPayload(data, '', type) as ValkeyPayload, token);
+        return AddRemoteInstanceService.addValkey(
+          (await sealSecrets(toPayload(data, '', type))) as ValkeyPayload,
+          token
+        );
       case InstanceTypesExtra.external:
         return AddRemoteInstanceService.addExternal(toExternalServicePayload(data), token);
       default:
