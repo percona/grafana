@@ -40,7 +40,7 @@ import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
 import { InventoryNode } from './Nodes.types';
-import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
+import { canRemoveNode, getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -72,41 +72,37 @@ export const NodesTab = () => {
   );
 
   const getActions = useCallback(
-    (row: Row<Node>): Action[] => {
-      const actions = [
-        {
-          content: (
-            <Stack direction="row">
-              <span className={styles.actionItemTxtSpan}>{Messages.overrideThresholds}</span>
-            </Stack>
-          ),
-          action: () => {
-            const event = new OpenAlertThresholdsModalEvent({
-              nodeId: row.original.nodeId,
-              nodeName: row.original.nodeName,
-            });
-            appEvents.publish(event);
-          },
-        },
-      ];
-
-      if (!row.original.isPmmServerNode) {
-        actions.push({
-          content: (
-            <Stack direction="row">
-              <Icon name="trash-alt" />
-              <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
-            </Stack>
-          ),
-          action: () => {
-            setActionItem(row.original);
-            setModalVisible(true);
-          },
-        });
-      }
-
-      return actions;
-    },
+    (row: Row<Node>): Action[] =>
+      canRemoveNode(row.original)
+        ? [
+            {
+              content: (
+                <Stack direction="row">
+                  <Icon name="trash-alt" />
+                  <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
+                </Stack>
+              ),
+              action: () => {
+                setActionItem(row.original);
+                setModalVisible(true);
+              },
+            },
+            {
+              content: (
+                <Stack direction="row">
+                  <span className={styles.actionItemTxtSpan}>{Messages.overrideThresholds}</span>
+                </Stack>
+              ),
+              action: () => {
+                const event = new OpenAlertThresholdsModalEvent({
+                  nodeId: row.original.nodeId,
+                  nodeName: row.original.nodeName,
+                });
+                appEvents.publish(event);
+              },
+            },
+          ]
+        : [],
     [styles.actionItemTxtSpan]
   );
 
@@ -425,7 +421,7 @@ export const NodesTab = () => {
             columns={columns}
             data={mappedNodes}
             totalItems={mappedNodes.length}
-            rowSelection={(row) => !row.original.isPmmServerNode}
+            rowSelection={(row) => canRemoveNode(row.original)}
             autoResetSelectedRows={false}
             autoResetExpanded={false}
             autoResetPage={false}

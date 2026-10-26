@@ -17,6 +17,10 @@ export const mapNodesToInventoryNodes = (nodes: Node[], haNodes: HighAvailabilit
     };
   });
 
+// PMM Server refuses to remove its own Nodes, and the Nodes a PMM deployment provisioned for itself
+// while their pmm-agent is connected, so they are not offered for removal.
+export const canRemoveNode = (node: Node) => !node.isPmmServerNode && !node.isPmmProtectedNode;
+
 export const getHaRoleBadgeText = (role: NodeRole) => {
   switch (role) {
     case NodeRole.leader:
