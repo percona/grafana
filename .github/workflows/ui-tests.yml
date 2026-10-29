@@ -75,39 +75,17 @@ jobs:
           repository: percona/pmm-qa
           path: ./pmm-qa
 
-      - name: Install dependencies for UI tests
-        working-directory: ./pmm-qa/codeceptjs-e2e
-        run: npm install
-
-      - name: install playwright
-        working-directory: ./pmm-qa/codeceptjs-e2e
-        run: npx playwright install
-
-      - name: Run UI tests
-        working-directory: ./pmm-qa/codeceptjs-e2e
-        run: npm run e2e:grafana-pr
-
-      - name: Attaching artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-tests-output
-          path:  ./pmm-qa/codeceptjs-e2e/tests/output
-
       - name: Install Playwright dependencies for UI tests
-        if: ${{ !cancelled() }}
         working-directory: ./pmm-qa/e2e_tests
         run: npm install
 
       - name: install playwright (e2e_tests)
-        if: ${{ !cancelled() }}
         working-directory: ./pmm-qa/e2e_tests
         run: npx playwright install
 
       - name: Run Playwright UI tests
-        if: ${{ !cancelled() }}
         working-directory: ./pmm-qa/e2e_tests
-        run: npx playwright test --grep @grafana-pr --pass-with-no-tests
+        run: npx playwright test --grep @grafana-pr
 
       - name: Attaching Playwright artifacts
         if: ${{ always() }}
