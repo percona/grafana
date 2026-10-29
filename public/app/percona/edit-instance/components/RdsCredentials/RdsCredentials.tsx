@@ -38,11 +38,13 @@ export const RdsCredentials: FC<RdsCredentialsProps> = ({ exporter, mode }) => {
             name="aws_access_key"
             label={fields.awsAccessKey.label}
             placeholder={fields.awsAccessKey.placeholder}
+            tooltipText={fields.awsAccessKey.tooltipText}
             validators={ACCESS_KEY_VALIDATORS}
           />
           <PasswordInputField
             name="aws_secret_key"
             label={fields.awsSecretKey.label}
+            tooltipText={fields.awsSecretKey.tooltipText}
             placeholder={
               exporter.isAwsSecretKeySet ? fields.awsSecretKey.storedPlaceholder : fields.awsSecretKey.placeholder
             }
