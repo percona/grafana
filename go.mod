@@ -1,6 +1,6 @@
 module github.com/grafana/grafana
 
-go 1.26.9
+go 1.26.10
 
 // Direct requirements -- every entry needs an owner
 require (
@@ -28,7 +28,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0 // @grafana/grafana-backend-group
 	github.com/VividCortex/mysqlerr v0.0.0-20170204212430-6c6b55f8796f // @grafana/grafana-backend-group
 	github.com/alicebob/miniredis/v2 v2.37.0 // @grafana/alerting-backend
-	github.com/andybalholm/brotli v1.2.2 // @grafana/partner-datasources
+	github.com/andybalholm/brotli v1.2.7 // @grafana/partner-datasources
 	github.com/apache/arrow-go/v18 v18.5.2 // @grafana/plugins-platform-backend
 	github.com/armon/go-radix v1.0.0 // @grafana/grafana-app-platform-squad
 	github.com/aws/aws-sdk-go v1.55.8 // @grafana/aws-datasources
@@ -64,7 +64,7 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1 // @grafana/identity-access-team
 	github.com/fullstorydev/grpchan v1.1.1 // @grafana/grafana-backend-group
 	github.com/gchaincl/sqlhooks v1.3.0 // @grafana/grafana-search-and-storage
-	github.com/getkin/kin-openapi v0.147.0 // @grafana/grafana-app-platform-squad
+	github.com/getkin/kin-openapi v0.151.0 // @grafana/grafana-app-platform-squad
 	github.com/go-jose/go-jose/v4 v4.1.4 // @grafana/identity-access-team
 	github.com/go-kit/log v0.2.1 //  @grafana/grafana-backend-group
 	github.com/go-ldap/ldap/v3 v3.4.4 // @grafana/identity-access-team
@@ -700,7 +700,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/prometheus/client_golang/exp v0.0.0-20260602051030-3537b20ac86b // indirect
-	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3 // indirect
 	github.com/sony/gobreaker/v2 v2.4.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
