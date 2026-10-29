@@ -35,6 +35,42 @@ describe('Pagination', () => {
     expect(screen.getByTestId('last-page-button')).not.toBeDisabled();
   });
 
+  it('should follow the pageIndex prop when controlled', () => {
+    const onPageChange = jest.fn();
+    const { rerender } = render(
+      <Pagination
+        pageIndex={2}
+        totalItems={30}
+        pageCount={3}
+        pageSizeOptions={[]}
+        pageSize={10}
+        nrRowsOnCurrentPage={10}
+        onPageChange={onPageChange}
+      />
+    );
+
+    expect(screen.getByTestId('page-button-active')).toHaveTextContent('3');
+
+    fireEvent.click(screen.getByTestId('first-page-button'));
+
+    expect(onPageChange).toHaveBeenCalledWith(0);
+    expect(screen.getByTestId('page-button-active')).toHaveTextContent('3');
+
+    rerender(
+      <Pagination
+        pageIndex={1}
+        totalItems={30}
+        pageCount={3}
+        pageSizeOptions={[]}
+        pageSize={10}
+        nrRowsOnCurrentPage={10}
+        onPageChange={onPageChange}
+      />
+    );
+
+    expect(screen.getByTestId('page-button-active')).toHaveTextContent('2');
+  });
+
   it('should show all pages when pagesPerView > totalPages', () => {
     render(
       <Pagination

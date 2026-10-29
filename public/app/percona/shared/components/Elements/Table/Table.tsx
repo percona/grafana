@@ -311,7 +311,7 @@ export const Table: FC<TableProps> = ({
         <Pagination
           pagesPerView={pagesPerView}
           pageCount={pageCount}
-          initialPageIndex={pageIndex}
+          pageIndex={pageIndex}
           totalItems={totalItems}
           pageSizeOptions={PAGE_SIZES}
           pageSize={pageSize}
