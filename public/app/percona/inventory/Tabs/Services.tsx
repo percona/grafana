@@ -14,7 +14,7 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { DATA_INTERVAL } from 'app/percona/shared/core';
 import { ServiceDeletedEvent } from 'app/percona/shared/core/events';
 import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
-import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -72,14 +72,13 @@ export const Services = () => {
   const loadData = useCallback(async () => {
     // FIX PMM-14640: Check if component is still mounted before making requests.
     // This prevents "zombie" requests when useRecurringCall timer fires after unmount.
-    // Without this check, requests to /v1/inventory/services:getTypes continue on other pages.
+    // Without this check, requests to /v1/management/services continue on other pages.
     if (!isMountedRef.current) {
       return;
     }
 
     try {
       await dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
-      await dispatch(fetchActiveServiceTypesAction());
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
