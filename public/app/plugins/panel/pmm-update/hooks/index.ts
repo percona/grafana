@@ -1,1 +1,0 @@
-export { useToggleOnAltClick } from './useToggleOnAltClick';

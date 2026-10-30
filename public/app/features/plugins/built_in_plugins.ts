@@ -12,10 +12,6 @@ const prometheusPlugin = async () =>
   await import(/* webpackChunkName: "prometheusPlugin" */ 'app/plugins/datasource/prometheus/module');
 const alertmanagerPlugin = async () =>
   await import(/* webpackChunkName: "alertmanagerPlugin" */ 'app/plugins/datasource/alertmanager/module');
-const pmmPTSummaryDatasource = async () =>
-  await import(
-    /* webpackChunkName: "pmmPTSummaryDatasource" */ 'app/plugins/datasource/pmm-pt-summary-datasource/module'
-  );
 
 // Async loaded panels
 const alertListPanel = async () =>
@@ -60,13 +56,6 @@ const tracesPanel = async () => await import(/* webpackChunkName: "tracesPanel" 
 const trendPanel = async () => await import(/* webpackChunkName: "trendPanel" */ 'app/plugins/panel/trend/module');
 const welcomeBanner = async () =>
   await import(/* webpackChunkName: "welcomeBanner" */ 'app/plugins/panel/welcome/module');
-// @PERCONA
-const pmmCheckPanel = async () =>
-  await import(/* webpackChunkName: "pmmCheckPanel" */ 'app/plugins/panel/pmm-check/module');
-const pmmPTSummaryPanel = async () =>
-  await import(/* webpackChunkName: "pmmPTSummaryPanel" */ 'app/plugins/panel/pmm-pt-summary-panel/module');
-const pmmUpdatePanel = async () =>
-  await import(/* webpackChunkName: "pmmUpdatePanel" */ 'app/plugins/panel/pmm-update/module');
 
 const geomapPanel = async () => await import(/* webpackChunkName: "geomapPanel" */ 'app/plugins/panel/geomap/module');
 const canvasPanel = async () => await import(/* webpackChunkName: "canvasPanel" */ 'app/plugins/panel/canvas/module');
@@ -86,8 +75,6 @@ const builtInPlugins: Record<string, System.Module | (() => Promise<System.Modul
   'core:plugin/mixed': mixedPlugin,
   'core:plugin/prometheus': prometheusPlugin,
   'core:plugin/alertmanager': alertmanagerPlugin,
-  // @PERCONA
-  'core:plugin/pmm-pt-summary-datasource': pmmPTSummaryDatasource,
   // panels
   'core:plugin/text': textPanel,
   'core:plugin/timeseries': timeseriesPanel,
@@ -120,10 +107,6 @@ const builtInPlugins: Record<string, System.Module | (() => Promise<System.Modul
   'core:plugin/welcome': welcomeBanner,
   'core:plugin/nodeGraph': nodeGraph,
   'core:plugin/histogram': histogramPanel,
-  // @PERCONA
-  'core:plugin/pmm-check': pmmCheckPanel,
-  'core:plugin/pmm-update': pmmUpdatePanel,
-  'core:plugin/pmm-pt-summary-panel': pmmPTSummaryPanel,
 };
 
 export function isBuiltinPluginPath(path: string): path is keyof typeof builtInPlugins {
