@@ -14,7 +14,6 @@ import {
   AzureMonitorDataSourceJsonData,
   AzureMonitorLocations,
   AzureMonitorMetricsMetadataResponse,
-  AzureMonitorProvidersResponse,
   DatasourceValidationResult,
   GetLogAnalyticsTableResponse,
   GetMetricMetadataQuery,
@@ -27,7 +26,7 @@ import {
   Subscription,
   TablePlan,
 } from '../types/types';
-import { replaceTemplateVariables, routeNames } from '../utils/common';
+import { fetchAllArmPages, replaceTemplateVariables, routeNames } from '../utils/common';
 import migrateQuery from '../utils/migrateQuery';
 
 import ResponseParser from './response_parser';
@@ -47,7 +46,6 @@ export default class AzureMonitorDatasource extends DataSourceWithBackend<
   apiVersion = '2018-01-01';
   apiPreviewVersion = '2017-12-01-preview';
   listByResourceGroupApiVersion = '2021-04-01';
-  providerApiVersion = '2021-04-01';
   locationsApiVersion = '2020-01-01';
   defaultSubscriptionId?: string;
   basicLogsEnabled?: boolean;
@@ -171,11 +169,12 @@ export default class AzureMonitorDatasource extends DataSourceWithBackend<
       return [];
     }
 
-    return this.getResource<AzureAPIResponse<Subscription>>(
-      `${this.resourcePath}/subscriptions?api-version=2019-03-01`
-    ).then((result) => {
-      return ResponseParser.parseSubscriptions(result);
-    });
+    const value = await fetchAllArmPages<Subscription>(
+      this.resourcePath,
+      `${this.resourcePath}/subscriptions?api-version=2019-03-01`,
+      (path) => this.getResource<AzureAPIResponse<Subscription>>(path)
+    );
+    return ResponseParser.parseSubscriptions({ value });
   }
 
   // Note globalRegion should be false when querying custom metric namespaces
@@ -319,12 +318,6 @@ export default class AzureMonitorDatasource extends DataSourceWithBackend<
     // { resourceGroup: ['rg1', 'rg2'], resourceName: ['res2'] } would result in
     // { resourceGroup: 'rg1', resourceName: 'res2' } which is not.
     return replaceTemplateVariables(this.templateSrv, query, scopedVars)[0];
-  }
-
-  async getProvider(providerName: string) {
-    return await this.getResource<AzureMonitorProvidersResponse>(
-      `${routeNames.azureMonitor}/providers/${providerName}?api-version=${this.providerApiVersion}`
-    );
   }
 
   async getLocations(subscriptions: string[]) {
