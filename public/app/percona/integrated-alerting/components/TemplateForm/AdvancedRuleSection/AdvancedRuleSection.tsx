@@ -1,8 +1,13 @@
 import { FC, useState } from 'react';
 
-import { Collapse, useStyles } from '@grafana/ui';
+import { Badge, Collapse, Stack, useStyles } from '@grafana/ui';
 import { Label } from 'app/percona/shared/components/Form/Label';
 
+import {
+  formatDatasource,
+  formatExpression,
+  getDatasourceBadgeColor,
+} from '../../AlertRuleTemplate/AlertRuleTemplate.utils';
 import { Messages } from '../TemplateForm.messages';
 
 import { getStyles } from './AdvancedRuleSection.styles';
@@ -32,10 +37,17 @@ export const AdvancedRuleSection: FC<AdvancedRuleSectionProps> = ({
             {queries.map((query) => (
               <div
                 key={query.ref_id}
-                data-testid={'template-query-' + query.ref_id}
+                data-testid={`template-query-${query.ref_id}`}
                 className={styles.templateParsedField}
               >
-                <Label label={query.ref_id + ':'} />
+                <Stack direction="row" alignItems="center">
+                  <Label label={query.ref_id + ':'} />
+                  <Badge
+                    text={formatDatasource(query.datasource)}
+                    color={getDatasourceBadgeColor(query.datasource)}
+                    data-testid={`template-query-${query.ref_id}-datasource`}
+                  />
+                </Stack>
                 <pre>{query.expr}</pre>
               </div>
             ))}
@@ -51,7 +63,7 @@ export const AdvancedRuleSection: FC<AdvancedRuleSectionProps> = ({
                 className={styles.templateParsedField}
               >
                 <Label label={expression.ref_id + ':'} />
-                <pre>{expression.expression}</pre>
+                <pre>{formatExpression(expression)}</pre>
               </div>
             ))}
           </div>
