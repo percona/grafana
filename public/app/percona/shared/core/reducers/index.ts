@@ -122,15 +122,7 @@ export const updateSettingsAction = createAsyncThunk(
 
 export const fetchTemplatesAction = createAsyncThunk(
   'percona/fetchTemplates',
-  async (): Promise<TemplatesList> =>
-    withSerializedError(
-      AlertRuleTemplateService.list({
-        page_params: {
-          index: 0,
-          page_size: 100,
-        },
-      })
-    )
+  async (): Promise<TemplatesList> => withSerializedError(AlertRuleTemplateService.list({}))
 );
 
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;

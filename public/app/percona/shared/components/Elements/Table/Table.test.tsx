@@ -119,6 +119,38 @@ describe('Table', () => {
     expect(screen.getAllByTestId('page-button-active')).toHaveLength(1);
   });
 
+  it('should follow a pageIndex change from the parent with controlled pagination', () => {
+    const { rerender } = render(
+      <Table
+        showPagination
+        totalItems={21}
+        totalPages={3}
+        pageSize={10}
+        pageIndex={2}
+        data={data}
+        columns={columns}
+        onPaginationChanged={jest.fn()}
+      />
+    );
+
+    expect(screen.getByTestId('page-button-active')).toHaveTextContent('3');
+
+    rerender(
+      <Table
+        showPagination
+        totalItems={20}
+        totalPages={2}
+        pageSize={10}
+        pageIndex={1}
+        data={data}
+        columns={columns}
+        onPaginationChanged={jest.fn()}
+      />
+    );
+
+    expect(screen.getByTestId('page-button-active')).toHaveTextContent('2');
+  });
+
   it('should display partial data with showPagination using uncontrolled pagination', () => {
     const mockData = [];
 

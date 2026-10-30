@@ -11,6 +11,7 @@ import { getShownPages, getLeftItemNumber, getRightItemNumber } from './Paginati
 export const Pagination: FC<PaginationProps> = ({
   pageCount = 1,
   initialPageIndex = 0,
+  pageIndex,
   pageSize,
   pagesPerView = 3,
   nrRowsOnCurrentPage,
@@ -19,7 +20,8 @@ export const Pagination: FC<PaginationProps> = ({
   onPageChange = () => 0,
   onPageSizeChange = () => 0,
 }) => {
-  const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
+  const [uncontrolledPageIndex, setUncontrolledPageIndex] = useState(initialPageIndex);
+  const activePageIndex = pageIndex ?? uncontrolledPageIndex;
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
   // We want to center our selected page, thus we need to know how many should be on the left
   const shownPages = getShownPages(pageArray, activePageIndex, pagesPerView);
@@ -27,18 +29,18 @@ export const Pagination: FC<PaginationProps> = ({
   const rightItemNumber = getRightItemNumber(activePageIndex, pageSize, nrRowsOnCurrentPage);
   const style = useStyles(getStyles);
 
-  const gotoPage = (pageIndex: number) => {
-    pageIndex = Math.max(0, Math.min(pageIndex, pageCount - 1));
+  const gotoPage = (newPageIndex: number) => {
+    newPageIndex = Math.max(0, Math.min(newPageIndex, pageCount - 1));
 
-    if (pageIndex !== activePageIndex) {
-      setActivePageIndex(pageIndex);
-      onPageChange(pageIndex);
+    if (newPageIndex !== activePageIndex) {
+      setUncontrolledPageIndex(newPageIndex);
+      onPageChange(newPageIndex);
     }
   };
 
   const pageSizeChanged = (pageSize: number) => {
     onPageSizeChange(pageSize);
-    setActivePageIndex(0);
+    setUncontrolledPageIndex(0);
   };
 
   return (

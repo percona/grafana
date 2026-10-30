@@ -186,6 +186,14 @@ export const Table: FC<TableProps> = ({
     onPaginationChanged(newPageSize, 0);
   };
 
+  // react-table reads pageIndex only on mount; follow the parent when it moves the page itself.
+  useEffect(() => {
+    if (manualPagination && propPageIndex !== pageIndex) {
+      gotoPage(propPageIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propPageIndex]);
+
   useEffect(() => {
     if (onRowSelection) {
       onRowSelection(selectedFlatRows);
@@ -303,7 +311,7 @@ export const Table: FC<TableProps> = ({
         <Pagination
           pagesPerView={pagesPerView}
           pageCount={pageCount}
-          initialPageIndex={pageIndex}
+          pageIndex={pageIndex}
           totalItems={totalItems}
           pageSizeOptions={PAGE_SIZES}
           pageSize={pageSize}
