@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import { DataModel } from 'app/percona/backup/Backup.types';
+import { Compression, DataModel } from 'app/percona/backup/Backup.types';
 
 import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 
@@ -13,6 +13,7 @@ describe('ScheduledBackupsDetails', () => {
         dataModel={DataModel.PHYSICAL}
         cronExpression=" * * * 1,3 0"
         folder="folder1"
+        compression={Compression.NONE}
       />
     );
     expect(screen.getByTestId('scheduled-backup-details-wrapper')).toBeInTheDocument();
@@ -21,5 +22,6 @@ describe('ScheduledBackupsDetails', () => {
     expect(screen.getByTestId('scheduled-backup-details-cron')).toBeInTheDocument();
     expect(screen.getByTestId('scheduled-backup-details-data-model')).toBeInTheDocument();
     expect(screen.getByTestId('scheduled-backup-details-folder')).toBeInTheDocument();
+    expect(screen.getByTestId('scheduled-backup-details-compression')).toBeInTheDocument();
   });
 });

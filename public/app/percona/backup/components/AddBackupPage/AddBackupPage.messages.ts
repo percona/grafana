@@ -13,6 +13,10 @@ export const Messages = {
   folder: 'Folder',
   location: 'Location',
   retryMode: 'Retry mode',
+  compression: 'Compression',
+  compressionTooltip:
+    'Choose the compression algorithm for the backup. Different algorithms offer different trade-offs between compression ratio and speed.',
+  selectCompression: 'Select compression type',
   cancelAction: 'Cancel',
   retryTimes: 'Retry, times',
   retryInterval: 'Retry interval, seconds',
