@@ -46,6 +46,7 @@ const Credentials: FC<CredentialsProps> = ({ discover }) => {
                 name={awsAccessKey.name}
                 placeholder={awsAccessKey.placeholder}
                 label={awsAccessKey.label}
+                tooltipText={awsAccessKey.tooltipText}
                 fieldClassName={styles.credentialsField}
                 validators={exclusiveValidators}
               />
@@ -53,6 +54,7 @@ const Credentials: FC<CredentialsProps> = ({ discover }) => {
                 name={awsSecretKey.name}
                 placeholder={awsSecretKey.placeholder}
                 label={awsSecretKey.label}
+                tooltipText={awsSecretKey.tooltipText}
                 fieldClassName={styles.credentialsField}
                 validators={exclusiveValidators}
               />

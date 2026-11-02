@@ -11,6 +11,7 @@ import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
+import { requiredUnlessVaultPath, VaultPathField } from '../VaultPath/VaultPath';
 
 export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, remoteInstanceCredentials }) => {
   const styles = useStyles2(getStyles);
@@ -28,7 +29,7 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
     []
   );
   const userPassValidators = useMemo(
-    () => (tlsFlag || type === Databases.valkey ? [] : [validators.required]),
+    () => (tlsFlag || type === Databases.valkey ? [] : [requiredUnlessVaultPath]),
     [tlsFlag, type]
   );
 
@@ -79,6 +80,10 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />
+      </div>
+      <div className={styles.group}>
+        <VaultPathField />
+        <div />
       </div>
       <div className={styles.group}>
         <TextInputField

@@ -24,10 +24,12 @@ export const Messages = {
     awsAccessKey: {
       label: awsAccessKey.label,
       placeholder: awsAccessKey.placeholder,
+      tooltipText: awsAccessKey.tooltipText,
     },
     awsSecretKey: {
       label: awsSecretKey.label,
       placeholder: awsSecretKey.placeholder,
+      tooltipText: awsSecretKey.tooltipText,
       storedPlaceholder: 'Leave blank to keep the current secret key',
     },
     awsRoleArn: {
