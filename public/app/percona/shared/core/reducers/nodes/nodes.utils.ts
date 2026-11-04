@@ -41,6 +41,7 @@ export const nodeFromDbMapper = (nodeFromDb: NodeDB[]): Node[] => {
       containerName: node.container_name,
       customLabels: node.custom_labels,
       isPmmServerNode: node.is_pmm_server_node,
+      isPmmProtectedNode: node.is_pmm_protected_node,
       agents: agents,
       createdAt: node.created_at,
       updatedAt: node.updated_at,

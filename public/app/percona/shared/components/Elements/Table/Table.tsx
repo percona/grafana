@@ -171,6 +171,7 @@ export const Table: FC<TableProps> = ({
     setPageSize,
     gotoPage,
     selectedFlatRows,
+    toggleRowSelected,
     state: { pageSize, pageIndex },
   } = tableInstance;
   const hasData = data.length > 0;
@@ -185,6 +186,15 @@ export const Table: FC<TableProps> = ({
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
+
+  // A selection can outlive a data refresh (autoResetSelectedRows off), so drop rows that stopped being selectable.
+  useEffect(() => {
+    if (typeof rowSelection !== 'function') {
+      return;
+    }
+
+    selectedFlatRows.filter((row) => !rowSelection(row)).forEach((row) => toggleRowSelected(row.id, false));
+  }, [rowSelection, selectedFlatRows, toggleRowSelected]);
 
   useEffect(() => {
     if (onRowSelection) {
