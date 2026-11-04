@@ -209,4 +209,27 @@ describe('Table', () => {
     fireEvent.click(screen.getByTestId('table-select-all-checkbox-input'));
     expect(onRowSelection.mock.lastCall[0]).toHaveLength(0);
   });
+
+  it('should deselect a selected row that stops matching the rowSelection predicate', () => {
+    const onRowSelection = jest.fn();
+    const renderTable = (rows: Array<{ value: string; locked: boolean }>) => (
+      <Table
+        totalItems={rows.length}
+        data={rows}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        rowSelection={(row: Row<{ value: string; locked: boolean }>) => !row.original.locked}
+        onRowSelection={onRowSelection}
+        autoResetSelectedRows={false}
+        getRowId={(row) => row.value}
+      />
+    );
+    const { rerender } = render(renderTable([{ value: 'node1', locked: false }]));
+
+    fireEvent.click(screen.getByTestId('table-select-node1-checkbox-input'));
+    expect(onRowSelection.mock.lastCall[0]).toHaveLength(1);
+
+    rerender(renderTable([{ value: 'node1', locked: true }]));
+    expect(onRowSelection.mock.lastCall[0]).toHaveLength(0);
+  });
 });
