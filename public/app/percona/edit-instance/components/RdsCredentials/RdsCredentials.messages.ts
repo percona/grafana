@@ -1,11 +1,3 @@
-import { Messages as DiscoveryMessages } from 'app/percona/add-instance/components/Discovery/components/Credentials/Credentials.messages';
-
-const { awsAccessKey, awsSecretKey, awsRoleArn } = DiscoveryMessages.form.fields;
-
-// Field labels and placeholders are shared with the discovery form so the same credential is not
-// called two different things in two places. The tooltips are not shared: on discovery the
-// identity is PMM Server's and the action is listing instances, while here it is the pmm-agent
-// host's and the action is scraping CloudWatch.
 export const Messages = {
   sectionTitle: 'Amazon RDS credentials',
   description:
@@ -22,17 +14,17 @@ export const Messages = {
   },
   fields: {
     awsAccessKey: {
-      label: awsAccessKey.label,
-      placeholder: awsAccessKey.placeholder,
+      label: 'Amazon RDS access key',
+      placeholder: 'Amazon RDS access key',
     },
     awsSecretKey: {
-      label: awsSecretKey.label,
-      placeholder: awsSecretKey.placeholder,
+      label: 'Amazon RDS secret key',
+      placeholder: 'Amazon RDS secret key',
       storedPlaceholder: 'Leave blank to keep the current secret key',
     },
     awsRoleArn: {
-      label: awsRoleArn.label,
-      placeholder: awsRoleArn.placeholder,
+      label: 'AWS IAM role ARN',
+      placeholder: 'arn:aws:iam::123456789012:role/PmmRdsMonitoring',
       tooltipText:
         'The pmm-agent host running this exporter assumes this role using its own AWS identity. PMM stores no access key for it.',
     },

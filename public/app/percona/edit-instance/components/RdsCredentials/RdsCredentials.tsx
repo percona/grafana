@@ -1,11 +1,11 @@
 import { FC, useMemo } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 
+import { getStyles } from '../../EditInstance.styles';
 import { RdsAuthMode } from '../../EditInstance.types';
 
 import { ACCESS_KEY_VALIDATORS, AUTH_MODE_OPTIONS, ROLE_ARN_VALIDATORS } from './RdsCredentials.constants';

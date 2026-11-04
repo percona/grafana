@@ -11,7 +11,6 @@ import { Page } from 'app/core/components/Page/Page';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { useAppDispatch } from 'app/store/store';
 
-import { Labels } from '../add-instance/components/AddRemoteInstance/FormParts';
 import {
   PMM_EDIT_INSTANCE_PAGE,
   PMM_SERVICES_PAGE,
@@ -31,6 +30,7 @@ import { Messages } from './EditInstance.messages';
 import { getStyles } from './EditInstance.styles';
 import { EditInstanceFormValues, RdsAuthMode, RdsExporter } from './EditInstance.types';
 import { getInitialValues, getRdsExporter, getService, toRdsCredentialsPayload } from './EditInstance.utils';
+import { Labels } from './components/Labels/Labels';
 import { RdsCredentials } from './components/RdsCredentials/RdsCredentials';
 
 const EditInstancePage: FC = () => {
@@ -233,7 +233,7 @@ const EditInstancePage: FC = () => {
             >
               <Page.Contents isLoading={isLoading}>
                 <form onSubmit={handleSubmit} data-testid="edit-instance-form">
-                  <Labels showNodeFields={false} />
+                  <Labels />
                   {rdsExporter && <RdsCredentials exporter={rdsExporter} mode={values?.rds_auth_mode} />}
                   {/* enable submit by keyboard */}
                   <input type="submit" className={styles.hidden} />
