@@ -23,9 +23,7 @@ import {
   PMM_ACCESS_ROLES_PAGE,
   PMM_ADD_INSTANCE_PAGE,
   PMM_BACKUP_PAGE,
-  PMM_DUMP_PAGE,
   PMM_EDIT_INSTANCE_PAGE,
-  PMM_EXPORT_DUMP_PAGE,
   PMM_INVENTORY_PAGE,
 } from './PerconaNavigation/PerconaNavigation.constants';
 import {
@@ -50,7 +48,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       const updatedNavTree = buildInitialState();
       const { alertingEnabled } = settings || {};
 
-      await dispatch(updateNavIndex(PMM_EXPORT_DUMP_PAGE));
       await dispatch(updateNavIndex(PMM_BACKUP_PAGE));
       await dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
       await dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
@@ -61,13 +58,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       await dispatch(updateNavIndex(buildAdvisorsNavItem(categorizedAdvisors)));
 
       if (isPmmAdmin(config.bootData.user)) {
-        // PMM Dump
-        const help = updatedNavTree['help'];
-        if (help) {
-          dispatch(updateNavIndex(PMM_DUMP_PAGE));
-          dispatch(updateNavIndex(help));
-        }
-
         if (settings?.enableAccessControl) {
           const cfg = updatedNavTree['cfg'];
           const usersAndAccessWithRoles = buildUsersAndAccessNavWithRoles(updatedNavTree);

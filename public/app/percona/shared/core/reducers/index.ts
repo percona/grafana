@@ -17,7 +17,6 @@ import perconaBackupLocations from './backups/backupLocations';
 import highAvailabilityReducer from './highAvailability/highAvailability';
 import navigationReducer from './navigation';
 import nodesReducer from './nodes';
-import pmmDumpsReducers from './pmmDump/pmmDump';
 import rolesReducers from './roles/roles';
 import servicesReducer from './services';
 import updatesReducers from './updates';
@@ -151,7 +150,6 @@ export default {
     roles: rolesReducers,
     users: usersReducers,
     advisors: advisorsReducers,
-    pmmDumps: pmmDumpsReducers,
     updates: updatesReducers,
     highAvailability: highAvailabilityReducer,
   }),

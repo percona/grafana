@@ -130,22 +130,6 @@ export const PMM_ADD_INSTANCE_CREATE_PAGE: NavModelItem = {
   isCreateAction: true,
 };
 
-export const PMM_EXPORT_DUMP_PAGE: NavModelItem = {
-  id: 'pmm-dump-export',
-  url: `${config.appSubUrl}/pmm-dump/new`,
-  text: 'Export new dataset',
-};
-
-export const PMM_DUMP_PAGE: NavModelItem = {
-  id: 'pmm-dump',
-  url: `${config.appSubUrl}/pmm-dump`,
-  icon: 'brain',
-  subTitle:
-    'Simplify troubleshooting and accelerate issue resolution by securely sharing relevant data, ensuring a smoother support experience.',
-  text: 'PMM Dump',
-  children: [PMM_EXPORT_DUMP_PAGE],
-};
-
 export const PMM_EDIT_INSTANCE_PAGE: NavModelItem = {
   id: 'edit-instance',
   url: `${config.appSubUrl}/edit-instance`,
