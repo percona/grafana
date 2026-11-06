@@ -1,4 +1,3 @@
-export { awsRoleArn } from './awsRoleArn';
 export { compose } from './compose';
 export { containsLowercase } from './containsLowercase';
 export { containsUppercase } from './containsUppercase';
