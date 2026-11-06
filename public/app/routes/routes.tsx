@@ -665,27 +665,15 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/add-instance',
+      path: '/add-instance/*',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')
-      ),
-    },
-    {
-      path: '/add-instance/:instanceType',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')
+        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
       ),
     },
     {
       path: '/edit-instance/:serviceId',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
-      ),
-    },
-    {
-      path: '/add-instance/:tab',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')
       ),
     },
     {
