@@ -10,6 +10,7 @@ import {
   Template,
   TemplateParamType,
 } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
+import { usesClickHouse } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.utils';
 import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
 import { getTemplates } from 'app/percona/shared/core/selectors';
 import { useDispatch, useSelector } from 'app/types/store';
@@ -219,7 +220,7 @@ export const TemplateForm: FC = () => {
 
       <EvaluationGroup />
 
-      <TemplateFiltersField />
+      <TemplateFiltersField description={Messages.getFiltersDescription(usesClickHouse(currentTemplate))} />
 
       {currentTemplate && (
         <AdvancedRuleSection

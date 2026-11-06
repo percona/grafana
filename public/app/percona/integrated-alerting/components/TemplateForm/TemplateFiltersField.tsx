@@ -9,7 +9,11 @@ import { AlertRuleFilterType } from 'app/percona/shared/core';
 import { Messages } from './TemplateForm.messages';
 import { getStyles } from './TemplateForm.styles';
 
-const TemplateFiltersField: FC = () => {
+interface TemplateFiltersFieldProps {
+  description?: string;
+}
+
+const TemplateFiltersField: FC<TemplateFiltersFieldProps> = ({ description = Messages.tooltips.filters }) => {
   const styles = useStyles2(getStyles);
   const {
     register,
@@ -30,7 +34,7 @@ const TemplateFiltersField: FC = () => {
       {({ fields, append, remove }) => (
         <>
           <div className={styles.filtersLabelWrapper}>
-            <Label description={Messages.tooltips.filters}>{Messages.filter.header}</Label>
+            <Label description={description}>{Messages.filter.header}</Label>
           </div>
 
           <Button
