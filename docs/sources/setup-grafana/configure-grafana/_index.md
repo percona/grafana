@@ -1017,6 +1017,16 @@ This is a comma-separated list of usernames. Users specified here are hidden in 
 
 <hr>
 
+### `[service_accounts]`
+
+#### `token_expiration_day_limit`
+
+The maximum number of days a new service account token can be valid for. When set, Grafana rejects new tokens that have no expiration date or that expire later than this limit. Existing tokens aren't affected. By default, there is no limit.
+
+For more information, refer to [Service account token expiration dates](../../administration/service-accounts/#service-account-token-expiration-dates).
+
+<hr>
+
 ### `[auth]`
 
 Grafana provides many ways to authenticate users. Refer to the Grafana [Authentication overview](../configure-access/configure-authentication/) and other authentication documentation for detailed instructions on how to set up and configure authentication.
@@ -2093,6 +2103,10 @@ Set the query offset to imported Grafana-managed rules when `query_offset` is no
 #### `default_datasource_uid`
 
 Set the default data source UID to use for query execution when importing Prometheus rules. Grafana uses this default when the `X-Grafana-Alerting-Datasource-UID` header isn't provided during import. If this option isn't set, the header becomes required. The default value is empty.
+
+#### `max_request_body_bytes`
+
+Set the maximum allowed request body size in bytes for Prometheus conversion API POST endpoints. This limits the size of rule group and Alertmanager configuration payloads that can be imported. Set to `0` to disable the limit. The default value is `52428800` (50 MB).
 
 <hr>
 
