@@ -655,32 +655,10 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/inventory',
+      path: '/inventory/*',
       // eslint-disable-next-line react/display-name
-      component: () => <Navigate replace to="/inventory/services" />,
-    },
-    {
-      path: '/inventory/services',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "InventoryServicesPage" */ 'app/percona/inventory/Tabs/Services')
-      ),
-    },
-    {
-      path: '/inventory/services/:serviceId/agents',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "InventoryAgentsPage" */ 'app/percona/inventory/Tabs/Agents')
-      ),
-    },
-    {
-      path: '/inventory/nodes',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "InventoryNodesPage" */ 'app/percona/inventory/Tabs/Nodes')
-      ),
-    },
-    {
-      path: '/inventory/nodes/:nodeId/agents',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "InventoryAgentsPage" */ 'app/percona/inventory/Tabs/Agents')
+        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
       ),
     },
     {
@@ -698,7 +676,7 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/edit-instance/:serviceId',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/edit-instance/EditInstance')
+        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
       ),
     },
     {
