@@ -132,7 +132,8 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
       if (isPmmAdmin(user)) {
         if (settings?.updatesEnabled) {
-          await dispatch(checkUpdatesAction());
+          // not awaited, so a slow check without Internet access can't hold up the app; see PMM-15364
+          dispatch(checkUpdatesAction());
         }
       }
 
