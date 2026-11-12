@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
 jobs:
   detect-changes:
+    # Run on `grafana/grafana` pushes, or on pull requests, to prevent double-running on mirrors
+    if: (github.event_name == 'pull_request' || (github.event_name == 'push' && github.repository == 'grafana/grafana'))
     name: Detect whether code changed
     runs-on: ubuntu-latest
     permissions:
@@ -35,10 +37,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup Go
-        uses: actions/setup-go@v6.0.0
+        uses: ./.github/actions/setup-go
         with:
-          go-version-file: go.mod
-          cache: true
+          cache-build: 'false'
 
       - name: Verify code generation
         run: |
@@ -55,7 +56,7 @@ jobs:
       - name: Get GitHub App token
         id: get-github-app-token
         if: github.event.pull_request.head.repo.fork == false
-        uses: grafana/shared-workflows/actions/create-github-app-token@e5b7989c92b55fe3ac6dd006d6de49082ba8c507 # create-github-app-token (github-script/v9)
+        uses: grafana/shared-workflows/actions/create-github-app-token@46f48da11e78ebdba7a8747ae456b11062fac83e # create-github-app-token/v0.3.1
         with:
           github_app: grafana-ci-bot
       - name: Setup Grafana Enterprise

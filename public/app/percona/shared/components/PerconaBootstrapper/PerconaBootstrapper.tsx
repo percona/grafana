@@ -3,16 +3,15 @@ import { useEffect } from 'react';
 import { config } from '@grafana/runtime';
 import { buildInitialState, updateNavIndex } from 'app/core/reducers/navModel';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
-import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
-import { getCategorizedAdvisors, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types/store';
 
 import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
-import { isPmmAdmin, isViewer } from '../../helpers/permissions';
+import { isPmmAdmin } from '../../helpers/permissions';
 import { isPmmNavEnabled } from '../../helpers/plugin';
 import { SettingsUpdatedEvent } from '../../core/events';
 
@@ -29,7 +28,6 @@ import {
   PMM_INVENTORY_PAGE,
 } from './PerconaNavigation/PerconaNavigation.constants';
 import {
-  buildAdvisorsNavItem,
   buildIntegratedAlertingMenuItem,
   buildUsersAndAccessNavWithRoles,
   getPmmSettingsPage,
@@ -39,7 +37,6 @@ import { appEvents } from 'app/core/app_events';
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const dispatch = useAppDispatch();
-  const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const { result: settings } = useSelector(getPerconaSettings);
   const { updateAvailable, isLoading: isLoadingUpdates, showUpdateModal } = useSelector(getUpdatesInfo);
   const { user } = config.bootData;
@@ -58,7 +55,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       await dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
       await dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
       await dispatch(updateNavIndex(getPmmSettingsPage()));
-      await dispatch(updateNavIndex(buildAdvisorsNavItem(categorizedAdvisors)));
 
       if (isPmmAdmin(config.bootData.user)) {
         // PMM Dump
@@ -100,7 +96,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     };
 
     updateNavTree();
-  }, [dispatch, settings, categorizedAdvisors]);
+  }, [dispatch, settings]);
 
   useEffect(() => {
     const setupSubscriptions = async () => {
@@ -125,10 +121,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     };
     const bootstrap = async () => {
       const settings = await getSettings();
-
-      if (!isViewer(user)) {
-        await dispatch(fetchAdvisors({ disableNotifications: true }));
-      }
 
       if (isPmmAdmin(user)) {
         if (settings?.updatesEnabled) {
