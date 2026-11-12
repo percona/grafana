@@ -1,7 +1,6 @@
 import { NavIndex, NavModelItem } from '@grafana/data';
 import config from 'app/core/config';
 import { isViewer } from 'app/percona/shared/helpers/permissions';
-import { CategorizedAdvisor } from 'app/percona/shared/services/advisors/Advisors.types';
 
 import {
   PMM_ACCESS_ROLES_PAGE,
@@ -9,35 +8,6 @@ import {
   PMM_ALERTING_PERCONA_ALERTS,
   WEIGHTS,
 } from './PerconaNavigation.constants';
-
-export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) => {
-  const modelItem: NavModelItem = {
-    id: `advisors`,
-    icon: 'percona-database-checks',
-    text: 'Advisors',
-    sortWeight: WEIGHTS.alerting,
-    subTitle: 'Run and analyze all checks',
-    url: `${config.appSubUrl}/advisors`,
-    children: [],
-  };
-  const categories = Object.keys(categorizedAdvisors);
-
-  modelItem.children!.push({
-    id: 'advisors-insights',
-    text: 'Advisor Insights',
-    url: `${config.appSubUrl}/advisors/insights`,
-  });
-
-  categories.forEach((category) => {
-    modelItem.children!.push({
-      id: `advisors-${category}`,
-      text: `${category[0].toUpperCase()}${category.substring(1)} Advisors`,
-      url: `${config.appSubUrl}/advisors/${category}`,
-    });
-  });
-
-  return modelItem;
-};
 
 export const buildIntegratedAlertingMenuItem = (mainLinks: NavIndex): NavModelItem | undefined => {
   const alertingItem = mainLinks['alerting'];

@@ -14,6 +14,8 @@ permissions: {}
 
 jobs:
   detect-changes:
+    # Run on `grafana/grafana` pushes, or on pull requests, to prevent double-running on mirrors
+    if: (github.event_name == 'pull_request' || (github.event_name == 'push' && github.repository == 'grafana/grafana'))
     name: Detect whether code changed
     runs-on: ubuntu-arm64-small
     permissions:
@@ -69,7 +71,7 @@ jobs:
       uses: ./.github/actions/setup-node
     - name: Get GitHub App token
       id: get-github-app-token
-      uses: grafana/shared-workflows/actions/create-github-app-token@e5b7989c92b55fe3ac6dd006d6de49082ba8c507 # create-github-app-token (github-script/v9)
+      uses: grafana/shared-workflows/actions/create-github-app-token@46f48da11e78ebdba7a8747ae456b11062fac83e # create-github-app-token/v0.3.1
       with:
         github_app: grafana-ci-bot
     - name: Setup Enterprise
@@ -120,7 +122,7 @@ jobs:
       uses: ./.github/actions/setup-node
     - name: Get GitHub App token
       id: get-github-app-token
-      uses: grafana/shared-workflows/actions/create-github-app-token@e5b7989c92b55fe3ac6dd006d6de49082ba8c507 # create-github-app-token (github-script/v9)
+      uses: grafana/shared-workflows/actions/create-github-app-token@46f48da11e78ebdba7a8747ae456b11062fac83e # create-github-app-token/v0.3.1
       with:
         github_app: grafana-ci-bot
     - name: Setup Enterprise
@@ -164,8 +166,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    # Run this workflow for non-PR events (like pushes to `main` or `release-*`) OR for internal PRs (PRs not from forks)
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+    # Run this workflow for pushes to `main` or `release-*` on `grafana/grafana` (not mirrors) OR for internal PRs (PRs not from forks)
+    if: (github.event_name == 'push' && github.repository == 'grafana/grafana') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false)
     name: Verify API clients (enterprise)
     runs-on: ubuntu-x64
     steps:
@@ -176,7 +178,7 @@ jobs:
       uses: ./.github/actions/setup-node
     - name: Get GitHub App token
       id: get-github-app-token
-      uses: grafana/shared-workflows/actions/create-github-app-token@e5b7989c92b55fe3ac6dd006d6de49082ba8c507 # create-github-app-token (github-script/v9)
+      uses: grafana/shared-workflows/actions/create-github-app-token@46f48da11e78ebdba7a8747ae456b11062fac83e # create-github-app-token/v0.3.1
       with:
         github_app: grafana-ci-bot
     - name: Setup Enterprise
@@ -191,7 +193,9 @@ jobs:
     - name: Verify generated clients
       run: |
         uncommited_error_message="ERROR! API client generation has not been committed. Please run 'yarn generate-apis', commit the changes and push again."
-        file_diff="$(git diff ':!conf')"
+        # LICENSE is swapped to the Enterprise License Agreement by the "Setup Enterprise"
+        # step above (grafana-enterprise's build.sh overlay), not by API client generation.
+        file_diff="$(git diff ':!conf' ':!LICENSE')"
         if [ -n "$file_diff" ]; then
             echo "$file_diff"
             echo "${uncommited_error_message}"
