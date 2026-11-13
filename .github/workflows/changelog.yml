@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Get GitHub App token
         id: get-github-app-token
-        uses: grafana/shared-workflows/actions/create-github-app-token@e5b7989c92b55fe3ac6dd006d6de49082ba8c507 # create-github-app-token (github-script/v9)
+        uses: grafana/shared-workflows/actions/create-github-app-token@46f48da11e78ebdba7a8747ae456b11062fac83e # create-github-app-token/v0.3.1
         with:
           github_app: grafana-releases-oss
       - name: "Checkout Grafana repo"
@@ -66,7 +66,11 @@ jobs:
         with:
           previous: ${{ inputs.previous_version }}
           github_token: ${{ steps.get-github-app-token.outputs.token }}
-          target: v${{ inputs.version }}
+          # The release tag doesn't exist yet at this point; diff against the release branch instead.
+          target: release-${{ inputs.version }}
+          # target is a branch name now, not semver-parseable; give the action a real version
+          # string to look up the previous release tag from when previous_version isn't set.
+          version: v${{ inputs.version }}
           output_file: changelog_items.md
       - name: "Patch CHANGELOG.md"
         run: |
