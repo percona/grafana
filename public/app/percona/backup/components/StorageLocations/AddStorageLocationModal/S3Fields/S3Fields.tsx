@@ -24,11 +24,17 @@ export const S3Fields: FC<S3FieldsProps> = ({ endpoint, accessKey, secretKey, bu
       inputProps={{ maxLength: MAX_LENGTH }}
       name="accessKey"
       label={Messages.accessKey}
+      tooltipText={Messages.keyTooltip}
       validators={required}
       initialValue={accessKey}
     />
     <SecretToggler
-      fieldProps={{ name: 'secretKey', label: 'Secret Key', validators: required }}
+      fieldProps={{
+        name: 'secretKey',
+        label: Messages.secretKey,
+        tooltipText: Messages.keyTooltip,
+        validators: required,
+      }}
       secret={secretKey}
       maxLength={MAX_LENGTH}
       readOnly={false}
