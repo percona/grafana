@@ -3,7 +3,6 @@ import { CancelToken } from 'axios';
 import { DbServicePayload, Service, ServiceType } from 'app/percona/shared/services/services/Services.types';
 
 export interface ServicesState {
-  activeTypes: ServiceType[];
   services: Service[];
   isLoading: boolean;
 }

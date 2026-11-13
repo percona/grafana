@@ -301,10 +301,8 @@ func (hs *HTTPServer) getFrontendSettings(c *contextmodel.ReqContext) (*dtos.Fro
 			EnabledFeatures: hs.License.EnabledFeatures(),
 		},
 
-		FeatureToggles:   featureToggles,
-		AnonymousEnabled: hs.Cfg.Anonymous.Enabled,
-		// @PERCONA: add anonymousOrgRole to the frontend settings
-		AnonymousOrgRole:                    hs.Cfg.Anonymous.OrgRole,
+		FeatureToggles:                      featureToggles,
+		AnonymousEnabled:                    hs.Cfg.Anonymous.Enabled,
 		AnonymousDeviceLimit:                hs.Cfg.Anonymous.DeviceLimit,
 		RendererAvailable:                   hs.RenderService.IsAvailable(c.Req.Context()),
 		RendererVersion:                     hs.RenderService.Version(),
