@@ -2513,6 +2513,7 @@
     },
     "recording-rules": {
       "description-target-data-source": "The Prometheus data source to store recording rules in",
+      "description-target-data-source-no-write": "The Prometheus data source to store recording rules in. Saving the rule needs permission to edit this data source, which you do not have.",
       "label-target-data-source": "Target data source",
       "target-data-source-required": "Please select a target data source"
     },

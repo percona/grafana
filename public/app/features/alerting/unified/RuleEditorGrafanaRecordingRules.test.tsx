@@ -132,4 +132,24 @@ describe('RuleEditor grafana recording rules', () => {
     ['alertingQueryAndExpressionsStepMode', 'alertingNotificationsStepMode'],
     'cannot create new grafana recording rule with invalid metric name with simplified steps enabled'
   );
+
+  it('says saving needs permission to edit the target data source when the user lacks it', async () => {
+    grantUserPermissions([
+      AccessControlAction.AlertingRuleRead,
+      AccessControlAction.AlertingRuleCreate,
+      AccessControlAction.DataSourcesRead,
+      AccessControlAction.FoldersRead,
+    ]);
+    renderRuleEditor(undefined, 'grafana-recording');
+
+    const targetDsField = await ui.inputs.targetDatasource.find();
+    expect(targetDsField).toHaveTextContent(/needs permission to edit this data source/i);
+  });
+
+  it('does not warn a user who can edit data sources', async () => {
+    renderRuleEditor(undefined, 'grafana-recording');
+
+    const targetDsField = await ui.inputs.targetDatasource.find();
+    expect(targetDsField).not.toHaveTextContent(/needs permission to edit this data source/i);
+  });
 });

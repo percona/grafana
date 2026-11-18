@@ -4,7 +4,9 @@ import { DataSourceInstanceSettings } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { Trans, t } from '@grafana/i18n';
 import { Field, Input, Stack, Text } from '@grafana/ui';
+import { contextSrv } from 'app/core/services/context_srv';
 import { DataSourcePicker } from 'app/features/datasources/components/picker/DataSourcePicker';
+import { AccessControlAction } from 'app/types/accessControl';
 
 import { RuleFormType, RuleFormValues } from '../../types/rule-form';
 import { isValidRecordingRulesTarget } from '../../utils/datasource';
@@ -42,6 +44,8 @@ export const AlertRuleNameAndMetric = () => {
   const recordingLabel = isGrafanaRecordingRule ? 'recording rule and metric' : 'recording rule';
   const namePlaceholder = isRecording ? 'recording rule' : 'alert rule';
   const entityName = isRecording ? recordingLabel : 'alert rule';
+  // Saving a recording rule needs write access to its target data source, so say so before the save fails.
+  const canWriteDataSources = contextSrv.hasPermission(AccessControlAction.DataSourcesWrite);
   return (
     <RuleEditorSection
       stepNo={1}
@@ -114,10 +118,17 @@ export const AlertRuleNameAndMetric = () => {
             id="target-data-source"
             data-testid="target-data-source"
             label={t('alerting.recording-rules.label-target-data-source', 'Target data source')}
-            description={t(
-              'alerting.recording-rules.description-target-data-source',
-              'The Prometheus data source to store recording rules in'
-            )}
+            description={
+              canWriteDataSources
+                ? t(
+                    'alerting.recording-rules.description-target-data-source',
+                    'The Prometheus data source to store recording rules in'
+                  )
+                : t(
+                    'alerting.recording-rules.description-target-data-source-no-write',
+                    'The Prometheus data source to store recording rules in. Saving the rule needs permission to edit this data source, which you do not have.'
+                  )
+            }
             error={errors.targetDatasourceUid?.message}
             invalid={!!errors.targetDatasourceUid?.message}
           >
