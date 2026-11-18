@@ -81,9 +81,8 @@ func (r *RuleService) getRulesQueryEvaluator(rules ...*models.AlertRule) accessc
 	return accesscontrol.EvalAll(evals...)
 }
 
-// getRecordingTargetEvaluator returns the permission to write to the data source a recording rule stores its
-// result in, or nil for an alert rule. Querying the data source is not enough: the rule writes series that every
-// reader of it trusts (PMM-15941).
+// getRecordingTargetEvaluator returns the permission to write to a recording rule's target data source, or nil for an
+// alert rule; query access is not enough, since the rule writes series every reader trusts (PMM-15941).
 func getRecordingTargetEvaluator(rule *models.AlertRule) accesscontrol.Evaluator {
 	if rule.Record == nil {
 		return nil
@@ -315,9 +314,11 @@ func (r *RuleService) AuthorizeRuleChanges(ctx context.Context, user identity.Re
 			}
 		}
 
-		// Any change to a recording rule changes what it writes: its query, metric name, labels, target or interval.
-		if err := r.authorizeRecordingTarget(ctx, user, rule.New); err != nil {
-			return err
+		// Reordering, renaming the group or moving the rule leaves the written series unchanged.
+		if rule.AffectsRecording() {
+			if err := r.authorizeRecordingTarget(ctx, user, rule.New); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

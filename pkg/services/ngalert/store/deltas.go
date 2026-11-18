@@ -15,6 +15,9 @@ var AlertRuleFieldsToIgnoreInDiff = [...]string{"ID", "Version", "Updated", "Upd
 // AlertRuleFieldsWhichAffectQuery contains fields which affect the rule's query(s)
 var AlertRuleFieldsWhichAffectQuery = [...]string{"Data", "IntervalSeconds"}
 
+// AlertRuleFieldsWhichAffectRecording contains the fields that decide which series a recording rule writes.
+var AlertRuleFieldsWhichAffectRecording = [...]string{"Data", "IntervalSeconds", "Labels", "Record"}
+
 type RuleDelta struct {
 	Existing *models.AlertRule
 	New      *models.AlertRule
@@ -27,6 +30,17 @@ func (d *RuleDelta) AffectsQuery() bool {
 	}
 	for _, path := range d.Diff.Paths() {
 		for _, field := range AlertRuleFieldsWhichAffectQuery {
+			if strings.HasPrefix(path, field) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (d *RuleDelta) AffectsRecording() bool {
+	for _, path := range d.Diff.Paths() {
+		for _, field := range AlertRuleFieldsWhichAffectRecording {
 			if strings.HasPrefix(path, field) {
 				return true
 			}

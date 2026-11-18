@@ -808,6 +808,21 @@ func TestDeltaAffectsQuery(t *testing.T) {
 	})
 }
 
+func TestDeltaAffectsRecording(t *testing.T) {
+	for _, path := range []string{"Data[0].Model", "IntervalSeconds", "Labels", "Record.Metric", "Record.TargetDatasourceUID"} {
+		t.Run("true for "+path, func(t *testing.T) {
+			delta := RuleDelta{Diff: cmputil.DiffReport{{Path: path}}}
+			assert.True(t, delta.AffectsRecording())
+		})
+	}
+	for _, path := range []string{"RuleGroupIndex", "RuleGroup", "NamespaceUID", "Title", "IsPaused"} {
+		t.Run("false for "+path, func(t *testing.T) {
+			delta := RuleDelta{Diff: cmputil.DiffReport{{Path: path}}}
+			assert.False(t, delta.AffectsRecording())
+		})
+	}
+}
+
 // simulateSubmitted resets some fields of the structure that are not populated by API model to model conversion
 func simulateSubmitted(rule *models.AlertRule) {
 	rule.ID = 0

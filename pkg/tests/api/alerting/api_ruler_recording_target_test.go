@@ -78,15 +78,42 @@ func TestIntegrationRulerRecordingRuleTargetNeedsWriteAccess(t *testing.T) {
 		require.Contains(t, body, "target data source")
 	})
 
-	t.Run("an editor can still create an alert rule", func(t *testing.T) {
+	alertGroup := func(name string) *apimodels.PostableRuleGroupConfig {
 		alert := group("", "")
-		alert.Name = "alerting"
+		alert.Name = name
 		alert.Rules[0].ApiRuleNode.For = new(prommodel.Duration)
+		alert.Rules[0].GrafanaManagedAlert.Title = "alert rule"
 		alert.Rules[0].GrafanaManagedAlert.Record = nil
 		alert.Rules[0].GrafanaManagedAlert.Condition = "A"
 		alert.Rules[0].GrafanaManagedAlert.NoDataState = apimodels.NoData
 		alert.Rules[0].GrafanaManagedAlert.ExecErrState = apimodels.AlertingErrState
-		_, status, body := editorClient.PostRulesGroupWithStatus(t, folderUID, alert, false)
+		return alert
+	}
+
+	t.Run("an editor can still create an alert rule", func(t *testing.T) {
+		_, status, body := editorClient.PostRulesGroupWithStatus(t, folderUID, alertGroup("alerting"), false)
+		require.Equalf(t, http.StatusAccepted, status, body)
+	})
+
+	t.Run("an editor can delete an alert rule ordered before the admin's recording rule", func(t *testing.T) {
+		recording := group("recorded_mixed", targetDS.Body.Datasource.UID).Rules[0]
+		recording.GrafanaManagedAlert.Title = "mixed recording rule"
+		mixed := alertGroup("mixed")
+		mixed.Rules[0].GrafanaManagedAlert.Title = "mixed alert rule"
+		mixed.Rules = append(mixed.Rules, recording)
+		_, status, body := adminClient.PostRulesGroupWithStatus(t, folderUID, mixed, false)
+		require.Equalf(t, http.StatusAccepted, status, body)
+
+		rules, status, raw := editorClient.GetRulesGroupWithStatus(t, folderUID, "mixed")
+		require.Equalf(t, http.StatusAccepted, status, string(raw))
+		require.Len(t, rules.Rules, 2)
+
+		withoutAlert := group("recorded_mixed", targetDS.Body.Datasource.UID)
+		withoutAlert.Name = "mixed"
+		withoutAlert.Rules[0].GrafanaManagedAlert.Title = "mixed recording rule"
+		withoutAlert.Rules[0].GrafanaManagedAlert.UID = rules.Rules[1].GrafanaManagedAlert.UID
+		withoutAlert.Rules[0].GrafanaManagedAlert.Data = rules.Rules[1].GrafanaManagedAlert.Data
+		_, status, body = editorClient.PostRulesGroupWithStatus(t, folderUID, withoutAlert, false)
 		require.Equalf(t, http.StatusAccepted, status, body)
 	})
 
@@ -101,6 +128,7 @@ func TestIntegrationRulerRecordingRuleTargetNeedsWriteAccess(t *testing.T) {
 
 		changed := group("up", targetDS.Body.Datasource.UID)
 		changed.Rules[0].GrafanaManagedAlert.UID = rules.Rules[0].GrafanaManagedAlert.UID
+		changed.Rules[0].GrafanaManagedAlert.Data = rules.Rules[0].GrafanaManagedAlert.Data
 		_, status, body := editorClient.PostRulesGroupWithStatus(t, folderUID, changed, false)
 		require.Equalf(t, http.StatusForbidden, status, body)
 	})

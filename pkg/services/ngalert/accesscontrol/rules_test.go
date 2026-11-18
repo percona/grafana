@@ -698,6 +698,16 @@ func TestAuthorizeRuleChanges(t *testing.T) {
 	}
 }
 
+type ruleGroupReader models.RulesGroup
+
+func (g ruleGroupReader) ListAlertRules(context.Context, *models.ListAlertRulesQuery) (models.RulesGroup, error) {
+	return models.RulesGroup(g), nil
+}
+
+func (g ruleGroupReader) GetAlertRulesGroupByRuleUID(context.Context, *models.GetAlertRulesGroupByRuleUIDQuery) ([]*models.AlertRule, error) {
+	return g, nil
+}
+
 func TestAuthorizeRuleChangesRecordingTarget(t *testing.T) {
 	groupKey := models.GenerateGroupKey(1)
 	folderScope := dashboards.ScopeFoldersProvider.GetResourceScopeUID(groupKey.NamespaceUID)
@@ -751,6 +761,25 @@ func TestAuthorizeRuleChangesRecordingTarget(t *testing.T) {
 			AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{groupKey: {rule}},
 			Delete:         models.RulesGroup{rule},
 		})
+		require.NoError(t, err)
+	})
+
+	t.Run("an editor can delete an alert rule ordered before a recording rule", func(t *testing.T) {
+		withDelete := maps.Clone(editor)
+		withDelete[ruleDelete] = []string{folderScope}
+		alertRule := gen.With(gen.WithGroupKey(groupKey), gen.WithNoNotificationSettings(), gen.WithGroupIndex(1)).GenerateRef()
+		recording := models.CopyRule(rule)
+		recording.RuleGroupIndex = 2
+
+		// The ruler API numbers submitted rules by position, so the untouched recording rule moves to index 1.
+		submitted := models.CopyRule(recording)
+		submitted.RuleGroupIndex = 1
+		delta, err := store.CalculateChanges(t.Context(), ruleGroupReader{alertRule, recording}, groupKey,
+			[]*models.AlertRuleWithOptionals{{AlertRule: *submitted}})
+		require.NoError(t, err)
+		require.Len(t, delta.Update, 1)
+
+		err = srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(withDelete), delta)
 		require.NoError(t, err)
 	})
 
