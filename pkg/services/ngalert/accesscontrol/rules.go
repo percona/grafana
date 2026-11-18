@@ -81,6 +81,35 @@ func (r *RuleService) getRulesQueryEvaluator(rules ...*models.AlertRule) accessc
 	return accesscontrol.EvalAll(evals...)
 }
 
+// getRecordingTargetEvaluator returns the permission to write to the data source a recording rule stores its
+// result in, or nil for an alert rule. Querying the data source is not enough: the rule writes series that every
+// reader of it trusts (PMM-15941).
+func getRecordingTargetEvaluator(rule *models.AlertRule) accesscontrol.Evaluator {
+	if rule.Record == nil {
+		return nil
+	}
+
+	// An empty target falls back to the default data source in [recording_rules], which can be any of them.
+	scope := datasources.ScopeProvider.GetResourceAllScope()
+	if rule.Record.TargetDatasourceUID != "" {
+		scope = datasources.ScopeProvider.GetResourceScopeUID(rule.Record.TargetDatasourceUID)
+	}
+
+	return accesscontrol.EvalPermission(datasources.ActionWrite, scope)
+}
+
+// authorizeRecordingTarget checks that the user can write to the data source the recording rule stores its result in.
+func (r *RuleService) authorizeRecordingTarget(ctx context.Context, user identity.Requester, rule *models.AlertRule) error {
+	ev := getRecordingTargetEvaluator(rule)
+	if ev == nil {
+		return nil
+	}
+
+	return r.HasAccessOrError(ctx, user, ev, func() string {
+		return fmt.Sprintf("write to the target data source of recording rule '%s'", rule.Title)
+	})
+}
+
 // CanReadAllRules returns true when user has access to all folders and can read rules in them.
 func (r *RuleService) CanReadAllRules(ctx context.Context, user identity.Requester) (bool, error) {
 	return r.HasAccess(ctx, user, accesscontrol.EvalAll(
@@ -232,6 +261,10 @@ func (r *RuleService) AuthorizeRuleChanges(ctx context.Context, user identity.Re
 			if err := r.authorizeNotificationSettings(ctx, user, rule); err != nil {
 				return err
 			}
+
+			if err := r.authorizeRecordingTarget(ctx, user, rule); err != nil {
+				return err
+			}
 		}
 		if !existingGroup {
 			// create a new group, check that user has "read" access to that new group. Otherwise, it will not be able to read it back.
@@ -280,6 +313,11 @@ func (r *RuleService) AuthorizeRuleChanges(ctx context.Context, user identity.Re
 			if err := r.authorizeNotificationSettings(ctx, user, rule.New); err != nil {
 				return err
 			}
+		}
+
+		// Any change to a recording rule changes what it writes: its query, metric name, labels, target or interval.
+		if err := r.authorizeRecordingTarget(ctx, user, rule.New); err != nil {
+			return err
 		}
 	}
 	return nil

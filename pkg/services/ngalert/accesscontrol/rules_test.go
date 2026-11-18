@@ -3,6 +3,7 @@ package accesscontrol
 import (
 	"context"
 	"fmt"
+	"maps"
 	"math"
 	"math/rand"
 	"testing"
@@ -93,6 +94,20 @@ func getReceiverScopesForRules(rules models.RulesGroup) []string {
 			result = append(result, scope)
 			scopesMap[scope] = struct{}{}
 		}
+	}
+	return result
+}
+
+func getTargetScopesForRules(rules models.RulesGroup) []string {
+	scopesMap := map[string]struct{}{}
+	var result []string
+	for _, rule := range rules {
+		scope := datasources.ScopeProvider.GetResourceScopeUID(rule.Record.TargetDatasourceUID)
+		if _, ok := scopesMap[scope]; ok {
+			continue
+		}
+		result = append(result, scope)
+		scopesMap[scope] = struct{}{}
 	}
 	return result
 }
@@ -562,6 +577,99 @@ func TestAuthorizeRuleChanges(t *testing.T) {
 				}
 			},
 		},
+		{
+			name: "if there are recording rules to add it should also check write access to their target data sources",
+			changes: func() *store.GroupDelta {
+				return &store.GroupDelta{
+					GroupKey: groupKey,
+					New:      genWithGroupKey.With(gen.WithAllRecordingRules()).GenerateManyRef(1, 5),
+				}
+			},
+			permissions: func(c *store.GroupDelta) map[string][]string {
+				return map[string][]string{
+					ruleCreate: {
+						namespaceIdScope,
+					},
+					ruleRead: {
+						namespaceIdScope,
+					},
+					dashboards.ActionFoldersRead: {
+						namespaceIdScope,
+					},
+					datasources.ActionQuery: getDatasourceScopesForRules(c.New),
+					datasources.ActionWrite: getTargetScopesForRules(c.New),
+				}
+			},
+		},
+		{
+			name: "if a recording rule to add has no target it should check write access to all data sources",
+			changes: func() *store.GroupDelta {
+				return &store.GroupDelta{
+					GroupKey: groupKey,
+					New:      genWithGroupKey.With(gen.WithAllRecordingRules(), gen.WithoutTargetDataSource()).GenerateManyRef(1),
+				}
+			},
+			permissions: func(c *store.GroupDelta) map[string][]string {
+				return map[string][]string{
+					ruleCreate: {
+						namespaceIdScope,
+					},
+					ruleRead: {
+						namespaceIdScope,
+					},
+					dashboards.ActionFoldersRead: {
+						namespaceIdScope,
+					},
+					datasources.ActionQuery: getDatasourceScopesForRules(c.New),
+					datasources.ActionWrite: {datasources.ScopeProvider.GetResourceAllScope()},
+				}
+			},
+		},
+		{
+			name: "if recording rules are updated without query changes it should check write access to their target data sources",
+			changes: func() *store.GroupDelta {
+				rules := genWithGroupKey.With(gen.WithAllRecordingRules()).GenerateManyRef(1, 5)
+				updates := make([]store.RuleDelta, 0, len(rules))
+
+				for _, rule := range rules {
+					cp := models.CopyRule(rule)
+					cp.Labels = map[string]string{"service_name": "changed"}
+					updates = append(updates, store.RuleDelta{
+						Existing: rule,
+						New:      cp,
+						Diff: []cmputil.Diff{
+							{
+								Path: "Labels",
+							},
+						},
+					})
+				}
+
+				return &store.GroupDelta{
+					GroupKey: groupKey,
+					AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{
+						groupKey: rules,
+					},
+					Update: updates,
+				}
+			},
+			permissions: func(c *store.GroupDelta) map[string][]string {
+				return map[string][]string{
+					ruleRead: {
+						namespaceIdScope,
+					},
+					dashboards.ActionFoldersRead: {
+						namespaceIdScope,
+					},
+					ruleUpdate: {
+						namespaceIdScope,
+					},
+					datasources.ActionWrite: getTargetScopesForRules(mapUpdates(c.Update, func(update store.RuleDelta) *models.AlertRule {
+						return update.New
+					})),
+				}
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -588,6 +696,90 @@ func TestAuthorizeRuleChanges(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+func TestAuthorizeRuleChangesRecordingTarget(t *testing.T) {
+	groupKey := models.GenerateGroupKey(1)
+	folderScope := dashboards.ScopeFoldersProvider.GetResourceScopeUID(groupKey.NamespaceUID)
+	gen := models.RuleGen
+	rule := gen.With(gen.WithGroupKey(groupKey), gen.WithAllRecordingRules()).GenerateRef()
+	targetScope := datasources.ScopeProvider.GetResourceScopeUID(rule.Record.TargetDatasourceUID)
+
+	// What an Editor holds: it can create rules and query every data source, but write to none.
+	editor := map[string][]string{
+		ruleCreate:                   {folderScope},
+		ruleRead:                     {folderScope},
+		ruleUpdate:                   {folderScope},
+		dashboards.ActionFoldersRead: {folderScope},
+		datasources.ActionQuery:      {datasources.ScopeProvider.GetResourceAllScope()},
+	}
+	admin := maps.Clone(editor)
+	admin[datasources.ActionWrite] = []string{datasources.ScopeProvider.GetResourceAllScope()}
+
+	ac := acimpl.ProvideAccessControl(featuremgmt.WithFeatures())
+	srv := NewRuleService(ac)
+
+	t.Run("an editor cannot create a recording rule", func(t *testing.T) {
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), &store.GroupDelta{
+			GroupKey: groupKey,
+			New:      models.RulesGroup{rule},
+		})
+		require.ErrorIs(t, err, ErrAuthorizationBase)
+		assert.Contains(t, err.Error(), "target data source")
+	})
+
+	t.Run("an editor cannot change a recording rule", func(t *testing.T) {
+		changed := models.CopyRule(rule)
+		changed.Record.Metric = "up"
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), &store.GroupDelta{
+			GroupKey:       groupKey,
+			AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{groupKey: {rule}},
+			Update: []store.RuleDelta{{
+				Existing: rule,
+				New:      changed,
+				Diff:     cmputil.DiffReport{{Path: "Record.Metric"}},
+			}},
+		})
+		require.ErrorIs(t, err, ErrAuthorizationBase)
+	})
+
+	t.Run("an editor can still delete a recording rule", func(t *testing.T) {
+		withDelete := maps.Clone(editor)
+		withDelete[ruleDelete] = []string{folderScope}
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(withDelete), &store.GroupDelta{
+			GroupKey:       groupKey,
+			AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{groupKey: {rule}},
+			Delete:         models.RulesGroup{rule},
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("an editor can still create an alert rule", func(t *testing.T) {
+		alertRule := gen.With(gen.WithGroupKey(groupKey), gen.WithNoNotificationSettings()).GenerateRef()
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), &store.GroupDelta{
+			GroupKey: groupKey,
+			New:      models.RulesGroup{alertRule},
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("write access to the target alone is enough", func(t *testing.T) {
+		scoped := maps.Clone(editor)
+		scoped[datasources.ActionWrite] = []string{targetScope}
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(scoped), &store.GroupDelta{
+			GroupKey: groupKey,
+			New:      models.RulesGroup{rule},
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("an admin can create a recording rule", func(t *testing.T) {
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(admin), &store.GroupDelta{
+			GroupKey: groupKey,
+			New:      models.RulesGroup{rule},
+		})
+		require.NoError(t, err)
+	})
 }
 
 func TestCheckDatasourcePermissionsForRule(t *testing.T) {
