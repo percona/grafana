@@ -314,8 +314,10 @@ func (r *RuleService) AuthorizeRuleChanges(ctx context.Context, user identity.Re
 			}
 		}
 
-		// Reordering, renaming the group or moving the rule leaves the written series unchanged.
-		if rule.AffectsRecording() {
+		// Reordering, renaming the group, moving or pausing the rule leaves the written series unchanged;
+		// resuming starts writing again.
+		resumes := rule.Existing.IsPaused && !rule.New.IsPaused
+		if rule.AffectsRecording() || resumes {
 			if err := r.authorizeRecordingTarget(ctx, user, rule.New); err != nil {
 				return err
 			}

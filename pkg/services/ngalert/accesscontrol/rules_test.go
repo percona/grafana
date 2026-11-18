@@ -783,6 +783,31 @@ func TestAuthorizeRuleChangesRecordingTarget(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("an editor can pause a recording rule but cannot resume it", func(t *testing.T) {
+		paused := models.CopyRule(rule)
+		paused.IsPaused = true
+		pauseOrResume := func(existing, updated *models.AlertRule) *store.GroupDelta {
+			return &store.GroupDelta{
+				GroupKey:       groupKey,
+				AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{groupKey: {existing}},
+				Update: []store.RuleDelta{{
+					Existing: existing,
+					New:      updated,
+					Diff:     cmputil.DiffReport{{Path: "IsPaused"}},
+				}},
+			}
+		}
+
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), pauseOrResume(rule, paused))
+		require.NoError(t, err)
+
+		err = srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), pauseOrResume(paused, rule))
+		require.ErrorIs(t, err, ErrAuthorizationBase)
+
+		err = srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(admin), pauseOrResume(paused, rule))
+		require.NoError(t, err)
+	})
+
 	t.Run("an editor can still create an alert rule", func(t *testing.T) {
 		alertRule := gen.With(gen.WithGroupKey(groupKey), gen.WithNoNotificationSettings()).GenerateRef()
 		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), &store.GroupDelta{
