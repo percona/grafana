@@ -69,6 +69,7 @@ func TestIntegrationAlertRulePermissions(t *testing.T) {
 		Password:       "password",
 		Login:          "grafana",
 	})
+	grantDatasourceWrite(t, env, userID)
 
 	apiClient := newAlertingApiClient(grafanaListedAddr, "grafana", "password")
 
@@ -377,6 +378,7 @@ func TestIntegrationAlertRuleNestedPermissions(t *testing.T) {
 		Password:       "password",
 		Login:          "grafana",
 	})
+	grantDatasourceWrite(t, env, userID)
 
 	apiClient := newAlertingApiClient(grafanaListedAddr, "grafana", "password")
 
@@ -4729,11 +4731,12 @@ func TestIntegrationRuleVersions(t *testing.T) {
 
 	grafanaListedAddr, env := testinfra.StartGrafanaEnv(t, dir, p)
 
-	createUser(t, env.SQLStore, env.Cfg, user.CreateUserCommand{
+	userID := createUser(t, env.SQLStore, env.Cfg, user.CreateUserCommand{
 		DefaultOrgRole: string(org.RoleEditor),
 		Password:       "password",
 		Login:          "grafana",
 	})
+	grantDatasourceWrite(t, env, userID)
 
 	apiClient := newAlertingApiClient(grafanaListedAddr, "grafana", "password")
 

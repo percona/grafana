@@ -884,11 +884,12 @@ func TestIntegrationConvertPrometheusEndpoints_Delete(t *testing.T) {
 		adminClient := newAlertingApiClient(grafanaListedAddr, "admin", "admin")
 		adminClient.prometheusConversionUseLokiPaths = enableLokiPaths
 
-		createUser(t, env.SQLStore, env.Cfg, user.CreateUserCommand{
+		editorID := createUser(t, env.SQLStore, env.Cfg, user.CreateUserCommand{
 			DefaultOrgRole: string(org.RoleEditor),
 			Password:       "password",
 			Login:          "editor",
 		})
+		grantDatasourceWrite(t, env, editorID)
 		editorClient := newAlertingApiClient(grafanaListedAddr, "editor", "password")
 		editorClient.prometheusConversionUseLokiPaths = enableLokiPaths
 

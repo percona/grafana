@@ -9,7 +9,11 @@ import (
 	prommodel "github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana/pkg/server"
+	"github.com/grafana/grafana/pkg/services/accesscontrol"
+	"github.com/grafana/grafana/pkg/services/accesscontrol/resourcepermissions"
 	"github.com/grafana/grafana/pkg/services/datasources"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/user"
@@ -17,6 +21,19 @@ import (
 	"github.com/grafana/grafana/pkg/util"
 	"github.com/grafana/grafana/pkg/util/testutil"
 )
+
+// grantDatasourceWrite lets an Editor create recording rules, which by default only Admins can (PMM-15941).
+func grantDatasourceWrite(t *testing.T, env *server.TestEnv, userID int64) {
+	t.Helper()
+	store := resourcepermissions.NewStore(env.Cfg, env.SQLStore, featuremgmt.WithFeatures())
+	_, err := store.SetUserResourcePermission(t.Context(), 1, accesscontrol.User{ID: userID}, resourcepermissions.SetResourcePermissionCommand{
+		Actions:           []string{datasources.ActionWrite},
+		Resource:          datasources.ScopeRoot,
+		ResourceID:        "*",
+		ResourceAttribute: "uid",
+	}, nil)
+	require.NoError(t, err)
+}
 
 // Writing a recording rule's result needs write access to its target data source, not only query access (PMM-15941).
 func TestIntegrationRulerRecordingRuleTargetNeedsWriteAccess(t *testing.T) {
