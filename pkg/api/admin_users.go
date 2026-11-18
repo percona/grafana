@@ -113,7 +113,8 @@ func (hs *HTTPServer) AdminUpdateUserPassword(c *contextmodel.ReqContext) respon
 	}
 
 	if err := hs.userService.Update(c.Req.Context(), &user.UpdateUserCommand{UserID: userID, Password: &form.Password}); err != nil {
-		return response.Error(http.StatusInternalServerError, "Failed to update user password", err)
+		// @PERCONA
+		return response.ErrOrFallback(http.StatusInternalServerError, "Failed to update user password", err)
 	}
 
 	usr, err := hs.userService.GetByID(c.Req.Context(), &user.GetUserByIDQuery{ID: userID})
