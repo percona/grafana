@@ -783,6 +783,20 @@ func TestAuthorizeRuleChangesRecordingTarget(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("an editor can add an alert rule to a group with a recording rule", func(t *testing.T) {
+		// Provisioning adds the unchanged siblings to the update set before it authorizes.
+		alertRule := gen.With(gen.WithGroupKey(groupKey), gen.WithNoNotificationSettings()).GenerateRef()
+		delta := store.UpdateCalculatedRuleFields(&store.GroupDelta{
+			GroupKey:       groupKey,
+			AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{groupKey: {rule}},
+			New:            models.RulesGroup{alertRule},
+		})
+		require.Len(t, delta.Update, 1)
+
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(editor), delta)
+		require.NoError(t, err)
+	})
+
 	t.Run("an editor can pause a recording rule but cannot resume it", func(t *testing.T) {
 		paused := models.CopyRule(rule)
 		paused.IsPaused = true
@@ -805,6 +819,30 @@ func TestAuthorizeRuleChangesRecordingTarget(t *testing.T) {
 		require.ErrorIs(t, err, ErrAuthorizationBase)
 
 		err = srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(admin), pauseOrResume(paused, rule))
+		require.NoError(t, err)
+	})
+
+	t.Run("changing the target needs write access to the new target", func(t *testing.T) {
+		moved := models.CopyRule(rule)
+		moved.Record.TargetDatasourceUID = "new-target"
+		delta := &store.GroupDelta{
+			GroupKey:       groupKey,
+			AffectedGroups: map[models.AlertRuleGroupKey]models.RulesGroup{groupKey: {rule}},
+			Update: []store.RuleDelta{{
+				Existing: rule,
+				New:      moved,
+				Diff:     cmputil.DiffReport{{Path: "Record.TargetDatasourceUID"}},
+			}},
+		}
+
+		oldOnly := maps.Clone(editor)
+		oldOnly[datasources.ActionWrite] = []string{targetScope}
+		err := srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(oldOnly), delta)
+		require.ErrorIs(t, err, ErrAuthorizationBase)
+
+		newOnly := maps.Clone(editor)
+		newOnly[datasources.ActionWrite] = []string{datasources.ScopeProvider.GetResourceScopeUID("new-target")}
+		err = srv.AuthorizeRuleChanges(t.Context(), createUserWithPermissions(newOnly), delta)
 		require.NoError(t, err)
 	})
 
