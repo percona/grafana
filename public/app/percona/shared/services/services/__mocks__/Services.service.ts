@@ -4,11 +4,6 @@ export const ServicesService = jest.genMockFromModule<typeof service>(
   'app/percona/shared/services/services/Services.service'
 ).ServicesService;
 
-ServicesService.getActive = () =>
-  Promise.resolve({
-    service_types: [],
-  });
-
 ServicesService.getServices = () =>
   Promise.resolve({
     services: [],

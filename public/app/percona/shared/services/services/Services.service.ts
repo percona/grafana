@@ -2,18 +2,9 @@ import { CancelToken } from 'axios';
 
 import { api } from 'app/percona/shared/helpers/api';
 
-import {
-  ListServicesBody,
-  ListTypesPayload,
-  RemoveServiceBody,
-  ServiceListPayload,
-  UpdateServiceBody,
-} from './Services.types';
+import { ListServicesBody, RemoveServiceBody, ServiceListPayload, UpdateServiceBody } from './Services.types';
 
 export const ServicesService = {
-  getActive(token?: CancelToken, disableNotifications?: boolean) {
-    return api.post<ListTypesPayload, {}>('/v1/inventory/services:getTypes', {}, disableNotifications, token);
-  },
   getServices(params: Partial<ListServicesBody> = {}, token?: CancelToken) {
     return api.get<ServiceListPayload, Partial<ListServicesBody>>('/v1/management/services', false, {
       cancelToken: token,
