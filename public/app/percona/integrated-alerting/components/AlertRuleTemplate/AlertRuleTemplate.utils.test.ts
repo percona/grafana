@@ -1,11 +1,15 @@
 import { SOURCE_MAP } from './AlertRuleTemplate.constants';
-import { SourceDescription, Template, TemplateParamUnit } from './AlertRuleTemplate.types';
+import { SourceDescription, Template, TemplateDatasourceType, TemplateParamUnit } from './AlertRuleTemplate.types';
 import {
   formatTemplate,
   formatTemplates,
   beautifyUnit,
   formatSource,
+  formatDatasource,
+  formatExpression,
+  getDatasourceBadgeColor,
   isDynamicTemplate,
+  usesClickHouse,
 } from './AlertRuleTemplate.utils';
 
 const moment = jest.requireActual('moment-timezone');
@@ -59,6 +63,29 @@ describe('AlertRuleTemplatesTable utils', () => {
     expect(formatSource(SourceDescription.BUILT_IN)).toBe(SOURCE_MAP.TEMPLATE_SOURCE_BUILT_IN);
   });
 
+  test('formatDatasource', () => {
+    expect(formatDatasource(TemplateDatasourceType.METRICS)).toBe('Metrics');
+    expect(formatDatasource(TemplateDatasourceType.CLICKHOUSE)).toBe('ClickHouse');
+    expect(formatDatasource(TemplateDatasourceType.UNSPECIFIED)).toBe('Metrics');
+    expect(formatDatasource(undefined)).toBe('Metrics');
+  });
+
+  test('getDatasourceBadgeColor', () => {
+    expect(getDatasourceBadgeColor(TemplateDatasourceType.METRICS)).toBe('blue');
+    expect(getDatasourceBadgeColor(TemplateDatasourceType.CLICKHOUSE)).toBe('purple');
+    expect(getDatasourceBadgeColor(TemplateDatasourceType.UNSPECIFIED)).toBe('blue');
+    expect(getDatasourceBadgeColor(undefined)).toBe('blue');
+  });
+
+  test('formatExpression', () => {
+    expect(formatExpression({ ref_id: 'B', type: 'reduce', reducer: 'max', expression: '$A' })).toBe('reduce(max): $A');
+    expect(formatExpression({ ref_id: 'C', type: 'math', expression: '$B > 0' })).toBe('$B > 0');
+  });
+
+  test('formatExpression with missing reducer', () => {
+    expect(formatExpression({ ref_id: 'B', type: 'reduce', expression: '$A' })).toBe('$A');
+  });
+
   test('isDynamicTemplate', () => {
     const dynamicTemplate = {
       params: [
@@ -77,5 +104,24 @@ describe('AlertRuleTemplatesTable utils', () => {
 
     expect(isDynamicTemplate(dynamicTemplate)).toBe(true);
     expect(isDynamicTemplate(staticTemplate)).toBe(false);
+  });
+
+  test('usesClickHouse', () => {
+    const clickHouseTemplate = {
+      queries: [{ ref_id: 'A', expr: 'SELECT 1', datasource: TemplateDatasourceType.CLICKHOUSE }],
+    } as Template;
+    const metricsTemplate = {
+      queries: [{ ref_id: 'A', expr: 'up', datasource: TemplateDatasourceType.METRICS }],
+    } as Template;
+    const missingDatasourceTemplate = {
+      queries: [{ ref_id: 'A', expr: 'up' }],
+    } as Template;
+    const noQueriesTemplate = {} as Template;
+
+    expect(usesClickHouse(clickHouseTemplate)).toBe(true);
+    expect(usesClickHouse(metricsTemplate)).toBe(false);
+    expect(usesClickHouse(missingDatasourceTemplate)).toBe(false);
+    expect(usesClickHouse(noQueriesTemplate)).toBe(false);
+    expect(usesClickHouse(undefined)).toBe(false);
   });
 });

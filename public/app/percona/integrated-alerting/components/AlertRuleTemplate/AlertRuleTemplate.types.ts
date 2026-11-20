@@ -48,6 +48,13 @@ export enum TemplateParamUnit {
   SECONDS = 'PARAM_UNIT_SECONDS',
 }
 
+// https://github.com/percona/pmm/blob/main/api/alerting/v1/alerting.proto
+export enum TemplateDatasourceType {
+  UNSPECIFIED = 'DATASOURCE_TYPE_UNSPECIFIED',
+  METRICS = 'DATASOURCE_TYPE_METRICS',
+  CLICKHOUSE = 'DATASOURCE_TYPE_CLICKHOUSE',
+}
+
 export interface TemplateFloatParamAPI {
   has_default: boolean;
   has_min: boolean;
@@ -83,12 +90,14 @@ export interface TemplateAnnotation {
 export interface TemplateQuery {
   ref_id: string;
   expr: string;
+  datasource?: TemplateDatasourceType;
 }
 
 export interface TemplateExpression {
   ref_id: string;
   type: string;
   expression: string;
+  reducer?: string;
 }
 
 export interface TemplateAPI {
