@@ -10,6 +10,7 @@ import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
+import { requiredUnlessVaultPath, VaultPathField } from '../VaultPath/VaultPath';
 
 export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
   const styles = useStyles2(getStyles);
@@ -26,7 +27,7 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
     ],
     []
   );
-  const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
+  const userPassValidators = useMemo(() => (tlsFlag ? [] : [requiredUnlessVaultPath]), [tlsFlag]);
   const maxQueryLengthValidators = useMemo(() => [Validators.min(-1)], []);
 
   return (
@@ -76,6 +77,10 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />
+      </div>
+      <div className={styles.group}>
+        <VaultPathField />
+        <div />
       </div>
       <div className={styles.group}>
         <TextInputField

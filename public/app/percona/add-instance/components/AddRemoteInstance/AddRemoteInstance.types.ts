@@ -70,7 +70,12 @@ interface TLSCommon {
   tls_skip_verify?: boolean;
 }
 
-export interface ProxySQLPayload extends RemoteCommonPayload, TLSCommon {
+// The credentials of a database may be read from a HashiCorp Vault secret instead.
+interface VaultCommon {
+  vault_path?: string;
+}
+
+export interface ProxySQLPayload extends RemoteCommonPayload, TLSCommon, VaultCommon {
   node_id: string;
   add_node: AddNode;
   port: number;
@@ -83,7 +88,7 @@ export interface ProxySQLPayload extends RemoteCommonPayload, TLSCommon {
   agent_password: string;
 }
 
-export interface PostgreSQLPayload extends RemoteCommonPayload, TLSCommon {
+export interface PostgreSQLPayload extends RemoteCommonPayload, TLSCommon, VaultCommon {
   node_id: string;
   add_node: AddNode;
   port: number;
@@ -106,7 +111,7 @@ export interface PostgreSQLPayload extends RemoteCommonPayload, TLSCommon {
   max_exporter_connections: number;
 }
 
-export interface MySQLPayload extends RemoteCommonPayload, TLSCommon {
+export interface MySQLPayload extends RemoteCommonPayload, TLSCommon, VaultCommon {
   node_id: string;
   add_node: AddNode;
   port: number;
@@ -129,7 +134,7 @@ export interface MySQLPayload extends RemoteCommonPayload, TLSCommon {
   max_query_length: number;
 }
 
-export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {
+export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon, VaultCommon {
   node_id: string;
   add_node: AddNode;
   port: number;
@@ -149,7 +154,7 @@ export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {
   max_query_length: number;
 }
 
-export interface ValkeyPayload extends RemoteCommonPayload, TLSCommon {
+export interface ValkeyPayload extends RemoteCommonPayload, TLSCommon, VaultCommon {
   node_id: string;
   add_node: AddNode;
   port: number;
@@ -183,7 +188,7 @@ export interface ExternalPayload extends RemoteCommonPayload {
   metrics_mode: string;
 }
 
-export interface CommonRDSAzurePayload extends RemoteCommonPayload, TLSCommon {
+export interface CommonRDSAzurePayload extends RemoteCommonPayload, TLSCommon, VaultCommon {
   region?: string;
   az?: string;
   instance_id?: string;

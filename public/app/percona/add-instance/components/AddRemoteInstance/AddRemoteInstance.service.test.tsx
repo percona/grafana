@@ -128,6 +128,20 @@ describe('AddRemoteInstanceService:: ', () => {
     expect((toPayload(data) as RDSPayload).aws_role_arn).toEqual('arn:aws:iam::123456789012:role/PmmRdsMonitoring');
   });
 
+  it('should pass vault_path through to the payload, without a password', () => {
+    const data = {
+      address: 'localhost',
+      pmm_agent_id: { value: 'pmm-server' },
+      node: { value: 'node1', label: 'node1' },
+      username: 'pmm',
+      vault_path: 'secret/data/pmm/mysql',
+    };
+
+    const payload = toPayload(data) as MySQLPayload;
+    expect(payload.vault_path).toEqual('secret/data/pmm/mysql');
+    expect(payload.password).toBeUndefined();
+  });
+
   it('should parse disable_collectors string into a trimmed, filtered array for rds (mysql)', () => {
     const data = {
       address: 'localhost',

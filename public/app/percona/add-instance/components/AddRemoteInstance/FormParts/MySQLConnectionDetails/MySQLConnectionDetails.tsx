@@ -10,6 +10,7 @@ import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
 import { NodesAgents } from '../NodesAgents/NodesAgents';
+import { requiredUnlessVaultPath, VaultPathField } from '../VaultPath/VaultPath';
 
 export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
   const styles = useStyles2(getStyles);
@@ -17,7 +18,7 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
   const tlsFlag = formValues && formValues['tls'];
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
-  const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
+  const userPassValidators = useMemo(() => (tlsFlag ? [] : [requiredUnlessVaultPath]), [tlsFlag]);
   const maxQueryLengthValidators = useMemo(() => [Validators.min(-1)], []);
   const timeoutValidators = useMemo(
     () => [
@@ -86,6 +87,10 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />
+      </div>
+      <div className={styles.group}>
+        <VaultPathField />
+        <div />
       </div>
       <div className={styles.group}>
         <TextInputField
