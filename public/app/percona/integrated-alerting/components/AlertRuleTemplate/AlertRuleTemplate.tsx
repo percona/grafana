@@ -49,13 +49,16 @@ export const AlertRuleTemplate: FC = () => {
     try {
       const { templates, total_items, total_pages } = await AlertRuleTemplateService.list(
         {
-          page_params: {
-            index: pageIndex,
-            page_size: pageSize,
-          },
+          page_size: pageSize,
+          page_index: pageIndex,
         },
         generateToken(GET_TEMPLATES_CANCEL_TOKEN)
       );
+      // Deleting the only template on the last page leaves pageIndex past the end.
+      if (!templates.length && pageIndex > 0 && total_pages) {
+        setPageindex(total_pages - 1);
+        return;
+      }
       setData(formatTemplates(templates));
       setTotalItems(total_items || 0);
       setTotalPages(total_pages || 0);

@@ -14,10 +14,8 @@ export interface DeleteAlertRuleTemplatePayload {
 }
 
 export interface AlertRuleTemplateGetPayload {
-  page_params: {
-    page_size: number;
-    index: number;
-  };
+  page_size?: number;
+  page_index?: number;
   reload?: boolean;
 }
 
