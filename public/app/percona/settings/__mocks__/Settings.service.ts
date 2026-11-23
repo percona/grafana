@@ -18,7 +18,6 @@ export const stub: Settings = {
   awsPartitions: [],
   alertManagerUrl: 'alert.foo.com',
   alertManagerRules: '',
-  advisorEnabled: true,
   alertingEnabled: true,
   alertingSettings: {
     email: {
@@ -30,11 +29,6 @@ export const stub: Settings = {
     slack: {
       url: 'slack.foo.com',
     },
-  },
-  advisorRunIntervals: {
-    rareInterval: '10s',
-    standardInterval: '10s',
-    frequentInterval: '10s',
   },
   defaultRoleId: 1,
   enableInternalPgQan: false,

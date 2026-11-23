@@ -100,10 +100,6 @@ export interface RemoveServiceBody {
   force: boolean;
 }
 
-export interface ListTypesPayload {
-  service_types?: ServiceType[];
-}
-
 export interface UpdateServiceBody {
   service_id: string;
   environment?: string;

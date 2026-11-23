@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
@@ -380,6 +382,56 @@ func Test_AdminUpdateUserPermissions(t *testing.T) {
 			sc.fakeReqWithParams("PUT", sc.url, map[string]string{}).exec()
 
 			assert.Equal(t, tc.expectedRespCode, sc.resp.Code)
+		})
+	}
+}
+
+func Test_AdminUpdateUserPassword(t *testing.T) {
+	testcases := []struct {
+		name             string
+		updateErr        error
+		expectedRespCode int
+		expectedMessage  string
+	}{
+		{
+			name:             "Should return bad request when the password violates the password policy",
+			updateErr:        user.ErrPasswordPolicyInfringe.Errorf("new password is too short for the strong password policy"),
+			expectedRespCode: http.StatusBadRequest,
+			expectedMessage:  "New password doesn't comply with the password policy",
+		},
+		{
+			name:             "Should return internal server error when the update fails unexpectedly",
+			updateErr:        errors.New("database is locked"),
+			expectedRespCode: http.StatusInternalServerError,
+			expectedMessage:  "Failed to update user password",
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			hs := &HTTPServer{
+				Cfg:             setting.NewCfg(),
+				authInfoService: &authinfotest.FakeService{ExpectedError: user.ErrUserNotFound},
+				userService: &usertest.FakeUserService{
+					UpdateFn: func(context.Context, *user.UpdateUserCommand) error { return tc.updateErr },
+				},
+			}
+
+			sc := setupScenarioContext(t, "/api/admin/users/1/password")
+			sc.defaultHandler = routing.Wrap(func(c *contextmodel.ReqContext) response.Response {
+				c.Req.Body = mockRequestBody(dtos.AdminUpdateUserPasswordForm{Password: "Strike"})
+				c.Req.Header.Add("Content-Type", "application/json")
+				sc.context = c
+				return hs.AdminUpdateUserPassword(c)
+			})
+
+			sc.m.Put("/api/admin/users/:id/password", sc.defaultHandler)
+
+			sc.fakeReqWithParams("PUT", sc.url, map[string]string{}).exec()
+
+			assert.Equal(t, tc.expectedRespCode, sc.resp.Code)
+			respJSON, err := simplejson.NewJson(sc.resp.Body.Bytes())
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedMessage, respJSON.Get("message").MustString())
 		})
 	}
 }
