@@ -1,10 +1,6 @@
-export { awsCredentialsExclusive } from './awsCredentialsExclusive';
-export { awsRoleArn } from './awsRoleArn';
 export { compose } from './compose';
 export { containsLowercase } from './containsLowercase';
-export { containsNumber } from './containsNumber';
 export { containsUppercase } from './containsUppercase';
-export { disableCollectors } from './disableCollectors';
 export { email } from './email';
 export { greaterThan } from './greaterThan';
 export { lessThan } from './lessThan';
