@@ -15,7 +15,7 @@ import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordI
 import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
-import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import validators from 'app/percona/shared/helpers/validators';
@@ -53,10 +53,7 @@ const ExportDataset: FC = () => {
 
   const loadData = useCallback(async () => {
     try {
-      await Promise.all([
-        dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) })),
-        dispatch(fetchActiveServiceTypesAction()),
-      ]);
+      await dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
     } catch (e) {
       if (isApiCancelError(e)) {
         return;

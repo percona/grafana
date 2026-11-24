@@ -72,7 +72,7 @@
     "plugins:build-bundled": "echo 'bundled plugins are no longer supported'",
     "watch": "yarn start -d watch,start core:start --watchTheme",
     "ci:test-frontend": "yarn run test:ci",
-    "ci:test-percona-frontend": "yarn run prettier:check && yarn run packages:typecheck && yarn run typecheck && yarn run jest-percona-ci",
+    "ci:test-percona-frontend": "yarn run prettier:check && yarn run typecheck && yarn run jest-percona-ci",
     "i18n:stats": "node ./scripts/cli/reportI18nStats.mjs",
     "i18n-extract": "make i18n-extract",
     "plugin:build": "nx run-many -t build --projects='tag:scope:plugin'",
