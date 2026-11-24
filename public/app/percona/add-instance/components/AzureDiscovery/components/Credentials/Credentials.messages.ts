@@ -10,6 +10,7 @@ export const Messages = {
         placeholder: 'Client Secret',
         name: 'azure_client_secret',
         label: 'Client Secret',
+        tooltipText: 'Or a vault:<path>#<key> reference to it in HashiCorp Vault, which PMM Server reads.',
       },
       tenantId: {
         placeholder: 'Tenant ID',
