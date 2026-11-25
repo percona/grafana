@@ -8,7 +8,7 @@ WIRE_TAGS = "oss"
 include .citools/Variables.mk
 
 GO = go
-GO_VERSION = 1.26.10
+GO_VERSION = 1.26.11
 GO_HOST_OS := $(shell $(GO) env GOHOSTOS)
 GO_HOST_ARCH := $(shell $(GO) env GOHOSTARCH)
 GO_LINT_FILES ?= $(shell ./scripts/go-workspace/golangci-lint-includes.sh)
@@ -303,8 +303,8 @@ install-cue:
 .PHONY: fix-cue
 fix-cue: install-cue
 	@echo "formatting cue files"
-	$(cue) fix kinds/**/*.cue
-	$(cue) fix public/app/plugins/**/**/*.cue
+	$(CUE) fix kinds/**/*.cue
+	$(CUE) fix public/app/plugins/**/**/*.cue
 
 .PHONY: gen-jsonnet
 gen-jsonnet:
@@ -491,10 +491,6 @@ run-frontend: deps-js ## Fetch js dependencies and watch frontend for rebuild
 run-local-env: ## Start local frontend with pmm-server:dev-latest
 	yarn dev
 	docker compose up -d
-	
-.PHONY: run-bra
-run-bra: ## [Deprecated] Build and run web server on filesystem changes. See /.bra.toml for configuration.
-	$(bra) run
 
 .PHONY: frontend-service-check
 frontend-service-check:

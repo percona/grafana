@@ -1,9 +1,9 @@
 module github.com/grafana/grafana/pkg/apimachinery
 
-go 1.26.10
+go 1.26.11
 
 require (
-	github.com/go-jose/go-jose/v4 v4.1.4
+	github.com/go-jose/go-jose/v4 v4.1.6
 	github.com/grafana/authlib v0.0.0-20260203153107-16a114a99f67 // @grafana/identity-access-team
 	github.com/grafana/authlib/types v0.0.0-20260203131350-b83e80394acc // @grafana/identity-access-team
 	github.com/stretchr/testify v1.12.1
@@ -44,15 +44,16 @@ require (
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.46.0 // indirect
-	go.opentelemetry.io/otel/metric v1.46.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.46.0 // indirect
-	go.opentelemetry.io/otel/trace v1.46.0 // indirect
+	go.opentelemetry.io/otel v1.47.0 // indirect
+	go.opentelemetry.io/otel/log v1.47.0 // indirect
+	go.opentelemetry.io/otel/metric v1.47.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.47.0 // indirect
+	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	golang.org/x/net v0.60.0 // indirect
-	golang.org/x/sync v0.23.0 // indirect
-	golang.org/x/sys v0.48.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260819154853-08b0e4226688 // indirect
 	google.golang.org/grpc v1.83.2 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
