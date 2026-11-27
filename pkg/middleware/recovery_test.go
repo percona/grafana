@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"errors"
+	"net/http"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -42,6 +44,19 @@ func TestRecoveryMiddleware(t *testing.T) {
 			// @PERCONA
 			assert.Contains(t, sc.resp.Body.String(), "<title>Percona Monitoring and Management</title>")
 		})
+	})
+}
+
+func TestErrorTemplateRendersFromReqContextHandle(t *testing.T) {
+	recoveryScenario(t, "error template should render from ReqContext.Handle", "/error", func(t *testing.T, sc *scenarioContext) {
+		sc.handlerFunc = func(c *contextmodel.ReqContext) {
+			c.Handle(sc.cfg, http.StatusBadRequest, "intentional error-page test", errors.New("intentional error-page test"))
+		}
+		sc.fakeReq("GET", "/error").exec()
+
+		assert.Equal(t, http.StatusBadRequest, sc.resp.Code)
+		assert.Equal(t, "text/html; charset=UTF-8", sc.resp.Header().Get("content-type"))
+		assert.Contains(t, sc.resp.Body.String(), "</html>")
 	})
 }
 

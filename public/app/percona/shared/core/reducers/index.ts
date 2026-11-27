@@ -12,7 +12,6 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { isPmmAdmin } from '../../helpers/permissions';
 import { SettingsUpdatedEvent } from '../events';
 
-import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
 import highAvailabilityReducer from './highAvailability/highAvailability';
 import navigationReducer from './navigation';
@@ -38,7 +37,6 @@ const initialSettingsState: Settings = {
   awsPartitions: [],
   alertManagerUrl: '',
   alertManagerRules: '',
-  advisorEnabled: false,
   alertingEnabled: false,
   alertingSettings: {
     email: {
@@ -50,11 +48,6 @@ const initialSettingsState: Settings = {
     slack: {
       url: '',
     },
-  },
-  advisorRunIntervals: {
-    rareInterval: '10s',
-    standardInterval: '10s',
-    frequentInterval: '10s',
   },
   defaultRoleId: 1,
   enableAccessControl: false,
@@ -149,7 +142,6 @@ export default {
     backupLocations: perconaBackupLocations,
     roles: rolesReducers,
     users: usersReducers,
-    advisors: advisorsReducers,
     updates: updatesReducers,
     highAvailability: highAvailabilityReducer,
   }),

@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { ServicesService } from 'app/percona/shared/services/services/Services.service';
-import { Service, ServiceType } from 'app/percona/shared/services/services/Services.types';
+import { Service } from 'app/percona/shared/services/services/Services.types';
 import { createAsyncThunk } from 'app/types/store';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
@@ -23,7 +23,6 @@ import {
 } from './services.utils';
 
 const initialState: ServicesState = {
-  activeTypes: Object.values(ServiceType) as ServiceType[],
   services: [],
   isLoading: false,
 };
@@ -55,22 +54,10 @@ const servicesSlice = createSlice({
       services: action.payload,
       isLoading: false,
     }));
-    builder.addCase(fetchActiveServiceTypesAction.fulfilled, (state, action) => ({
-      ...state,
-      activeTypes: action.payload,
-    }));
   },
 });
 
 export const { setServices, setLoading } = servicesSlice.actions;
-
-export const fetchActiveServiceTypesAction = createAsyncThunk<ServiceType[]>(
-  'percona/fetchActiveServiceTypes',
-  async () => {
-    const response = await ServicesService.getActive(undefined, true);
-    return response.service_types || [];
-  }
-);
 
 export const fetchServicesAction = createAsyncThunk<Service[], Partial<ListServicesParams>>(
   'percona/fetchServices',
@@ -101,7 +88,6 @@ export const removeServiceAction = createAsyncThunk(
         await ServicesService.removeService(body);
 
         thunkAPI.dispatch(fetchServicesAction({}));
-        thunkAPI.dispatch(fetchActiveServiceTypesAction());
       })()
     )
 );

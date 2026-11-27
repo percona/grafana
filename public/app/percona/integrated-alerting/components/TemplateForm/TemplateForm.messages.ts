@@ -18,6 +18,8 @@ export const Messages = {
     severity: 'The severity level for the alert triggered by this rule.',
     channels: 'Which contact points should be used to send the alert through.',
     filters: 'Apply rule only to required services or nodes.',
+    filtersQanHint:
+      "For Query Analytics (ClickHouse) templates, filters apply to the columns the query returns, e.g. service_name, node_name, region, environment. A label the query doesn't return counts as empty, as for metrics. Custom labels aren't available.",
   },
   filter: {
     header: 'Filters',
@@ -84,4 +86,6 @@ export const Messages = {
 
     return `${summary} (${paramDetails.join(', ')})`;
   },
+  getFiltersDescription: (showQanHint: boolean) =>
+    showQanHint ? `${Messages.tooltips.filters} ${Messages.tooltips.filtersQanHint}` : Messages.tooltips.filters,
 };
